@@ -1,0 +1,153 @@
+<html>
+	<head>
+		<title>Libreddit: r/{{sub}}</title>
+		<style>
+			* {
+				margin: 0px;
+			}
+
+			html {
+				background: black;
+			}
+
+			main {
+				max-width: 1000px;
+				margin: 0 auto;
+				padding: 0px 10px;
+			}
+
+			button {
+				background: none;
+				border: none;
+				color: inherit;
+				font-weight: bold;
+			}
+
+			a {
+				color: inherit;
+				text-decoration: none;
+			}
+
+			a:not(.post_right):hover {
+				text-decoration: underline;
+			}
+
+			header {
+				background: #111;
+				color: white;
+			}
+
+			.subreddit {
+				max-width: 1000px;
+				margin: 0 auto;
+				display: flex;
+			}
+
+			.subreddit_right {
+				display: flex;
+				flex-flow: column;
+				justify-content: center;
+			}
+
+			.subreddit_icon {
+				width: 100px;
+				height: 100px;
+				border-radius: 100%;
+				padding: 20px;
+			}
+
+			#sort {
+				max-width: 1000px;
+				margin: 20px auto 20px;
+				display: flex;
+				justify-content: start;
+				padding: 0px 10px;
+			}
+
+			#sort > div {
+				background: #111;
+				color: lightgrey;
+				border-radius: 5px;
+				margin-right: 5px;
+				padding: 10px;
+				width: 50px;
+				text-align: center;
+				cursor: pointer;
+			}
+
+			#sort > div:hover {
+				background: #222;
+			}
+
+			#sort > #sort_{{sort}} {
+				background: #333;
+				color: white;
+			}
+
+			.post {
+				border-radius: 5px;
+				background: #111;
+				display: flex;
+				color: white;
+			}
+
+			.post:hover {
+				background: #222;
+			}
+
+			.post:hover > .post_left {
+				background: #333;
+			}
+
+			.post_left, .post_right {
+				display: flex;
+				flex-direction: column;
+			}
+
+			.post_left {
+				text-align: center;
+				background: #222;
+				border-radius: 5px 0px 0px 5px;
+				color: white;
+				min-width: 75px;
+				padding: 10px 0px;
+			}
+
+			.post_score {
+				margin: 5px 0px;
+			}
+
+			.post_right {
+				padding: 10px 25px;
+				flex-grow: 1;
+				flex-shrink: 1;
+			}
+
+			.post_right > * {
+				margin: 5px;
+			}
+
+			.post_thumbnail {
+				object-fit: cover;
+				width: auto;
+				flex-shrink: 0;
+				border-radius: 0px 5px 5px 0px;
+			}
+
+			.post_thumbnail[src=""] {
+				border: none;
+			}
+		</style>
+	</head>
+	<body>
+		<header>{{{about}}}</header>
+		<div id="sort">
+			<div id="sort_hot"><a href="/r/{{sub}}/hot">Hot</a></div>
+			<div id="sort_top"><a href="/r/{{sub}}/top">Top</a></div>
+			<div id="sort_new"><a href="/r/{{sub}}/new">New</a></div>
+		</div>
+		<main>
+			{{{posts}}}
+		</main>
+	</body>
+</html>

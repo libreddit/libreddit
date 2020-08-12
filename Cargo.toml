@@ -1,0 +1,17 @@
+[package]
+name = "libreddit"
+version = "0.1.0"
+authors = ["Spike <3758624-spikecodes@users.noreply.gitlab.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+serde_json = "1.0"
+reqwest = { version = "0.10", features = ["blocking"] }
+rocket = "0.4.5"
+
+[dependencies.rocket_contrib]
+version = "0.4.5"
+default-features = false
+features = ["handlebars_templates", "tera_templates"]
