@@ -1,6 +1,10 @@
 # Libreddit
 
-> Libre + Reddit = Libreddit
+Libre + Reddit = Libreddit
+
+![](https://i.ibb.co/CsYPXJ8/image.png)
+
+## Features
 
 - 🚀 Fast: written in Rust for blazing fast speeds and safety
 - ☁️ Light: uses no javascript or ads
@@ -12,20 +16,9 @@ Think Invidious but for Reddit. Watch your cat videos without being watched.
 
 **Note**: Libreddit is still a WIP.
 
-## Contents
-
-- [Screenshot](#screenshot)
-- [Instances](#instances)
-- [Deploy an Instance](#deploy-an-instance)
-  - [Manual](#a-manual)
-
-## Screenshot
-
-![](https://i.ibb.co/CsYPXJ8/image.png)
-
 ## Instances
 
-- [libreddit.spike.codes](https://libreddit.spike.codes) (may not be up to date with code)
+- [libreddit.spike.codes](https://libreddit.spike.codes) 🇺🇸
 
 ## Deploy an Instance
 
