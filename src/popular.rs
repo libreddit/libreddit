@@ -4,11 +4,11 @@ use rocket_contrib::templates::Template;
 
 #[get("/")]
 pub fn page() -> Template {
-	let posts: String = subreddit::posts_html("popular", "best");
+	let posts: String = subreddit::posts_html("popular", "hot");
 
 	let mut context = std::collections::HashMap::new();
 	context.insert("about", String::new());
-	context.insert("sort", String::from("best"));
+	context.insert("sort", String::from("hot"));
 	context.insert("posts", posts);
 
 	Template::render("popular", context)

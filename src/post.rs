@@ -1,3 +1,5 @@
+extern crate comrak;
+use comrak::{markdown_to_html, ComrakOptions};
 use rocket_contrib::templates::Template;
 
 #[get("/r/<subreddit>/comments/<id>/<title>")]
@@ -17,9 +19,10 @@ pub fn page(subreddit: String, id: String, title: String) -> Template {
 pub struct Post {
 	pub title: String,
 	pub community: String,
+	pub body: String,
 	pub author: String,
 	pub score: i64,
-	pub image: String
+	pub media: String
 }
 
 pub struct Comment {
@@ -32,9 +35,8 @@ fn val (j: &serde_json::Value, k: &str) -> String { String::from(j["data"][k].as
 
 pub fn post_html (sub: &str, id: &str, title: &str) -> String {
 	let post: Post = fetch_post(String::from(sub), String::from(id), String::from(title)).unwrap();
-	println!("{}", post.image);
 	format!(r#"
-		<div class="post">
+		<div class="post" style="border: 2px solid #555;background: #222;">
 			<div class="post_left">
 				<button class="post_upvote">↑</button>
 				<h3 class="post_score">{}</h3>
@@ -48,11 +50,12 @@ pub fn post_html (sub: &str, id: &str, title: &str) -> String {
 					<a class="post_author" href="/u/{author}">u/{author}</a>
 				</p>
 				<h3 class="post_title">{t}</h3>
-				<img class="post_image" src="{img}">
+				{media}
+				<h4 class="post_body">{b}</h4>
 			</div>
 		</div><br>
 	"#, if post.score>1000{format!("{}k", post.score/1000)} else {post.score.to_string()}, sub = post.community,
-			author = post.author, t = post.title, img = post.image)
+			author = post.author, t = post.title, media = post.media, b = post.body)
 }
 
 fn comments_html (sub: String, id: String, title: String) -> String {
@@ -67,13 +70,28 @@ fn comments_html (sub: String, id: String, title: String) -> String {
 				</div>
 				<div class="post_right">
 					<p>Posted by <a class="post_author" href="/u/{author}">u/{author}</a></p>
-					<h3 class="post_title">{t}</h3>
+					<h4 class="post_body">{t}</h4>
 				</div>
 			</div><br>
 		"#, if comment.score>1000{format!("{}k", comment.score/1000)} else {comment.score.to_string()},
 				author = comment.author, t = comment.body);
 		html.push(hc)
 	}; html.join("\n")
+}
+
+fn media(data: &serde_json::Value) -> String {
+	let post_hint: &str = data["data"]["post_hint"].as_str().unwrap_or("");
+	let has_media: bool = data["data"]["media"].is_object();
+
+	let media: String = if !has_media { format!(r#"<h4 class="post_body"><a href="{u}">{u}</a></h4>"#, u=data["data"]["url"].as_str().unwrap()) }
+											else { format!(r#"<img class="post_image" src="{}.png"/>"#, data["data"]["url"].as_str().unwrap()) };
+
+	match post_hint {
+		"hosted:video" => format!(r#"<video class="post_image" src="{}" controls/>"#, data["data"]["media"]["reddit_video"]["fallback_url"].as_str().unwrap()),
+		"image" => format!(r#"<img class="post_image" src="{}"/>"#, data["data"]["url"].as_str().unwrap()),
+		"self" => String::from(""),
+		_ => media
+	}
 }
 
 fn fetch_post (sub: String, id: String, title: String) -> Result<Post, Box<dyn std::error::Error>> {
@@ -87,9 +105,10 @@ fn fetch_post (sub: String, id: String, title: String) -> Result<Post, Box<dyn s
 	Ok(Post {
 		title: val(post_data, "title"),
 		community: val(post_data, "subreddit"),
+		body: markdown_to_html(post_data["data"]["selftext"].as_str().unwrap(), &ComrakOptions::default()),
 		author: val(post_data, "author"),
 		score: post_data["data"]["score"].as_i64().unwrap(),
-		image: if post_data["data"]["post_hint"]=="image" { val(post_data, "url") } else { String::new() }
+		media: media(post_data)
 	})
 }
 
@@ -105,7 +124,7 @@ fn fetch_comments (sub: String, id: String, title: String) -> Result<Vec<Comment
 	
 	for comment in comment_data.iter() {
 		comments.push(Comment {
-			body: val(comment, "body"),
+			body: markdown_to_html(comment["data"]["body"].as_str().unwrap_or(""), &ComrakOptions::default()),
 			author: val(comment, "author"),
 			score: comment["data"]["score"].as_i64().unwrap_or(0)
 		});

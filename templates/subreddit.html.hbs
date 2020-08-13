@@ -4,10 +4,18 @@
 		<style>
 			* {
 				margin: 0px;
+				color: white;
 			}
 
 			html {
 				background: black;
+			}
+
+			header {
+				color: aqua;
+				background: #111;
+				padding: 10px;
+				border-bottom: 2px solid #222;
 			}
 
 			main {
@@ -19,7 +27,6 @@
 			button {
 				background: none;
 				border: none;
-				color: inherit;
 				font-weight: bold;
 			}
 
@@ -32,9 +39,8 @@
 				text-decoration: underline;
 			}
 
-			header {
+			#about {
 				background: #111;
-				color: white;
 			}
 
 			.subreddit {
@@ -81,14 +87,13 @@
 
 			#sort > #sort_{{sort}} {
 				background: #333;
-				color: white;
 			}
 
 			.post {
+				border: 2px solid #222;
 				border-radius: 5px;
 				background: #111;
 				display: flex;
-				color: white;
 			}
 
 			.post:hover {
@@ -105,10 +110,10 @@
 			}
 
 			.post_left {
+				display: none;
 				text-align: center;
 				background: #222;
 				border-radius: 5px 0px 0px 5px;
-				color: white;
 				min-width: 75px;
 				padding: 10px 0px;
 			}
@@ -127,6 +132,10 @@
 				margin: 5px;
 			}
 
+			.post_right > p {
+				opacity: 0.75;
+			}
+
 			.post_thumbnail {
 				object-fit: cover;
 				width: auto;
@@ -140,7 +149,8 @@
 		</style>
 	</head>
 	<body>
-		<header>{{{about}}}</header>
+		<header><a href="/">LIBREDDIT</a></header>
+		<div id="about">{{{about}}}</div>
 		<div id="sort">
 			<div id="sort_hot"><a href="/r/{{sub}}/hot">Hot</a></div>
 			<div id="sort_top"><a href="/r/{{sub}}/top">Top</a></div>
