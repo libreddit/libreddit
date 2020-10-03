@@ -2,7 +2,7 @@
 
 Libre + Reddit = Libreddit
 
-![](https://i.ibb.co/FVVmPGH/image.png)
+![](https://i.ibb.co/Kwwb1CK/image.png)
 
 ## Features
 
