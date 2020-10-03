@@ -47,5 +47,3 @@ Provides:
 - Free HTTPS url (https://\<app name\>.\<username\>\.repl\.co)
     - Supports custom domains
 - Downtime after periods of inactivity \([solution 1](https://repl.it/talk/ask/use-this-pingmat1replco-just-enter/28821/101298), [solution 2](https://repl.it/talk/learn/How-to-use-and-setup-UptimeRobot/9003)\) -->
-
-BTC: `bc1q72l5jtjcxlma8knwt80nwm5c9wccu45tt7y02g`
