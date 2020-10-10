@@ -11,6 +11,7 @@ serde_json = "1.0"
 reqwest = { version = "0.10", features = ["blocking"] }
 rocket = "0.4.5"
 comrak = "0.8"
+chrono = "0.4"
 
 [dependencies.rocket_contrib]
 version = "0.4.5"

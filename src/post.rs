@@ -1,15 +1,17 @@
 extern crate comrak;
 use comrak::{markdown_to_html, ComrakOptions};
 use rocket_contrib::templates::Template;
+use chrono::{TimeZone, Utc};
 
 #[get("/r/<subreddit>/comments/<id>/<title>")]
 pub fn page(subreddit: String, id: String, title: String) -> Template {
 	let post: String = post_html(subreddit.as_str(), id.as_str(), title.as_str());
-	let comments: String = comments_html(subreddit, id, title);
+	let comments: String = comments_html(subreddit, id, String::from(&title));
 
 	let mut context = std::collections::HashMap::new();
 	context.insert("comments", comments);
 	context.insert("post", post);
+	context.insert("title", title.replace("_", " "));
 	// context.insert("sort", String::from("hot"));
 	// context.insert("sub", String::from(subreddit.as_str()));
 
@@ -22,13 +24,15 @@ pub struct Post {
 	pub body: String,
 	pub author: String,
 	pub score: i64,
-	pub media: String
+	pub media: String,
+	pub time: String
 }
 
 pub struct Comment {
 	pub body: String,
 	pub author: String,
-	pub score: i64
+	pub score: i64,
+	pub time: String
 }
 
 fn val (j: &serde_json::Value, k: &str) -> String { String::from(j["data"][k].as_str().unwrap_or("")) }
@@ -48,6 +52,7 @@ pub fn post_html (sub: &str, id: &str, title: &str) -> String {
 					•
 					Posted by 
 					<a class="post_author" href="/u/{author}">u/{author}</a>
+					<span style="float: right;">{time}</span>
 				</p>
 				<h3 class="post_title">{t}</h3>
 				{media}
@@ -55,7 +60,7 @@ pub fn post_html (sub: &str, id: &str, title: &str) -> String {
 			</div>
 		</div><br>
 	"#, if post.score>1000{format!("{}k", post.score/1000)} else {post.score.to_string()}, sub = post.community,
-			author = post.author, t = post.title, media = post.media, b = post.body)
+			author = post.author, t = post.title, media = post.media, b = post.body, time = post.time)
 }
 
 fn comments_html (sub: String, id: String, title: String) -> String {
@@ -69,12 +74,16 @@ fn comments_html (sub: String, id: String, title: String) -> String {
 					<button class="post_upvote">↓</button>
 				</div>
 				<div class="post_right">
-					<p>Posted by <a class="post_author" href="/u/{author}">u/{author}</a></p>
+					<p>
+						Posted by <a class="post_author" href="/u/{author}">u/{author}</a>
+						<span style="float: right;">{time}</span>
+					</p>
 					<h4 class="post_body">{t}</h4>
+					
 				</div>
 			</div><br>
 		"#, if comment.score>1000{format!("{}k", comment.score/1000)} else {comment.score.to_string()},
-				author = comment.author, t = comment.body);
+				author = comment.author, t = comment.body, time = comment.time);
 		html.push(hc)
 	}; html.join("\n")
 }
@@ -102,13 +111,16 @@ fn fetch_post (sub: String, id: String, title: String) -> Result<Post, Box<dyn s
   
 	let post_data: &serde_json::Value = &data[0]["data"]["children"][0];
 
+	let unix_time: i64 = post_data["data"]["created_utc"].as_f64().unwrap().round() as i64;
+
 	Ok(Post {
 		title: val(post_data, "title"),
 		community: val(post_data, "subreddit"),
 		body: markdown_to_html(post_data["data"]["selftext"].as_str().unwrap(), &ComrakOptions::default()),
 		author: val(post_data, "author"),
 		score: post_data["data"]["score"].as_i64().unwrap(),
-		media: media(post_data)
+		media: media(post_data),
+		time: Utc.timestamp(unix_time, 0).to_string()
 	})
 }
 
@@ -123,10 +135,12 @@ fn fetch_comments (sub: String, id: String, title: String) -> Result<Vec<Comment
 	let mut comments: Vec<Comment> = Vec::new();
 	
 	for comment in comment_data.iter() {
+		let unix_time: i64 = comment["data"]["created_utc"].as_f64().unwrap_or(0.0).round() as i64;
 		comments.push(Comment {
 			body: markdown_to_html(comment["data"]["body"].as_str().unwrap_or(""), &ComrakOptions::default()),
 			author: val(comment, "author"),
-			score: comment["data"]["score"].as_i64().unwrap_or(0)
+			score: comment["data"]["score"].as_i64().unwrap_or(0),
+			time: Utc.timestamp(unix_time, 0).to_string()
 		});
 	}
 

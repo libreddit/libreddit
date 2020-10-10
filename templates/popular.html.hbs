@@ -1,6 +1,6 @@
 <html>
 	<head>
-		<title>Libreddit</title>
+		<title>Libreddit: Alternative private front-end to Reddit </title>
 		<style>
 			* {
 				transition: 0.2s all;
@@ -17,9 +17,11 @@
 				display: flex;
 				justify-content: space-between;
 				color: aqua;
-				background: #111;
-				padding: 10px;
-				border-bottom: 2px solid #222;
+				background: #151515;
+				padding: 15px;
+				font-weight: bold;
+				font-size: 20px;
+				/* border-bottom: 3px solid #222; */
 			}
 
 			main {
@@ -52,7 +54,7 @@
 			}
 
 			#sort > div {
-				background: #111;
+				background: #151515;
 				color: lightgrey;
 				border-radius: 5px;
 				margin-right: 5px;
@@ -60,6 +62,7 @@
 				width: 50px;
 				text-align: center;
 				cursor: pointer;
+				font-weight: bold;
 			}
 			
 			#sort > div:hover {
@@ -67,13 +70,14 @@
 			}
 
 			#sort > #sort_{{sort}} {
-				background: #333;
+				background: aqua;
+				color: black;
 			}
 
 			.post {
-				border: 2px solid #222;
+				/* border: 3px solid #222; */
 				border-radius: 5px;
-				background: #111;
+				background: #151515;
 				display: flex;
 			}
 
@@ -95,7 +99,7 @@
 				background: #222;
 				border-radius: 5px 0px 0px 5px;
 				min-width: 50px;
-				padding: 10px 0px;
+				padding: 5px;
 			}
 
 			.post_upvote {
@@ -103,11 +107,12 @@
 			}
 
 			.post_score {
-				margin-top: 10px;
+				margin-top: 1em;
+				color: aqua;
 			}
 
 			.post_right {
-				padding: 10px 25px;
+				padding: 20px 25px;
 				flex-grow: 1;
 				flex-shrink: 1;
 			}
@@ -124,7 +129,8 @@
 				object-fit: cover;
 				width: auto;
 				flex-shrink: 0;
-				border-radius: 0px 5px 5px 0px;
+				padding: 10px;
+				border-radius: 15px;
 			}
 
 			.post_thumbnail[src=""] {
@@ -133,7 +139,10 @@
 		</style>
 	</head>
 	<body>
-		<header><a href="/">LIBREDDIT</a><a style="color:white" href="https://github.com/spikecodes/libreddit">GITHUB</a></header>
+		<header>
+			<a href="/"><span style="color:white">lib</span>reddit.</a>
+			<a style="color:white" href="https://github.com/spikecodes/libreddit">GITHUB</a>
+		</header>
 		<div id="sort">
 			<div id="sort_hot"><a href="/hot">Hot</a></div>
 			<div id="sort_top"><a href="/top">Top</a></div>

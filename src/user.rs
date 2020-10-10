@@ -1,4 +1,5 @@
 use rocket_contrib::templates::Template;
+use chrono::{TimeZone, Utc};
 
 #[get("/u/<username>")]
 pub fn page(username: String) -> Template {
@@ -57,7 +58,8 @@ pub struct Post {
 	pub author: String,
 	pub score: i64,
 	pub image: String,
-	pub url: String
+	pub url: String,
+	pub time: String
 }
 
 fn user_val (j: &serde_json::Value, k: &str) -> String { String::from(j["data"]["subreddit"][k].as_str().unwrap()) }
@@ -94,13 +96,14 @@ pub fn posts_html (name: &str, sort: &str) -> String {
 						•
 						Posted by 
 						<a class="post_author" href="/u/{author}">u/{author}</a>
+						<span style="float: right;">{time}</span>
 					</p>
 					<h3 class="post_title"><a href="{u}">{t}</a></h3>
 				</div>
 				<img class="post_thumbnail" src="{thumb}">
 			</div><br>
 		"#, if post.score>1000{format!("{}k", post.score/1000)} else {post.score.to_string()}, sub = post.community,
-				author = post.author, u = post.url, t = post.title, thumb = post.image);
+				author = post.author, u = post.url, t = post.title, thumb = post.image, time = post.time);
 		html_posts.push(hp)
 	}; html_posts.join("\n")
 }
@@ -114,6 +117,8 @@ pub fn posts(name: &str, sort: &str) -> Result<Vec<Post>, Box<dyn std::error::Er
 	let post_list = popular["data"]["children"].as_array().unwrap();
 
 	let mut posts: Vec<Post> = Vec::new();
+
+	let unix_time: i64 = popular["data"]["created"].as_f64().unwrap().round() as i64;
 	
 	for post in post_list.iter() {
     if post_val(post, "title") == "Comment" { continue };
@@ -123,7 +128,8 @@ pub fn posts(name: &str, sort: &str) -> Result<Vec<Post>, Box<dyn std::error::Er
 			author: String::from(name),
 			score: post["data"]["score"].as_i64().unwrap(),
 			image: String::new(),
-			url: post_val(post, "permalink")
+			url: post_val(post, "permalink"),
+			time: Utc.timestamp(unix_time, 0).format("%d/%m/%y").to_string()
 		});
 	}
 

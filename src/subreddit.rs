@@ -1,4 +1,5 @@
 use rocket_contrib::templates::Template;
+use chrono::{TimeZone, Utc};
 
 #[allow(dead_code)]
 #[get("/r/<sub_name>")]
@@ -36,7 +37,8 @@ pub struct Post {
 	pub author: String,
 	pub score: i64,
 	pub image: String,
-	pub url: String
+	pub url: String,
+	pub time: String
 }
 
 pub struct Subreddit {
@@ -64,13 +66,14 @@ pub fn posts_html (sub: &str, sort: &str) -> String {
 						•
 						Posted by 
 						<a class="post_author" href="/u/{author}">u/{author}</a>
+						<span style="float: right;">{time}</span>
 					</p>
 					<h3 class="post_title"><a href="{u}">{t}</a></h3>
 				</div>
 				<img class="post_thumbnail" src="{thumb}">
 			</div><br>
 		"#, if post.score>1000{format!("{}k", post.score/1000)} else {post.score.to_string()}, sub = post.community,
-				author = post.author, u = post.url, t = post.title, thumb = post.image);
+				author = post.author, u = post.url, t = post.title, thumb = post.image, time = post.time);
 		html_posts.push(hp)
 	}; html_posts.join("\n")
 }
@@ -119,13 +122,15 @@ pub fn posts(sub: &str, sort: &str) -> Result<Vec<Post>, Box<dyn std::error::Err
 	
 	for post in post_list.iter() {
 		let img = if val(post, "thumbnail").starts_with("https:/") { val(post, "thumbnail") } else { String::new() };
+		let unix_time: i64 = post["data"]["created_utc"].as_f64().unwrap().round() as i64;
 		posts.push(Post {
 			title: val(post, "title"),
 			community: val(post, "subreddit"),
 			author: val(post, "author"),
 			score: post["data"]["score"].as_i64().unwrap(),
 			image: img,
-			url: val(post, "permalink")
+			url: val(post, "permalink"),
+			time: Utc.timestamp(unix_time, 0).format("%d/%m/%y").to_string()
 		});
 	}
 
