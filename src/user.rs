@@ -37,15 +37,16 @@ pub fn user_html(name: &str) -> String {
 			</div>
 			<div class="user_right">
 				<h2 class="user_name">u/{}</h2>
-				<p class="user_description">{}</p>
+				<p class="user_description"><span>Karma:</span> {} | <span>Description:</span> "{}"</p>
 			</div>
 		</div>
-	"#, user.icon, user.name, user.description)
+	"#, user.icon, user.name, user.karma, user.description)
 }
 
 pub struct User {
 	pub name: String,
 	pub icon: String,
+	pub karma: i64,
 	pub banner: String,
 	pub description: String
 }
@@ -71,6 +72,7 @@ pub fn user(name: &str) -> Result<User, Box<dyn std::error::Error>> {
   Ok(User {
     name: String::from(name),
     icon: user_val(&data, "icon_img"),
+		karma: data["data"]["total_karma"].as_i64().unwrap(),
     banner: user_val(&data, "banner_img"),
     description: user_val(&data, "public_description")
   })
