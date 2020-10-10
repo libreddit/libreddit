@@ -37,7 +37,7 @@ pub fn post_html (sub: &str, id: &str, title: &str) -> String {
 	let post: Post = fetch_post(String::from(sub), String::from(id), String::from(title)).unwrap();
 	format!(r#"
 		<div class="post" style="border: 2px solid #555;background: #222;">
-			<div class="post_left">
+			<div class="post_left" style="background: #333;">
 				<button class="post_upvote">↑</button>
 				<h3 class="post_score">{}</h3>
 				<button class="post_upvote">↓</button>
