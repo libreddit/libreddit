@@ -1,13 +1,11 @@
 # Libreddit
 
+> An alternative private front-end to Reddit 
+
 Libre + Reddit = Libreddit
 
-![](https://i.ibb.co/Kwwb1CK/image.png)
-
-## Features
-
 - 🚀 Fast: written in Rust for blazing fast speeds and safety
-- ☁️ Light: uses no javascript or ads
+- ☁️ Light: no javascript, no ads, no tracking
 - 🕵 Private: ~~all~~ most requests are proxied through the server (images are still loaded from Reddit)
 - 🔒 Safe: does not rely on Reddit's closed APIs 
 - 📱 Responsive: works great on mobile!
@@ -15,6 +13,10 @@ Libre + Reddit = Libreddit
 Think Invidious but for Reddit. Watch your cat videos without being watched.
 
 **Note**: Libreddit is still a WIP.
+
+## Screenshot
+
+![](https://i.ibb.co/Kwwb1CK/image.png)
 
 ## Instances
 
@@ -38,12 +40,14 @@ cd libreddit
 cargo run
 ```
 
-<!-- ### B) Repl.it
+### B) Docker
 
-[![Run on Repl.it](https://repl.it/badge/github/spikecodes/libreddit)](https://repl.it/github/spikecodes/libreddit)
+Deploy the Docker image of Libreddit:
+```
+docker run -d --name libreddit -p 8080:8080 spikecodes/libreddit
+```
 
-Provides:
-- Free deployment of app (can be ran without account)
-- Free HTTPS url (https://\<app name\>.\<username\>\.repl\.co)
-    - Supports custom domains
-- Downtime after periods of inactivity \([solution 1](https://repl.it/talk/ask/use-this-pingmat1replco-just-enter/28821/101298), [solution 2](https://repl.it/talk/learn/How-to-use-and-setup-UptimeRobot/9003)\) -->
+Deploy using a different port (in this case, port 80):
+```
+docker run -d --name libreddit -p 80:8080 spikecodes/libreddit
+```
