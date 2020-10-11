@@ -118,9 +118,8 @@ pub fn posts(name: &str, sort: &str) -> Result<Vec<Post>, Box<dyn std::error::Er
 
 	let mut posts: Vec<Post> = Vec::new();
 
-	let unix_time: i64 = popular["data"]["created"].as_f64().unwrap().round() as i64;
-	
 	for post in post_list.iter() {
+		let unix_time: i64 = post["data"]["created_utc"].as_f64().unwrap().round() as i64;
     if post_val(post, "title") == "Comment" { continue };
 		posts.push(Post {
 			title: post_val(post, "title"),
