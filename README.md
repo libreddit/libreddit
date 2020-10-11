@@ -44,10 +44,10 @@ cargo run
 
 Deploy the Docker image of Libreddit:
 ```
-docker run -d --name libreddit -p 8080:8080 spikecodes/libreddit
+docker run -d --name libreddit -p 8000:8000 spikecodes/libreddit
 ```
 
 Deploy using a different port (in this case, port 80):
 ```
-docker run -d --name libreddit -p 80:8080 spikecodes/libreddit
+docker run -d --name libreddit -p 80:8000 spikecodes/libreddit
 ```
