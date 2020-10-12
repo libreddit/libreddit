@@ -16,7 +16,7 @@ Think Invidious but for Reddit. Watch your cat videos without being watched.
 
 ## Screenshot
 
-![](https://i.ibb.co/Kwwb1CK/image.png)
+![](https://i.ibb.co/SfFHDhh/image.png)
 
 ## Instances
 
@@ -26,7 +26,7 @@ Think Invidious but for Reddit. Watch your cat videos without being watched.
 
 ### A) Manual
 
-Make sure you have [Rust](https://rust-lang.org) installed first or else `cargo` commands won't work.Libreddit uses Rocket for the web server and as of now, Rocket requires Rust Nightly.
+Make sure you have [Rust](https://rust-lang.org) installed first or else `cargo` commands won't work. Libreddit uses Rocket for the web server and as of now, Rocket requires Rust Nightly.
 
 ```
 rustup default nightly
