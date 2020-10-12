@@ -26,7 +26,8 @@ fn main() {
 		subreddit::sorted,
 		user::page,
 		user::sorted,
-		post::page
+		post::page,
+		post::sorted
 	];
 
 	rocket::ignite().mount("/", routes).attach(Template::fairing()).launch();

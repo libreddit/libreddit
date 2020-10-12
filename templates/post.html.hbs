@@ -79,8 +79,7 @@
 				color: lightgrey;
 				border-radius: 5px;
 				margin-right: 5px;
-				padding: 10px;
-				width: 50px;
+				padding: 10px 20px;
 				text-align: center;
 				cursor: pointer;
 				font-weight: bold;
@@ -176,13 +175,16 @@
 			<a href="/"><span style="color:white">lib</span>reddit.</a>
 			<a style="color:white" href="https://github.com/spikecodes/libreddit">GITHUB</a>
 		</header>
-    {{!-- <div id="sort">
-			<div id="sort_new"><a href="/u/{{user}}/?sort=new">New</a></div>
-			<div id="sort_hot"><a href="/u/{{user}}/?sort=hot">Hot</a></div>
-			<div id="sort_top"><a href="/u/{{user}}/?sort=top">Top</a></div>
-		</div> --}}
 		<main>
 			{{{post}}}
+			<div id="sort">
+				<div id="sort_confidence"><a href="{{url}}/confidence">Best</a></div>
+				<div id="sort_top"><a href="{{url}}/top">Top</a></div>
+				<div id="sort_new"><a href="{{url}}/new">New</a></div>
+				<div id="sort_controversial"><a href="{{url}}/controversial">Controversial</a></div>
+				<div id="sort_old"><a href="{{url}}/old">Old</a></div>
+				<!-- <div id="sort_qa"><a href="{{url}}/qa">Q&A</a></div> -->
+			</div>
 			{{{comments}}}
 		</main>
 	</body>

@@ -4,21 +4,16 @@ use chrono::{TimeZone, Utc};
 #[allow(dead_code)]
 #[get("/r/<sub_name>")]
 pub fn page(sub_name: String) -> Template {
-	let about: String = if sub_name != "popular" { subreddit_html(sub_name.as_str()) } else {String::new()};
-	let posts: String = posts_html(sub_name.as_str(), "hot");
-
-	let mut context = std::collections::HashMap::new();
-	context.insert("about", about);
-	context.insert("sort", String::from("hot"));
-	context.insert("sub", sub_name);
-	context.insert("posts", posts);
-
-	Template::render("subreddit", context)
+	render(sub_name, String::from("hot"))
 }
 
 #[allow(dead_code)]
 #[get("/r/<sub_name>/<sort>")]
 pub fn sorted(sub_name: String, sort: String) -> Template {
+	render(sub_name, sort)
+}
+
+pub fn render(sub_name: String, sort: String) -> Template {
 	let about: String = if sub_name != "popular" { subreddit_html(sub_name.as_str()) } else {String::new()};
 	let posts: String = posts_html(sub_name.as_str(), sort.as_str());
 

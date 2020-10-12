@@ -5,14 +5,24 @@ use chrono::{TimeZone, Utc};
 
 #[get("/r/<subreddit>/comments/<id>/<title>")]
 pub fn page(subreddit: String, id: String, title: String) -> Template {
+	render(subreddit, id, title, String::from("confidence"))
+}
+#[get("/r/<subreddit>/comments/<id>/<title>/<sort>")]
+pub fn sorted(subreddit: String, id: String, title: String, sort: String) -> Template {
+	print!("{}", sort);
+	render(subreddit, id, title, sort)
+}
+
+pub fn render(subreddit: String, id: String, title: String, sort: String) -> Template {
 	let post: String = post_html(subreddit.as_str(), id.as_str(), title.as_str());
-	let comments: String = comments_html(subreddit, id, String::from(&title));
+	let comments: String = comments_html(String::from(&subreddit), String::from(&id), String::from(&title), String::from(&sort));
 
 	let mut context = std::collections::HashMap::new();
 	context.insert("comments", comments);
 	context.insert("post", post);
 	context.insert("title", title.replace("_", " "));
-	// context.insert("sort", String::from("hot"));
+	context.insert("sort", sort);
+	context.insert("url", format!("/r/{}/comments/{}/{}", subreddit, id, title));
 	// context.insert("sub", String::from(subreddit.as_str()));
 
 	Template::render("post", context)
@@ -63,9 +73,9 @@ pub fn post_html (sub: &str, id: &str, title: &str) -> String {
 			author = post.author, t = post.title, media = post.media, b = post.body, time = post.time)
 }
 
-fn comments_html (sub: String, id: String, title: String) -> String {
+fn comments_html (sub: String, id: String, title: String, sort: String) -> String {
 	let mut html: Vec<String> = Vec::new();
-	for comment in fetch_comments(sub, id, title).unwrap().iter() {
+	for comment in fetch_comments(sub, id, title, sort).unwrap().iter() {
 		let hc: String = format!(r#"
 			<div class="post">
 				<div class="post_left">
@@ -124,8 +134,8 @@ fn fetch_post (sub: String, id: String, title: String) -> Result<Post, Box<dyn s
 	})
 }
 
-fn fetch_comments (sub: String, id: String, title: String) -> Result<Vec<Comment>, Box<dyn std::error::Error>> {
-  let url: String = format!("https://www.reddit.com/r/{}/comments/{}/{}.json", sub, id, title);
+fn fetch_comments (sub: String, id: String, title: String, sort: String) -> Result<Vec<Comment>, Box<dyn std::error::Error>> {
+  let url: String = format!("https://www.reddit.com/r/{}/comments/{}/{}.json?sort={}", sub, id, title, sort);
 	let resp: String = reqwest::blocking::get(&url)?.text()?;
   
   let data: serde_json::Value = serde_json::from_str(resp.as_str())?;
