@@ -1,0 +1,51 @@
+<html>
+	<head>
+		<title>Libreddit: u/{{ user.name }}</title>
+		<meta name="description" content="View on Libreddit, an alternative private front-end to Reddit.">
+		<link rel="stylesheet" href="/style.css">
+	</head>
+	<body>
+		<header>
+			<a href="/"><span style="color:white">lib</span>reddit.</a>
+			<a style="color:white" href="https://github.com/spikecodes/libreddit">GITHUB</a>
+		</header>
+		<div id="about">
+			<div class="user">
+				<div class="user_left">
+					<img class="user_icon" src="{{ user.icon }}">
+				</div>
+				<div class="user_right">
+					<h2 class="user_name">u/{{ user.name }}</h2>
+					<p class="user_description"><span>Karma:</span> {{ user.karma }} | <span>Description:</span> "{{ user.description }}"</p>
+				</div>
+			</div>
+		</div>
+		<main>
+			<div id="sort">
+				<div id="sort_hot"><a href="/u/{{ user.name }}/?sort=hot">Hot</a></div>
+				<div id="sort_top"><a href="/u/{{ user.name }}/?sort=top">Top</a></div>
+				<div id="sort_new"><a href="/u/{{ user.name }}/?sort=new">New</a></div>
+			</div>
+			{% for post in posts %}
+			<div class="post">
+				<div class="post_left">
+					<button class="post_upvote">↑</button>
+					<h3 class="post_score">{{ post.score }}</h3>
+					<button class="post_upvote">↓</button>
+				</div>
+				<div class="post_right">
+					<p>
+						<b><a class="post_subreddit" href="/r/{{ post.community }}">r/{{ post.community }}</a></b>
+						&bull;
+						Posted by 
+						<a class="post_author" href="/u/{{ post.author }}">u/{{ post.author }}</a>
+						<span style="float: right;">{{ post.time }}</span>
+					</p>
+					<h3 class="post_title"><a href="{{ post.url }}">{{ post.title }}</a></h3>
+				</div>
+				<img class="post_thumbnail" src="{{ post.image }}">
+			</div><br>
+			{% endfor %}
+		</main>
+	</body>
+</html>

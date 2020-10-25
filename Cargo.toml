@@ -1,0 +1,17 @@
+[package]
+name = "libreddit-actix"
+version = "0.1.0"
+authors = ["spikecodes <19519553+spikecodes@users.noreply.github.com>"]
+edition = "2018"
+
+[dependencies]
+actix-web = "3"
+actix-files = "0.4.0"
+askama = "0.9"
+serde_json = "1.0"
+reqwest = { version = "0.10", features = ["blocking"] }
+comrak = "0.8"
+chrono = "0.4"
+
+[build-dependencies]
+askama = "0.9"

@@ -1,0 +1,64 @@
+<html>
+	<head>
+		<title>{{ post.title }} - r/{{ post.community }}</title>
+		<meta name="author" content="u/{{ post.author }}">
+		<meta name="description" content="View on Libreddit, an alternative private front-end to Reddit.">
+		<link rel="stylesheet" href="/style.css">
+		<style>
+			/* #sort > #sort_{{ sort }} {
+				background: aqua;
+				color: black;
+			} */
+		</style>
+	</head>
+	<body>
+		<header>
+			<a href="/"><span style="color:white">lib</span>reddit.</a>
+			<a style="color:white" href="https://github.com/spikecodes/libreddit">GITHUB</a>
+		</header>
+		<main>
+			<div class="post" style="border: 2px solid #555;background: #222;">
+				<div class="post_left" style="background: #333;">
+					<button class="post_upvote">↑</button>
+					<h3 class="post_score">{{ post.score }}</h3>
+					<button class="post_upvote">↓</button>
+				</div>
+				<div class="post_right">
+					<p>
+						<b><a class="post_subreddit" href="/r/{{ post.community }}">r/{{ post.community }}</a></b>
+						&bull;
+						Posted by 
+						<a class="post_author" href="/u/{{ post.author }}">u/{{ post.author }}</a>
+						<span style="float: right;">{{ post.time }}</span>
+					</p>
+					<h3 class="post_title">{{ post.title }}</h3>
+					{{ post.media }}
+					<h4 class="post_body">{{ post.body }}</h4>
+				</div>
+			</div>
+			<div id="sort">
+				<div id="sort_confidence"><a href="{{ post.url }}confidence">Best</a></div>
+				<div id="sort_top"><a href="{{ post.url }}top">Top</a></div>
+				<div id="sort_new"><a href="{{ post.url }}new">New</a></div>
+				<div id="sort_controversial"><a href="{{ post.url }}controversial">Controversial</a></div>
+				<div id="sort_old"><a href="{{ post.url }}old">Old</a></div>
+			</div>
+			{% for comment in comments %}
+			<div class="comment">
+				<div class="comment_left">
+					<button class="comment_upvote">↑</button>
+					<h3 class="comment_score">{{ comment.score }}</h3>
+					<button class="comment_upvote">↓</button>
+				</div>
+				<div class="comment_right">
+					<p>
+						Posted by <a class="comment_author" href="/u/{{ comment.author }}">u/{{ comment.author }}</a>
+						<span style="float: right;">{{ comment.time }}</span>
+					</p>
+					<h4 class="comment_body">{{ comment.body }}</h4>
+				</div>
+			</div><br>
+			{% endfor %}
+		</main>
+	</body>
+</html>
