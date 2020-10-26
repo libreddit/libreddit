@@ -1,5 +1,5 @@
 [package]
-name = "libreddit-actix"
+name = "libreddit"
 version = "0.1.0"
 authors = ["spikecodes <19519553+spikecodes@users.noreply.github.com>"]
 edition = "2018"
