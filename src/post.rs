@@ -43,6 +43,9 @@ async fn render(id: String, sort: String) -> Result<HttpResponse> {
 	}
 	.render()
 	.unwrap();
+
+	// println!("{}", s);
+	
 	Ok(HttpResponse::Ok().content_type("text/html").body(s))
 }
 
@@ -80,13 +83,6 @@ async fn media(data: &serde_json::Value) -> String {
 	}
 }
 
-fn html_escape(input: String) -> String {
-	input
-		.replace("&", "&amp;")
-		.replace("’", "&#39;")
-		.replace("\"", "&quot;")
-}
-
 // POSTS
 async fn fetch_post (id: &String) -> Post {
 	let url: String = format!("https://reddit.com/{}.json", id);
@@ -100,9 +96,9 @@ async fn fetch_post (id: &String) -> Post {
 	let score = post_data["data"]["score"].as_i64().unwrap();
 
 	Post {
-		title: html_escape(val(post_data, "title").await),
+		title: val(post_data, "title").await,
 		community: val(post_data, "subreddit").await,
-		body: html_escape(markdown_to_html(post_data["data"]["selftext"].as_str().unwrap(), &ComrakOptions::default())),
+		body: markdown_to_html(post_data["data"]["selftext"].as_str().unwrap(), &ComrakOptions::default()),
 		author: val(post_data, "author").await,
 		url: val(post_data, "permalink").await,
 		score: if score>1000 {format!("{}k",score/1000)} else {score.to_string()},
@@ -127,8 +123,10 @@ async fn fetch_comments (id: String, sort: &String) -> Result<Vec<Comment>, Box<
 		let score = comment["data"]["score"].as_i64().unwrap_or(0);
 		let body = markdown_to_html(comment["data"]["body"].as_str().unwrap_or(""), &ComrakOptions::default());
 
+		// println!("{}", body);
+
 		comments.push(Comment {
-			body: html_escape(body),
+			body: body,
 			author: val(comment, "author").await,
 			score: if score>1000 {format!("{}k",score/1000)} else {score.to_string()},
 			time: Utc.timestamp(unix_time, 0).format("%b %e %Y %H:%M UTC").to_string()

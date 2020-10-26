@@ -62,13 +62,6 @@ async fn sorted(web::Path((sub, sort)): web::Path<(String, String)>) -> Result<H
 // UTILITIES
 async fn val (j: &serde_json::Value, k: &str) -> String { String::from(j["data"][k].as_str().unwrap_or("")) }
 
-fn html_escape(input: String) -> String {
-	input
-		.replace("&", "&amp;")
-		.replace("’", "&#39;")
-		.replace("\"", "&quot;")
-}
-
 // SUBREDDIT
 async fn subreddit(sub: &String) -> Subreddit {
 	let url: String = format!("https://www.reddit.com/r/{}/about.json", sub);
@@ -82,8 +75,8 @@ async fn subreddit(sub: &String) -> Subreddit {
 
   Subreddit {
 		name: val(&data, "display_name").await,
-		title: html_escape(val(&data, "title").await),
-		description: html_escape(val(&data, "public_description").await),
+		title: val(&data, "title").await,
+		description: val(&data, "public_description").await,
 		icon: String::from(icon_parts[0]),
 	}
 }
@@ -103,7 +96,7 @@ pub async fn posts(sub: String, sort: &String) -> Vec<Post> {
     let unix_time: i64 = post["data"]["created_utc"].as_f64().unwrap().round() as i64;
     let score = post["data"]["score"].as_i64().unwrap();
 		posts.push(Post {
-			title: html_escape(val(post, "title").await),
+			title: val(post, "title").await,
 			community: val(post, "subreddit").await,
 			author: val(post, "author").await,
 			score: if score>1000 {format!("{}k",score/1000)} else {score.to_string()},

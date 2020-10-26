@@ -263,6 +263,7 @@ span {
 }
 
 .comment_right {
+	word-wrap: anywhere;
 	padding: 20px 25px;
 	flex-grow: 1;
 	flex-shrink: 1;

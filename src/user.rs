@@ -61,13 +61,6 @@ async fn sorted(web::Path((username, sort)): web::Path<(String, String)>) -> Res
 async fn user_val (j: &serde_json::Value, k: &str) -> String { String::from(j["data"]["subreddit"][k].as_str().unwrap()) }
 async fn post_val (j: &serde_json::Value, k: &str) -> String { String::from(j["data"][k].as_str().unwrap_or("Comment")) }
 
-fn html_escape(input: String) -> String {
-	input
-		.replace("&", "&amp;")
-		.replace("’", "&#39;")
-		.replace("\"", "&quot;")
-}
-
 // USER
 async fn user(name: &String) -> User {
 	let url: String = format!("https://www.reddit.com/user/{}/about.json", name);
@@ -80,7 +73,7 @@ async fn user(name: &String) -> User {
 		icon: user_val(&data, "icon_img").await,
 		karma: data["data"]["total_karma"].as_i64().unwrap(),
 		banner: user_val(&data, "banner_img").await,
-		description: html_escape(user_val(&data, "public_description").await)
+		description: user_val(&data, "public_description").await
 	}
 }
 
@@ -99,7 +92,7 @@ async fn posts(sub: String, sort: &String) -> Vec<Post> {
 		let unix_time: i64 = post["data"]["created_utc"].as_f64().unwrap().round() as i64;
 		let score = post["data"]["score"].as_i64().unwrap();
 		posts.push(Post {
-			title: html_escape(post_val(post, "title").await),
+			title: post_val(post, "title").await,
 			community: post_val(post, "subreddit").await,
 			author: post_val(post, "author").await,
 			score: if score>1000 {format!("{}k",score/1000)} else {score.to_string()},
