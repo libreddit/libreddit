@@ -1,5 +1,4 @@
 // CRATES
-extern crate comrak;
 use actix_web::{get, HttpResponse, Result};
 use askama::Template;
 

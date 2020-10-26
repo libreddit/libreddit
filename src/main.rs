@@ -1,5 +1,4 @@
 // Import Crates
-extern crate comrak;
 use actix_files::NamedFile;
 use actix_web::{get, App, HttpServer, HttpResponse, Result};
 

@@ -1,7 +1,7 @@
 // CRATES
 use actix_web::{get, web, HttpResponse, Result};
 use askama::Template;
-use comrak::{markdown_to_html, ComrakOptions};
+use pulldown_cmark::{Parser, Options, html};
 use chrono::{TimeZone, Utc};
 
 // STRUCTS
@@ -83,6 +83,20 @@ async fn media(data: &serde_json::Value) -> String {
 	}
 }
 
+async fn markdown_to_html(md: &str) -> String {
+	let mut options = Options::empty();
+	options.insert(Options::ENABLE_TABLES);
+	options.insert(Options::ENABLE_FOOTNOTES);
+	options.insert(Options::ENABLE_STRIKETHROUGH);
+	options.insert(Options::ENABLE_TASKLISTS);
+	let parser = Parser::new_ext(md, options);
+
+	// Write to String buffer.
+	let mut html_output = String::new();
+	html::push_html(&mut html_output, parser);
+	html_output
+}
+
 // POSTS
 async fn fetch_post (id: &String) -> Post {
 	let url: String = format!("https://reddit.com/{}.json", id);
@@ -98,7 +112,7 @@ async fn fetch_post (id: &String) -> Post {
 	Post {
 		title: val(post_data, "title").await,
 		community: val(post_data, "subreddit").await,
-		body: markdown_to_html(post_data["data"]["selftext"].as_str().unwrap(), &ComrakOptions::default()),
+		body: markdown_to_html(post_data["data"]["selftext"].as_str().unwrap()).await, //markdown_to_html(post_data["data"]["selftext"].as_str().unwrap(), &ComrakOptions::default()),
 		author: val(post_data, "author").await,
 		url: val(post_data, "permalink").await,
 		score: if score>1000 {format!("{}k",score/1000)} else {score.to_string()},
@@ -121,7 +135,7 @@ async fn fetch_comments (id: String, sort: &String) -> Result<Vec<Comment>, Box<
 	for comment in comment_data.iter() {
 		let unix_time: i64 = comment["data"]["created_utc"].as_f64().unwrap_or(0.0).round() as i64;
 		let score = comment["data"]["score"].as_i64().unwrap_or(0);
-		let body = markdown_to_html(comment["data"]["body"].as_str().unwrap_or(""), &ComrakOptions::default());
+		let body = markdown_to_html(comment["data"]["body"].as_str().unwrap_or("")).await;// markdown_to_html(comment["data"]["body"].as_str().unwrap_or(""), &ComrakOptions::default());
 
 		// println!("{}", body);
 

@@ -1,5 +1,4 @@
 // CRATES
-extern crate comrak;
 use actix_web::{get, web, HttpResponse, Result};
 use askama::Template;
 use chrono::{TimeZone, Utc};

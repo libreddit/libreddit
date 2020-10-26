@@ -300,3 +300,15 @@ span {
 	text-decoration: underline;
 	color: aqua;
 }
+
+/* Tables */
+
+table {
+	border: 3px #333 solid;
+	border-spacing: 0rem;
+}
+
+td, th {
+	border: 1px #333 solid;
+	padding: 0.5em;
+}
