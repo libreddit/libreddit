@@ -1,5 +1,4 @@
 // CRATES
-extern crate comrak;
 use actix_web::{get, web, HttpResponse, Result};
 use askama::Template;
 use comrak::{markdown_to_html, ComrakOptions};
@@ -28,7 +27,7 @@ pub struct Post {
 pub struct Comment {
 	pub body: String,
 	pub author: String,
-	pub score: i64,
+	pub score: String,
 	pub time: String
 }
 
@@ -53,7 +52,7 @@ async fn short(web::Path(id): web::Path<String>) -> Result<HttpResponse> {
 	render(id.to_string(), "confidence".to_string()).await
 }
 
-#[get("/r/{sub}/comments/{id}/{title}")]
+#[get("/r/{sub}/comments/{id}/{title}/")]
 async fn page(web::Path((_sub, id)): web::Path<(String, String)>) -> Result<HttpResponse> {
 	render(id.to_string(), "confidence".to_string()).await
 }
@@ -81,32 +80,14 @@ async fn media(data: &serde_json::Value) -> String {
 	}
 }
 
-// POSTS
-// async fn post_html (post: Post) -> String {
-// 	format!(r#"
-// 		<div class="post" style="border: 2px solid #555;background: #222;">
-// 			<div class="post_left" style="background: #333;">
-// 				<button class="post_upvote">↑</button>
-// 				<h3 class="post_score">{}</h3>
-// 				<button class="post_upvote">↓</button>
-// 			</div>
-// 			<div class="post_right">
-// 				<p>
-// 					<b><a class="post_subreddit" href="/r/{sub}">r/{sub}</a></b>
-// 					•
-// 					Posted by 
-// 					<a class="post_author" href="/u/{author}">u/{author}</a>
-// 					<span style="float: right;">{time}</span>
-// 				</p>
-// 				<h3 class="post_title">{t}</h3>
-// 				{media}
-// 				<h4 class="post_body">{b}</h4>
-// 			</div>
-// 		</div><br>
-// 	"#, if post.score>1000{format!("{}k", post.score/1000)} else {post.score.to_string()}, sub = post.community,
-// 			author = post.author, t = post.title, media = post.media, b = post.body, time = post.time)
-// }
+fn html_escape(input: String) -> String {
+	input
+		.replace("&", "&amp;")
+		.replace("’", "&#39;")
+		.replace("\"", "&quot;")
+}
 
+// POSTS
 async fn fetch_post (id: &String) -> Post {
 	let url: String = format!("https://reddit.com/{}.json", id);
 	let resp: String = reqwest::get(&url).await.unwrap().text().await.unwrap();
@@ -119,9 +100,9 @@ async fn fetch_post (id: &String) -> Post {
 	let score = post_data["data"]["score"].as_i64().unwrap();
 
 	Post {
-		title: val(post_data, "title").await,
+		title: html_escape(val(post_data, "title").await),
 		community: val(post_data, "subreddit").await,
-		body: markdown_to_html(post_data["data"]["selftext"].as_str().unwrap(), &ComrakOptions::default()),
+		body: html_escape(markdown_to_html(post_data["data"]["selftext"].as_str().unwrap(), &ComrakOptions::default())),
 		author: val(post_data, "author").await,
 		url: val(post_data, "permalink").await,
 		score: if score>1000 {format!("{}k",score/1000)} else {score.to_string()},
@@ -143,37 +124,16 @@ async fn fetch_comments (id: String, sort: &String) -> Result<Vec<Comment>, Box<
 	
 	for comment in comment_data.iter() {
 		let unix_time: i64 = comment["data"]["created_utc"].as_f64().unwrap_or(0.0).round() as i64;
+		let score = comment["data"]["score"].as_i64().unwrap_or(0);
+		let body = markdown_to_html(comment["data"]["body"].as_str().unwrap_or(""), &ComrakOptions::default());
+
 		comments.push(Comment {
-			body: markdown_to_html(comment["data"]["body"].as_str().unwrap_or(""), &ComrakOptions::default()),
+			body: html_escape(body),
 			author: val(comment, "author").await,
-			score: comment["data"]["score"].as_i64().unwrap_or(0),
+			score: if score>1000 {format!("{}k",score/1000)} else {score.to_string()},
 			time: Utc.timestamp(unix_time, 0).format("%b %e %Y %H:%M UTC").to_string()
 		});
 	}
 
 	Ok(comments)
 }
-
-// async fn comments_html (comments: Vec<Comment>) -> String {
-// 	let mut html: Vec<String> = Vec::new();
-// 	for comment in comments.iter() {
-// 		let hc: String = format!(r#"
-// 			<div class="post">
-// 				<div class="post_left">
-// 					<button class="post_upvote">↑</button>
-// 					<h3 class="post_score">{}</h3>
-// 					<button class="post_upvote">↓</button>
-// 				</div>
-// 				<div class="post_right">
-// 					<p>
-// 						Posted by <a class="post_author" href="/u/{author}">u/{author}</a>
-// 						<span style="float: right;">{time}</span>
-// 					</p>
-// 					<h4 class="post_body">{t}</h4>		
-// 				</div>
-// 			</div><br>
-// 		"#, if comment.score>1000{format!("{}k", comment.score/1000)} else {comment.score.to_string()},
-// 				author = comment.author, t = comment.body, time = comment.time);
-// 		html.push(hc)
-// 	}; html.join("\n")
-// }

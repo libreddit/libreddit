@@ -232,10 +232,6 @@ span {
 	background: #222;
 }
 
-.comment:hover > .comment_left {
-	background: #333;
-}
-
 .comment_left, .comment_right {
 	display: flex;
 	flex-direction: column;
@@ -243,7 +239,7 @@ span {
 
 .comment_left {
 	text-align: center;
-	background: #222;
+	border-right: 2px solid #000;
 	border-radius: 5px 0px 0px 5px;
 	min-width: 50px;
 	padding: 5px;
