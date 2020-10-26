@@ -1,5 +1,6 @@
 // CRATES
-use actix_web::{get, HttpResponse, Result};
+use actix_web::{get, web, HttpResponse, Result};
+use serde::Deserialize;
 use askama::Template;
 
 #[path = "subreddit.rs"] mod subreddit;
@@ -12,9 +13,17 @@ struct PopularTemplate {
 	sort: String
 }
 
+#[derive(Deserialize)]
+pub struct Params {
+  sort: Option<String>
+}
+
 #[get("/")]
-pub async fn page() -> Result<HttpResponse> {
-	render("popular".to_string(), "hot".to_string()).await
+pub async fn page(params: web::Query<Params>) -> Result<HttpResponse> {
+	match &params.sort {
+    Some(sort) => render("popular".to_string(), sort.to_string()).await,
+    None => render("popular".to_string(), "hot".to_string()).await,
+	}
 }
 
 async fn render(sub_name: String, sort: String) -> Result<HttpResponse> {
