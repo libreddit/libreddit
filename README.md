@@ -61,12 +61,12 @@ Think Invidious but for Reddit. Watch your cat videos without being watched.
 
 ## Deploy an Instance
 
-### A) Manual
+### A) Cargo
 
 Make sure Rust stable is installed along with `cargo`, Rust's package manager.
 
 ```
-cargo install --git https://github.com/spikecodes/libreddit
+cargo install libreddit
 ```
 
 ### B) Docker
@@ -93,4 +93,12 @@ yay -S libreddit-git
 Deploy:
 ```
 libreddit
+```
+
+## Building
+
+```
+git clone https://github.com/spikecodes/libreddit
+cd libreddit
+cargo run
 ```
