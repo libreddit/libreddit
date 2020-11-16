@@ -23,6 +23,7 @@ async fn favicon() -> HttpResponse {
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
 	// start http server
+	println!("Running Libreddit on 0.0.0.0:8080!");
 	HttpServer::new(|| {
 		App::new()
 			// GENERAL SERVICES
@@ -41,7 +42,7 @@ async fn main() -> std::io::Result<()> {
 			// USER SERVICES
 			.service(user::page)
 	})
-	.bind("127.0.0.1:8080")?
+	.bind("0.0.0.0:8080")?
 	.run()
 	.await
 }
