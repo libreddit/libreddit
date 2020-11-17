@@ -3,6 +3,10 @@ use actix_web::{get, web, HttpResponse, Result};
 use askama::Template;
 use chrono::{TimeZone, Utc};
 
+#[path = "utils.rs"]
+mod utils;
+pub use utils::{Flair, Post, Subreddit, val};
+
 // STRUCTS
 #[derive(Template)]
 #[template(path = "subreddit.html", escape = "none")]
@@ -10,27 +14,6 @@ struct SubredditTemplate {
 	sub: Subreddit,
 	posts: Vec<Post>,
 	sort: String,
-}
-
-// Post flair with text, background color and foreground color
-pub struct Flair(pub String, pub String, pub String);
-
-pub struct Post {
-	pub title: String,
-	pub community: String,
-	pub author: String,
-	pub score: String,
-	pub image: String,
-	pub url: String,
-	pub time: String,
-	pub flair: Flair,
-}
-
-pub struct Subreddit {
-	pub name: String,
-	pub title: String,
-	pub description: String,
-	pub icon: String,
 }
 
 async fn render(sub_name: String, sort: String) -> Result<HttpResponse> {
@@ -58,11 +41,6 @@ async fn page(web::Path(sub): web::Path<String>) -> Result<HttpResponse> {
 #[get("/r/{sub}/{sort}")]
 async fn sorted(web::Path((sub, sort)): web::Path<(String, String)>) -> Result<HttpResponse> {
 	render(sub, sort).await
-}
-
-// UTILITIES
-async fn val(j: &serde_json::Value, k: &str) -> String {
-	String::from(j["data"][k].as_str().unwrap_or(""))
 }
 
 // SUBREDDIT
@@ -105,9 +83,10 @@ pub async fn posts(sub: String, sort: &String) -> Vec<Post> {
 		posts.push(Post {
 			title: val(post, "title").await,
 			community: val(post, "subreddit").await,
+			body: String::new(),
 			author: val(post, "author").await,
 			score: if score > 1000 { format!("{}k", score / 1000) } else { score.to_string() },
-			image: img,
+			media: img,
 			url: val(post, "permalink").await,
 			time: Utc.timestamp(unix_time, 0).format("%b %e '%y").to_string(),
 			flair: Flair(

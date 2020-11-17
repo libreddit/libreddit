@@ -4,6 +4,10 @@ use askama::Template;
 use chrono::{TimeZone, Utc};
 use pulldown_cmark::{html, Options, Parser};
 
+#[path = "utils.rs"]
+mod utils;
+use utils::{Comment, Flair, Post, val};
+
 // STRUCTS
 #[derive(Template)]
 #[template(path = "post.html", escape = "none")]
@@ -11,28 +15,6 @@ struct PostTemplate {
 	comments: Vec<Comment>,
 	post: Post,
 	sort: String,
-}
-
-// Post flair with text, background color and foreground color
-pub struct Flair(String, String, String);
-
-pub struct Post {
-	pub title: String,
-	pub community: String,
-	pub body: String,
-	pub author: String,
-	pub url: String,
-	pub score: String,
-	pub media: String,
-	pub time: String,
-	pub flair: Flair,
-}
-
-pub struct Comment {
-	pub body: String,
-	pub author: String,
-	pub score: String,
-	pub time: String,
 }
 
 async fn render(id: String, sort: String) -> Result<HttpResponse> {
@@ -70,10 +52,6 @@ async fn sorted(web::Path((_sub, id, _title, sort)): web::Path<(String, String, 
 }
 
 // UTILITIES
-async fn val(j: &serde_json::Value, k: &str) -> String {
-	String::from(j["data"][k].as_str().unwrap_or(""))
-}
-
 async fn media(data: &serde_json::Value) -> String {
 	let post_hint: &str = data["data"]["post_hint"].as_str().unwrap_or("");
 	let has_media: bool = data["data"]["media"].is_object();
