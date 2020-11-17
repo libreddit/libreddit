@@ -13,6 +13,9 @@ struct PostTemplate {
 	sort: String,
 }
 
+// Post flair with text, background color and foreground color
+pub struct Flair(String, String, String);
+
 pub struct Post {
 	pub title: String,
 	pub community: String,
@@ -22,6 +25,7 @@ pub struct Post {
 	pub score: String,
 	pub media: String,
 	pub time: String,
+	pub flair: Flair,
 }
 
 pub struct Comment {
@@ -39,7 +43,7 @@ async fn render(id: String, sort: String) -> Result<HttpResponse> {
 	let s = PostTemplate {
 		comments: comments,
 		post: post,
-		sort: sort,
+		sort: sort
 	}
 	.render()
 	.unwrap();
@@ -126,6 +130,11 @@ async fn fetch_post(id: &String) -> Post {
 		score: if score > 1000 { format!("{}k", score / 1000) } else { score.to_string() },
 		media: media(post_data).await,
 		time: Utc.timestamp(unix_time, 0).format("%b %e %Y %H:%M UTC").to_string(),
+		flair: Flair(
+			val(post_data, "link_flair_text").await,
+			val(post_data, "link_flair_background_color").await,
+			if val(post_data, "link_flair_text_color").await == "dark" { "black".to_string() } else { "white".to_string() }
+		),
 	}
 }
 

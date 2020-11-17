@@ -32,7 +32,12 @@
 						<a class="post_author" href="/u/{{ post.author }}">u/{{ post.author }}</a>
 						<span style="float: right;">{{ post.time }}</span>
 					</p>
-					<h3 class="post_title">{{ post.title }}</h3>
+					<h3 class="post_title">
+						{{ post.title }}
+						{% if post.flair.0 != "" %}
+						<small style="color:{{ post.flair.2 }}; background:{{ post.flair.1 }}">{{ post.flair.0 }}</small>
+						{% endif %}
+					</h3>
 					{{ post.media }}
 					<h4 class="post_body">{{ post.body }}</h4>
 				</div>

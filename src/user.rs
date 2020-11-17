@@ -12,6 +12,9 @@ struct UserTemplate {
 	sort: String,
 }
 
+// Post flair with text, background color and foreground color
+pub struct Flair(String, String, String);
+
 pub struct Post {
 	pub title: String,
 	pub community: String,
@@ -20,6 +23,7 @@ pub struct Post {
 	pub image: String,
 	pub url: String,
 	pub time: String,
+	pub flair: Flair,
 }
 
 pub struct User {
@@ -99,6 +103,11 @@ async fn posts(sub: String, sort: &String) -> Vec<Post> {
 			image: img,
 			url: post_val(post, "permalink").await,
 			time: Utc.timestamp(unix_time, 0).format("%b %e '%y").to_string(),
+			flair: Flair(
+				post_val(post, "link_flair_text").await,
+				post_val(post, "link_flair_background_color").await,
+				if post_val(post, "link_flair_text_color").await == "dark" { "black".to_string() } else { "white".to_string() }
+			),
 		});
 	}
 

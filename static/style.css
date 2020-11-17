@@ -220,6 +220,15 @@ span {
 	border: none;
 }
 
+small {
+    background: aqua;
+    color: black;
+    padding: 5px;
+    border-radius: 5px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
 /* Comment */
 
 .comment {
