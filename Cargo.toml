@@ -8,14 +8,11 @@ authors = ["spikecodes <19519553+spikecodes@users.noreply.github.com>"]
 edition = "2018"
 
 [dependencies]
-actix-web = "3"
+actix-web = "3.2.0"
 actix-files = "0.4.0"
-askama = "0.9"
+askama = "0.8.0"
 serde = "1.0.117"
 serde_json = "1.0"
-reqwest = { version = "0.10", features = ["blocking"] }
+reqwest = "0.10.8"
 pulldown-cmark = "0.8.0"
-chrono = "0.4"
-
-[build-dependencies]
-askama = "0.9"
+chrono = "0.4.19"

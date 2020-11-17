@@ -106,7 +106,11 @@ async fn posts(sub: String, sort: &String) -> Vec<Post> {
 			flair: Flair(
 				post_val(post, "link_flair_text").await,
 				post_val(post, "link_flair_background_color").await,
-				if post_val(post, "link_flair_text_color").await == "dark" { "black".to_string() } else { "white".to_string() }
+				if post_val(post, "link_flair_text_color").await == "dark" {
+					"black".to_string()
+				} else {
+					"white".to_string()
+				},
 			),
 		});
 	}

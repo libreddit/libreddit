@@ -43,7 +43,7 @@ async fn render(id: String, sort: String) -> Result<HttpResponse> {
 	let s = PostTemplate {
 		comments: comments,
 		post: post,
-		sort: sort
+		sort: sort,
 	}
 	.render()
 	.unwrap();
@@ -133,7 +133,11 @@ async fn fetch_post(id: &String) -> Post {
 		flair: Flair(
 			val(post_data, "link_flair_text").await,
 			val(post_data, "link_flair_background_color").await,
-			if val(post_data, "link_flair_text_color").await == "dark" { "black".to_string() } else { "white".to_string() }
+			if val(post_data, "link_flair_text_color").await == "dark" {
+				"black".to_string()
+			} else {
+				"white".to_string()
+			},
 		),
 	}
 }
