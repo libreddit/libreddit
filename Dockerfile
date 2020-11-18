@@ -1,9 +1,9 @@
-FROM rust:latest as builder
+FROM rust:alpine as builder
 WORKDIR /usr/src/libreddit
 COPY . .
+RUN apk add --no-cache g++ openssl-dev
 RUN cargo install --path .
 
-FROM debian:buster-slim
-RUN apt-get update && apt-get install -y extra-runtime-dependencies && rm -rf /var/lib/apt/lists/*
+FROM alpine:latest
 COPY --from=builder /usr/local/cargo/bin/libreddit /usr/local/bin/libreddit
 CMD ["libreddit"]
