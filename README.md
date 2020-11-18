@@ -30,6 +30,7 @@ Think Invidious but for Reddit. Watch your cat videos without being watched.
   - [x] Posts
     - [x] Post sorting
 - [x] Posts
+  - [x] Flairs
   - [x] Comments
     - [x] Comment sorting
     - [ ] Nested comments

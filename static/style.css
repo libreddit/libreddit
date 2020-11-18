@@ -143,6 +143,7 @@ span {
 .post_left, .post_right {
 	display: flex;
 	flex-direction: column;
+	overflow-wrap: anywhere;
 }
 
 .post_left {
