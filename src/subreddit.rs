@@ -5,7 +5,7 @@ use chrono::{TimeZone, Utc};
 
 #[path = "utils.rs"]
 mod utils;
-pub use utils::{Flair, Post, Subreddit, val};
+pub use utils::{Params, Flair, Post, Subreddit, val};
 
 // STRUCTS
 #[derive(Template)]
@@ -33,21 +33,20 @@ async fn render(sub_name: String, sort: String) -> Result<HttpResponse> {
 // SERVICES
 #[allow(dead_code)]
 #[get("/r/{sub}")]
-async fn page(web::Path(sub): web::Path<String>) -> Result<HttpResponse> {
-	render(sub, String::from("hot")).await
-}
-
-#[allow(dead_code)]
-#[get("/r/{sub}/{sort}")]
-async fn sorted(web::Path((sub, sort)): web::Path<(String, String)>) -> Result<HttpResponse> {
-	render(sub, sort).await
+async fn page(web::Path(sub): web::Path<String>, params: web::Query<Params>) -> Result<HttpResponse> {
+	match &params.sort {
+		Some(sort) => render(sub, sort.to_string()).await,
+		None => render(sub, "hot".to_string()).await,
+	}
 }
 
 // SUBREDDIT
 async fn subreddit(sub: &String) -> Subreddit {
+	// Make a GET request to the Reddit's JSON API for the metadata of this subreddit
 	let url: String = format!("https://www.reddit.com/r/{}/about.json", sub);
 	let resp: String = reqwest::get(&url).await.unwrap().text().await.unwrap();
 
+	// Parse the response from Reddit as JSON
 	let data: serde_json::Value = serde_json::from_str(resp.as_str()).expect("Failed to parse JSON");
 
 	let icon: String = String::from(data["data"]["community_icon"].as_str().unwrap()); //val(&data, "community_icon");
@@ -64,9 +63,11 @@ async fn subreddit(sub: &String) -> Subreddit {
 
 // POSTS
 pub async fn posts(sub: String, sort: &String) -> Vec<Post> {
+	// Make a GET request to the Reddit's JSON API for the content of this subreddit
 	let url: String = format!("https://www.reddit.com/r/{}/{}.json", sub, sort);
 	let resp: String = reqwest::get(&url).await.unwrap().text().await.unwrap();
 
+	// Parse the response from Reddit as JSON
 	let popular: serde_json::Value = serde_json::from_str(resp.as_str()).expect("Failed to parse JSON");
 	let post_list = popular["data"]["children"].as_array().unwrap();
 

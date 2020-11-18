@@ -6,7 +6,7 @@ use pulldown_cmark::{html, Options, Parser};
 
 #[path = "utils.rs"]
 mod utils;
-use utils::{Comment, Flair, Post, val};
+use utils::{Params, Comment, Flair, Post, val};
 
 // STRUCTS
 #[derive(Template)]
@@ -42,13 +42,11 @@ async fn short(web::Path(id): web::Path<String>) -> Result<HttpResponse> {
 }
 
 #[get("/r/{sub}/comments/{id}/{title}/")]
-async fn page(web::Path((_sub, id)): web::Path<(String, String)>) -> Result<HttpResponse> {
-	render(id.to_string(), "confidence".to_string()).await
-}
-
-#[get("/r/{sub}/comments/{id}/{title}/{sort}")]
-async fn sorted(web::Path((_sub, id, _title, sort)): web::Path<(String, String, String, String)>) -> Result<HttpResponse> {
-	render(id.to_string(), sort).await
+async fn page(web::Path((_sub, id)): web::Path<(String, String)>, params: web::Query<Params>) -> Result<HttpResponse> {
+	match &params.sort {
+		Some(sort) => render(id, sort.to_string()).await,
+		None => render(id, "confidence".to_string()).await,
+	}
 }
 
 // UTILITIES

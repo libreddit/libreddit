@@ -5,7 +5,7 @@ use chrono::{TimeZone, Utc};
 
 #[path = "utils.rs"]
 mod utils;
-use utils::{Flair, Post, User, val, nested_val};
+use utils::{Params, Flair, Post, User, val, nested_val};
 
 // STRUCTS
 #[derive(Template)]
@@ -26,13 +26,11 @@ async fn render(username: String, sort: String) -> Result<HttpResponse> {
 
 // SERVICES
 #[get("/u/{username}")]
-async fn page(web::Path(username): web::Path<String>) -> Result<HttpResponse> {
-	render(username, "hot".to_string()).await
-}
-
-#[get("/u/{username}/{sort}")]
-async fn sorted(web::Path((username, sort)): web::Path<(String, String)>) -> Result<HttpResponse> {
-	render(username, sort).await
+async fn page(web::Path(username): web::Path<String>, params: web::Query<Params>) -> Result<HttpResponse> {
+	match &params.sort {
+		Some(sort) => render(username, sort.to_string()).await,
+		None => render(username, "hot".to_string()).await,
+	}
 }
 
 // USER

@@ -32,13 +32,10 @@ async fn main() -> std::io::Result<()> {
 			// POST SERVICES
 			.service(post::short)
 			.service(post::page)
-			.service(post::sorted)
 			// SUBREDDIT SERVICES
 			.service(subreddit::page)
-			.service(subreddit::sorted)
 			// POPULAR SERVICES
 			.service(popular::page)
-			// .service(popular::sorted)
 			// USER SERVICES
 			.service(user::page)
 	})

@@ -1,11 +1,14 @@
 // CRATES
 use actix_web::{get, web, HttpResponse, Result};
 use askama::Template;
-use serde::Deserialize;
 
 #[path = "subreddit.rs"]
 mod subreddit;
 use subreddit::{posts, Post};
+
+#[path = "utils.rs"]
+mod utils;
+use utils::{Params};
 
 // STRUCTS
 #[derive(Template)]
@@ -13,11 +16,6 @@ use subreddit::{posts, Post};
 struct PopularTemplate {
 	posts: Vec<Post>,
 	sort: String,
-}
-
-#[derive(Deserialize)]
-pub struct Params {
-	sort: Option<String>,
 }
 
 // RENDER
