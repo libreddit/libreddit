@@ -61,3 +61,34 @@ pub async fn nested_val(j: &serde_json::Value, n: &str, k: &str) -> String {
 pub struct Params {
 	pub sort: Option<String>,
 }
+
+// Make a request to a Reddit API and parse the JSON response
+#[allow(dead_code)]
+pub async fn request(url: String) -> serde_json::Value {
+
+	// --- actix-web::client ---
+	// let client = actix_web::client::Client::default();
+	// let res = client
+	// 	.get(url)
+	// 	.send()
+	// 	.await?
+	// 	.body()
+	// 	.limit(1000000)
+	// 	.await?;
+
+	// let body = std::str::from_utf8(res.as_ref())?; // .as_ref converts Bytes to [u8]
+
+	// --- surf ---
+	// let req = surf::get(url);
+	// let client = surf::client().with(surf::middleware::Redirect::new(5));
+	// let mut res = client.send(req).await.unwrap();
+	// let body = res.body_string().await.unwrap();
+
+	// --- reqwest ---
+	let resp: String = reqwest::get(&url).await.unwrap().text().await.unwrap();
+
+	// Parse the response from Reddit as JSON
+	let json: serde_json::Value = serde_json::from_str(resp.as_str()).expect("Failed to parse JSON");
+	
+	json
+}

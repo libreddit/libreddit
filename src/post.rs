@@ -6,7 +6,7 @@ use pulldown_cmark::{html, Options, Parser};
 
 #[path = "utils.rs"]
 mod utils;
-use utils::{val, Comment, Flair, Params, Post};
+use utils::{val, Comment, Flair, Params, Post, request};
 
 // STRUCTS
 #[derive(Template)]
@@ -19,8 +19,8 @@ struct PostTemplate {
 
 async fn render(id: String, sort: String) -> Result<HttpResponse> {
 	println!("id: {}", id);
-	let post: Post = fetch_post(&id).await;
-	let comments: Vec<Comment> = fetch_comments(id, &sort).await.unwrap();
+	let post: Post = fetch_post(&id).await?;
+	let comments: Vec<Comment> = fetch_comments(id, &sort).await?;
 
 	let s = PostTemplate {
 		comments: comments,
@@ -86,18 +86,19 @@ async fn markdown_to_html(md: &str) -> String {
 }
 
 // POSTS
-async fn fetch_post(id: &String) -> Post {
+async fn fetch_post(id: &String) -> Result<Post> {
+	// Build the Reddit JSON API url
 	let url: String = format!("https://reddit.com/{}.json", id);
-	let resp: String = reqwest::get(&url).await.unwrap().text().await.unwrap();
 
-	let data: serde_json::Value = serde_json::from_str(resp.as_str()).expect("Failed to parse JSON");
+	// Send a request to the url, receive JSON in response
+	let res = request(url).await;
 
-	let post_data: &serde_json::Value = &data[0]["data"]["children"][0];
+	let post_data: &serde_json::Value = &res[0]["data"]["children"][0];
 
 	let unix_time: i64 = post_data["data"]["created_utc"].as_f64().unwrap().round() as i64;
 	let score = post_data["data"]["score"].as_i64().unwrap();
 
-	Post {
+	let post = Post {
 		title: val(post_data, "title").await,
 		community: val(post_data, "subreddit").await,
 		body: markdown_to_html(post_data["data"]["selftext"].as_str().unwrap()).await,
@@ -115,17 +116,20 @@ async fn fetch_post(id: &String) -> Post {
 				"white".to_string()
 			},
 		),
-	}
+	};
+
+	Ok(post)
 }
 
 // COMMENTS
-async fn fetch_comments(id: String, sort: &String) -> Result<Vec<Comment>, Box<dyn std::error::Error>> {
+async fn fetch_comments(id: String, sort: &String) -> Result<Vec<Comment>> {
+	// Build the Reddit JSON API url
 	let url: String = format!("https://reddit.com/{}.json?sort={}", id, sort);
-	let resp: String = reqwest::get(&url).await?.text().await?;
 
-	let data: serde_json::Value = serde_json::from_str(resp.as_str())?;
+	// Send a request to the url, receive JSON in response
+	let res = request(url).await;
 
-	let comment_data = data[1]["data"]["children"].as_array().unwrap();
+	let comment_data = res[1]["data"]["children"].as_array().unwrap();
 
 	let mut comments: Vec<Comment> = Vec::new();
 

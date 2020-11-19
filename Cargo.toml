@@ -9,9 +9,9 @@ edition = "2018"
 
 [dependencies]
 actix-web = "3.2.0"
+reqwest = "0.10.8"
 askama = "0.8.0"
 serde = "1.0.117"
 serde_json = "1.0"
-reqwest = "0.10.8"
 pulldown-cmark = "0.8.0"
 chrono = "0.4.19"

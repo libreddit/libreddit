@@ -5,7 +5,7 @@ use chrono::{TimeZone, Utc};
 
 #[path = "utils.rs"]
 mod utils;
-use utils::{nested_val, val, Flair, Params, Post, User};
+use utils::{nested_val, val, Flair, Params, Post, User, request};
 
 // STRUCTS
 #[derive(Template)]
@@ -35,27 +35,30 @@ async fn page(web::Path(username): web::Path<String>, params: web::Query<Params>
 
 // USER
 async fn user(name: &String) -> User {
+	// Build the Reddit JSON API url
 	let url: String = format!("https://www.reddit.com/user/{}/about.json", name);
-	let resp: String = reqwest::get(&url).await.unwrap().text().await.unwrap();
-
-	let data: serde_json::Value = serde_json::from_str(resp.as_str()).expect("Failed to parse JSON");
+	
+	// Send a request to the url, receive JSON in response
+	let res = request(url).await;
 
 	User {
 		name: name.to_string(),
-		icon: nested_val(&data, "subreddit", "icon_img").await,
-		karma: data["data"]["total_karma"].as_i64().unwrap(),
-		banner: nested_val(&data, "subreddit", "banner_img").await,
-		description: nested_val(&data, "subreddit", "public_description").await,
+		icon: nested_val(&res, "subreddit", "icon_img").await,
+		karma: res["data"]["total_karma"].as_i64().unwrap(),
+		banner: nested_val(&res, "subreddit", "banner_img").await,
+		description: nested_val(&res, "subreddit", "public_description").await,
 	}
 }
 
 // POSTS
 async fn posts(sub: String, sort: &String) -> Vec<Post> {
+	// Build the Reddit JSON API url
 	let url: String = format!("https://www.reddit.com/u/{}/.json?sort={}", sub, sort);
-	let resp: String = reqwest::get(&url).await.unwrap().text().await.unwrap();
 
-	let popular: serde_json::Value = serde_json::from_str(resp.as_str()).expect("Failed to parse JSON");
-	let post_list = popular["data"]["children"].as_array().unwrap();
+	// Send a request to the url, receive JSON in response
+	let res = request(url).await;
+
+	let post_list = res["data"]["children"].as_array().unwrap();
 
 	let mut posts: Vec<Post> = Vec::new();
 

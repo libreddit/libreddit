@@ -5,7 +5,7 @@ use chrono::{TimeZone, Utc};
 
 #[path = "utils.rs"]
 mod utils;
-pub use utils::{val, Flair, Params, Post, Subreddit};
+pub use utils::{val, Flair, Params, Post, Subreddit, request};
 
 // STRUCTS
 #[derive(Template)]
@@ -17,8 +17,8 @@ struct SubredditTemplate {
 }
 
 async fn render(sub_name: String, sort: String) -> Result<HttpResponse> {
-	let mut sub: Subreddit = subreddit(&sub_name).await;
-	let posts: Vec<Post> = posts(sub_name, &sort).await;
+	let mut sub: Subreddit = subreddit(&sub_name).await?;
+	let posts: Vec<Post> = posts(sub_name, &sort).await?;
 
 	sub.icon = if sub.icon != "" {
 		format!(r#"<img class="subreddit_icon" src="{}">"#, sub.icon)
@@ -41,35 +41,37 @@ async fn page(web::Path(sub): web::Path<String>, params: web::Query<Params>) -> 
 }
 
 // SUBREDDIT
-async fn subreddit(sub: &String) -> Subreddit {
-	// Make a GET request to the Reddit's JSON API for the metadata of this subreddit
+async fn subreddit(sub: &String) -> Result<Subreddit> {
+	// Build the Reddit JSON API url
 	let url: String = format!("https://www.reddit.com/r/{}/about.json", sub);
-	let resp: String = reqwest::get(&url).await.unwrap().text().await.unwrap();
 
-	// Parse the response from Reddit as JSON
-	let data: serde_json::Value = serde_json::from_str(resp.as_str()).expect("Failed to parse JSON");
+	// Send a request to the url, receive JSON in response
+	let res = request(url).await;
 
-	let icon: String = String::from(data["data"]["community_icon"].as_str().unwrap()); //val(&data, "community_icon");
+	let icon: String = String::from(res["data"]["community_icon"].as_str().unwrap()); //val(&data, "community_icon");
 	let icon_split: std::str::Split<&str> = icon.split("?");
 	let icon_parts: Vec<&str> = icon_split.collect();
 
-	Subreddit {
-		name: val(&data, "display_name").await,
-		title: val(&data, "title").await,
-		description: val(&data, "public_description").await,
+	let sub = Subreddit {
+		name: val(&res, "display_name").await,
+		title: val(&res, "title").await,
+		description: val(&res, "public_description").await,
 		icon: String::from(icon_parts[0]),
-	}
+	};
+
+	Ok(sub)
 }
 
 // POSTS
-pub async fn posts(sub: String, sort: &String) -> Vec<Post> {
-	// Make a GET request to the Reddit's JSON API for the content of this subreddit
+pub async fn posts(sub: String, sort: &String) -> Result<Vec<Post>> {
+	// Build the Reddit JSON API url
 	let url: String = format!("https://www.reddit.com/r/{}/{}.json", sub, sort);
-	let resp: String = reqwest::get(&url).await.unwrap().text().await.unwrap();
 
-	// Parse the response from Reddit as JSON
-	let popular: serde_json::Value = serde_json::from_str(resp.as_str()).expect("Failed to parse JSON");
-	let post_list = popular["data"]["children"].as_array().unwrap();
+	// Send a request to the url, receive JSON in response
+	let res = request(url).await;
+
+	// Fetch the list of posts from the JSON response
+	let post_list = res["data"]["children"].as_array().unwrap();
 
 	let mut posts: Vec<Post> = Vec::new();
 
@@ -101,5 +103,5 @@ pub async fn posts(sub: String, sort: &String) -> Vec<Post> {
 			),
 		});
 	}
-	posts
+	Ok(posts)
 }

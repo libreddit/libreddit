@@ -20,7 +20,7 @@ struct PopularTemplate {
 
 // RENDER
 async fn render(sub_name: String, sort: String) -> Result<HttpResponse> {
-	let posts: Vec<Post> = posts(sub_name, &sort).await;
+	let posts: Vec<Post> = posts(sub_name, &sort).await?;
 
 	let s = PopularTemplate { posts: posts, sort: sort }.render().unwrap();
 	Ok(HttpResponse::Ok().content_type("text/html").body(s))
