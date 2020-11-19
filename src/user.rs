@@ -5,7 +5,7 @@ use chrono::{TimeZone, Utc};
 
 #[path = "utils.rs"]
 mod utils;
-use utils::{Params, Flair, Post, User, val, nested_val};
+use utils::{nested_val, val, Flair, Params, Post, User};
 
 // STRUCTS
 #[derive(Template)]
@@ -70,7 +70,7 @@ async fn posts(sub: String, sort: &String) -> Vec<Post> {
 		let title = val(post, "title").await;
 
 		posts.push(Post {
-			title: if title.is_empty() {"Comment".to_string()} else {title},
+			title: if title.is_empty() { "Comment".to_string() } else { title },
 			community: val(post, "subreddit").await,
 			body: String::new(),
 			author: val(post, "author").await,

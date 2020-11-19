@@ -1,6 +1,6 @@
 // Import Crates
-use actix_files::NamedFile;
-use actix_web::{get, App, HttpResponse, HttpServer, Result};
+use actix_web::{get, App, HttpResponse, HttpServer};
+use std::fs;
 
 // Reference local files
 mod popular;
@@ -10,9 +10,9 @@ mod user;
 
 // Create Services
 #[get("/style.css")]
-async fn style() -> Result<NamedFile> {
-	let file = NamedFile::open("static/style.css");
-	Ok(file?)
+async fn style() -> HttpResponse {
+	let file = fs::read_to_string("static/style.css").expect("ERROR: Could not read style.css");
+	HttpResponse::Ok().body(file)
 }
 
 #[get("/favicon.ico")]

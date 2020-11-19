@@ -5,7 +5,7 @@ use chrono::{TimeZone, Utc};
 
 #[path = "utils.rs"]
 mod utils;
-pub use utils::{Params, Flair, Post, Subreddit, val};
+pub use utils::{val, Flair, Params, Post, Subreddit};
 
 // STRUCTS
 #[derive(Template)]

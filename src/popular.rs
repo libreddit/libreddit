@@ -8,7 +8,7 @@ use subreddit::{posts, Post};
 
 #[path = "utils.rs"]
 mod utils;
-use utils::{Params};
+use utils::Params;
 
 // STRUCTS
 #[derive(Template)]
