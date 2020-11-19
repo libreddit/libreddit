@@ -5,7 +5,7 @@ use chrono::{TimeZone, Utc};
 
 #[path = "utils.rs"]
 mod utils;
-use utils::{nested_val, val, Flair, Params, Post, User, request};
+use utils::{nested_val, request, val, Flair, Params, Post, User};
 
 // STRUCTS
 #[derive(Template)]
@@ -37,7 +37,7 @@ async fn page(web::Path(username): web::Path<String>, params: web::Query<Params>
 async fn user(name: &String) -> User {
 	// Build the Reddit JSON API url
 	let url: String = format!("https://www.reddit.com/user/{}/about.json", name);
-	
+
 	// Send a request to the url, receive JSON in response
 	let res = request(url).await;
 

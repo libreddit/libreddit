@@ -5,7 +5,7 @@ use chrono::{TimeZone, Utc};
 
 #[path = "utils.rs"]
 mod utils;
-pub use utils::{val, Flair, Params, Post, Subreddit, request};
+pub use utils::{request, val, Flair, Params, Post, Subreddit};
 
 // STRUCTS
 #[derive(Template)]
@@ -14,11 +14,31 @@ struct SubredditTemplate {
 	sub: Subreddit,
 	posts: Vec<Post>,
 	sort: String,
+	ends: (String, String),
 }
 
-async fn render(sub_name: String, sort: String) -> Result<HttpResponse> {
+// SERVICES
+#[allow(dead_code)]
+#[get("/r/{sub}")]
+async fn page(web::Path(sub): web::Path<String>, params: web::Query<Params>) -> Result<HttpResponse> {
+	render(sub, params.sort.clone(), (params.before.clone(), params.after.clone())).await
+}
+
+pub async fn render(sub_name: String, sort: Option<String>, ends: (Option<String>, Option<String>)) -> Result<HttpResponse> {
+	let sorting = sort.unwrap_or("hot".to_string());
+	let before = ends.1.clone().unwrap_or(String::new()); // If there is an after, there must be a before
+
+	// Build the Reddit JSON API url
+	let url = match ends.0 {
+		Some(val) => format!("https://www.reddit.com/r/{}/{}.json?before={}&count=25", sub_name, sorting, val),
+		None => match ends.1 {
+			Some(val) => format!("https://www.reddit.com/r/{}/{}.json?after={}&count=25", sub_name, sorting, val),
+			None => format!("https://www.reddit.com/r/{}/{}.json", sub_name, sorting),
+		},
+	};
+
 	let mut sub: Subreddit = subreddit(&sub_name).await?;
-	let posts: Vec<Post> = posts(sub_name, &sort).await?;
+	let items = posts(url).await?;
 
 	sub.icon = if sub.icon != "" {
 		format!(r#"<img class="subreddit_icon" src="{}">"#, sub.icon)
@@ -26,18 +46,15 @@ async fn render(sub_name: String, sort: String) -> Result<HttpResponse> {
 		String::new()
 	};
 
-	let s = SubredditTemplate { sub: sub, posts: posts, sort: sort }.render().unwrap();
-	Ok(HttpResponse::Ok().content_type("text/html").body(s))
-}
-
-// SERVICES
-#[allow(dead_code)]
-#[get("/r/{sub}")]
-async fn page(web::Path(sub): web::Path<String>, params: web::Query<Params>) -> Result<HttpResponse> {
-	match &params.sort {
-		Some(sort) => render(sub, sort.to_string()).await,
-		None => render(sub, "hot".to_string()).await,
+	let s = SubredditTemplate {
+		sub: sub,
+		posts: items.0,
+		sort: sorting,
+		ends: (before, items.1),
 	}
+	.render()
+	.unwrap();
+	Ok(HttpResponse::Ok().content_type("text/html").body(s))
 }
 
 // SUBREDDIT
@@ -63,10 +80,7 @@ async fn subreddit(sub: &String) -> Result<Subreddit> {
 }
 
 // POSTS
-pub async fn posts(sub: String, sort: &String) -> Result<Vec<Post>> {
-	// Build the Reddit JSON API url
-	let url: String = format!("https://www.reddit.com/r/{}/{}.json", sub, sort);
-
+pub async fn posts(url: String) -> Result<(Vec<Post>, String)> {
 	// Send a request to the url, receive JSON in response
 	let res = request(url).await;
 
@@ -103,5 +117,6 @@ pub async fn posts(sub: String, sort: &String) -> Result<Vec<Post>> {
 			),
 		});
 	}
-	Ok(posts)
+
+	Ok((posts, res["data"]["after"].as_str().unwrap_or("").to_string()))
 }

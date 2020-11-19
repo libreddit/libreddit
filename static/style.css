@@ -29,6 +29,11 @@ main {
 	padding: 0px 10px;
 }
 
+footer {
+	display: flex;
+	justify-content: center;
+}
+
 button {
 	background: none;
 	border: none;
@@ -109,7 +114,7 @@ span {
 	padding: 0px 10px;
 }
 
-#sort > div {
+#sort > div, footer > a {
 	background: #151515;
 	color: lightgrey;
 	border-radius: 5px;
@@ -117,7 +122,6 @@ span {
 	padding: 10px 20px;
 	text-align: center;
 	cursor: pointer;
-	font-weight: bold;
 }
 
 #sort > div:hover {

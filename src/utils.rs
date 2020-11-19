@@ -44,6 +44,14 @@ pub struct Subreddit {
 	pub icon: String,
 }
 
+// Parser for query params, used in sorting (eg. /r/rust/?sort=hot)
+#[derive(serde::Deserialize)]
+pub struct Params {
+	pub sort: Option<String>,
+	pub after: Option<String>,
+	pub before: Option<String>,
+}
+
 #[allow(dead_code)]
 // val() function used to parse JSON from Reddit APIs
 pub async fn val(j: &serde_json::Value, k: &str) -> String {
@@ -56,16 +64,9 @@ pub async fn nested_val(j: &serde_json::Value, n: &str, k: &str) -> String {
 	String::from(j["data"][n][k].as_str().unwrap())
 }
 
-// Parser for query params, used in sorting (eg. /r/rust/?sort=hot)
-#[derive(serde::Deserialize)]
-pub struct Params {
-	pub sort: Option<String>,
-}
-
 // Make a request to a Reddit API and parse the JSON response
 #[allow(dead_code)]
 pub async fn request(url: String) -> serde_json::Value {
-
 	// --- actix-web::client ---
 	// let client = actix_web::client::Client::default();
 	// let res = client
@@ -89,6 +90,6 @@ pub async fn request(url: String) -> serde_json::Value {
 
 	// Parse the response from Reddit as JSON
 	let json: serde_json::Value = serde_json::from_str(resp.as_str()).expect("Failed to parse JSON");
-	
+
 	json
 }

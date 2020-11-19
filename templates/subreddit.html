@@ -58,6 +58,16 @@
 				<img class="post_thumbnail" src="{{ post.media }}">
 			</div><br>
 			{% endfor %}
+
+			<footer>
+				{% if ends.0 != "" %}
+				<a href="?before={{ ends.0 }}">PREV</a>
+				{% endif %}
+	
+				{% if ends.1 != "" %}
+				<a href="?after={{ ends.1 }}">NEXT</a>
+				{% endif %}
+			</footer>			
 		</main>
 	</body>
 </html>

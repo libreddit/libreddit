@@ -6,7 +6,7 @@ use pulldown_cmark::{html, Options, Parser};
 
 #[path = "utils.rs"]
 mod utils;
-use utils::{val, Comment, Flair, Params, Post, request};
+use utils::{request, val, Comment, Flair, Params, Post};
 
 // STRUCTS
 #[derive(Template)]
