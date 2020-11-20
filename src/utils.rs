@@ -114,12 +114,12 @@ pub async fn request(url: String) -> Result<serde_json::Value, &'static str> {
 	let json: serde_json::Value = serde_json::from_str(body.as_str()).unwrap_or(serde_json::Value::Null);
 
 	if !success {
-		Ok(json)
+		println!("! {} - {}", url, "Page not found");
+		Err("Page not found")
 	} else if json == serde_json::Value::Null {
 		println!("! {} - {}", url, "Failed to parse page JSON data");
 		Err("Failed to parse page JSON data")
 	} else {
-		println!("! {} - {}", url, "Page not found");
-		Err("Page not found")
+		Ok(json)
 	}
 }
