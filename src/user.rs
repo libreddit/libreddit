@@ -5,7 +5,7 @@ use chrono::{TimeZone, Utc};
 
 #[path = "utils.rs"]
 mod utils;
-use utils::{nested_val, request, val, Flair, Params, Post, User};
+use utils::{nested_val, request, val, ErrorTemplate, Flair, Params, Post, User};
 
 // STRUCTS
 #[derive(Template)]
@@ -17,11 +17,26 @@ struct UserTemplate {
 }
 
 async fn render(username: String, sort: String) -> Result<HttpResponse> {
-	let user: User = user(&username).await;
-	let posts: Vec<Post> = posts(username, &sort).await;
+	let user = user(&username).await;
+	let posts = posts(username, &sort).await;
 
-	let s = UserTemplate { user: user, posts: posts, sort: sort }.render().unwrap();
-	Ok(HttpResponse::Ok().content_type("text/html").body(s))
+	if user.is_err() || posts.is_err() {
+		let s = ErrorTemplate {
+			message: user.err().unwrap().to_string(),
+		}
+		.render()
+		.unwrap();
+		Ok(HttpResponse::Ok().content_type("text/html").body(s))
+	} else {
+		let s = UserTemplate {
+			user: user.unwrap(),
+			posts: posts.unwrap(),
+			sort: sort,
+		}
+		.render()
+		.unwrap();
+		Ok(HttpResponse::Ok().content_type("text/html").body(s))
+	}
 }
 
 // SERVICES
@@ -34,29 +49,46 @@ async fn page(web::Path(username): web::Path<String>, params: web::Query<Params>
 }
 
 // USER
-async fn user(name: &String) -> User {
+async fn user(name: &String) -> Result<User, &'static str> {
 	// Build the Reddit JSON API url
 	let url: String = format!("https://www.reddit.com/user/{}/about.json", name);
 
 	// Send a request to the url, receive JSON in response
-	let res = request(url).await;
+	let req = request(url).await;
 
-	User {
+	// If the Reddit API returns an error, exit this function
+	if req.is_err() {
+		return Err(req.err().unwrap());
+	}
+
+	// Otherwise, grab the JSON output from the request
+	let res = req.unwrap();
+
+	// Parse the JSON output into a User struct
+	Ok(User {
 		name: name.to_string(),
 		icon: nested_val(&res, "subreddit", "icon_img").await,
 		karma: res["data"]["total_karma"].as_i64().unwrap(),
 		banner: nested_val(&res, "subreddit", "banner_img").await,
 		description: nested_val(&res, "subreddit", "public_description").await,
-	}
+	})
 }
 
 // POSTS
-async fn posts(sub: String, sort: &String) -> Vec<Post> {
+async fn posts(sub: String, sort: &String) -> Result<Vec<Post>, &'static str> {
 	// Build the Reddit JSON API url
 	let url: String = format!("https://www.reddit.com/u/{}/.json?sort={}", sub, sort);
 
 	// Send a request to the url, receive JSON in response
-	let res = request(url).await;
+	let req = request(url).await;
+
+	// If the Reddit API returns an error, exit this function
+	if req.is_err() {
+		return Err(req.err().unwrap());
+	}
+
+	// Otherwise, grab the JSON output from the request
+	let res = req.unwrap();
 
 	let post_list = res["data"]["children"].as_array().unwrap();
 
@@ -93,5 +125,5 @@ async fn posts(sub: String, sort: &String) -> Vec<Post> {
 		});
 	}
 
-	posts
+	Ok(posts)
 }

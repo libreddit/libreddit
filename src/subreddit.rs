@@ -5,7 +5,7 @@ use chrono::{TimeZone, Utc};
 
 #[path = "utils.rs"]
 mod utils;
-pub use utils::{request, val, Flair, Params, Post, Subreddit};
+pub use utils::{request, val, ErrorTemplate, Flair, Params, Post, Subreddit};
 
 // STRUCTS
 #[derive(Template)]
@@ -37,33 +37,53 @@ pub async fn render(sub_name: String, sort: Option<String>, ends: (Option<String
 		},
 	};
 
-	let mut sub: Subreddit = subreddit(&sub_name).await?;
-	let items = posts(url).await?;
+	let sub_result = subreddit(&sub_name).await;
+	let items_result = posts(url).await;
 
-	sub.icon = if sub.icon != "" {
-		format!(r#"<img class="subreddit_icon" src="{}">"#, sub.icon)
+	if sub_result.is_err() || items_result.is_err() {
+		let s = ErrorTemplate {
+			message: sub_result.err().unwrap().to_string(),
+		}
+		.render()
+		.unwrap();
+		Ok(HttpResponse::Ok().content_type("text/html").body(s))
 	} else {
-		String::new()
-	};
+		let mut sub = sub_result.unwrap();
+		let items = items_result.unwrap();
 
-	let s = SubredditTemplate {
-		sub: sub,
-		posts: items.0,
-		sort: sorting,
-		ends: (before, items.1),
+		sub.icon = if sub.icon != "" {
+			format!(r#"<img class="subreddit_icon" src="{}">"#, sub.icon)
+		} else {
+			String::new()
+		};
+
+		let s = SubredditTemplate {
+			sub: sub,
+			posts: items.0,
+			sort: sorting,
+			ends: (before, items.1),
+		}
+		.render()
+		.unwrap();
+		Ok(HttpResponse::Ok().content_type("text/html").body(s))
 	}
-	.render()
-	.unwrap();
-	Ok(HttpResponse::Ok().content_type("text/html").body(s))
 }
 
 // SUBREDDIT
-async fn subreddit(sub: &String) -> Result<Subreddit> {
+async fn subreddit(sub: &String) -> Result<Subreddit, &'static str> {
 	// Build the Reddit JSON API url
 	let url: String = format!("https://www.reddit.com/r/{}/about.json", sub);
 
 	// Send a request to the url, receive JSON in response
-	let res = request(url).await;
+	let req = request(url).await;
+
+	// If the Reddit API returns an error, exit this function
+	if req.is_err() {
+		return Err(req.err().unwrap());
+	}
+
+	// Otherwise, grab the JSON output from the request
+	let res = req.unwrap();
 
 	let icon: String = String::from(res["data"]["community_icon"].as_str().unwrap()); //val(&data, "community_icon");
 	let icon_split: std::str::Split<&str> = icon.split("?");
@@ -80,9 +100,17 @@ async fn subreddit(sub: &String) -> Result<Subreddit> {
 }
 
 // POSTS
-pub async fn posts(url: String) -> Result<(Vec<Post>, String)> {
+pub async fn posts(url: String) -> Result<(Vec<Post>, String), &'static str> {
 	// Send a request to the url, receive JSON in response
-	let res = request(url).await;
+	let req = request(url).await;
+
+	// If the Reddit API returns an error, exit this function
+	if req.is_err() {
+		return Err(req.err().unwrap());
+	}
+
+	// Otherwise, grab the JSON output from the request
+	let res = req.unwrap();
 
 	// Fetch the list of posts from the JSON response
 	let post_list = res["data"]["children"].as_array().unwrap();

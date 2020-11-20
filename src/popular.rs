@@ -8,7 +8,7 @@ use subreddit::{posts, Post};
 
 #[path = "utils.rs"]
 mod utils;
-use utils::Params;
+use utils::{ErrorTemplate, Params};
 
 // STRUCTS
 #[derive(Template)]
@@ -33,16 +33,27 @@ async fn render(sub_name: String, sort: Option<String>, ends: (Option<String>, O
 		},
 	};
 
-	let items = posts(url).await?;
+	let items_result = posts(url).await;
 
-	let s = PopularTemplate {
-		posts: items.0,
-		sort: sorting,
-		ends: (before, items.1),
+	if items_result.is_err() {
+		let s = ErrorTemplate {
+			message: items_result.err().unwrap().to_string(),
+		}
+		.render()
+		.unwrap();
+		Ok(HttpResponse::Ok().content_type("text/html").body(s))
+	} else {
+		let items = items_result.unwrap();
+
+		let s = PopularTemplate {
+			posts: items.0,
+			sort: sorting,
+			ends: (before, items.1),
+		}
+		.render()
+		.unwrap();
+		Ok(HttpResponse::Ok().content_type("text/html").body(s))
 	}
-	.render()
-	.unwrap();
-	Ok(HttpResponse::Ok().content_type("text/html").body(s))
 }
 
 // SERVICES

@@ -6,7 +6,7 @@ use pulldown_cmark::{html, Options, Parser};
 
 #[path = "utils.rs"]
 mod utils;
-use utils::{request, val, Comment, Flair, Params, Post};
+use utils::{request, val, Comment, ErrorTemplate, Flair, Params, Post};
 
 // STRUCTS
 #[derive(Template)]
@@ -19,20 +19,26 @@ struct PostTemplate {
 
 async fn render(id: String, sort: String) -> Result<HttpResponse> {
 	println!("id: {}", id);
-	let post: Post = fetch_post(&id).await?;
-	let comments: Vec<Comment> = fetch_comments(id, &sort).await?;
+	let post = fetch_post(&id).await;
+	let comments = fetch_comments(id, &sort).await;
 
-	let s = PostTemplate {
-		comments: comments,
-		post: post,
-		sort: sort,
+	if post.is_err() || comments.is_err() {
+		let s = ErrorTemplate {
+			message: post.err().unwrap().to_string(),
+		}
+		.render()
+		.unwrap();
+		Ok(HttpResponse::Ok().content_type("text/html").body(s))
+	} else {
+		let s = PostTemplate {
+			comments: comments.unwrap(),
+			post: post.unwrap(),
+			sort: sort,
+		}
+		.render()
+		.unwrap();
+		Ok(HttpResponse::Ok().content_type("text/html").body(s))
 	}
-	.render()
-	.unwrap();
-
-	// println!("{}", s);
-
-	Ok(HttpResponse::Ok().content_type("text/html").body(s))
 }
 
 // SERVICES
@@ -86,12 +92,20 @@ async fn markdown_to_html(md: &str) -> String {
 }
 
 // POSTS
-async fn fetch_post(id: &String) -> Result<Post> {
+async fn fetch_post(id: &String) -> Result<Post, &'static str> {
 	// Build the Reddit JSON API url
 	let url: String = format!("https://reddit.com/{}.json", id);
 
 	// Send a request to the url, receive JSON in response
-	let res = request(url).await;
+	let req = request(url).await;
+
+	// If the Reddit API returns an error, exit this function
+	if req.is_err() {
+		return Err(req.err().unwrap());
+	}
+
+	// Otherwise, grab the JSON output from the request
+	let res = req.unwrap();
 
 	let post_data: &serde_json::Value = &res[0]["data"]["children"][0];
 
@@ -122,12 +136,20 @@ async fn fetch_post(id: &String) -> Result<Post> {
 }
 
 // COMMENTS
-async fn fetch_comments(id: String, sort: &String) -> Result<Vec<Comment>> {
+async fn fetch_comments(id: String, sort: &String) -> Result<Vec<Comment>, &'static str> {
 	// Build the Reddit JSON API url
 	let url: String = format!("https://reddit.com/{}.json?sort={}", id, sort);
 
 	// Send a request to the url, receive JSON in response
-	let res = request(url).await;
+	let req = request(url).await;
+
+	// If the Reddit API returns an error, exit this function
+	if req.is_err() {
+		return Err(req.err().unwrap());
+	}
+
+	// Otherwise, grab the JSON output from the request
+	let res = req.unwrap();
 
 	let comment_data = res[1]["data"]["children"].as_array().unwrap();
 

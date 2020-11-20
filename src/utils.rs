@@ -1,3 +1,6 @@
+//
+// STRUCTS
+//
 #[allow(dead_code)]
 // Post flair with text, background color and foreground color
 pub struct Flair(pub String, pub String, pub String);
@@ -52,6 +55,17 @@ pub struct Params {
 	pub before: Option<String>,
 }
 
+// Error template
+#[derive(askama::Template)]
+#[template(path = "error.html", escape = "none")]
+pub struct ErrorTemplate {
+	pub message: String,
+}
+
+//
+// JSON PARSING
+//
+
 #[allow(dead_code)]
 // val() function used to parse JSON from Reddit APIs
 pub async fn val(j: &serde_json::Value, k: &str) -> String {
@@ -64,9 +78,13 @@ pub async fn nested_val(j: &serde_json::Value, n: &str, k: &str) -> String {
 	String::from(j["data"][n][k].as_str().unwrap())
 }
 
+//
+// NETWORKING
+//
+
 // Make a request to a Reddit API and parse the JSON response
 #[allow(dead_code)]
-pub async fn request(url: String) -> serde_json::Value {
+pub async fn request(url: String) -> Result<serde_json::Value, &'static str> {
 	// --- actix-web::client ---
 	// let client = actix_web::client::Client::default();
 	// let res = client
@@ -86,10 +104,22 @@ pub async fn request(url: String) -> serde_json::Value {
 	// let body = res.body_string().await.unwrap();
 
 	// --- reqwest ---
-	let resp: String = reqwest::get(&url).await.unwrap().text().await.unwrap();
+	let res = reqwest::get(&url).await.unwrap();
+	// Read the status from the response
+	let success = res.status().is_success();
+	// Read the body of the response
+	let body = res.text().await.unwrap();
 
 	// Parse the response from Reddit as JSON
-	let json: serde_json::Value = serde_json::from_str(resp.as_str()).expect("Failed to parse JSON");
+	let json: serde_json::Value = serde_json::from_str(body.as_str()).unwrap_or(serde_json::Value::Null);
 
-	json
+	if !success {
+		Ok(json)
+	} else if json == serde_json::Value::Null {
+		println!("! {} - {}", url, "Failed to parse page JSON data");
+		Err("Failed to parse page JSON data")
+	} else {
+		println!("! {} - {}", url, "Page not found");
+		Err("Page not found")
+	}
 }
