@@ -12,7 +12,7 @@ mod user;
 #[get("/style.css")]
 async fn style() -> HttpResponse {
 	let file = fs::read_to_string("static/style.css").expect("ERROR: Could not read style.css");
-	HttpResponse::Ok().body(file)
+	HttpResponse::Ok().content_type("text/css").body(file)
 }
 
 #[get("/favicon.ico")]
