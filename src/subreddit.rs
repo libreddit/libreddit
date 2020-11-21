@@ -1,11 +1,10 @@
 // CRATES
 use actix_web::{get, web, HttpResponse, Result};
 use askama::Template;
-use chrono::{TimeZone, Utc};
 
 #[path = "utils.rs"]
 mod utils;
-pub use utils::{request, val, ErrorTemplate, Flair, Params, Post, Subreddit};
+pub use utils::{request, val, fetch_posts, ErrorTemplate, Flair, Params, Post, Subreddit};
 
 // STRUCTS
 #[derive(Template)]
@@ -38,7 +37,7 @@ pub async fn render(sub_name: String, sort: Option<String>, ends: (Option<String
 	};
 
 	let sub_result = subreddit(&sub_name).await;
-	let items_result = posts(url).await;
+	let items_result = fetch_posts(url, String::new()).await;
 
 	if sub_result.is_err() || items_result.is_err() {
 		let s = ErrorTemplate {
@@ -97,54 +96,4 @@ async fn subreddit(sub: &String) -> Result<Subreddit, &'static str> {
 	};
 
 	Ok(sub)
-}
-
-// POSTS
-pub async fn posts(url: String) -> Result<(Vec<Post>, String), &'static str> {
-	// Send a request to the url, receive JSON in response
-	let req = request(url).await;
-
-	// If the Reddit API returns an error, exit this function
-	if req.is_err() {
-		return Err(req.err().unwrap());
-	}
-
-	// Otherwise, grab the JSON output from the request
-	let res = req.unwrap();
-
-	// Fetch the list of posts from the JSON response
-	let post_list = res["data"]["children"].as_array().unwrap();
-
-	let mut posts: Vec<Post> = Vec::new();
-
-	for post in post_list.iter() {
-		let img = if val(post, "thumbnail").await.starts_with("https:/") {
-			val(post, "thumbnail").await
-		} else {
-			String::new()
-		};
-		let unix_time: i64 = post["data"]["created_utc"].as_f64().unwrap().round() as i64;
-		let score = post["data"]["score"].as_i64().unwrap();
-		posts.push(Post {
-			title: val(post, "title").await,
-			community: val(post, "subreddit").await,
-			body: String::new(),
-			author: val(post, "author").await,
-			score: if score > 1000 { format!("{}k", score / 1000) } else { score.to_string() },
-			media: img,
-			url: val(post, "permalink").await,
-			time: Utc.timestamp(unix_time, 0).format("%b %e '%y").to_string(),
-			flair: Flair(
-				val(post, "link_flair_text").await,
-				val(post, "link_flair_background_color").await,
-				if val(post, "link_flair_text_color").await == "dark" {
-					"black".to_string()
-				} else {
-					"white".to_string()
-				},
-			),
-		});
-	}
-
-	Ok((posts, res["data"]["after"].as_str().unwrap_or("").to_string()))
 }

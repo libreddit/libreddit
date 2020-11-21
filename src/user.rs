@@ -1,11 +1,10 @@
 // CRATES
 use actix_web::{get, web, HttpResponse, Result};
 use askama::Template;
-use chrono::{TimeZone, Utc};
 
 #[path = "utils.rs"]
 mod utils;
-use utils::{nested_val, request, val, ErrorTemplate, Flair, Params, Post, User};
+use utils::{nested_val, request, fetch_posts, ErrorTemplate, Params, Post, User};
 
 // STRUCTS
 #[derive(Template)]
@@ -17,8 +16,11 @@ struct UserTemplate {
 }
 
 async fn render(username: String, sort: String) -> Result<HttpResponse> {
+	// Build the Reddit JSON API url
+	let url: String = format!("https://www.reddit.com/user/{}/.json?sort={}", username, sort);
+
 	let user = user(&username).await;
-	let posts = posts(username, &sort).await;
+	let posts = fetch_posts(url, "Comment".to_string()).await;
 
 	if user.is_err() || posts.is_err() {
 		let s = ErrorTemplate {
@@ -30,7 +32,7 @@ async fn render(username: String, sort: String) -> Result<HttpResponse> {
 	} else {
 		let s = UserTemplate {
 			user: user.unwrap(),
-			posts: posts.unwrap(),
+			posts: posts.unwrap().0,
 			sort: sort,
 		}
 		.render()
@@ -72,58 +74,4 @@ async fn user(name: &String) -> Result<User, &'static str> {
 		banner: nested_val(&res, "subreddit", "banner_img").await,
 		description: nested_val(&res, "subreddit", "public_description").await,
 	})
-}
-
-// POSTS
-async fn posts(sub: String, sort: &String) -> Result<Vec<Post>, &'static str> {
-	// Build the Reddit JSON API url
-	let url: String = format!("https://www.reddit.com/u/{}/.json?sort={}", sub, sort);
-
-	// Send a request to the url, receive JSON in response
-	let req = request(url).await;
-
-	// If the Reddit API returns an error, exit this function
-	if req.is_err() {
-		return Err(req.err().unwrap());
-	}
-
-	// Otherwise, grab the JSON output from the request
-	let res = req.unwrap();
-
-	let post_list = res["data"]["children"].as_array().unwrap();
-
-	let mut posts: Vec<Post> = Vec::new();
-
-	for post in post_list.iter() {
-		let img = if val(post, "thumbnail").await.starts_with("https:/") {
-			val(post, "thumbnail").await
-		} else {
-			String::new()
-		};
-		let unix_time: i64 = post["data"]["created_utc"].as_f64().unwrap().round() as i64;
-		let score = post["data"]["score"].as_i64().unwrap();
-		let title = val(post, "title").await;
-
-		posts.push(Post {
-			title: if title.is_empty() { "Comment".to_string() } else { title },
-			community: val(post, "subreddit").await,
-			body: String::new(),
-			author: val(post, "author").await,
-			score: if score > 1000 { format!("{}k", score / 1000) } else { score.to_string() },
-			media: img,
-			url: val(post, "permalink").await,
-			time: Utc.timestamp(unix_time, 0).format("%b %e '%y").to_string(),
-			flair: Flair(
-				val(post, "link_flair_text").await,
-				val(post, "link_flair_background_color").await,
-				if val(post, "link_flair_text_color").await == "dark" {
-					"black".to_string()
-				} else {
-					"white".to_string()
-				},
-			),
-		});
-	}
-
-	Ok(posts)
 }

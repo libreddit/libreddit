@@ -1,4 +1,9 @@
 //
+// CRATES
+//
+use chrono::{TimeZone, Utc};
+
+//
 // STRUCTS
 //
 #[allow(dead_code)]
@@ -78,6 +83,58 @@ pub async fn nested_val(j: &serde_json::Value, n: &str, k: &str) -> String {
 	String::from(j["data"][n][k].as_str().unwrap())
 }
 
+#[allow(dead_code)]
+pub async fn fetch_posts(url: String, fallback_title: String) -> Result<(Vec<Post>, String), &'static str> {
+	// Send a request to the url, receive JSON in response
+	let req = request(url).await;
+
+	// If the Reddit API returns an error, exit this function
+	if req.is_err() {
+		return Err(req.err().unwrap());
+	}
+
+	// Otherwise, grab the JSON output from the request
+	let res = req.unwrap();
+
+	// Fetch the list of posts from the JSON response
+	let post_list = res["data"]["children"].as_array().unwrap();
+
+	let mut posts: Vec<Post> = Vec::new();
+
+	for post in post_list.iter() {
+		let img = if val(post, "thumbnail").await.starts_with("https:/") {
+			val(post, "thumbnail").await
+		} else {
+			String::new()
+		};
+		let unix_time: i64 = post["data"]["created_utc"].as_f64().unwrap().round() as i64;
+		let score = post["data"]["score"].as_i64().unwrap();
+		let title = val(post, "title").await;
+
+		posts.push(Post {
+			title: if title.is_empty() { fallback_title.to_owned() } else { title },
+			community: val(post, "subreddit").await,
+			body: String::new(),
+			author: val(post, "author").await,
+			score: if score > 1000 { format!("{}k", score / 1000) } else { score.to_string() },
+			media: img,
+			url: val(post, "permalink").await,
+			time: Utc.timestamp(unix_time, 0).format("%b %e '%y").to_string(),
+			flair: Flair(
+				val(post, "link_flair_text").await,
+				val(post, "link_flair_background_color").await,
+				if val(post, "link_flair_text_color").await == "dark" {
+					"black".to_string()
+				} else {
+					"white".to_string()
+				},
+			),
+		});
+	}
+
+	Ok((posts, res["data"]["after"].as_str().unwrap_or("").to_string()))
+}
+
 //
 // NETWORKING
 //
@@ -103,6 +160,8 @@ pub async fn request(url: String) -> Result<serde_json::Value, &'static str> {
 	let mut res = client.send(req).await.unwrap();
 	let success = res.status().is_success();
 	let body = res.body_string().await.unwrap();
+
+	dbg!(url.clone());
 
 	// --- reqwest ---
 	// let res = reqwest::get(&url).await.unwrap();

@@ -2,13 +2,9 @@
 use actix_web::{get, web, HttpResponse, Result};
 use askama::Template;
 
-#[path = "subreddit.rs"]
-mod subreddit;
-use subreddit::{posts, Post};
-
 #[path = "utils.rs"]
 mod utils;
-use utils::{ErrorTemplate, Params};
+use utils::{fetch_posts, ErrorTemplate, Params, Post};
 
 // STRUCTS
 #[derive(Template)]
@@ -33,7 +29,7 @@ async fn render(sub_name: String, sort: Option<String>, ends: (Option<String>, O
 		},
 	};
 
-	let items_result = posts(url).await;
+	let items_result = fetch_posts(url, String::new()).await;
 
 	if items_result.is_err() {
 		let s = ErrorTemplate {
