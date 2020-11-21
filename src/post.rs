@@ -28,7 +28,7 @@ async fn render(id: String, sort: String) -> Result<HttpResponse> {
 		}
 		.render()
 		.unwrap();
-		Ok(HttpResponse::Ok().content_type("text/html").body(s))
+		Ok(HttpResponse::Ok().status(actix_web::http::StatusCode::NOT_FOUND).content_type("text/html").body(s))
 	} else {
 		let s = PostTemplate {
 			comments: comments.unwrap(),

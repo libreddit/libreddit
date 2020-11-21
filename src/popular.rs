@@ -41,7 +41,7 @@ async fn render(sub_name: String, sort: Option<String>, ends: (Option<String>, O
 		}
 		.render()
 		.unwrap();
-		Ok(HttpResponse::Ok().content_type("text/html").body(s))
+		Ok(HttpResponse::Ok().status(actix_web::http::StatusCode::NOT_FOUND).content_type("text/html").body(s))
 	} else {
 		let items = items_result.unwrap();
 
