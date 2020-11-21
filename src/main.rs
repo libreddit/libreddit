@@ -15,6 +15,12 @@ async fn style() -> HttpResponse {
 	HttpResponse::Ok().content_type("text/css").body(file)
 }
 
+#[get("/robots.txt")]
+async fn robots() -> HttpResponse {
+	let file = fs::read_to_string("static/robots.txt").expect("ERROR: Could not read robots.txt");
+	HttpResponse::Ok().body(file)
+}
+
 #[get("/favicon.ico")]
 async fn favicon() -> HttpResponse {
 	HttpResponse::Ok().body("")
@@ -30,6 +36,7 @@ async fn main() -> std::io::Result<()> {
 			// GENERAL SERVICES
 			.service(style)
 			.service(favicon)
+			.service(robots)
 			// POST SERVICES
 			.service(post::short)
 			.service(post::page)
