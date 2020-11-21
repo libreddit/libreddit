@@ -98,17 +98,18 @@ pub async fn request(url: String) -> Result<serde_json::Value, &'static str> {
 	// let body = std::str::from_utf8(res.as_ref())?; // .as_ref converts Bytes to [u8]
 
 	// --- surf ---
-	// let req = surf::get(url);
-	// let client = surf::client().with(surf::middleware::Redirect::new(5));
-	// let mut res = client.send(req).await.unwrap();
-	// let body = res.body_string().await.unwrap();
+	let req = surf::get(&url).header("User-Agent", "libreddit");
+	let client = surf::client().with(surf::middleware::Redirect::new(5));
+	let mut res = client.send(req).await.unwrap();
+	let success = res.status().is_success();
+	let body = res.body_string().await.unwrap();
 
 	// --- reqwest ---
-	let res = reqwest::get(&url).await.unwrap();
-	// Read the status from the response
-	let success = res.status().is_success();
-	// Read the body of the response
-	let body = res.text().await.unwrap();
+	// let res = reqwest::get(&url).await.unwrap();
+	// // Read the status from the response
+	// let success = res.status().is_success();
+	// // Read the body of the response
+	// let body = res.text().await.unwrap();
 
 	// Parse the response from Reddit as JSON
 	let json: serde_json::Value = serde_json::from_str(body.as_str()).unwrap_or(serde_json::Value::Null);
