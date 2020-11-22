@@ -7,7 +7,7 @@ Libre + Reddit = Libreddit
 - 🚀 Fast: written in Rust for blazing fast speeds and safety
 - ☁️ Light: no javascript, no ads, no tracking
 - 🕵 Private: ~~all~~ most requests are proxied through the server (images are still loaded from Reddit)
-- 🔒 Safe: does not rely on Reddit's closed APIs 
+- 🔒 Safe: does not rely on Reddit's OAuth-requiring APIs 
 - 📱 Responsive: works great on mobile!
 
 Think Invidious but for Reddit. Watch your cat videos without being watched.
