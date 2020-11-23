@@ -40,7 +40,6 @@ Think Invidious but for Reddit. Watch your cat videos without being watched.
     - [ ] Proxied images 
   - [x] Reddit-hosted video
     - [ ] Proxied video
-  - [ ] Localized post date
 - [x] Users
   - [x] Username
   - [x] Karma
@@ -61,6 +60,17 @@ Think Invidious but for Reddit. Watch your cat videos without being watched.
 - [libreddit.spike.codes](https://libreddit.spike.codes) 🇺🇸
 
 ## Deploy an Instance
+
+Once installed, deploy Libreddit (unless you're using Docker) by running:
+
+```
+libreddit
+```
+
+Specify a custom address for the server by passing the `-a` or `--address` argument:
+```
+libreddit --address=0.0.0.0:8111
+```
 
 ### A) Cargo
 
@@ -89,11 +99,6 @@ Libreddit is available from the Arch User Repository as [`libreddit-git`](https:
 Install:
 ```
 yay -S libreddit-git
-```
-
-Deploy:
-```
-libreddit
 ```
 
 ## Building
