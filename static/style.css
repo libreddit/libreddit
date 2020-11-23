@@ -22,6 +22,10 @@ header {
 	font-size: 20px;
 }
 
+#lib, #github {
+	color: white;
+}
+
 main {
 	max-width: 750px;
 	margin: 0 auto;
@@ -83,6 +87,10 @@ span {
 	padding: 20px;
 }
 
+#stats {
+	margin-top: 10px;
+}
+
 /* User */
 
 .user {
@@ -124,6 +132,11 @@ span {
 	cursor: pointer;
 }
 
+#sort > div.selected {
+	background: aqua;
+	color: black;
+}
+
 #sort > div:hover {
 	background: #222;
 }
@@ -134,6 +147,15 @@ span {
 	border-radius: 5px;
 	background: #151515;
 	display: flex;
+}
+
+.post.highlighted {
+	border: 2px solid #555;
+	background: #222;
+}
+
+.post.highlighted > .post_left {
+	background: #333;
 }
 
 .post:hover {
@@ -156,6 +178,10 @@ span {
 	border-radius: 5px 0px 0px 5px;
 	min-width: 50px;
 	padding: 5px;
+}
+
+.post_right > p > span, .comment_right > p > span {
+	float: right;
 }
 
 .post_title {

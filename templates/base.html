@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		{% block head %}
+		<title>{% block title %}{% endblock %}</title>
+		<meta name="description" content="View on Libreddit, an alternative private front-end to Reddit.">
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<link rel="stylesheet" href="/style.css">
+		{% block sortstyle %}
+		<style>
+			#sort > #sort_{{ sort }} {
+				background: aqua;
+				color: black;
+			}
+		</style>
+		{% endblock %}
+		{% endblock %}
+    </head>
+	<body>
+		{% block body %}
+		{% block header %}
+		<header>
+			<a href="/"><span id="lib">lib</span>reddit.</a>
+			<a id="github" href="https://github.com/spikecodes/libreddit">GITHUB</a>
+		</header>
+		{% endblock %}
+
+		<main>
+			{% block content %}
+			{% endblock %}
+		</main>
+		{% endblock %}
+	</body>
+</html>

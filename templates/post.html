@@ -1,70 +1,55 @@
-<html>
-	<head>
-		<title>{{ post.title }} - r/{{ post.community }}</title>
-		<meta name="author" content="u/{{ post.author }}">
-		<meta name="description" content="View on Libreddit, an alternative private front-end to Reddit.">
-		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-		<link rel="stylesheet" href="/style.css">
-		<style>
-			#sort > #sort_{{ sort }} {
-				background: aqua;
-				color: black;
-			}
-		</style>
-	</head>
-	<body>
-		<header>
-			<a href="/"><span style="color:white">lib</span>reddit.</a>
-			<a style="color:white" href="https://github.com/spikecodes/libreddit">GITHUB</a>
-		</header>
-		<main>
-			<div class="post" style="border: 2px solid #555;background: #222;">
-				<div class="post_left" style="background: #333;">
-					<button class="post_upvote">↑</button>
-					<h3 class="post_score">{{ post.score }}</h3>
-					<button class="post_upvote">↓</button>
-				</div>
-				<div class="post_right">
-					<p>
-						<b><a class="post_subreddit" href="/r/{{ post.community }}">r/{{ post.community }}</a></b>
-						&bull;
-						Posted by 
-						<a class="post_author" href="/u/{{ post.author }}">u/{{ post.author }}</a>
-						<span style="float: right;">{{ post.time }}</span>
-					</p>
-					<h3 class="post_title">
-						{{ post.title }}
-						{% if post.flair.0 != "" %}
-						<small style="color:{{ post.flair.2 }}; background:{{ post.flair.1 }}">{{ post.flair.0 }}</small>
-						{% endif %}
-					</h3>
-					{{ post.media }}
-					<h4 class="post_body">{{ post.body }}</h4>
-				</div>
-			</div>
-			<div id="sort">
-				<div id="sort_confidence"><a href="?sort=confidence">Best</a></div>
-				<div id="sort_top"><a href="?sort=top">Top</a></div>
-				<div id="sort_new"><a href="?sort=new">New</a></div>
-				<div id="sort_controversial"><a href="?sort=controversial">Controversial</a></div>
-				<div id="sort_old"><a href="?sort=old">Old</a></div>
-			</div>
-			{% for comment in comments %}
-			<div class="comment">
-				<div class="comment_left">
-					<button class="comment_upvote">↑</button>
-					<h3 class="comment_score">{{ comment.score }}</h3>
-					<button class="comment_upvote">↓</button>
-				</div>
-				<div class="comment_right">
-					<p>
-						Posted by <a class="comment_author" href="/u/{{ comment.author }}">u/{{ comment.author }}</a>
-						<span style="float: right;">{{ comment.time }}</span>
-					</p>
-					<h4 class="comment_body">{{ comment.body }}</h4>
-				</div>
-			</div><br>
-			{% endfor %}
-		</main>
-	</body>
-</html>
+{% extends "base.html" %}
+{% block title %}{{ post.title }} - r/{{ post.community }}{% endblock %}
+{% block head %}
+	{% call super() %}
+	<meta name="author" content="u/{{ post.author }}">
+{% endblock %}
+{% block content %}
+	<div class="post highlighted">
+		<div class="post_left">
+			<button class="post_upvote">↑</button>
+			<h3 class="post_score">{{ post.score }}</h3>
+			<button class="post_upvote">↓</button>
+		</div>
+		<div class="post_right">
+			<p>
+				<b><a class="post_subreddit" href="/r/{{ post.community }}">r/{{ post.community }}</a></b>
+				&bull;
+				Posted by 
+				<a class="post_author" href="/u/{{ post.author }}">u/{{ post.author }}</a>
+				<span>{{ post.time }}</span>
+			</p>
+			<h3 class="post_title">
+				{{ post.title }}
+				{% if post.flair.0 != "" %}
+				<small style="color:{{ post.flair.2 }}; background:{{ post.flair.1 }}">{{ post.flair.0 }}</small>
+				{% endif %}
+			</h3>
+			{{ post.media }}
+			<h4 class="post_body">{{ post.body }}</h4>
+		</div>
+	</div>
+	<div id="sort">
+		<div id="sort_confidence"><a href="?sort=confidence">Best</a></div>
+		<div id="sort_top"><a href="?sort=top">Top</a></div>
+		<div id="sort_new"><a href="?sort=new">New</a></div>
+		<div id="sort_controversial"><a href="?sort=controversial">Controversial</a></div>
+		<div id="sort_old"><a href="?sort=old">Old</a></div>
+	</div>
+	{% for comment in comments %}
+	<div class="comment">
+		<div class="comment_left">
+			<button class="comment_upvote">↑</button>
+			<h3 class="comment_score">{{ comment.score }}</h3>
+			<button class="comment_upvote">↓</button>
+		</div>
+		<div class="comment_right">
+			<p>
+				Posted by <a class="comment_author" href="/u/{{ comment.author }}">u/{{ comment.author }}</a>
+				<span>{{ comment.time }}</span>
+			</p>
+			<h4 class="comment_body">{{ comment.body }}</h4>
+		</div>
+	</div><br>
+	{% endfor %}
+{% endblock %}

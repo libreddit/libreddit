@@ -1,62 +1,44 @@
-<html>
-	<head>
-		<title>Libreddit</title>
-		<meta name="description" content="Alternative private front-end to Reddit">
-		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-		<link rel="stylesheet" href="/style.css">
-		<style>
-			#sort > #sort_{{ sort }} {
-				background: aqua;
-				color: black;
-			}
-		</style>
-	</head>
-	<body>
-		<header>
-			<a href="/"><span style="color:white">lib</span>reddit.</a>
-			<a style="color:white" href="https://github.com/spikecodes/libreddit">GITHUB</a>
-		</header>
-		<main>
-			<div id="sort">
-				<div id="sort_hot"><a href="?sort=hot">Hot</a></div>
-				<div id="sort_top"><a href="?sort=top">Top</a></div>
-				<div id="sort_new"><a href="?sort=new">New</a></div>
-			</div>
-			{% for post in posts %}
-			<div class="post">
-				<div class="post_left">
-					<button class="post_upvote">↑</button>
-					<h3 class="post_score">{{ post.score }}</h3>
-					<button class="post_upvote">↓</button>
-				</div>
-				<div class="post_right">
-					<p>
-						<b><a class="post_subreddit" href="/r/{{ post.community }}">r/{{ post.community }}</a></b>
-						&bull;
-						Posted by 
-						<a class="post_author" href="/u/{{ post.author }}">u/{{ post.author }}</a>
-						<span style="float: right;">{{ post.time }}</span>
-					</p>
-					<h3 class="post_title">
-						{% if post.flair.0 != "" %}
-						<small style="color:{{ post.flair.2 }}; background:{{ post.flair.1 }}">{{ post.flair.0 }}</small>
-						{% endif %}
-						<a href="{{ post.url }}">{{ post.title }}</a>
-					</h3>
-				</div>
-				<img class="post_thumbnail" src="{{ post.media }}">
-			</div><br>
-			{% endfor %}
+{% extends "base.html" %}
+{% block title %}Libreddit{% endblock %}
+{% block content %}
+	<div id="sort">
+		<div id="sort_hot"><a href="?sort=hot">Hot</a></div>
+		<div id="sort_top"><a href="?sort=top">Top</a></div>
+		<div id="sort_new"><a href="?sort=new">New</a></div>
+	</div>
+	{% for post in posts %}
+	<div class="post">
+		<div class="post_left">
+			<button class="post_upvote">↑</button>
+			<h3 class="post_score">{{ post.score }}</h3>
+			<button class="post_upvote">↓</button>
+		</div>
+		<div class="post_right">
+			<p>
+				<b><a class="post_subreddit" href="/r/{{ post.community }}">r/{{ post.community }}</a></b>
+				&bull;
+				Posted by 
+				<a class="post_author" href="/u/{{ post.author }}">u/{{ post.author }}</a>
+				<span style="float: right;">{{ post.time }}</span>
+			</p>
+			<h3 class="post_title">
+				{% if post.flair.0 != "" %}
+				<small style="color:{{ post.flair.2 }}; background:{{ post.flair.1 }}">{{ post.flair.0 }}</small>
+				{% endif %}
+				<a href="{{ post.url }}">{{ post.title }}</a>
+			</h3>
+		</div>
+		<img class="post_thumbnail" src="{{ post.media }}">
+	</div><br>
+	{% endfor %}
 
-			<footer>
-				{% if ends.0 != "" %}
-				<a href="?before={{ ends.0 }}">PREV</a>
-				{% endif %}
-	
-				{% if ends.1 != "" %}
-				<a href="?after={{ ends.1 }}">NEXT</a>
-				{% endif %}
-			</footer>
-		</main>
-	</body>
-</html>
+	<footer>
+		{% if ends.0 != "" %}
+		<a href="?before={{ ends.0 }}">PREV</a>
+		{% endif %}
+
+		{% if ends.1 != "" %}
+		<a href="?after={{ ends.1 }}">NEXT</a>
+		{% endif %}
+	</footer>
+{% endblock %}
