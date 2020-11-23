@@ -2,7 +2,7 @@ use actix_web::{get, web, HttpResponse, Result, client::Client, Error};
 
 #[get("/imageproxy/{url:.*}")]
 async fn handler(web::Path(url): web::Path<String>) -> Result<HttpResponse> {
-    dbg!("Proxy: ", &url);
+    dbg!(&url);
     let client = Client::default();
     client.get(url)
         .send()
