@@ -39,7 +39,7 @@ async fn main() -> std::io::Result<()> {
 	}
 
 	// start http server
-	println!("Running Libreddit on {}!", address);
+	println!("Running Libreddit on {}!", address.clone());
 
 	HttpServer::new(|| {
 		App::new()
@@ -47,6 +47,8 @@ async fn main() -> std::io::Result<()> {
 			.service(style)
 			.service(favicon)
 			.service(robots)
+			// PROXY SERVICE
+			.service(proxy::handler)
 			// POST SERVICES
 			.service(post::short)
 			.service(post::page)
@@ -57,7 +59,8 @@ async fn main() -> std::io::Result<()> {
 			// USER SERVICES
 			.service(user::page)
 	})
-	.bind(address)?
+	.bind(address.clone())
+	.expect(format!("Cannot bind to the address: {}", address).as_str())
 	.run()
 	.await
 }

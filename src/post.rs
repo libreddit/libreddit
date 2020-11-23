@@ -77,15 +77,15 @@ async fn media(data: &serde_json::Value) -> String {
 	let media: String = if !has_media {
 		format!(r#"<h4 class="post_body"><a href="{u}">{u}</a></h4>"#, u = data["data"]["url"].as_str().unwrap())
 	} else {
-		format!(r#"<img class="post_image" src="{}.png"/>"#, data["data"]["url"].as_str().unwrap())
+		format!(r#"<img class="post_image" src="/imageproxy/{}.png"/>"#, data["data"]["url"].as_str().unwrap())
 	};
 
 	match post_hint {
 		"hosted:video" => format!(
-			r#"<video class="post_image" src="{}" controls/>"#,
+			r#"<video class="post_image" src="/imageproxy/{}" controls/>"#,
 			data["data"]["media"]["reddit_video"]["fallback_url"].as_str().unwrap()
 		),
-		"image" => format!(r#"<img class="post_image" src="{}"/>"#, data["data"]["url"].as_str().unwrap()),
+		"image" => format!(r#"<img class="post_image" src="/imageproxy/{}"/>"#, data["data"]["url"].as_str().unwrap()),
 		"self" => String::from(""),
 		_ => media,
 	}
