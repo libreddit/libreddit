@@ -13,7 +13,7 @@ struct SubredditTemplate {
 	sub: Subreddit,
 	posts: Vec<Post>,
 	sort: String,
-	ends: (String, String),
+	ends: (String, String)
 }
 
 // SERVICES
@@ -60,7 +60,7 @@ pub async fn render(sub_name: String, sort: Option<String>, ends: (Option<String
 			sub: sub,
 			posts: items.0,
 			sort: sorting,
-			ends: (before, items.1),
+			ends: (before, items.1)
 		}
 		.render()
 		.unwrap();
@@ -84,15 +84,16 @@ async fn subreddit(sub: &String) -> Result<Subreddit, &'static str> {
 	// Otherwise, grab the JSON output from the request
 	let res = req.unwrap();
 
-	let icon: String = String::from(res["data"]["community_icon"].as_str().unwrap()); //val(&data, "community_icon");
-	let icon_split: std::str::Split<&str> = icon.split("?");
-	let icon_parts: Vec<&str> = icon_split.collect();
+	let members = res["data"]["subscribers"].as_u64().unwrap_or(0);
+	let active =  res["data"]["accounts_active"].as_u64().unwrap_or(0);
 
 	let sub = Subreddit {
 		name: val(&res, "display_name").await,
 		title: val(&res, "title").await,
 		description: val(&res, "public_description").await,
-		icon: String::from(icon_parts[0]),
+		icon: val(&res, "icon_img").await,
+		members: if members > 1000 { format!("{}k", members / 1000) } else { members.to_string() },
+		active: if active > 1000 { format!("{}k", active / 1000) } else { active.to_string() },
 	};
 
 	Ok(sub)
