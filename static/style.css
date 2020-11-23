@@ -264,12 +264,12 @@ small {
 
 .comment {
 	border-radius: 5px;
-	background: #151515;
 	display: flex;
+	border: 2px solid #222;
 }
 
 .comment:hover {
-	background: #222;
+	background: #111;
 }
 
 .comment_left, .comment_right {
@@ -279,10 +279,9 @@ small {
 
 .comment_left {
 	text-align: center;
-	border-right: 2px solid #000;
-	border-radius: 5px 0px 0px 5px;
 	min-width: 50px;
 	padding: 5px;
+	align-items: flex-end;
 }
 
 .comment_title {
@@ -290,7 +289,11 @@ small {
 }
 
 .comment_upvote {
-	display: none;
+	margin-top: 0.5em;
+	border-radius: 5px 5px 0px 0px;
+	background: #222;
+	width: 40px;
+	padding: 10px 0px 0px 0px;
 }
 
 .comment_subreddit {
@@ -298,13 +301,16 @@ small {
 }
 
 .comment_score {
-	margin-top: 1em;
 	color: aqua;
+	background: #222;
+	width: 40px;
+	padding: 5px 0px 10px 0px;
+	border-radius: 0px 0px 5px 5px;
 }
 
 .comment_right {
 	word-wrap: anywhere;
-	padding: 20px 25px;
+	padding: 10px 25px 10px 10px;
 	flex-grow: 1;
 	flex-shrink: 1;
 }
@@ -339,6 +345,15 @@ small {
 .comment_body a {
 	text-decoration: underline;
 	color: aqua;
+}
+
+.post.comment {
+	background: #000;
+	border: 2px solid #222;
+}
+
+.post.comment > .post_left {
+	background: black;
 }
 
 /* Tables */

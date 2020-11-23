@@ -25,7 +25,8 @@
 			<div id="sort_new"><a href="?sort=new">New</a></div>
 		</div>
 		{% for post in posts %}
-		<div class="post">
+		{% if post.title != "Comment" %}
+		<div class='post'>
 			<div class="post_left">
 				<button class="post_upvote">↑</button>
 				<h3 class="post_score">{{ post.score }}</h3>
@@ -50,6 +51,21 @@
 			</div>
 			<img class="post_thumbnail" src="{{ post.media }}">
 		</div><br>
+		{% else %}
+		<div class="comment">
+			<div class="comment_left">
+				<button class="comment_upvote">↑</button>
+				<h3 class="comment_score">{{ post.score }}</h3>
+			</div>
+			<div class="comment_right">
+				<p>
+					COMMENT &bull; Posted by <a class="comment_author" href="/u/{{ post.author }}">u/{{ post.author }}</a>
+					<span>{{ post.time }}</span>
+				</p>
+				<h4 class="comment_body">{{ post.body }}</h4>
+			</div>
+		</div><br>
+		{% endif %}
 		{% endfor %}
 	</main>
 {% endblock %}

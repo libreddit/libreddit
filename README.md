@@ -45,9 +45,7 @@ Think Invidious but for Reddit. Watch your cat videos without being watched.
   - [x] Karma
   - [x] Description
   - [x] Post history
-    - [x] Post sorting
-  - [ ] Comment history
-    - [ ] Comment sorting
+  - [x] Comment history
 
 - [ ] Search
   - [ ] Post aggregating

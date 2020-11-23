@@ -116,7 +116,7 @@ pub async fn fetch_posts(url: String, fallback_title: String) -> Result<(Vec<Pos
 		posts.push(Post {
 			title: if title.is_empty() { fallback_title.to_owned() } else { title },
 			community: val(post, "subreddit").await,
-			body: String::new(),
+			body: val(post, "body").await,
 			author: val(post, "author").await,
 			score: if score > 1000 { format!("{}k", score / 1000) } else { score.to_string() },
 			media: img,
