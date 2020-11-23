@@ -57,18 +57,7 @@ Think Invidious but for Reddit. Watch your cat videos without being watched.
 - [libredd.it](https://libredd.it) 🇺🇸 (Thank you to [YeapGuy](https://github.com/YeapGuy)!)
 - [libreddit.spike.codes](https://libreddit.spike.codes) 🇺🇸
 
-## Deploy an Instance
-
-Once installed, deploy Libreddit (unless you're using Docker) by running:
-
-```
-libreddit
-```
-
-Specify a custom address for the server by passing the `-a` or `--address` argument:
-```
-libreddit --address=0.0.0.0:8111
-```
+## Installation
 
 ### A) Cargo
 
@@ -99,7 +88,24 @@ Install:
 yay -S libreddit-git
 ```
 
-## Building
+### D) GitHub Releases
+
+If you're on Linux and none of these methods work for you, you can grab a Linux binary from [the newest release](https://github.com/spikecodes/libreddit/releases/latest).
+
+## Deploy an Instance
+
+Once installed, deploy Libreddit (unless you're using Docker) by running:
+
+```
+libreddit
+```
+
+Specify a custom address for the server by passing the `-a` or `--address` argument:
+```
+libreddit --address=0.0.0.0:8111
+```
+
+## Building from Source
 
 ```
 git clone https://github.com/spikecodes/libreddit
