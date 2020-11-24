@@ -105,6 +105,11 @@ Specify a custom address for the server by passing the `-a` or `--address` argum
 libreddit --address=0.0.0.0:8111
 ```
 
+To disable the media proxy built into Libreddit, run:
+```
+libreddit --no-default-features
+```
+
 ## Building from Source
 
 ```

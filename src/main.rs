@@ -32,9 +32,11 @@ async fn main() -> std::io::Result<()> {
 	let mut address = "0.0.0.0:8080".to_string();
 
 	if args.len() > 1 {
-		if args[1].starts_with("--address=") || args[1].starts_with("-a=") {
-			let split: Vec<&str> = args[1].split("=").collect();
-			address = split[1].to_string();
+		for arg in args {
+			if arg.starts_with("--address=") || arg.starts_with("-a=") {
+				let split: Vec<&str> = arg.split("=").collect();
+				address = split[1].to_string();
+			}
 		}
 	}
 
