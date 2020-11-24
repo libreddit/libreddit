@@ -7,8 +7,12 @@ version = "0.1.6"
 authors = ["spikecodes <19519553+spikecodes@users.noreply.github.com>"]
 edition = "2018"
 
+[features]
+default = ["proxy"]
+proxy = ["actix-web/rustls"]
+
 [dependencies]
-actix-web = { version = "3.2.0", features = ["rustls"] }
+actix-web = "3.2.0"
 surf = "2.1.0"
 askama = "0.8.0"
 serde = "1.0.117"

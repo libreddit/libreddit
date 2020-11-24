@@ -74,18 +74,20 @@ async fn media(data: &serde_json::Value) -> String {
 	let post_hint: &str = data["data"]["post_hint"].as_str().unwrap_or("");
 	let has_media: bool = data["data"]["media"].is_object();
 
+	let prefix = if cfg!(feature = "proxy") { "/imageproxy/" } else { "" };
+
 	let media: String = if !has_media {
 		format!(r#"<h4 class="post_body"><a href="{u}">{u}</a></h4>"#, u = data["data"]["url"].as_str().unwrap())
 	} else {
-		format!(r#"<img class="post_image" src="/imageproxy/{}.png"/>"#, data["data"]["url"].as_str().unwrap())
+		format!(r#"<img class="post_image" src="{}{}.png"/>"#, prefix, data["data"]["url"].as_str().unwrap())
 	};
 
 	match post_hint {
 		"hosted:video" => format!(
-			r#"<video class="post_image" src="/imageproxy/{}" controls/>"#,
-			data["data"]["media"]["reddit_video"]["fallback_url"].as_str().unwrap()
+			r#"<video class="post_image" src="{}{}" controls/>"#,
+			prefix, data["data"]["media"]["reddit_video"]["fallback_url"].as_str().unwrap()
 		),
-		"image" => format!(r#"<img class="post_image" src="/imageproxy/{}"/>"#, data["data"]["url"].as_str().unwrap()),
+		"image" => format!(r#"<img class="post_image" src="{}{}"/>"#, prefix, data["data"]["url"].as_str().unwrap()),
 		"self" => String::from(""),
 		_ => media,
 	}
