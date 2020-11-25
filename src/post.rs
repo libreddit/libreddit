@@ -1,12 +1,9 @@
 // CRATES
-use actix_web::{get, web, HttpResponse, Result};
+use actix_web::{get, web, HttpResponse, Result, http::StatusCode};
 use askama::Template;
 use chrono::{TimeZone, Utc};
 use pulldown_cmark::{html, Options, Parser};
-
-#[path = "utils.rs"]
-mod utils;
-use utils::{request, val, Comment, ErrorTemplate, Flair, Params, Post};
+use crate::utils::{request, val, Comment, ErrorTemplate, Flair, Params, Post};
 
 // STRUCTS
 #[derive(Template)]
@@ -34,7 +31,7 @@ async fn render(id: String, sort: String) -> Result<HttpResponse> {
 		}
 		.render()
 		.unwrap();
-		return Ok(HttpResponse::Ok().status(actix_web::http::StatusCode::NOT_FOUND).content_type("text/html").body(s));
+		return Ok(HttpResponse::Ok().status(StatusCode::NOT_FOUND).content_type("text/html").body(s));
 	}
 
 	// Otherwise, grab the JSON output from the request

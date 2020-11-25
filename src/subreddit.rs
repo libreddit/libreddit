@@ -1,10 +1,7 @@
 // CRATES
-use actix_web::{get, web, HttpResponse, Result};
+use actix_web::{get, web, HttpResponse, Result, http::StatusCode};
 use askama::Template;
-
-#[path = "utils.rs"]
-mod utils;
-pub use utils::{request, val, fetch_posts, ErrorTemplate, Flair, Params, Post, Subreddit};
+use crate::utils::{request, val, fetch_posts, ErrorTemplate, Params, Post, Subreddit};
 
 // STRUCTS
 #[derive(Template)]
@@ -45,7 +42,7 @@ pub async fn render(sub_name: String, sort: Option<String>, ends: (Option<String
 		}
 		.render()
 		.unwrap();
-		Ok(HttpResponse::Ok().status(actix_web::http::StatusCode::NOT_FOUND).content_type("text/html").body(s))
+		Ok(HttpResponse::Ok().status(StatusCode::NOT_FOUND).content_type("text/html").body(s))
 	} else {
 		let mut sub = sub_result.unwrap();
 		let items = items_result.unwrap();

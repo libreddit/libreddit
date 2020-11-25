@@ -2,6 +2,8 @@
 // CRATES
 //
 use chrono::{TimeZone, Utc};
+use surf::{get, client, middleware::Redirect};
+use serde_json::{Value, from_str};
 
 //
 // STRUCTS
@@ -157,8 +159,8 @@ pub async fn request(url: String) -> Result<serde_json::Value, &'static str> {
 	// let body = std::str::from_utf8(res.as_ref())?; // .as_ref converts Bytes to [u8]
 
 	// --- surf ---
-	let req = surf::get(&url).header("User-Agent", "libreddit");
-	let client = surf::client().with(surf::middleware::Redirect::new(5));
+	let req = get(&url).header("User-Agent", "libreddit");
+	let client = client().with(Redirect::new(5));
 	let mut res = client.send(req).await.unwrap();
 	let success = res.status().is_success();
 	let body = res.body_string().await.unwrap();
@@ -173,12 +175,12 @@ pub async fn request(url: String) -> Result<serde_json::Value, &'static str> {
 	// let body = res.text().await.unwrap();
 
 	// Parse the response from Reddit as JSON
-	let json: serde_json::Value = serde_json::from_str(body.as_str()).unwrap_or(serde_json::Value::Null);
+	let json: Value = from_str(body.as_str()).unwrap_or(Value::Null);
 
 	if !success {
 		println!("! {} - {}", url, "Page not found");
 		Err("Page not found")
-	} else if json == serde_json::Value::Null {
+	} else if json == Value::Null {
 		println!("! {} - {}", url, "Failed to parse page JSON data");
 		Err("Failed to parse page JSON data")
 	} else {

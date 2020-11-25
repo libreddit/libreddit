@@ -7,6 +7,7 @@ mod post;
 mod subreddit;
 mod user;
 mod proxy;
+mod utils;
 
 // Create Services
 #[get("/style.css")]
