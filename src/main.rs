@@ -12,14 +12,12 @@ mod utils;
 // Create Services
 #[get("/style.css")]
 async fn style() -> HttpResponse {
-	let file = std::fs::read_to_string("static/style.css").expect("ERROR: Could not read style.css");
-	HttpResponse::Ok().content_type("text/css").body(file)
+	HttpResponse::Ok().content_type("text/css").body(include_str!("../static/style.css"))
 }
 
 #[get("/robots.txt")]
 async fn robots() -> HttpResponse {
-	let file = std::fs::read_to_string("static/robots.txt").expect("ERROR: Could not read robots.txt");
-	HttpResponse::Ok().body(file)
+	HttpResponse::Ok().body(include_str!("../static/robots.txt"))
 }
 
 #[get("/favicon.ico")]
