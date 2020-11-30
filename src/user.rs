@@ -1,7 +1,7 @@
 // CRATES
-use actix_web::{get, web, HttpResponse, Result, http::StatusCode};
+use crate::utils::{fetch_posts, nested_val, request, ErrorTemplate, Params, Post, User};
+use actix_web::{get, http::StatusCode, web, HttpResponse, Result};
 use askama::Template;
-use crate::utils::{nested_val, request, fetch_posts, ErrorTemplate, Params, Post, User};
 
 // STRUCTS
 #[derive(Template)]

@@ -1,7 +1,7 @@
 // CRATES
-use actix_web::{get, web, HttpResponse, Result, http::StatusCode};
+use crate::utils::{fetch_posts, request, val, ErrorTemplate, Params, Post, Subreddit};
+use actix_web::{get, http::StatusCode, web, HttpResponse, Result};
 use askama::Template;
-use crate::utils::{request, val, fetch_posts, ErrorTemplate, Params, Post, Subreddit};
 
 // STRUCTS
 #[derive(Template)]
@@ -10,7 +10,7 @@ struct SubredditTemplate {
 	sub: Subreddit,
 	posts: Vec<Post>,
 	sort: String,
-	ends: (String, String)
+	ends: (String, String),
 }
 
 // SERVICES
@@ -57,7 +57,7 @@ pub async fn render(sub_name: String, sort: Option<String>, ends: (Option<String
 			sub: sub,
 			posts: items.0,
 			sort: sorting,
-			ends: (before, items.1)
+			ends: (before, items.1),
 		}
 		.render()
 		.unwrap();
@@ -82,7 +82,7 @@ async fn subreddit(sub: &String) -> Result<Subreddit, &'static str> {
 	let res = req.unwrap();
 
 	let members = res["data"]["subscribers"].as_u64().unwrap_or(0);
-	let active =  res["data"]["accounts_active"].as_u64().unwrap_or(0);
+	let active = res["data"]["accounts_active"].as_u64().unwrap_or(0);
 
 	let sub = Subreddit {
 		name: val(&res, "display_name").await,

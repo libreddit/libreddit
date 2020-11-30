@@ -2,8 +2,8 @@
 // CRATES
 //
 use chrono::{TimeZone, Utc};
-use surf::{get, client, middleware::Redirect};
-use serde_json::{Value, from_str};
+use serde_json::{from_str, Value};
+use surf::{client, get, middleware::Redirect};
 
 //
 // STRUCTS
@@ -23,7 +23,7 @@ pub struct Post {
 	pub score: String,
 	pub media: String,
 	pub time: String,
-	pub flair: Flair
+	pub flair: Flair,
 }
 
 #[allow(dead_code)]
@@ -32,7 +32,7 @@ pub struct Comment {
 	pub body: String,
 	pub author: String,
 	pub score: String,
-	pub time: String
+	pub time: String,
 }
 
 #[allow(dead_code)]
@@ -42,7 +42,7 @@ pub struct User {
 	pub icon: String,
 	pub karma: i64,
 	pub banner: String,
-	pub description: String
+	pub description: String,
 }
 
 #[allow(dead_code)]
@@ -53,7 +53,7 @@ pub struct Subreddit {
 	pub description: String,
 	pub icon: String,
 	pub members: String,
-	pub active: String
+	pub active: String,
 }
 
 // Parser for query params, used in sorting (eg. /r/rust/?sort=hot)
@@ -61,14 +61,14 @@ pub struct Subreddit {
 pub struct Params {
 	pub sort: Option<String>,
 	pub after: Option<String>,
-	pub before: Option<String>
+	pub before: Option<String>,
 }
 
 // Error template
 #[derive(askama::Template)]
 #[template(path = "error.html", escape = "none")]
 pub struct ErrorTemplate {
-	pub message: String
+	pub message: String,
 }
 
 //

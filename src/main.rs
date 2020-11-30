@@ -4,9 +4,9 @@ use actix_web::{get, App, HttpResponse, HttpServer};
 // Reference local files
 mod popular;
 mod post;
+mod proxy;
 mod subreddit;
 mod user;
-mod proxy;
 mod utils;
 
 // Create Services

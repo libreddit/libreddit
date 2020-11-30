@@ -1394,11 +1394,12 @@ dependencies = [
 
 [[package]]
 name = "libreddit"
-version = "0.1.7"
+version = "0.1.8"
 dependencies = [
  "actix-web",
  "askama",
  "chrono",
+ "percent-encoding",
  "pulldown-cmark",
  "serde",
  "serde_json",

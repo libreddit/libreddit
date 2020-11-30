@@ -3,15 +3,16 @@ name = "libreddit"
 description = " Alternative private front-end to Reddit"
 license = "AGPL-3.0"
 repository = "https://github.com/spikecodes/libreddit"
-version = "0.1.7"
+version = "0.1.8"
 authors = ["spikecodes <19519553+spikecodes@users.noreply.github.com>"]
 edition = "2018"
 
 [features]
 default = ["proxy"]
-proxy = ["actix-web/rustls"]
+proxy = ["actix-web/rustls", "percent-encoding"]
 
 [dependencies]
+percent-encoding = { version = "2.1.0", optional = true }
 actix-web = "3.2.0"
 surf = "2.1.0"
 askama = "0.8.0"

@@ -1,9 +1,12 @@
 // CRATES
-use actix_web::{get, web, HttpResponse, Result, http::StatusCode};
+use crate::utils::{request, val, Comment, ErrorTemplate, Flair, Params, Post};
+use actix_web::{get, http::StatusCode, web, HttpResponse, Result};
 use askama::Template;
 use chrono::{TimeZone, Utc};
 use pulldown_cmark::{html, Options, Parser};
-use crate::utils::{request, val, Comment, ErrorTemplate, Flair, Params, Post};
+
+#[cfg(feature = "proxy")]
+use percent_encoding::{utf8_percent_encode, NON_ALPHANUMERIC};
 
 // STRUCTS
 #[derive(Template)]
@@ -66,6 +69,14 @@ async fn page(web::Path((_sub, id)): web::Path<(String, String)>, params: web::Q
 	}
 }
 
+async fn format_url(url: &str) -> String {
+	#[cfg(feature = "proxy")]
+	return utf8_percent_encode(url, NON_ALPHANUMERIC).to_string();
+
+	#[cfg(not(feature = "proxy"))]
+	return url.to_string();
+}
+
 // UTILITIES
 async fn media(data: &serde_json::Value) -> String {
 	let post_hint: &str = data["data"]["post_hint"].as_str().unwrap_or("");
@@ -76,15 +87,20 @@ async fn media(data: &serde_json::Value) -> String {
 	let media: String = if !has_media {
 		format!(r#"<h4 class="post_body"><a href="{u}">{u}</a></h4>"#, u = data["data"]["url"].as_str().unwrap())
 	} else {
-		format!(r#"<img class="post_image" src="{}{}.png"/>"#, prefix, data["data"]["url"].as_str().unwrap())
+		format!(
+			r#"<img class="post_image" src="{}{}.png"/>"#,
+			prefix,
+			format_url(data["data"]["url"].as_str().unwrap()).await
+		)
 	};
 
 	match post_hint {
 		"hosted:video" => format!(
 			r#"<video class="post_image" src="{}{}" controls/>"#,
-			prefix, data["data"]["media"]["reddit_video"]["fallback_url"].as_str().unwrap()
+			prefix,
+			format_url(data["data"]["media"]["reddit_video"]["fallback_url"].as_str().unwrap()).await
 		),
-		"image" => format!(r#"<img class="post_image" src="{}{}"/>"#, prefix, data["data"]["url"].as_str().unwrap()),
+		"image" => format!(r#"<img class="post_image" src="{}{}"/>"#, prefix, format_url(data["data"]["url"].as_str().unwrap()).await),
 		"self" => String::from(""),
 		_ => media,
 	}
