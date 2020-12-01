@@ -3,7 +3,7 @@
 //
 use chrono::{TimeZone, Utc};
 use serde_json::{from_str, Value};
-use surf::{client, get, middleware::Redirect};
+// use surf::{client, get, middleware::Redirect};
 
 //
 // STRUCTS
@@ -161,20 +161,20 @@ pub async fn request(url: String) -> Result<serde_json::Value, &'static str> {
 	// let body = std::str::from_utf8(res.as_ref())?; // .as_ref converts Bytes to [u8]
 
 	// --- surf ---
-	let req = get(&url).header("User-Agent", "libreddit");
-	let client = client().with(Redirect::new(5));
-	let mut res = client.send(req).await.unwrap();
-	let success = res.status().is_success();
-	let body = res.body_string().await.unwrap();
-
-	dbg!(url.clone());
-
-	// --- reqwest ---
-	// let res = reqwest::get(&url).await.unwrap();
-	// // Read the status from the response
+	// let req = get(&url).header("User-Agent", "libreddit");
+	// let client = client().with(Redirect::new(5));
+	// let mut res = client.send(req).await.unwrap();
 	// let success = res.status().is_success();
-	// // Read the body of the response
-	// let body = res.text().await.unwrap();
+	// let body = res.body_string().await.unwrap();
+	
+	// --- reqwest ---
+	let res = reqwest::get(&url).await.unwrap();
+	// Read the status from the response
+	let success = res.status().is_success();
+	// Read the body of the response
+	let body = res.text().await.unwrap();
+	
+	dbg!(url.clone());
 
 	// Parse the response from Reddit as JSON
 	let json: Value = from_str(body.as_str()).unwrap_or(Value::Null);
