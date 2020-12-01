@@ -5,6 +5,9 @@ use chrono::{TimeZone, Utc};
 use serde_json::{from_str, Value};
 // use surf::{client, get, middleware::Redirect};
 
+#[cfg(feature = "proxy")]
+use base64::encode;
+
 //
 // STRUCTS
 //
@@ -73,6 +76,18 @@ pub struct ErrorTemplate {
 }
 
 //
+// URL HANDLING
+//
+
+pub async fn format_url(url: &str) -> String {
+	#[cfg(feature = "proxy")]
+	return "/imageproxy/".to_string() + encode(url).as_str();
+
+	#[cfg(not(feature = "proxy"))]
+	return url.to_string();
+}
+
+//
 // JSON PARSING
 //
 
@@ -108,7 +123,7 @@ pub async fn fetch_posts(url: String, fallback_title: String) -> Result<(Vec<Pos
 
 	for post in post_list.iter() {
 		let img = if val(post, "thumbnail").await.starts_with("https:/") {
-			val(post, "thumbnail").await
+			format_url(val(post, "thumbnail").await.as_str()).await
 		} else {
 			String::new()
 		};
@@ -166,14 +181,14 @@ pub async fn request(url: String) -> Result<serde_json::Value, &'static str> {
 	// let mut res = client.send(req).await.unwrap();
 	// let success = res.status().is_success();
 	// let body = res.body_string().await.unwrap();
-	
+
 	// --- reqwest ---
 	let res = reqwest::get(&url).await.unwrap();
 	// Read the status from the response
 	let success = res.status().is_success();
 	// Read the body of the response
 	let body = res.text().await.unwrap();
-	
+
 	dbg!(url.clone());
 
 	// Parse the response from Reddit as JSON

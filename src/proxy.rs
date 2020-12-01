@@ -17,8 +17,6 @@ async fn handler(web::Path(url): web::Path<String>) -> Result<HttpResponse> {
 			Err(_e) => return Ok(HttpResponse::Ok().body("")),
 		};
 
-		dbg!(&media);
-
 		let client = Client::default();
 		client
 			.get(media.replace("&amp;", "&"))

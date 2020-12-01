@@ -1,12 +1,9 @@
 // CRATES
-use crate::utils::{request, val, Comment, ErrorTemplate, Flair, Params, Post};
+use crate::utils::{format_url, request, val, Comment, ErrorTemplate, Flair, Params, Post};
 use actix_web::{get, http::StatusCode, web, HttpResponse, Result};
 use askama::Template;
 use chrono::{TimeZone, Utc};
 use pulldown_cmark::{html, Options, Parser};
-
-#[cfg(feature = "proxy")]
-use base64::encode;
 
 // STRUCTS
 #[derive(Template)]
@@ -67,14 +64,6 @@ async fn page(web::Path((_sub, id)): web::Path<(String, String)>, params: web::Q
 		Some(sort) => render(id, sort.to_string()).await,
 		None => render(id, "confidence".to_string()).await,
 	}
-}
-
-async fn format_url(url: &str) -> String {
-	#[cfg(feature = "proxy")]
-	return "/imageproxy/".to_string() + encode(url).as_str();
-
-	#[cfg(not(feature = "proxy"))]
-	return url.to_string();
 }
 
 // UTILITIES

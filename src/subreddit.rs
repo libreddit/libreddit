@@ -1,5 +1,5 @@
 // CRATES
-use crate::utils::{fetch_posts, request, val, ErrorTemplate, Params, Post, Subreddit};
+use crate::utils::{fetch_posts, format_url, request, val, ErrorTemplate, Params, Post, Subreddit};
 use actix_web::{get, http::StatusCode, web, HttpResponse, Result};
 use askama::Template;
 
@@ -88,7 +88,7 @@ async fn subreddit(sub: &String) -> Result<Subreddit, &'static str> {
 		name: val(&res, "display_name").await,
 		title: val(&res, "title").await,
 		description: val(&res, "public_description").await,
-		icon: val(&res, "icon_img").await,
+		icon: format_url(val(&res, "icon_img").await.as_str()).await,
 		members: if members > 1000 { format!("{}k", members / 1000) } else { members.to_string() },
 		active: if active > 1000 { format!("{}k", active / 1000) } else { active.to_string() },
 	};
