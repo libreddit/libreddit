@@ -207,16 +207,21 @@ span {
 	margin: 5px;
 }
 
+.post_right > a {
+	color: aqua;
+}
+
+
 .post_right > p {
 	opacity: 0.75;
 }
 
-.post_image {
+.post_media {
 	max-width: 500px;
 	align-self: center;
 }
 
-.post_image[src=""] {
+.post_media[src=""] {
 	display: none;
 }
 
@@ -230,7 +235,7 @@ span {
 	margin-top: 1.5em;
 }
 
-.post_body a {
+.post_body > a {
 	text-decoration: underline;
 	color: aqua;
 }

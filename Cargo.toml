@@ -9,10 +9,10 @@ edition = "2018"
 
 [features]
 default = ["proxy"]
-proxy = ["actix-web/rustls", "percent-encoding"]
+proxy = ["actix-web/rustls", "base64"]
 
 [dependencies]
-percent-encoding = { version = "2.1.0", optional = true }
+base64 = { version = "0.13.0", optional = true }
 actix-web = "3.2.0"
 surf = "2.1.0"
 askama = "0.8.0"

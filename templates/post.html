@@ -23,7 +23,13 @@
 				<small style="color:{{ post.flair.2 }}; background:{{ post.flair.1 }}">{{ post.flair.0 }}</small>
 				{% endif %}
 			</h3>
-			{{ post.media }}
+			{% if post.post_type == "image" %}
+			<img class="post_media" src="{{ post.media }}"/>
+			{% else if post.post_type == "video" %}
+			<video class="post_media" src="{{ post.media }}" controls autoplay loop>
+			{% else if post.post_type == "link" %}
+			<a href="{{ post.media }}">{{ post.media }}</a>
+			{% endif %}
 			<h4 class="post_body">{{ post.body }}</h4>
 		</div>
 	</div>

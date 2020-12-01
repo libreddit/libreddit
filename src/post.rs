@@ -6,7 +6,7 @@ use chrono::{TimeZone, Utc};
 use pulldown_cmark::{html, Options, Parser};
 
 #[cfg(feature = "proxy")]
-use percent_encoding::{utf8_percent_encode, NON_ALPHANUMERIC};
+use base64::encode;
 
 // STRUCTS
 #[derive(Template)]
@@ -71,39 +71,32 @@ async fn page(web::Path((_sub, id)): web::Path<(String, String)>, params: web::Q
 
 async fn format_url(url: &str) -> String {
 	#[cfg(feature = "proxy")]
-	return utf8_percent_encode(url, NON_ALPHANUMERIC).to_string();
+	return "/imageproxy/".to_string() + encode(url).as_str();
 
 	#[cfg(not(feature = "proxy"))]
 	return url.to_string();
 }
 
 // UTILITIES
-async fn media(data: &serde_json::Value) -> String {
-	let post_hint: &str = data["data"]["post_hint"].as_str().unwrap_or("");
-	let has_media: bool = data["data"]["media"].is_object();
-
-	let prefix = if cfg!(feature = "proxy") { "/imageproxy/" } else { "" };
-
-	let media: String = if !has_media {
-		format!(r#"<h4 class="post_body"><a href="{u}">{u}</a></h4>"#, u = data["data"]["url"].as_str().unwrap())
+async fn media(data: &serde_json::Value) -> (String, String) {
+	let post_type: &str;
+	let url = if !data["preview"]["reddit_video_preview"]["fallback_url"].is_null() {
+		post_type = "video";
+		format_url(data["preview"]["reddit_video_preview"]["fallback_url"].as_str().unwrap()).await
+	} else if !data["secure_media"]["reddit_video"]["fallback_url"].is_null() {
+		post_type = "video";
+		format_url(data["secure_media"]["reddit_video"]["fallback_url"].as_str().unwrap()).await
+	} else if data["post_hint"].as_str().unwrap_or("") == "image" {
+		post_type = "image";
+		format_url(data["preview"]["images"][0]["source"]["url"].as_str().unwrap()).await
 	} else {
-		format!(
-			r#"<img class="post_image" src="{}{}.png"/>"#,
-			prefix,
-			format_url(data["data"]["url"].as_str().unwrap()).await
-		)
+		post_type = "link";
+		data["url"].as_str().unwrap().to_string()
 	};
 
-	match post_hint {
-		"hosted:video" => format!(
-			r#"<video class="post_image" src="{}{}" controls/>"#,
-			prefix,
-			format_url(data["data"]["media"]["reddit_video"]["fallback_url"].as_str().unwrap()).await
-		),
-		"image" => format!(r#"<img class="post_image" src="{}{}"/>"#, prefix, format_url(data["data"]["url"].as_str().unwrap()).await),
-		"self" => String::from(""),
-		_ => media,
-	}
+	dbg!(post_type, url.to_string());
+
+	(post_type.to_string(), url)
 }
 
 async fn markdown_to_html(md: &str) -> String {
@@ -127,6 +120,8 @@ async fn parse_post(json: serde_json::Value) -> Result<Post, &'static str> {
 	let unix_time: i64 = post_data["data"]["created_utc"].as_f64().unwrap().round() as i64;
 	let score = post_data["data"]["score"].as_i64().unwrap();
 
+	let media = media(&post_data["data"]).await;
+
 	let post = Post {
 		title: val(post_data, "title").await,
 		community: val(post_data, "subreddit").await,
@@ -134,7 +129,8 @@ async fn parse_post(json: serde_json::Value) -> Result<Post, &'static str> {
 		author: val(post_data, "author").await,
 		url: val(post_data, "permalink").await,
 		score: if score > 1000 { format!("{}k", score / 1000) } else { score.to_string() },
-		media: media(post_data).await,
+		post_type: media.0,
+		media: media.1,
 		time: Utc.timestamp(unix_time, 0).format("%b %e %Y %H:%M UTC").to_string(),
 		flair: Flair(
 			val(post_data, "link_flair_text").await,

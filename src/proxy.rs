@@ -1,22 +1,27 @@
 use actix_web::{client::Client, get, web, Error, HttpResponse, Result};
 
 #[cfg(feature = "proxy")]
-use percent_encoding::percent_decode_str;
+use base64::decode;
 
 #[get("/imageproxy/{url:.*}")]
 async fn handler(web::Path(url): web::Path<String>) -> Result<HttpResponse> {
 	if cfg!(feature = "proxy") {
-		#[cfg(feature = "proxy")]
-		let media: String = percent_decode_str(url.as_str()).decode_utf8()?.to_string();
+		let media: String;
 
 		#[cfg(not(feature = "proxy"))]
-		let media: String = url;
+		let media = url;
+
+		#[cfg(feature = "proxy")]
+		match decode(url) {
+			Ok(bytes) => media = String::from_utf8(bytes).unwrap(),
+			Err(_e) => return Ok(HttpResponse::Ok().body("")),
+		};
 
 		dbg!(&media);
 
 		let client = Client::default();
 		client
-			.get(media)
+			.get(media.replace("&amp;", "&"))
 			.send()
 			.await
 			.map_err(Error::from)
