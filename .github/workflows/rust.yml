@@ -20,7 +20,7 @@ jobs:
       run: cargo build --release
       
     - uses: actions/upload-artifact@v2.2.1
-    - name: Upload a Build Artifact
+      name: Upload a Build Artifact
       with:
         name: libreddit
         path: target/release/libreddit
