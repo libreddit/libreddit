@@ -16,43 +16,31 @@ Think Invidious but for Reddit. Watch your cat videos without being watched.
 
 ![](https://i.ibb.co/Tgjb3w7/image.png)
 
-## Status
+## About
 
-- [x] Hosting
-  - [x] Instances
-    - [x] Clearnet instance
-    - [ ] .onion instance
-  - [x] Cargo deployment
-  - [x] Docker deployment
-- [x] Subreddits
-  - [x] Title
-  - [x] Description
-  - [x] Posts
-    - [x] Post sorting
-- [x] Posts
-  - [x] Flairs
-  - [x] Comments
-    - [x] Comment sorting
-    - [ ] Nested comments
-  - [x] UTC post date
-  - [x] Image thumbnails
-  - [x] Embedded images
-    - [x] Proxied images 
-  - [x] Reddit-hosted video
-    - [x] Proxied video
-- [x] Users
-  - [x] Username
-  - [x] Karma
-  - [x] Description
-  - [x] Post history
-  - [x] Comment history
+Libreddit hopes to provide an easier way to browse Reddit, without the ads, trackers and bloat. Libreddit was inspired by other alternative front-ends to popular services such as [Invidious](https://github.com/iv-org/invidious) for YouTube, [Nitter](https://github.com/zedeus/nitter) for Twitter, and [Bibliogram](https://sr.ht/~cadence/bibliogram/) for Instagram.
 
-- [ ] Search
-  - [ ] Post aggregating
-  - [ ] Comment aggregating
-  - [ ] Result sorting
+Libreddit currently implements most of Reddit's functionalities but still lacks a few features that are being worked on below.
+
+### In Progress
+- Nested comments
+- User flairs
+- Searching
+
+### How does it compare to Teddit?
+
+Teddit is another awesome open source project designed to provide an alternative frontend to Reddit. There is no connection (AFAIK) between the two and you're welcome to use whichever one you favor. Competition fosters innovation and Teddit's release has motivated me to build Libreddit into an even more polished product.
+
+If you are looking to compare, the biggest differences I have noticed are:
+- Libreddit is themed around Reddit's redesign whereas Teddit appears to stick much closer to Reddit's old design. This may suit some users better as design is always subjective.
+- Libreddit is written in Rust for speed and memory safety. It uses Actix Web, which was [benchmarked as the fastest web server for single queries](https://www.techempower.com/benchmarks/#hw=ph&test=db).
+- Unlike Teddit (at the time of writing this), Libreddit does not require a Reddit API key to host. 
+- Currently, Teddit does not support hosting on Docker whereas Libreddit does.
+- Libreddit lacks certain functionality that Teddit offers, primarily: nested comments, configuration & multireddits. If these are features that you need, Teddit may suit your needs better.
 
 ## Instances
+
+Feel free to [open an issue](https://github.com/spikecodes/libreddit/issues/new) to have your selfhosted instance listed here!
 
 - [libredd.it](https://libredd.it) 🇺🇸 (Thank you to [YeapGuy](https://github.com/YeapGuy)!)
 - [libreddit.spike.codes](https://libreddit.spike.codes) 🇺🇸
