@@ -10,13 +10,13 @@
 			<h3 class="post_score">{{ post.score }}</h3>
 		</div>
 		<div class="post_right">
-			<p>
+			<h4>
 				<b><a class="post_subreddit" href="/r/{{ post.community }}">r/{{ post.community }}</a></b>
 				&bull;
 				Posted by 
 				<a class="post_author" href="/u/{{ post.author }}">u/{{ post.author }}</a>
-				<span>{{ post.time }}</span>
-			</p>
+				<span class="datetime">{{ post.time }}</span>
+			</h4>
 			<h3 class="post_title">
 				{{ post.title }}
 				{% if post.flair.0 != "" %}
@@ -47,10 +47,10 @@
 			<h3 class="comment_score">{{ comment.score }}</h3>
 		</div>
 		<div class="comment_right">
-			<p>
+			<h4>
 				Posted by <a class="comment_author" href="/u/{{ comment.author }}">u/{{ comment.author }}</a>
-				<span>{{ comment.time }}</span>
-			</p>
+				<span class="datetime">{{ comment.time }}</span>
+			</h4>
 			<h4 class="comment_body">{{ comment.body }}</h4>
 		</div>
 	</div><br>

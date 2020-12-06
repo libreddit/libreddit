@@ -189,8 +189,6 @@ pub async fn request(url: String) -> Result<serde_json::Value, &'static str> {
 	// Read the body of the response
 	let body = res.text().await.unwrap();
 
-	dbg!(url.clone());
-
 	// Parse the response from Reddit as JSON
 	let json: Value = from_str(body.as_str()).unwrap_or(Value::Null);
 

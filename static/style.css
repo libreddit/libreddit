@@ -180,12 +180,8 @@ span {
 	padding: 5px;
 }
 
-.post_right > p > span, .comment_right > p > span {
+.datetime {
 	float: right;
-}
-
-.post_title {
-	font-size: 20px;
 }
 
 .post_subreddit {
@@ -211,13 +207,13 @@ span {
 	color: aqua;
 }
 
-
 .post_right > p {
 	opacity: 0.75;
+	font-size: 16px;
 }
 
 .post_media {
-	max-width: 500px;
+	max-width: 90%;
 	align-self: center;
 }
 
@@ -246,19 +242,21 @@ span {
 	flex-shrink: 0;
 	padding: 10px;
 	border-radius: 15px;
+	max-width: 20%;
 }
 
 .post_thumbnail[src=""] {
-	border: none;
+	display: none;
 }
 
 small {
-    background: aqua;
-    color: black;
-    padding: 5px;
-    border-radius: 5px;
-    font-size: 12px;
-    font-weight: bold;
+	background: aqua;
+	color: black;
+	padding: 5px;
+	margin-right: 5px;
+	border-radius: 5px;
+	font-size: 12px;
+	font-weight: bold;
 }
 
 /* Comment */
@@ -367,4 +365,32 @@ table {
 td, th {
 	border: 1px #333 solid;
 	padding: 0.5em;
+}
+
+/* Mobile */
+
+@media screen and (max-width: 480px) {
+	.post {
+		flex-direction: column-reverse;
+	}
+
+	.post_left {
+		border-radius: 0px 0px 5px 5px;
+	}
+
+	.post_right {
+		padding: 20px;
+	}
+
+	.post_score {
+		margin-top: 0;
+	}
+
+	.post_thumbnail {
+		max-width: initial;
+	}
+
+	.datetime {
+		width: 100%;
+	}
 }

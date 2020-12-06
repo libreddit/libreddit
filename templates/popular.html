@@ -13,13 +13,13 @@
 			<h3 class="post_score">{{ post.score }}</h3>
 		</div>
 		<div class="post_right">
-			<p>
+			<h4>
 				<b><a class="post_subreddit" href="/r/{{ post.community }}">r/{{ post.community }}</a></b>
 				&bull;
 				Posted by 
 				<a class="post_author" href="/u/{{ post.author }}">u/{{ post.author }}</a>
-				<span style="float: right;">{{ post.time }}</span>
-			</p>
+				<span class="datetime" style="float: right;">{{ post.time }}</span>
+			</h4>
 			<h3 class="post_title">
 				{% if post.flair.0 != "" %}
 				<small style="color:{{ post.flair.2 }}; background:{{ post.flair.1 }}">{{ post.flair.0 }}</small>

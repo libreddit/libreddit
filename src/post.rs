@@ -16,7 +16,7 @@ struct PostTemplate {
 
 async fn render(id: String, sort: String) -> Result<HttpResponse> {
 	// Log the post ID being fetched
-	println!("id: {}", id);
+	dbg!(&id);
 
 	// Build the Reddit JSON API url
 	let url: String = format!("https://reddit.com/{}.json?sort={}", id, sort);
@@ -38,8 +38,8 @@ async fn render(id: String, sort: String) -> Result<HttpResponse> {
 	let res = req.unwrap();
 
 	// Parse the JSON into Post and Comment structs
-	let post = parse_post(res.clone()).await;
-	let comments = parse_comments(res).await;
+	let post = parse_post(res[0].clone()).await;
+	let comments = parse_comments(res[1].clone()).await;
 
 	// Use the Post and Comment structs to generate a website to show users
 	let s = PostTemplate {
@@ -83,8 +83,6 @@ async fn media(data: &serde_json::Value) -> (String, String) {
 		data["url"].as_str().unwrap().to_string()
 	};
 
-	dbg!(post_type, url.to_string());
-
 	(post_type.to_string(), url)
 }
 
@@ -104,7 +102,7 @@ async fn markdown_to_html(md: &str) -> String {
 
 // POSTS
 async fn parse_post(json: serde_json::Value) -> Result<Post, &'static str> {
-	let post_data: &serde_json::Value = &json[0]["data"]["children"][0];
+	let post_data: &serde_json::Value = &json["data"]["children"][0];
 
 	let unix_time: i64 = post_data["data"]["created_utc"].as_f64().unwrap().round() as i64;
 	let score = post_data["data"]["score"].as_i64().unwrap();
@@ -137,7 +135,7 @@ async fn parse_post(json: serde_json::Value) -> Result<Post, &'static str> {
 
 // COMMENTS
 async fn parse_comments(json: serde_json::Value) -> Result<Vec<Comment>, &'static str> {
-	let comment_data = json[1]["data"]["children"].as_array().unwrap();
+	let comment_data = json["data"]["children"].as_array().unwrap();
 
 	let mut comments: Vec<Comment> = Vec::new();
 
@@ -146,7 +144,9 @@ async fn parse_comments(json: serde_json::Value) -> Result<Vec<Comment>, &'stati
 		let score = comment["data"]["score"].as_i64().unwrap_or(0);
 		let body = markdown_to_html(comment["data"]["body"].as_str().unwrap_or("")).await;
 
-		// println!("{}", body);
+		// if comment["data"]["replies"].is_object() {
+		// 	let replies = parse_comments(comment["data"]["replies"].clone()).await.unwrap();
+		// }
 
 		comments.push(Comment {
 			body: body,
