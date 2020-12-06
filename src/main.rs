@@ -40,7 +40,7 @@ async fn main() -> std::io::Result<()> {
 	}
 
 	// start http server
-	println!("Running Libreddit on {}!", address.clone());
+	println!("Running Libreddit v{} on {}!", env!("CARGO_PKG_VERSION"), address.clone());
 
 	HttpServer::new(|| {
 		App::new()
