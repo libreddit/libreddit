@@ -89,8 +89,8 @@ async fn subreddit(sub: &String) -> Result<Subreddit, &'static str> {
 		title: val(&res, "title").await,
 		description: val(&res, "public_description").await,
 		icon: format_url(val(&res, "icon_img").await.as_str()).await,
-		members: if members > 1000 { format!("{}k", members / 1000) } else { members.to_string() },
-		active: if active > 1000 { format!("{}k", active / 1000) } else { active.to_string() },
+		members: format_num(members),
+		active: format_num(active),
 	};
 
 	Ok(sub)

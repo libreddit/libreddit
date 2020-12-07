@@ -136,7 +136,7 @@ pub async fn fetch_posts(url: String, fallback_title: String) -> Result<(Vec<Pos
 			community: val(post, "subreddit").await,
 			body: val(post, "body").await,
 			author: val(post, "author").await,
-			score: if score > 1000 { format!("{}k", score / 1000) } else { score.to_string() },
+			score: format_score(score),
 			post_type: "link".to_string(),
 			media: img,
 			url: val(post, "permalink").await,
@@ -201,4 +201,10 @@ pub async fn request(url: String) -> Result<serde_json::Value, &'static str> {
 	} else {
 		Ok(json)
 	}
+}
+
+
+// FORMATTING
+pub fn format_num(num: i64) -> String {
+	return if num > 1000 { format!("{}k", num / 1000) } else { num.to_string() };
 }

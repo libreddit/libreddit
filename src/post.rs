@@ -1,5 +1,5 @@
 // CRATES
-use crate::utils::{format_url, request, val, Comment, ErrorTemplate, Flair, Params, Post};
+use crate::utils::{format_url, request, val, Comment, ErrorTemplate, Flair, Params, Post, format_num};
 use actix_web::{get, http::StatusCode, web, HttpResponse, Result};
 use askama::Template;
 use chrono::{TimeZone, Utc};
@@ -115,7 +115,7 @@ async fn parse_post(json: serde_json::Value) -> Result<Post, &'static str> {
 		body: markdown_to_html(post_data["data"]["selftext"].as_str().unwrap()).await,
 		author: val(post_data, "author").await,
 		url: val(post_data, "permalink").await,
-		score: if score > 1000 { format!("{}k", score / 1000) } else { score.to_string() },
+		score: format_num(score),
 		post_type: media.0,
 		media: media.1,
 		time: Utc.timestamp(unix_time, 0).format("%b %e %Y %H:%M UTC").to_string(),
@@ -151,7 +151,7 @@ async fn parse_comments(json: serde_json::Value) -> Result<Vec<Comment>, &'stati
 		comments.push(Comment {
 			body: body,
 			author: val(comment, "author").await,
-			score: if score > 1000 { format!("{}k", score / 1000) } else { score.to_string() },
+			score: format_num(score),
 			time: Utc.timestamp(unix_time, 0).format("%b %e %Y %H:%M UTC").to_string(),
 		});
 	}
