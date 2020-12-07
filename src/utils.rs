@@ -88,7 +88,13 @@ pub async fn format_url(url: &str) -> String {
 }
 
 pub fn format_num(num: i64) -> String {
-	return if num > 1000 { format!("{}k", num / 1000) } else { num.to_string() };
+	if num > 1000000 {
+		format!("{}m", num / 1000000)
+	} else if num > 1000 {
+		format!("{}k", num / 1000)
+	} else {
+		num.to_string()
+	}
 }
 
 //

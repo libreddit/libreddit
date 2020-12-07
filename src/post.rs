@@ -1,5 +1,5 @@
 // CRATES
-use crate::utils::{format_url, request, val, Comment, ErrorTemplate, Flair, Params, Post, format_num};
+use crate::utils::{format_num, format_url, request, val, Comment, ErrorTemplate, Flair, Params, Post};
 use actix_web::{get, http::StatusCode, web, HttpResponse, Result};
 use askama::Template;
 use chrono::{TimeZone, Utc};

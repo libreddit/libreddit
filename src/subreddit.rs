@@ -1,5 +1,5 @@
 // CRATES
-use crate::utils::{fetch_posts, format_url, request, val, ErrorTemplate, Params, Post, Subreddit, format_num};
+use crate::utils::{fetch_posts, format_num, format_url, request, val, ErrorTemplate, Params, Post, Subreddit};
 use actix_web::{get, http::StatusCode, web, HttpResponse, Result};
 use askama::Template;
 use std::convert::TryInto;
