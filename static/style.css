@@ -193,6 +193,10 @@ span {
 	font-weight: bold;
 }
 
+.post_title {
+	font-size: 18px;
+}
+
 .post_score {
 	margin-top: 1em;
 	color: aqua;
@@ -206,10 +210,6 @@ span {
 
 .post_right > * {
 	margin: 5px;
-}
-
-.post_right > a {
-	color: aqua;
 }
 
 .post_right > p {
