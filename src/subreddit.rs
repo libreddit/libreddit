@@ -1,7 +1,8 @@
 // CRATES
-use crate::utils::{fetch_posts, format_url, request, val, ErrorTemplate, Params, Post, Subreddit};
+use crate::utils::{fetch_posts, format_url, request, val, ErrorTemplate, Params, Post, Subreddit, format_num};
 use actix_web::{get, http::StatusCode, web, HttpResponse, Result};
 use askama::Template;
+use std::convert::TryInto;
 
 // STRUCTS
 #[derive(Template)]
@@ -89,8 +90,8 @@ async fn subreddit(sub: &String) -> Result<Subreddit, &'static str> {
 		title: val(&res, "title").await,
 		description: val(&res, "public_description").await,
 		icon: format_url(val(&res, "icon_img").await.as_str()).await,
-		members: format_num(members),
-		active: format_num(active),
+		members: format_num(members.try_into().unwrap()),
+		active: format_num(active.try_into().unwrap()),
 	};
 
 	Ok(sub)

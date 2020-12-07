@@ -76,7 +76,7 @@ pub struct ErrorTemplate {
 }
 
 //
-// URL HANDLING
+// FORMATTING
 //
 
 pub async fn format_url(url: &str) -> String {
@@ -85,6 +85,10 @@ pub async fn format_url(url: &str) -> String {
 
 	#[cfg(not(feature = "proxy"))]
 	return url.to_string();
+}
+
+pub fn format_num(num: i64) -> String {
+	return if num > 1000 { format!("{}k", num / 1000) } else { num.to_string() };
 }
 
 //
@@ -136,7 +140,7 @@ pub async fn fetch_posts(url: String, fallback_title: String) -> Result<(Vec<Pos
 			community: val(post, "subreddit").await,
 			body: val(post, "body").await,
 			author: val(post, "author").await,
-			score: format_score(score),
+			score: format_num(score),
 			post_type: "link".to_string(),
 			media: img,
 			url: val(post, "permalink").await,
@@ -201,10 +205,4 @@ pub async fn request(url: String) -> Result<serde_json::Value, &'static str> {
 	} else {
 		Ok(json)
 	}
-}
-
-
-// FORMATTING
-pub fn format_num(num: i64) -> String {
-	return if num > 1000 { format!("{}k", num / 1000) } else { num.to_string() };
 }
