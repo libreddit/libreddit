@@ -2,25 +2,28 @@ name: Rust
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
-    branches: [ master ]
+    branches: [master]
 
 env:
   CARGO_TERM_COLOR: always
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Build
-      run: cargo build --release
-      
-    - uses: actions/upload-artifact@v2.2.1
-      name: Upload a Build Artifact
-      with:
-        name: libreddit
-        path: target/release/libreddit
+      - uses: actions/checkout@v2
+
+      - name: Cache Packages
+        uses: Swatinem/rust-cache@v1.0.1
+
+      - name: Build
+        run: cargo build --release
+
+      - uses: actions/upload-artifact@v2.2.1
+        name: Upload a Build Artifact
+        with:
+          name: libreddit
+          path: target/release/libreddit
