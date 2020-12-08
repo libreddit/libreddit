@@ -236,7 +236,7 @@ span {
 	margin-top: 1.5em;
 }
 
-.post_body > a {
+.post_body a {
 	text-decoration: underline;
 	color: aqua;
 }
