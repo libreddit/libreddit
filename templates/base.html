@@ -18,14 +18,14 @@
 		{% endblock %}
     </head>
 	<body>
-		{% block body %}
 		{% block header %}
 		<header>
 			<a href="/"><span id="lib">lib</span>reddit. <span id="version">v{{ env!("CARGO_PKG_VERSION") }}</span></a>
 			<a id="github" href="https://github.com/spikecodes/libreddit">GITHUB</a>
 		</header>
 		{% endblock %}
-
+		
+		{% block body %}
 		<main>
 			{% block content %}
 			{% endblock %}
