@@ -1,7 +1,5 @@
 # Libreddit
 
-💬 [#libreddit:matrix.org](https://matrix.to/#/#libreddit:matrix.org), :octocat: [spikecodes/libreddit](https://github.com/spikecodes/libreddit), 🐋 [spikecodes/libreddit](https://hub.docker.com/r/spikecodes/libreddit)
-
 > An alternative private front-end to Reddit 
 
 Libre + Reddit = Libreddit
@@ -20,6 +18,14 @@ Think Invidious but for Reddit. Watch your cat videos without being watched.
 
 ## About
 
+### Elsewhere
+Find Libreddit on...
+- 💬 Matrix: [#libreddit:matrix.org](https://matrix.to/#/#libreddit:matrix.org)
+- 🐋 Docker: [spikecodes/libreddit](https://hub.docker.com/r/spikecodes/libreddit)
+- :octocat: GitHub: [spikecodes/libreddit](https://github.com/spikecodes/libreddit)
+- 🦊 GitLab: [spikecodes/libreddit](https://gitlab.com/spikecodes/libreddit)
+
+### Info
 Libreddit hopes to provide an easier way to browse Reddit, without the ads, trackers and bloat. Libreddit was inspired by other alternative front-ends to popular services such as [Invidious](https://github.com/iv-org/invidious) for YouTube, [Nitter](https://github.com/zedeus/nitter) for Twitter, and [Bibliogram](https://sr.ht/~cadence/bibliogram/) for Instagram.
 
 Libreddit currently implements most of Reddit's functionalities but still lacks a few features that are being worked on below.
