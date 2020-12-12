@@ -241,6 +241,10 @@ span {
 	color: aqua;
 }
 
+#post_url {
+	color: aqua;
+}
+
 .post_thumbnail {
 	object-fit: cover;
 	width: auto;

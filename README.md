@@ -1,5 +1,7 @@
 # Libreddit
 
+💬 [#libreddit:matrix.org](https://matrix.to/#/#libreddit:matrix.org), :octocat: [spikecodes/libreddit](https://github.com/spikecodes/libreddit), 🐋 [spikecodes/libreddit](https://hub.docker.com/r/spikecodes/libreddit)
+
 > An alternative private front-end to Reddit 
 
 Libre + Reddit = Libreddit
@@ -7,7 +9,7 @@ Libre + Reddit = Libreddit
 - 🚀 Fast: written in Rust for blazing fast speeds and safety
 - ☁️ Light: no javascript, no ads, no tracking
 - 🕵 Private: all requests are proxied through the server, including media
-- 🔒 Safe: does not rely on Reddit's OAuth-requiring APIs 
+- 🔒 Safe: does not rely on Reddit OAuth or require a Reddit API Key 
 - 📱 Responsive: works great on mobile!
 
 Think Invidious but for Reddit. Watch your cat videos without being watched.
