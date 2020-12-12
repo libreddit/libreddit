@@ -28,7 +28,7 @@
 			{% else if post.post_type == "video" %}
 			<video class="post_media" src="{{ post.media }}" controls autoplay loop>
 			{% else if post.post_type == "link" %}
-			<a href="{{ post.media }}">{{ post.media }}</a>
+			<a id="post_url" href="{{ post.media }}">{{ post.media }}</a>
 			{% endif %}
 			<h4 class="post_body">{{ post.body }}</h4>
 		</div>
