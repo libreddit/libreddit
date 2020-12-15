@@ -1,6 +1,6 @@
 // CRATES
 use crate::utils::{fetch_posts, format_num, format_url, request, val, ErrorTemplate, Params, Post, Subreddit};
-use actix_web::{get, http::StatusCode, web, HttpResponse, Result};
+use actix_web::{http::StatusCode, web, HttpResponse, Result};
 use askama::Template;
 use std::convert::TryInto;
 
@@ -16,8 +16,7 @@ struct SubredditTemplate {
 
 // SERVICES
 #[allow(dead_code)]
-#[get("/r/{sub}")]
-async fn page(web::Path(sub): web::Path<String>, params: web::Query<Params>) -> Result<HttpResponse> {
+pub async fn page(web::Path(sub): web::Path<String>, params: web::Query<Params>) -> Result<HttpResponse> {
 	render(sub, params.sort.clone(), (params.before.clone(), params.after.clone())).await
 }
 

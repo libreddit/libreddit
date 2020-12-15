@@ -1,6 +1,6 @@
 // CRATES
 use crate::utils::{fetch_posts, ErrorTemplate, Params, Post};
-use actix_web::{get, http::StatusCode, web, HttpResponse, Result};
+use actix_web::{http::StatusCode, web, HttpResponse, Result};
 use askama::Template;
 
 // STRUCTS
@@ -50,7 +50,6 @@ async fn render(sub_name: String, sort: Option<String>, ends: (Option<String>, O
 }
 
 // SERVICES
-#[get("/")]
 pub async fn page(params: web::Query<Params>) -> Result<HttpResponse> {
 	render("popular".to_string(), params.sort.clone(), (params.before.clone(), params.after.clone())).await
 }

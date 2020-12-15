@@ -1,5 +1,5 @@
 // Import Crates
-use actix_web::{get, App, HttpResponse, HttpServer};
+use actix_web::{web, get, App, HttpResponse, HttpServer, middleware::NormalizePath};
 
 // Reference local files
 mod popular;
@@ -10,12 +10,10 @@ mod user;
 mod utils;
 
 // Create Services
-#[get("/style.css")]
 async fn style() -> HttpResponse {
 	HttpResponse::Ok().content_type("text/css").body(include_str!("../static/style.css"))
 }
 
-#[get("/robots.txt")]
 async fn robots() -> HttpResponse {
 	HttpResponse::Ok().body(include_str!("../static/robots.txt"))
 }
@@ -44,21 +42,24 @@ async fn main() -> std::io::Result<()> {
 
 	HttpServer::new(|| {
 		App::new()
+			// TRAILING SLASH MIDDLEWARE
+			.wrap(NormalizePath::default())
 			// GENERAL SERVICES
-			.service(style)
-			.service(favicon)
-			.service(robots)
+			.route("/style.css/", web::get().to(style))
+			.route("/favicon.ico/", web::get().to(|| HttpResponse::Ok()))
+			.route("/robots.txt/", web::get().to(robots))
 			// PROXY SERVICE
-			.service(proxy::handler)
-			// POST SERVICES
-			.service(post::short)
-			.service(post::page)
-			// SUBREDDIT SERVICES
-			.service(subreddit::page)
-			// POPULAR SERVICES
-			.service(popular::page)
+			.route("/proxy/{url:.*}/", web::get().to(proxy::handler))
 			// USER SERVICES
-			.service(user::page)
+			.route("/u/{username}/", web::get().to(user::page))
+			.route("/user/{username}/", web::get().to(user::page))
+			// SUBREDDIT SERVICES
+			.route("/r/{sub}/", web::get().to(subreddit::page))
+			// POPULAR SERVICES
+			.route("/", web::get().to(popular::page))
+			// POST SERVICES
+			.route("/{id:.{5,6}}/", web::get().to(post::short))
+			.route("/r/{sub}/comments/{id}/{title}/", web::get().to(post::page))
 	})
 	.bind(address.clone())
 	.expect(format!("Cannot bind to the address: {}", address).as_str())

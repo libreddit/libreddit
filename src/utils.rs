@@ -81,7 +81,7 @@ pub struct ErrorTemplate {
 
 pub async fn format_url(url: &str) -> String {
 	#[cfg(feature = "proxy")]
-	return "/imageproxy/".to_string() + encode(url).as_str();
+	return "/proxy/".to_string() + encode(url).as_str();
 
 	#[cfg(not(feature = "proxy"))]
 	return url.to_string();

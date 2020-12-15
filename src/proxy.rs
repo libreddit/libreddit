@@ -1,10 +1,9 @@
-use actix_web::{client::Client, get, web, Error, HttpResponse, Result};
+use actix_web::{client::Client, web, Error, HttpResponse, Result};
 
 #[cfg(feature = "proxy")]
 use base64::decode;
 
-#[get("/imageproxy/{url:.*}")]
-async fn handler(web::Path(url): web::Path<String>) -> Result<HttpResponse> {
+pub async fn handler(web::Path(url): web::Path<String>) -> Result<HttpResponse> {
 	if cfg!(feature = "proxy") {
 		let media: String;
 

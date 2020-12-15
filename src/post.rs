@@ -1,6 +1,7 @@
 // CRATES
 use crate::utils::{format_num, format_url, request, val, Comment, ErrorTemplate, Flair, Params, Post};
-use actix_web::{get, http::StatusCode, web, HttpResponse, Result};
+use actix_web::{http::StatusCode, web, HttpResponse, Result};
+
 use askama::Template;
 use chrono::{TimeZone, Utc};
 use pulldown_cmark::{html, Options, Parser};
@@ -53,13 +54,11 @@ async fn render(id: String, sort: String) -> Result<HttpResponse> {
 }
 
 // SERVICES
-#[get("/{id}")]
-async fn short(web::Path(id): web::Path<String>) -> Result<HttpResponse> {
+pub async fn short(web::Path(id): web::Path<String>) -> Result<HttpResponse> {
 	render(id.to_string(), "confidence".to_string()).await
 }
 
-#[get("/r/{sub}/comments/{id}/{title}/")]
-async fn page(web::Path((_sub, id)): web::Path<(String, String)>, params: web::Query<Params>) -> Result<HttpResponse> {
+pub async fn page(web::Path((_sub, id)): web::Path<(String, String)>, params: web::Query<Params>) -> Result<HttpResponse> {
 	match &params.sort {
 		Some(sort) => render(id, sort.to_string()).await,
 		None => render(id, "confidence".to_string()).await,

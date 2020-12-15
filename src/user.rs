@@ -1,6 +1,6 @@
 // CRATES
 use crate::utils::{fetch_posts, nested_val, request, ErrorTemplate, Params, Post, User};
-use actix_web::{get, http::StatusCode, web, HttpResponse, Result};
+use actix_web::{http::StatusCode, web, HttpResponse, Result};
 use askama::Template;
 
 // STRUCTS
@@ -39,8 +39,7 @@ async fn render(username: String, sort: String) -> Result<HttpResponse> {
 }
 
 // SERVICES
-#[get("/u/{username}")]
-async fn page(web::Path(username): web::Path<String>, params: web::Query<Params>) -> Result<HttpResponse> {
+pub async fn page(web::Path(username): web::Path<String>, params: web::Query<Params>) -> Result<HttpResponse> {
 	match &params.sort {
 		Some(sort) => render(username, sort.to_string()).await,
 		None => render(username, "hot".to_string()).await,
