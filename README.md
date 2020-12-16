@@ -43,8 +43,6 @@ If you are looking to compare, the biggest differences I have noticed are:
 - Libreddit is themed around Reddit's redesign whereas Teddit appears to stick much closer to Reddit's old design. This may suit some users better as design is always subjective.
 - Libreddit is written in Rust for speed and memory safety. It uses Actix Web, which was [benchmarked as the fastest web server for single queries](https://www.techempower.com/benchmarks/#hw=ph&test=db).
 - Unlike Teddit (at the time of writing this), Libreddit does not require a Reddit API key to host. 
-- Currently, Teddit does not support hosting on Docker whereas Libreddit does.
-- Libreddit lacks certain functionality that Teddit offers, primarily: nested comments, configuration & multireddits. If these are features that you need, Teddit may suit your needs better.
 
 ## Instances
 
@@ -77,7 +75,7 @@ docker run -d --name libreddit -p 80:8080 spikecodes/libreddit
 
 ### C) AUR
 
-Libreddit is available from the Arch User Repository as [`libreddit-git`](https://aur.archlinux.org/packages/libreddit-git).
+For ArchLinux users, Libreddit is available from the AUR as [`libreddit-git`](https://aur.archlinux.org/packages/libreddit-git).
 
 Install:
 ```
@@ -87,6 +85,7 @@ yay -S libreddit-git
 ### D) GitHub Releases
 
 If you're on Linux and none of these methods work for you, you can grab a Linux binary from [the newest release](https://github.com/spikecodes/libreddit/releases/latest).
+Currently Libreddit does not have Windows or MacOS binaries but those will be available soon.
 
 ## Deploy an Instance
 
