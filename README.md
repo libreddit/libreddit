@@ -37,7 +37,7 @@ Libreddit currently implements most of Reddit's functionalities but still lacks 
 
 ### How does it compare to Teddit?
 
-Teddit is another awesome open source project designed to provide an alternative frontend to Reddit. There is no connection (AFAIK) between the two and you're welcome to use whichever one you favor. Competition fosters innovation and Teddit's release has motivated me to build Libreddit into an even more polished product.
+Teddit is another awesome open source project designed to provide an alternative frontend to Reddit. There is no connection between the two and you're welcome to use whichever one you favor. Competition fosters innovation and Teddit's release has motivated me to build Libreddit into an even more polished product.
 
 If you are looking to compare, the biggest differences I have noticed are:
 - Libreddit is themed around Reddit's redesign whereas Teddit appears to stick much closer to Reddit's old design. This may suit some users better as design is always subjective.
