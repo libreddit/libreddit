@@ -14,7 +14,11 @@
 	</div>
 	<details class="comment_right" open>
 		<summary class="comment_data">
-			<a class="comment_author" href="/u/{{ item.author }}">u/{{ item.author }}</a> • <span class="datetime">{{ item.time }}</span>
+			<a class="comment_author" href="/u/{{ item.author }}">u/{{ item.author }}</a>
+			{% if item.flair.0 != "" %}
+				<small class="author_flair">{{ item.flair.0 }}</small>
+			{% endif %}
+			&bull; <span class="datetime">{{ item.time }}</span>
 		</summary>
 		<h4 class="comment_body">{{ item.body }}</h4>
 
@@ -29,14 +33,16 @@
 			<h4>
 				<b><a class="post_subreddit" href="/r/{{ post.community }}">r/{{ post.community }}</a></b>
 				&bull;
-				Posted by 
 				<a class="post_author" href="/u/{{ post.author }}">u/{{ post.author }}</a>
+				{% if post.author_flair.0 != "" %}
+					<small class="author_flair">{{ post.author_flair.0 }}</small>
+				{% endif %}
 				<span class="datetime">{{ post.time }}</span>
 			</h4>
 			<a href="{{ post.url }}" class="post_title">
 				{{ post.title }}
 				{% if post.flair.0 != "" %}
-				<small style="color:{{ post.flair.2 }}; background:{{ post.flair.1 }}">{{ post.flair.0 }}</small>
+					<small class="post_flair" style="color:{{ post.flair.2 }}; background:{{ post.flair.1 }}">{{ post.flair.0 }}</small>
 				{% endif %}
 			</a>
 			{% if post.post_type == "image" %}

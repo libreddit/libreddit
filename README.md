@@ -31,8 +31,8 @@ Libreddit hopes to provide an easier way to browse Reddit, without the ads, trac
 Libreddit currently implements most of Reddit's functionalities but still lacks a few features that are being worked on below.
 
 ### In Progress
-- User flairs
 - Searching
+- Multireddits
 
 ### How does it compare to Teddit?
 

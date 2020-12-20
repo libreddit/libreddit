@@ -17,12 +17,15 @@ struct PostTemplate {
 	sort: String,
 }
 
-async fn render(id: String, sort: String) -> Result<HttpResponse> {
+async fn render(id: String, sort: Option<String>) -> Result<HttpResponse> {
 	// Log the post ID being fetched
 	dbg!(&id);
 
+	// Handling sort paramater
+	let sorting: String = sort.unwrap_or("confidence".to_string());
+
 	// Build the Reddit JSON API url
-	let url: String = format!("https://reddit.com/{}.json?sort={}", id, sort);
+	let url: String = format!("https://reddit.com/{}.json?sort={}", id, sorting);
 
 	// Send a request to the url, receive JSON in response
 	let req = request(url).await;
@@ -48,7 +51,7 @@ async fn render(id: String, sort: String) -> Result<HttpResponse> {
 	let s = PostTemplate {
 		comments: comments.unwrap(),
 		post: post.unwrap(),
-		sort: sort,
+		sort: sorting,
 	}
 	.render()
 	.unwrap();
@@ -57,17 +60,11 @@ async fn render(id: String, sort: String) -> Result<HttpResponse> {
 
 // SERVICES
 pub async fn short(web::Path(id): web::Path<String>, params: web::Query<Params>) -> Result<HttpResponse> {
-	match &params.sort {
-		Some(sort) => render(id, sort.to_string()).await,
-		None => render(id, "confidence".to_string()).await,
-	}
+	render(id, params.sort.clone()).await
 }
 
 pub async fn page(web::Path((_sub, id)): web::Path<(String, String)>, params: web::Query<Params>) -> Result<HttpResponse> {
-	match &params.sort {
-		Some(sort) => render(id, sort.to_string()).await,
-		None => render(id, "confidence".to_string()).await,
-	}
+	render(id, params.sort.clone()).await
 }
 
 // UTILITIES
@@ -118,6 +115,11 @@ async fn parse_post(json: serde_json::Value) -> Result<Post, &'static str> {
 		community: val(post_data, "subreddit").await,
 		body: markdown_to_html(post_data["data"]["selftext"].as_str().unwrap()).await,
 		author: val(post_data, "author").await,
+		author_flair: Flair(
+			val(post_data, "author_flair_text").await,
+			val(post_data, "author_flair_background_color").await,
+			val(post_data, "author_flair_text_color").await,
+		),
 		url: val(post_data, "permalink").await,
 		score: format_num(score),
 		post_type: media.0,
@@ -131,7 +133,7 @@ async fn parse_post(json: serde_json::Value) -> Result<Post, &'static str> {
 			} else {
 				"white".to_string()
 			},
-		),
+		)
 	};
 
 	Ok(post)
@@ -167,6 +169,11 @@ async fn parse_comments(json: serde_json::Value) -> Result<Vec<Comment>, &'stati
 			score: format_num(score),
 			time: Utc.timestamp(unix_time, 0).format("%b %e %Y %H:%M UTC").to_string(),
 			replies: replies,
+			flair: Flair(
+				val(comment, "author_flair_text").await,
+				val(comment, "author_flair_background_color").await,
+				val(comment, "author_flair_text_color").await,
+			),
 		});
 	}
 

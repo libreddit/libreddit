@@ -27,14 +27,15 @@
 			<div class="post_right">
 				<h4>
 					<b><a class="post_subreddit" href="/r/{{ post.community }}">r/{{ sub.name }}</a></b>
-					&bull;
-					Posted by 
-					<a class="post_author" href="/u/{{ post.author }}">u/{{ post.author }}</a>
+					&bull; <a class="post_author" href="/u/{{ post.author }}">u/{{ post.author }}</a>
+					{% if post.author_flair.0 != "" %}
+						<small class="author_flair">{{ post.author_flair.0 }}</small>
+					{% endif %}
 					<span class="datetime">{{ post.time }}</span>
 				</h4>
 				<h3 class="post_title">
 					{% if post.flair.0 != "" %}
-					<small style="color:{{ post.flair.2 }}; background:{{ post.flair.1 }}">{{ post.flair.0 }}</small>
+					<small class="post_flair" style="color:{{ post.flair.2 }}; background:{{ post.flair.1 }}">{{ post.flair.0 }}</small>
 					{% endif %}
 					<a href="{{ post.url }}">{{ post.title }}</a>
 				</h3>

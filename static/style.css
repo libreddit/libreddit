@@ -253,7 +253,7 @@ a:not(.post_right):hover {
 	display: none;
 }
 
-small {
+.post_flair {
 	background: aqua;
 	color: black;
 	padding: 5px;
@@ -290,6 +290,16 @@ small {
 
 .comment_author {
 	opacity: 0.9;
+}
+
+.author_flair {
+	background: var(--highlighted);
+	color: white;
+	padding: 5px;
+	margin-right: 5px;
+	border-radius: 5px;
+	font-size: 12px;
+	font-weight: bold;
 }
 
 .comment_upvote {

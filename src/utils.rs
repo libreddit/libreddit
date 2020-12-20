@@ -22,6 +22,7 @@ pub struct Post {
 	pub community: String,
 	pub body: String,
 	pub author: String,
+	pub author_flair: Flair,
 	pub url: String,
 	pub score: String,
 	pub post_type: String,
@@ -35,6 +36,7 @@ pub struct Post {
 pub struct Comment {
 	pub body: String,
 	pub author: String,
+	pub flair: Flair,
 	pub score: String,
 	pub time: String,
 	pub replies: Vec<Comment>,
@@ -147,6 +149,11 @@ pub async fn fetch_posts(url: String, fallback_title: String) -> Result<(Vec<Pos
 			community: val(post, "subreddit").await,
 			body: val(post, "body").await,
 			author: val(post, "author").await,
+			author_flair: Flair(
+				val(post, "author_flair_text").await,
+				val(post, "author_flair_background_color").await,
+				val(post, "author_flair_text_color").await,
+			),
 			score: format_num(score),
 			post_type: "link".to_string(),
 			media: img,
