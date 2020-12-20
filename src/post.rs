@@ -56,8 +56,11 @@ async fn render(id: String, sort: String) -> Result<HttpResponse> {
 }
 
 // SERVICES
-pub async fn short(web::Path(id): web::Path<String>) -> Result<HttpResponse> {
-	render(id.to_string(), "confidence".to_string()).await
+pub async fn short(web::Path(id): web::Path<String>, params: web::Query<Params>) -> Result<HttpResponse> {
+	match &params.sort {
+		Some(sort) => render(id, sort.to_string()).await,
+		None => render(id, "confidence".to_string()).await,
+	}
 }
 
 pub async fn page(web::Path((_sub, id)): web::Path<(String, String)>, params: web::Query<Params>) -> Result<HttpResponse> {
