@@ -63,6 +63,7 @@ a:not(.post_right):hover {
 }
 
 #about {
+	padding-top: 20px;
 	background: #151515;
 }
 
@@ -268,7 +269,7 @@ small {
 	margin-top: 1em;
 	border-radius: 5px;
 	display: flex;
-	/* border: 2px solid var(--foreground); */
+	font-size: 15px;
 }
 
 .comment_left, .comment_right {
@@ -279,7 +280,7 @@ small {
 .comment_left {
 	text-align: center;
 	min-width: 50px;
-	padding: 5px;
+	padding: 5px 0px;
 	align-items: center;
 }
 
@@ -372,6 +373,21 @@ small {
 
 .post.comment > .post_left {
 	background: black;
+}
+
+/* Code */
+
+pre {
+	background: var(--outside);
+	padding: 20px;
+	margin-top: 10px;
+	border-radius: 5px;
+	box-shadow: var(--black-contrast);
+}
+
+code {
+	font-family: monospace;
+	font-size: 14px;
 }
 
 /* Tables */
