@@ -37,6 +37,7 @@ pub struct Comment {
 	pub author: String,
 	pub score: String,
 	pub time: String,
+	pub replies: Vec<Comment>,
 }
 
 #[allow(dead_code)]

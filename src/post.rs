@@ -2,6 +2,8 @@
 use crate::utils::{format_num, format_url, request, val, Comment, ErrorTemplate, Flair, Params, Post};
 use actix_web::{http::StatusCode, web, HttpResponse, Result};
 
+use async_recursion::async_recursion;
+
 use askama::Template;
 use chrono::{TimeZone, Utc};
 use pulldown_cmark::{html, Options, Parser};
@@ -133,25 +135,35 @@ async fn parse_post(json: serde_json::Value) -> Result<Post, &'static str> {
 }
 
 // COMMENTS
+#[async_recursion]
 async fn parse_comments(json: serde_json::Value) -> Result<Vec<Comment>, &'static str> {
+	// Separate the comment JSON into a Vector of comments
 	let comment_data = json["data"]["children"].as_array().unwrap();
 
 	let mut comments: Vec<Comment> = Vec::new();
 
+	// For each comment, retrieve the values to build a Comment object
 	for comment in comment_data.iter() {
 		let unix_time: i64 = comment["data"]["created_utc"].as_f64().unwrap_or(0.0).round() as i64;
+		if unix_time == 0 {
+			continue;
+		}
+
 		let score = comment["data"]["score"].as_i64().unwrap_or(0);
 		let body = markdown_to_html(comment["data"]["body"].as_str().unwrap_or("")).await;
 
-		// if comment["data"]["replies"].is_object() {
-		// 	let replies = parse_comments(comment["data"]["replies"].clone()).await.unwrap();
-		// }
+		let replies: Vec<Comment> = if comment["data"]["replies"].is_object() {
+			parse_comments(comment["data"]["replies"].clone()).await.unwrap_or(Vec::new())
+		} else {
+			Vec::new()
+		};
 
 		comments.push(Comment {
 			body: body,
 			author: val(comment, "author").await,
 			score: format_num(score),
 			time: Utc.timestamp(unix_time, 0).format("%b %e %Y %H:%M UTC").to_string(),
+			replies: replies,
 		});
 	}
 

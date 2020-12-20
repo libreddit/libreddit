@@ -1,5 +1,14 @@
 /* General */
 
+:root {
+	--background: #0F0F0F;
+	--foreground: #222;
+	--outside: #1F1F1F;
+	--post: #161616;
+	--highlighted: #333;
+	--black-contrast: 0 1px 3px rgba(0,0,0,0.5);
+}
+
 * {
 	transition: 0.2s all;
 	margin: 0px;
@@ -8,15 +17,15 @@
 	font-weight: normal;
 }
 
-html {
-	background: black;
+body {
+	background: var(--background);
 }
 
 header {
 	display: flex;
 	justify-content: space-between;
 	color: aqua;
-	background: #151515;
+	background: var(--outside);
 	padding: 15px;
 	font-weight: bold;
 	font-size: 20px;
@@ -51,10 +60,6 @@ a {
 
 a:not(.post_right):hover {
 	text-decoration: underline;
-}
-
-span {
-	color: aqua;
 }
 
 #about {
@@ -128,7 +133,7 @@ span {
 }
 
 #sort > div, footer > a {
-	background: #151515;
+	background: var(--outside);
 	color: lightgrey;
 	border-radius: 5px;
 	margin-right: 5px;
@@ -143,32 +148,24 @@ span {
 }
 
 #sort > div:hover {
-	background: #222;
+	background: var(--foreground);
 }
 
 /* Post */
 
 .post {
 	border-radius: 5px;
-	background: #151515;
+	background: var(--post);
+	box-shadow: var(--black-contrast);
 	display: flex;
 }
 
-.post.highlighted {
-	border: 2px solid #555;
-	background: #222;
-}
-
-.post.highlighted > .post_left {
-	background: #333;
-}
-
 .post:hover {
-	background: #222;
+	background: var(--foreground);
 }
 
 .post:hover > .post_left {
-	background: #333;
+	background: var(--highlighted);
 }
 
 .post_left, .post_right {
@@ -179,14 +176,10 @@ span {
 
 .post_left {
 	text-align: center;
-	background: #222;
+	background: var(--foreground);
 	border-radius: 5px 0px 0px 5px;
 	min-width: 50px;
 	padding: 5px;
-}
-
-.datetime {
-	float: right;
 }
 
 .post_subreddit {
@@ -271,13 +264,14 @@ small {
 /* Comment */
 
 .comment {
+	margin-top: 1em;
 	border-radius: 5px;
 	display: flex;
-	border: 2px solid #222;
+	/* border: 2px solid var(--foreground); */
 }
 
 .comment:hover {
-	background: #111;
+	background: var(--post);
 }
 
 .comment_left, .comment_right {
@@ -289,17 +283,21 @@ small {
 	text-align: center;
 	min-width: 50px;
 	padding: 5px;
-	align-items: flex-end;
+	align-items: center;
 }
 
 .comment_title {
 	font-size: 20px;
 }
 
+.comment_author {
+	opacity: 0.9;
+}
+
 .comment_upvote {
 	margin-top: 0.5em;
 	border-radius: 5px 5px 0px 0px;
-	background: #222;
+	background: var(--foreground);
 	width: 40px;
 	padding: 10px 0px 0px 0px;
 }
@@ -310,25 +308,21 @@ small {
 
 .comment_score {
 	color: aqua;
-	background: #222;
-	width: 40px;
-	padding: 5px 0px 10px 0px;
-	border-radius: 0px 0px 5px 5px;
+	background: var(--foreground);
+	min-width: 40px;
+	border-radius: 5px;
+	padding: 10px 0px;
 }
 
 .comment_right {
 	word-wrap: anywhere;
-	padding: 10px 25px 10px 10px;
+	padding: 10px 25px 10px 5px;
 	flex-grow: 1;
 	flex-shrink: 1;
 }
 
-.comment_right > * {
+.comment_data > * {
 	margin: 5px;
-}
-
-.comment_right > p {
-	opacity: 0.75;
 }
 
 .comment_image {
@@ -355,9 +349,28 @@ small {
 	color: aqua;
 }
 
+::marker {
+	color: aqua;
+}
+
+.reply {
+	margin-top: 0;
+	margin-left: 2em;
+}
+
+.datetime {
+	opacity: 0.75;
+}
+
+.line {
+	width: 2px;
+	height: 100%;
+	background: var(--foreground);
+}
+
 .post.comment {
 	background: #000;
-	border: 2px solid #222;
+	border: 2px solid var(--foreground);
 }
 
 .post.comment > .post_left {
@@ -367,12 +380,12 @@ small {
 /* Tables */
 
 table {
-	border: 3px #333 solid;
+	border: 3px var(--highlighted) solid;
 	border-spacing: 0rem;
 }
 
 td, th {
-	border: 1px #333 solid;
+	border: 1px var(--highlighted) solid;
 	padding: 0.5em;
 }
 

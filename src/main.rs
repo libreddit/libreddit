@@ -1,5 +1,5 @@
 // Import Crates
-use actix_web::{web, get, App, HttpResponse, HttpServer, middleware::NormalizePath};
+use actix_web::{get, middleware::NormalizePath, web, App, HttpResponse, HttpServer};
 
 // Reference local files
 mod popular;
