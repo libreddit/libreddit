@@ -133,6 +133,7 @@ a:not(.post_right):hover {
 }
 
 #sort > div, footer > a {
+	box-shadow: var(--black-contrast);
 	background: var(--outside);
 	color: lightgrey;
 	border-radius: 5px;
@@ -268,10 +269,6 @@ small {
 	border-radius: 5px;
 	display: flex;
 	/* border: 2px solid var(--foreground); */
-}
-
-.comment:hover {
-	background: var(--post);
 }
 
 .comment_left, .comment_right {
