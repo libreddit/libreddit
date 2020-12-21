@@ -14,7 +14,7 @@ Think Invidious but for Reddit. Watch your cat videos without being watched.
 
 ## Screenshot
 
-![](https://i.ibb.co/Tgjb3w7/image.png)
+![](https://i.ibb.co/1RyKrBz/libreddit-rust.png)
 
 ## About
 
