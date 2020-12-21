@@ -32,7 +32,6 @@ Libreddit currently implements most of Reddit's functionalities but still lacks 
 
 ### In Progress
 - Searching
-- Multireddits
 
 ### How does it compare to Teddit?
 
