@@ -21,7 +21,7 @@ body {
 	background: var(--background);
 }
 
-header {
+nav {
 	display: flex;
 	justify-content: space-between;
 	color: aqua;

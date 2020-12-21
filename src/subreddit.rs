@@ -33,7 +33,16 @@ pub async fn render(sub_name: String, sort: Option<String>, ends: (Option<String
 		},
 	};
 
-	let sub_result = subreddit(&sub_name).await;
+	let sub_result = if !&sub_name.contains("+") { subreddit(&sub_name).await } else {
+		Ok(Subreddit {
+			name: String::new(),
+			title: String::new(),
+			description: String::new(),
+			icon: String::new(),
+			members: String::new(),
+			active: String::new(),
+		})
+	};
 	let items_result = fetch_posts(url, String::new()).await;
 
 	if sub_result.is_err() || items_result.is_err() {

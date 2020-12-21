@@ -1,6 +1,11 @@
 {% extends "base.html" %}
+
+{% if sub.name != "" %}
 {% block title %}r/{{ sub.name }}: {{ sub.description }}{% endblock %}
+{% endif %}
+
 {% block body %}
+	{% if sub.name != "" %}
 	<div id="about">
 		<div class="subreddit">
 			<div class="subreddit_left">
@@ -13,6 +18,7 @@
 			</div>
 		</div>
 	</div>
+	{% endif %}
 	<main>
 		<div id="sort">
 			<div id="sort_hot"><a href="?sort=hot">Hot</a></div>
@@ -26,7 +32,7 @@
 			</div>
 			<div class="post_right">
 				<h4>
-					<b><a class="post_subreddit" href="/r/{{ post.community }}">r/{{ sub.name }}</a></b>
+					<b><a class="post_subreddit" href="/r/{{ post.community }}">r/{{ post.community }}</a></b>
 					&bull; <a class="post_author" href="/u/{{ post.author }}">u/{{ post.author }}</a>
 					{% if post.author_flair.0 != "" %}
 						<small class="author_flair">{{ post.author_flair.0 }}</small>

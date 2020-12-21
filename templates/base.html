@@ -2,8 +2,9 @@
 <html lang="en">
 	<head>
 		{% block head %}
-		<title>{% block title %}{% endblock %}</title>
-		<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline';">
+		<title>{% block title %}Libreddit{% endblock %}</title>
+		<meta http-equiv="Referrer-Policy" content="no-referrer">
+		<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; base-uri 'none'; form-action 'self'; frame-ancestors 'none';">
 		<meta name="description" content="View on Libreddit, an alternative private front-end to Reddit.">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -19,11 +20,11 @@
 		{% endblock %}
     </head>
 	<body>
-		{% block header %}
-		<header>
+		{% block navbar %}
+		<nav>
 			<a href="/"><span id="lib">lib</span>reddit. <span id="version">v{{ env!("CARGO_PKG_VERSION") }}</span></a>
 			<a id="github" href="https://github.com/spikecodes/libreddit">GITHUB</a>
-		</header>
+		</nav>
 		{% endblock %}
 		
 		{% block body %}
