@@ -13,11 +13,13 @@
 		</div>
 	</div>
 	<main>
-		<div id="sort">
-			<div id="sort_hot"><a href="?sort=hot">Hot</a></div>
-			<div id="sort_top"><a href="?sort=top">Top</a></div>
-			<div id="sort_new"><a href="?sort=new">New</a></div>
-		</div>
+		<form>
+			<select id="sort" name="sort"> 
+				<option value="hot" {% if sort == "hot" %}selected{% endif %}>Hot</option>
+				<option value="new" {% if sort == "new" %}selected{% endif %}>New</option> 
+				<option value="top" {% if sort == "top" %}selected{% endif %}>Top</option> 
+			</select><input id="sort_submit" type="submit" value="→">
+		</form>
 		{% for post in posts %}
 		{% if post.title != "Comment" %}
 		<div class='post'>

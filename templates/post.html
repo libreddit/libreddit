@@ -13,8 +13,7 @@
 		<div class="line"></div>
 	</div>
 	<details class="comment_right" open>
-		<summary class="comment_data">
-			<a class="comment_author" href="/u/{{ item.author }}">u/{{ item.author }}</a>
+		<summary class="comment_data"><a class="comment_author" href="/u/{{ item.author }}">u/{{ item.author }}</a>
 			{% if item.flair.0 != "" %}
 				<small class="author_flair">{{ item.flair.0 }}</small>
 			{% endif %}
@@ -55,13 +54,15 @@
 			<h4 class="post_body">{{ post.body }}</h4>
 		</div>
 	</div>
-	<div id="sort">
-		<div id="sort_confidence"><a href="?sort=confidence">Best</a></div>
-		<div id="sort_top"><a href="?sort=top">Top</a></div>
-		<div id="sort_new"><a href="?sort=new">New</a></div>
-		<div id="sort_controversial"><a href="?sort=controversial">Controversial</a></div>
-		<div id="sort_old"><a href="?sort=old">Old</a></div>
-	</div>
+	<form>
+		<select id="sort" name="sort"> 
+			<option value="confidence" {% if sort == "confidence" %}selected{% endif %}>Best</option> 
+			<option value="top" {% if sort == "top" %}selected{% endif %}>Top</option> 
+			<option value="new" {% if sort == "new" %}selected{% endif %}>New</option> 
+			<option value="controversial" {% if sort == "controversial" %}selected{% endif %}>Controversial</option> 
+			<option value="old" {% if sort == "old" %}selected{% endif %}>Old</option>
+		</select><input id="sort_submit" type="submit" value="→">
+	</form>
 
 	{% for c in comments -%}
 		<div class="thread">

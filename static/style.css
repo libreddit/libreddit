@@ -15,10 +15,12 @@
 	color: white;
 	font-family: sans-serif;
 	font-weight: normal;
+	outline: none;
 }
 
 body {
 	background: var(--background);
+	visibility: visible !important;
 }
 
 nav {
@@ -126,11 +128,23 @@ a:not(.post_right):hover {
 /* Sorting */
 
 #sort {
-	max-width: 750px;
-	margin: 20px -10px;
-	display: flex;
-	justify-content: start;
-	padding: 0px 10px;
+	background: var(--outside);
+	box-shadow: var(--black-contrast);
+	border: 0px;
+	padding: 0px 15px;
+	margin: 20px 0px;
+	height: 40px;
+	font-size: 15px;
+	border-radius: 5px 0px 0px 5px;
+	appearance: none;
+}
+
+#sort_submit {
+	background: var(--highlighted);
+	border: 0px;
+	font-size: 15px;
+	height: 40px;
+	border-radius: 0px 5px 5px 0px;
 }
 
 #sort > div, footer > a {
@@ -270,6 +284,7 @@ a:not(.post_right):hover {
 	border-radius: 5px;
 	display: flex;
 	font-size: 15px;
+	padding: 5px;
 }
 
 .comment_left, .comment_right {
@@ -361,9 +376,8 @@ a:not(.post_right):hover {
 	color: aqua;
 }
 
-.reply {
-	margin-top: 0;
-	margin-left: 2em;
+.replies > .comment {
+	margin-left: -20px;
 }
 
 .datetime {
