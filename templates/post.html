@@ -13,7 +13,7 @@
 		<div class="line"></div>
 	</div>
 	<details class="comment_right" open>
-		<summary class="comment_data"><a class="comment_author" href="/u/{{ item.author }}">u/{{ item.author }}</a>
+		<summary class="comment_data"><a class="comment_author {% if item.author == post.author %}op{% endif %}" href="/u/{{ item.author }}">u/{{ item.author }}</a>
 			{% if item.flair.0 != "" %}
 				<small class="author_flair">{{ item.flair.0 }}</small>
 			{% endif %}

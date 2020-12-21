@@ -33,7 +33,9 @@ pub async fn render(sub_name: String, sort: Option<String>, ends: (Option<String
 		},
 	};
 
-	let sub_result = if !&sub_name.contains("+") { subreddit(&sub_name).await } else {
+	let sub_result = if !&sub_name.contains("+") {
+		subreddit(&sub_name).await
+	} else {
 		Ok(Subreddit {
 			name: String::new(),
 			title: String::new(),

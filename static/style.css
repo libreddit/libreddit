@@ -307,6 +307,11 @@ a:not(.post_right):hover {
 	opacity: 0.9;
 }
 
+.comment_author.op {
+	color: aqua;
+	font-weight: bold;
+}
+
 .author_flair {
 	background: var(--highlighted);
 	color: white;

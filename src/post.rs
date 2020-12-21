@@ -133,7 +133,7 @@ async fn parse_post(json: serde_json::Value) -> Result<Post, &'static str> {
 			} else {
 				"white".to_string()
 			},
-		)
+		),
 	};
 
 	Ok(post)
