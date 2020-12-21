@@ -1,5 +1,5 @@
 // CRATES
-use crate::utils::{fetch_posts, nested_val, request, ErrorTemplate, Params, Post, User};
+use crate::utils::{fetch_posts, format_url, nested_val, request, ErrorTemplate, Params, Post, User};
 use actix_web::{http::StatusCode, web, HttpResponse, Result};
 use askama::Template;
 
@@ -65,7 +65,7 @@ async fn user(name: &String) -> Result<User, &'static str> {
 	// Parse the JSON output into a User struct
 	Ok(User {
 		name: name.to_string(),
-		icon: nested_val(&res, "subreddit", "icon_img").await,
+		icon: format_url(nested_val(&res, "subreddit", "icon_img").await.as_str()).await,
 		karma: res["data"]["total_karma"].as_i64().unwrap(),
 		banner: nested_val(&res, "subreddit", "banner_img").await,
 		description: nested_val(&res, "subreddit", "public_description").await,
