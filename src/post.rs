@@ -164,6 +164,7 @@ async fn parse_comments(json: serde_json::Value) -> Result<Vec<Comment>, &'stati
 		};
 
 		comments.push(Comment {
+			id: val(comment, "id").await,
 			body: body,
 			author: val(comment, "author").await,
 			score: format_num(score),

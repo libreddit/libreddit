@@ -34,6 +34,7 @@ pub struct Post {
 #[allow(dead_code)]
 // Comment with content, post, score and data/time that it was posted
 pub struct Comment {
+	pub id: String,
 	pub body: String,
 	pub author: String,
 	pub flair: Flair,

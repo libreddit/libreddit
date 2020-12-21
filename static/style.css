@@ -435,6 +435,11 @@ td, th {
 		max-width: initial;
 	}
 
+	.replies > .comment {
+		margin-left: -25px;
+		padding: 10px 10px 10px 5px;
+	}
+
 	.datetime {
 		width: 100%;
 	}

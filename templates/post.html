@@ -7,7 +7,7 @@
 
 {% macro comment(item) -%}
 
-<div class="comment">
+<div id="{{ item.id }}" class="comment">
 	<div class="comment_left">
 		<h3 class="comment_score">{{ item.score }}</h3>
 		<div class="line"></div>
@@ -67,11 +67,16 @@
 		<div class="thread">
 			{% call comment(c) %}
 			<div class="replies">
-				{% for reply in c.replies %}
-					{% call comment(reply) %}
+				{% for reply1 in c.replies %}
+					{% call comment(reply1) %}
 					<div class="replies">
-						{% for response in reply.replies %}
-							{% call comment(response) %}</details></div>
+						{% for reply2 in reply1.replies %}
+							{% call comment(reply2) %}
+							<div class="replies">
+								{% for reply3 in reply2.replies %}
+									{% call comment(reply3) %}</details></div>
+								{% endfor %}
+							</div></details></div>
 						{% endfor %}
 					</div></details></div>
 				{% endfor %}
