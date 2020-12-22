@@ -5,7 +5,7 @@
 Libre + Reddit = [Libreddit](https://libredd.it)
 
 - 🚀 Fast: written in Rust for blazing fast speeds and safety
-- ☁️ Light: no javascript, no ads, no tracking
+- ☁️ Light: no JavaScript, no ads, no tracking
 - 🕵 Private: all requests are proxied through the server, including media
 - 🔒 Safe: does not rely on Reddit OAuth or require a Reddit API Key 
 - 📱 Responsive: works great on mobile!
@@ -157,7 +157,7 @@ yay -S libreddit-git
 ### D) GitHub Releases
 
 If you're on Linux and none of these methods work for you, you can grab a Linux binary from [the newest release](https://github.com/spikecodes/libreddit/releases/latest).
-Currently Libreddit does not have Windows or MacOS binaries but those will be available soon.
+Currently, Libreddit does not have Windows or macOS binaries but those will be available soon.
 
 ## Deployment
 
