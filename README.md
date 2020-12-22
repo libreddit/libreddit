@@ -167,7 +167,7 @@ Currently, Libreddit does not have Windows or macOS binaries but those will be a
 
 ### E) Repl.it
 
-**Note:** Repl.it is a free option but they are *not* private and are likely monitoring server usage to prevent abuse. If you really need a cheap easy setup, this method may work best for you.
+**Note:** Repl.it is a free option but they are *not* private and are monitor server usage to prevent abuse. If you really need a free and easy setup, this method may work best for you.
 
 1. Create a Repl.it account (see note above)
 2. Visit [the official Repl](https://repl.it/@spikethecoder/libreddit) and fork it
