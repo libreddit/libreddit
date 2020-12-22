@@ -36,10 +36,6 @@ Like [Invidious](https://github.com/iv-org/invidious) but for Reddit. Browse the
 
 ![](https://i.ibb.co/1RyKrBz/libreddit-rust.png)
 
-## Comparison
-
-This section outlines how Libreddit compares to Reddit.
-
 ## About
 
 ### Elsewhere
@@ -66,6 +62,9 @@ If you are looking to compare, the biggest differences I have noticed are:
 - Libreddit is written in Rust for speed and memory safety. It uses Actix Web, which was [benchmarked as the fastest web server for single queries](https://www.techempower.com/benchmarks/#hw=ph&test=db).
 - Unlike Teddit (at the time of writing this), Libreddit does not require a Reddit API key to host. 
 
+## Comparison
+
+This section outlines how Libreddit compares to Reddit.
 
 ### Speed
 
