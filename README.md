@@ -28,6 +28,7 @@ Like [Invidious](https://github.com/iv-org/invidious) but for Reddit. Browse the
   - [Docker](#b-docker)
   - [AUR](#c-aur)
   - [GitHub Releases](#d-github-releases)
+  - [Repl.it](#e-replit)
 - Developing
   - [Deployment](#deployment)
   - [Building](#building)
@@ -122,11 +123,11 @@ For transparency, I hope to describe all the ways Libreddit handles user privacy
 
 **Logging:** In production (when running the binary, hosting with docker, or using the official instances), Libreddit logs nothing. When debugging (running from source without `--release`), Libreddit logs post IDs fetched to aid troubleshooting but nothing else.
 
-**DNS:** Both official domains (`libredd.it` and `libreddit.spike.codes`) use Cloudflare as the DNS resolver. Though, the sites are not proxied through Cloudflare meaning Cloudflare should not have access to user traffic.
+**DNS:** Both official domains (`libredd.it` and `libreddit.spike.codes`) use Cloudflare as the DNS resolver. Though, the sites are not proxied through Cloudflare meaning Cloudflare doesn't have access to user traffic.
 
 **Cookies:** Libreddit uses no cookies currently but eventually, I plan to add a configuration page where users can store an optional cookie to save their preferred theme, default sorting algorithm, or default layout.
 
-**Hosting:** The official instances (`libredd.it` and `libreddit.spike.codes`) are hosted on [Repl.it](https://repl.it/) which likely monitors some aspect of usage for preventing abuse. I can understand if this invalidates certain users' threat models and therefore, selfhosting and browsing through Tor are welcomed.
+**Hosting:** The official instances (`libredd.it` and `libreddit.spike.codes`) are hosted on [Repl.it](https://repl.it/) which monitors usage to prevent abuse. I can understand if this invalidates certain users' threat models and therefore, selfhosting and browsing through Tor are welcomed.
 
 ## Installation
 
@@ -163,6 +164,16 @@ yay -S libreddit-git
 
 If you're on Linux and none of these methods work for you, you can grab a Linux binary from [the newest release](https://github.com/spikecodes/libreddit/releases/latest).
 Currently, Libreddit does not have Windows or macOS binaries but those will be available soon.
+
+### E) Repl.it
+
+**Note:** Repl.it is a free option but they are *not* private and are likely monitoring server usage to prevent abuse. If you really need a cheap easy setup, this method may work best for you.
+
+1. Create a Repl.it account (see note above)
+2. Visit [the official Repl](https://repl.it/@spikethecoder/libreddit) and fork it
+3. Hit the run button to download the latest Libreddit version and start it
+
+In the web preview (defaults to top right), you should see your instance hosted where you can assign a [custom domain](https://docs.repl.it/repls/web-hosting#custom-domains).
 
 ## Deployment
 
