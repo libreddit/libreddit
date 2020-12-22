@@ -1,6 +1,7 @@
 /* General */
 
 :root {
+	--accent: aqua;
 	--background: #0F0F0F;
 	--foreground: #222;
 	--outside: #1F1F1F;
@@ -26,7 +27,7 @@ body {
 nav {
 	display: flex;
 	justify-content: space-between;
-	color: aqua;
+	color: var(--accent);
 	background: var(--outside);
 	padding: 15px;
 	font-weight: bold;
@@ -159,7 +160,7 @@ a:not(.post_right):hover {
 }
 
 #sort > div.selected {
-	background: aqua;
+	background: var(--accent);
 	color: black;
 }
 
@@ -207,8 +208,8 @@ a:not(.post_right):hover {
 }
 
 .post_score {
-	margin-top: 1em;
-	color: aqua;
+	margin-top: 20px;
+	color: var(--accent);
 }
 
 .post_right {
@@ -242,16 +243,16 @@ a:not(.post_right):hover {
 }
 
 .post_body > p:not(:first-child) {
-	margin-top: 1.5em;
+	margin-top: 20px;
 }
 
 .post_body a {
 	text-decoration: underline;
-	color: aqua;
+	color: var(--accent);
 }
 
 #post_url {
-	color: aqua;
+	color: var(--accent);
 }
 
 .post_thumbnail {
@@ -268,7 +269,7 @@ a:not(.post_right):hover {
 }
 
 .post_flair {
-	background: aqua;
+	background: var(--accent);
 	color: black;
 	padding: 5px;
 	margin-right: 5px;
@@ -280,7 +281,7 @@ a:not(.post_right):hover {
 /* Comment */
 
 .comment {
-	margin-top: 1em;
+	margin-top: 15px;
 	border-radius: 5px;
 	display: flex;
 	font-size: 15px;
@@ -307,7 +308,7 @@ a:not(.post_right):hover {
 }
 
 .comment_author.op {
-	color: aqua;
+	color: var(--accent);
 	font-weight: bold;
 }
 
@@ -321,20 +322,12 @@ a:not(.post_right):hover {
 	font-weight: bold;
 }
 
-.comment_upvote {
-	margin-top: 0.5em;
-	border-radius: 5px 5px 0px 0px;
-	background: var(--foreground);
-	width: 40px;
-	padding: 10px 0px 0px 0px;
-}
-
 .comment_subreddit {
 	font-weight: bold;
 }
 
 .comment_score {
-	color: aqua;
+	color: var(--accent);
 	background: var(--foreground);
 	min-width: 40px;
 	border-radius: 5px;
@@ -368,21 +361,21 @@ a:not(.post_right):hover {
 }
 
 .comment_body > p:not(:first-child) {
-	margin-top: 1.5em;
+	margin-top: 20px;
 }
 
 .comment_body a {
 	text-decoration: underline;
-	color: aqua;
+	color: var(--accent);
 }
 
 .deeper_replies {
-	color: aqua;
-	margin-left: 1em;
+	color: var(--accent);
+	margin-left: 15px;
 }
 
 ::marker {
-	color: aqua;
+	color: var(--accent);
 }
 
 .replies > .comment {
@@ -428,12 +421,12 @@ code {
 
 table {
 	border: 3px var(--highlighted) solid;
-	border-spacing: 0rem;
+	border-spacing: 0;
 }
 
 td, th {
 	border: 1px var(--highlighted) solid;
-	padding: 0.5em;
+	padding: 10px;
 }
 
 /* Mobile */
