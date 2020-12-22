@@ -10,7 +10,7 @@ Libre + Reddit = [Libreddit](https://libredd.it)
 - 🔒 Safe: does not rely on Reddit OAuth or require a Reddit API Key 
 - 📱 Responsive: works great on mobile!
 
-Inspired by other great alternative front-ends including [Invidious](https://github.com/iv-org/invidious), [Nitter](https://github.com/zedeus/nitter) and [Biliogram](https://github.com/cloudrac3r/bibliogram).
+Like [Invidious](https://github.com/iv-org/invidious) but for Reddit. Browse the coldest takes of [r/unpopularopinion](https://libredd.it/r/unpopularopinion) without being [tracked](#reddit).
 
 ## Contents
 - [Screenshot](#screenshot)
@@ -50,7 +50,7 @@ Find Libreddit on...
 - 🦊 GitLab: [spikecodes/libreddit](https://gitlab.com/spikecodes/libreddit)
 
 ### Info
-Libreddit hopes to provide an easier way to browse Reddit, without the ads, trackers and bloat. Libreddit was inspired by other alternative front-ends to popular services such as [Invidious](https://github.com/iv-org/invidious) for YouTube, [Nitter](https://github.com/zedeus/nitter) for Twitter, and [Bibliogram](https://sr.ht/~cadence/bibliogram/) for Instagram.
+Libreddit hopes to provide an easier way to browse Reddit, without the ads, trackers, and bloat. Libreddit was inspired by other alternative front-ends to popular services such as [Invidious](https://github.com/iv-org/invidious) for YouTube, [Nitter](https://github.com/zedeus/nitter) for Twitter, and [Bibliogram](https://sr.ht/~cadence/bibliogram/) for Instagram.
 
 Libreddit currently implements most of Reddit's functionalities but still lacks a few features that are being worked on below.
 
@@ -110,7 +110,7 @@ Reddit's [cookie notice](https://www.redditinc.com/policies/cookies) documents t
 - Third-Party Cookies
 - Third-Party Site
 
-#### Liberddit
+#### Libreddit
 
 In production (when running the binary, hosting with docker, or using the official instances), Libreddit logs nothing. When debugging (running from source without `--release`), Libreddit logs post IDs fetched to aid troubleshooting but nothing else.
 
