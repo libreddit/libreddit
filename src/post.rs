@@ -18,7 +18,8 @@ struct PostTemplate {
 }
 
 async fn render(id: String, sort: Option<String>, comment_id: Option<String>) -> Result<HttpResponse> {
-	// Log the post ID being fetched
+	// Log the post ID being fetched in debug mode
+	#[cfg(debug_assertions)]
 	dbg!(&id);
 
 	// Handling sort paramater
