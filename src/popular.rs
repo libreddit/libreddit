@@ -19,10 +19,10 @@ async fn render(sub_name: String, sort: Option<String>, ends: (Option<String>, O
 
 	// Build the Reddit JSON API url
 	let url = match ends.0 {
-		Some(val) => format!("https://www.reddit.com/r/{}/{}.json?before={}&count=25", sub_name, sorting, val),
+		Some(val) => format!("r/{}/{}.json?before={}&count=25", sub_name, sorting, val),
 		None => match ends.1 {
-			Some(val) => format!("https://www.reddit.com/r/{}/{}.json?after={}&count=25", sub_name, sorting, val),
-			None => format!("https://www.reddit.com/r/{}/{}.json", sub_name, sorting),
+			Some(val) => format!("r/{}/{}.json?after={}&count=25", sub_name, sorting, val),
+			None => format!("r/{}/{}.json", sub_name, sorting),
 		},
 	};
 

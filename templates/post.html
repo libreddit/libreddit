@@ -61,7 +61,7 @@
 			<option value="new" {% if sort == "new" %}selected{% endif %}>New</option> 
 			<option value="controversial" {% if sort == "controversial" %}selected{% endif %}>Controversial</option> 
 			<option value="old" {% if sort == "old" %}selected{% endif %}>Old</option>
-		</select><input id="sort_submit" type="submit" value="→">
+		</select><input id="sort_submit" type="submit" value="&rarr;">
 	</form>
 
 	{% for c in comments -%}
@@ -75,7 +75,11 @@
 							{% call comment(reply2) %}
 							<div class="replies">
 								{% for reply3 in reply2.replies %}
-									{% call comment(reply3) %}</details></div>
+									{% call comment(reply3) %}
+									{% if reply3.replies.len() > 0 %}
+										<a class="deeper_replies" href="{{ post.url }}{{ reply3.id }}">&rarr; More replies</a>
+									{% endif %}
+									</details></div>
 								{% endfor %}
 							</div></details></div>
 						{% endfor %}

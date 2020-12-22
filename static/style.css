@@ -284,7 +284,6 @@ a:not(.post_right):hover {
 	border-radius: 5px;
 	display: flex;
 	font-size: 15px;
-	padding: 5px;
 }
 
 .comment_left, .comment_right {
@@ -377,12 +376,18 @@ a:not(.post_right):hover {
 	color: aqua;
 }
 
+.deeper_replies {
+	color: aqua;
+	margin-left: 1em;
+}
+
 ::marker {
 	color: aqua;
 }
 
 .replies > .comment {
 	margin-left: -20px;
+	padding: 5px;
 }
 
 .datetime {
@@ -456,7 +461,7 @@ td, th {
 
 	.replies > .comment {
 		margin-left: -25px;
-		padding: 10px 10px 10px 5px;
+		padding: 5px 0px;
 	}
 
 	.datetime {

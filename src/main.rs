@@ -60,6 +60,7 @@ async fn main() -> std::io::Result<()> {
 			// POST SERVICES
 			.route("/{id:.{5,6}}/", web::get().to(post::short))
 			.route("/r/{sub}/comments/{id}/{title}/", web::get().to(post::page))
+			.route("/r/{sub}/comments/{id}/{title}/{comment_id}/", web::get().to(post::comment))
 	})
 	.bind(address.clone())
 	.expect(format!("Cannot bind to the address: {}", address).as_str())

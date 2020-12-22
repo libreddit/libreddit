@@ -181,7 +181,9 @@ pub async fn fetch_posts(url: String, fallback_title: String) -> Result<(Vec<Pos
 
 // Make a request to a Reddit API and parse the JSON response
 #[allow(dead_code)]
-pub async fn request(url: String) -> Result<serde_json::Value, &'static str> {
+pub async fn request(mut url: String) -> Result<serde_json::Value, &'static str> {
+	url = format!("https://www.reddit.com/{}", url);
+
 	// --- actix-web::client ---
 	// let client = actix_web::client::Client::default();
 	// let res = client

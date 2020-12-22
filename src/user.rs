@@ -14,7 +14,7 @@ struct UserTemplate {
 
 async fn render(username: String, sort: String) -> Result<HttpResponse> {
 	// Build the Reddit JSON API url
-	let url: String = format!("https://www.reddit.com/user/{}/.json?sort={}", username, sort);
+	let url: String = format!("user/{}/.json?sort={}", username, sort);
 
 	let user = user(&username).await;
 	let posts = fetch_posts(url, "Comment".to_string()).await;
@@ -49,7 +49,7 @@ pub async fn page(web::Path(username): web::Path<String>, params: web::Query<Par
 // USER
 async fn user(name: &String) -> Result<User, &'static str> {
 	// Build the Reddit JSON API url
-	let url: String = format!("https://www.reddit.com/user/{}/about.json", name);
+	let url: String = format!("user/{}/about.json", name);
 
 	// Send a request to the url, receive JSON in response
 	let req = request(url).await;

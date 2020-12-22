@@ -17,7 +17,7 @@ struct PostTemplate {
 	sort: String,
 }
 
-async fn render(id: String, sort: Option<String>) -> Result<HttpResponse> {
+async fn render(id: String, sort: Option<String>, comment_id: Option<String>) -> Result<HttpResponse> {
 	// Log the post ID being fetched
 	dbg!(&id);
 
@@ -25,7 +25,10 @@ async fn render(id: String, sort: Option<String>) -> Result<HttpResponse> {
 	let sorting: String = sort.unwrap_or("confidence".to_string());
 
 	// Build the Reddit JSON API url
-	let url: String = format!("https://reddit.com/{}.json?sort={}", id, sorting);
+	let url: String = match comment_id {
+		None => format!("{}.json?sort={}", id, sorting),
+		Some(val) => format!("{}.json?sort={}&comment={}", id, sorting, val)
+	};
 
 	// Send a request to the url, receive JSON in response
 	let req = request(url).await;
@@ -60,11 +63,15 @@ async fn render(id: String, sort: Option<String>) -> Result<HttpResponse> {
 
 // SERVICES
 pub async fn short(web::Path(id): web::Path<String>, params: web::Query<Params>) -> Result<HttpResponse> {
-	render(id, params.sort.clone()).await
+	render(id, params.sort.clone(), None).await
+}
+
+pub async fn comment(web::Path((_sub, id, _title, comment_id)): web::Path<(String, String, String, String)>, params: web::Query<Params>) -> Result<HttpResponse> {
+	render(id, params.sort.clone(), Some(comment_id)).await
 }
 
 pub async fn page(web::Path((_sub, id)): web::Path<(String, String)>, params: web::Query<Params>) -> Result<HttpResponse> {
-	render(id, params.sort.clone()).await
+	render(id, params.sort.clone(), None).await
 }
 
 // UTILITIES

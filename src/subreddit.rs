@@ -26,10 +26,10 @@ pub async fn render(sub_name: String, sort: Option<String>, ends: (Option<String
 
 	// Build the Reddit JSON API url
 	let url = match ends.0 {
-		Some(val) => format!("https://www.reddit.com/r/{}/{}.json?before={}&count=25", sub_name, sorting, val),
+		Some(val) => format!("r/{}/{}.json?before={}&count=25", sub_name, sorting, val),
 		None => match ends.1 {
-			Some(val) => format!("https://www.reddit.com/r/{}/{}.json?after={}&count=25", sub_name, sorting, val),
-			None => format!("https://www.reddit.com/r/{}/{}.json", sub_name, sorting),
+			Some(val) => format!("r/{}/{}.json?after={}&count=25", sub_name, sorting, val),
+			None => format!("r/{}/{}.json", sub_name, sorting),
 		},
 	};
 
@@ -79,7 +79,7 @@ pub async fn render(sub_name: String, sort: Option<String>, ends: (Option<String
 // SUBREDDIT
 async fn subreddit(sub: &String) -> Result<Subreddit, &'static str> {
 	// Build the Reddit JSON API url
-	let url: String = format!("https://www.reddit.com/r/{}/about.json", sub);
+	let url: String = format!("r/{}/about.json", sub);
 
 	// Send a request to the url, receive JSON in response
 	let req = request(url).await;
