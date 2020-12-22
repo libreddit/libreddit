@@ -14,6 +14,7 @@ Like [Invidious](https://github.com/iv-org/invidious) but for Reddit. Browse the
 
 ## Contents
 - [Screenshot](#screenshot)
+- [Instances](#instances)
 - [About](#about)
   - [Elsewhere](#elsewhere)
   - [Info](#info)
@@ -22,7 +23,6 @@ Like [Invidious](https://github.com/iv-org/invidious) but for Reddit. Browse the
 - [Comparison](#comparison)
   - [Speed](#speed)
   - [Privacy](#privacy)
-- [Instances](#instances)
 - [Installation](#installation)
   - [Cargo](#a-cargo)
   - [Docker](#b-docker)
@@ -35,6 +35,13 @@ Like [Invidious](https://github.com/iv-org/invidious) but for Reddit. Browse the
 ## Screenshot
 
 ![](https://i.ibb.co/1RyKrBz/libreddit-rust.png)
+
+## Instances
+
+Feel free to [open an issue](https://github.com/spikecodes/libreddit/issues/new) to have your [selfhosted instance](#deployment) listed here!
+
+- [libredd.it](https://libredd.it) 🇺🇸 (Thank you to [YeapGuy](https://github.com/YeapGuy)!)
+- [libreddit.spike.codes](https://libreddit.spike.codes) 🇺🇸
 
 ## About
 
@@ -59,7 +66,7 @@ Teddit is another awesome open source project designed to provide an alternative
 
 If you are looking to compare, the biggest differences I have noticed are:
 - Libreddit is themed around Reddit's redesign whereas Teddit appears to stick much closer to Reddit's old design. This may suit some users better as design is always subjective.
-- Libreddit is written in Rust for speed and memory safety. It uses Actix Web, which was [benchmarked as the fastest web server for single queries](https://www.techempower.com/benchmarks/#hw=ph&test=db).
+- Libreddit is written in [Rust](https://www.rust-lang.org) for speed and memory safety. It uses [Actix Web](https://actix.rs), which was [benchmarked as the fastest web server for single queries](https://www.techempower.com/benchmarks/#hw=ph&test=db).
 - Unlike Teddit (at the time of writing this), Libreddit does not require a Reddit API key to host. 
 
 ## Comparison
@@ -82,7 +89,7 @@ Results from Google Lighthouse ([Libreddit Report](https://lighthouse-dot-webdot
 
 #### Reddit
 
-According to Reddit's [privacy policy](https://www.redditinc.com/policies/privacy-policy), they "may [automatically] log information" including:
+**Logging:** According to Reddit's [privacy policy](https://www.redditinc.com/policies/privacy-policy), they "may [automatically] log information" including:
 - IP address
 - User-agent string
 - Browser type
@@ -95,13 +102,13 @@ According to Reddit's [privacy policy](https://www.redditinc.com/policies/privac
 - The requested URL
 - Search terms
 
-The same privacy policy goes on to describe location data may be collected through the use of:
+**Location:** The same privacy policy goes on to describe location data may be collected through the use of:
 - GPS (consensual)
 - Bluetooth (consensual)
 - Content associated with a location (consensual)
 - Your IP Address
 
-Reddit's [cookie notice](https://www.redditinc.com/policies/cookies) documents the array of cookies used by Reddit including/regarding:
+**Cookies:** Reddit's [cookie notice](https://www.redditinc.com/policies/cookies) documents the array of cookies used by Reddit including/regarding:
 - Authentication
 - Functionality
 - Analytics and Performance
@@ -111,16 +118,15 @@ Reddit's [cookie notice](https://www.redditinc.com/policies/cookies) documents t
 
 #### Libreddit
 
-In production (when running the binary, hosting with docker, or using the official instances), Libreddit logs nothing. When debugging (running from source without `--release`), Libreddit logs post IDs fetched to aid troubleshooting but nothing else.
+For transparency, I hope to describe all the ways Libreddit handles user privacy.
 
-Both official domains (`libredd.it` and `libreddit.spike.codes`) use Cloudflare. This may violate certain users' threat models and therefore, selfhosting is welcomed.
+**Logging:** In production (when running the binary, hosting with docker, or using the official instances), Libreddit logs nothing. When debugging (running from source without `--release`), Libreddit logs post IDs fetched to aid troubleshooting but nothing else.
 
-## Instances
+**DNS:** Both official domains (`libredd.it` and `libreddit.spike.codes`) use Cloudflare as the DNS resolver. Though, the sites are not proxied through Cloudflare meaning Cloudflare should not have access to user traffic.
 
-Feel free to [open an issue](https://github.com/spikecodes/libreddit/issues/new) to have your [selfhosted instance](#deployment) listed here!
+**Cookies:** Libreddit uses no cookies currently but eventually, I plan to add a configuration page where users can store an optional cookie to save their preferred theme, default sorting algorithm, or default layout.
 
-- [libredd.it](https://libredd.it) 🇺🇸 (Thank you to [YeapGuy](https://github.com/YeapGuy)!)
-- [libreddit.spike.codes](https://libreddit.spike.codes) 🇺🇸
+**Hosting:** The official instances (`libredd.it` and `libreddit.spike.codes`) are hosted on [Repl.it](https://repl.it/) which likely monitors some aspect of usage for preventing abuse. I can understand if this invalidates certain users' threat models and therefore, selfhosting and browsing through Tor are welcomed.
 
 ## Installation
 
