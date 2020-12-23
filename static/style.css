@@ -48,6 +48,7 @@ main {
 footer {
 	display: flex;
 	justify-content: center;
+	margin-bottom: 20px;
 }
 
 button {
@@ -199,17 +200,27 @@ a:not(.post_right):hover {
 	padding: 5px;
 }
 
+.post_score {
+	margin-top: 20px;
+	color: var(--accent);
+}
+
+.nsfw {
+	color: #FF5C5D;
+	margin-top: 20px;
+	border: 1px solid #FF5C5D;
+	padding: 5px;
+	font-size: 12px;
+	border-radius: 5px;
+	font-weight: bold;
+}
+
 .post_subreddit {
 	font-weight: bold;
 }
 
 .post_title {
 	font-size: 18px;
-}
-
-.post_score {
-	margin-top: 20px;
-	color: var(--accent);
 }
 
 .post_right {

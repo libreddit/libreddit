@@ -28,7 +28,7 @@ async fn render(id: String, sort: Option<String>, comment_id: Option<String>) ->
 	// Build the Reddit JSON API url
 	let url: String = match comment_id {
 		None => format!("{}.json?sort={}", id, sorting),
-		Some(val) => format!("{}.json?sort={}&comment={}", id, sorting, val)
+		Some(val) => format!("{}.json?sort={}&comment={}", id, sorting, val),
 	};
 
 	// Send a request to the url, receive JSON in response
@@ -111,13 +111,18 @@ async fn markdown_to_html(md: &str) -> String {
 
 // POSTS
 async fn parse_post(json: serde_json::Value) -> Result<Post, &'static str> {
+	// Retrieve post (as opposed to comments) from JSON
 	let post_data: &serde_json::Value = &json["data"]["children"][0];
 
+	// Grab UTC time as unix timestamp
 	let unix_time: i64 = post_data["data"]["created_utc"].as_f64().unwrap().round() as i64;
+	// Parse post score
 	let score = post_data["data"]["score"].as_i64().unwrap();
 
+	// Determine the type of media along with the media URL
 	let media = media(&post_data["data"]).await;
 
+	// Build a post using data parsed from Reddit post API
 	let post = Post {
 		title: val(post_data, "title").await,
 		community: val(post_data, "subreddit").await,
@@ -131,8 +136,6 @@ async fn parse_post(json: serde_json::Value) -> Result<Post, &'static str> {
 		url: val(post_data, "permalink").await,
 		score: format_num(score),
 		post_type: media.0,
-		media: media.1,
-		time: Utc.timestamp(unix_time, 0).format("%b %e %Y %H:%M UTC").to_string(),
 		flair: Flair(
 			val(post_data, "link_flair_text").await,
 			val(post_data, "link_flair_background_color").await,
@@ -142,6 +145,9 @@ async fn parse_post(json: serde_json::Value) -> Result<Post, &'static str> {
 				"white".to_string()
 			},
 		),
+		nsfw: post_data["data"]["over_18"].as_bool().unwrap_or(false),
+		media: media.1,
+		time: Utc.timestamp(unix_time, 0).format("%b %e %Y %H:%M UTC").to_string(),
 	};
 
 	Ok(post)
@@ -156,7 +162,7 @@ async fn parse_comments(json: serde_json::Value) -> Result<Vec<Comment>, &'stati
 	let mut comments: Vec<Comment> = Vec::new();
 
 	// For each comment, retrieve the values to build a Comment object
-	for comment in comment_data.iter() {
+	for comment in comment_data {
 		let unix_time: i64 = comment["data"]["created_utc"].as_f64().unwrap_or(0.0).round() as i64;
 		if unix_time == 0 {
 			continue;

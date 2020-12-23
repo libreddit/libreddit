@@ -11,11 +11,9 @@ use base64::encode;
 //
 // STRUCTS
 //
-#[allow(dead_code)]
 // Post flair with text, background color and foreground color
 pub struct Flair(pub String, pub String, pub String);
 
-#[allow(dead_code)]
 // Post containing content, metadata and media
 pub struct Post {
 	pub title: String,
@@ -26,12 +24,12 @@ pub struct Post {
 	pub url: String,
 	pub score: String,
 	pub post_type: String,
+	pub flair: Flair,
+	pub nsfw: bool,
 	pub media: String,
 	pub time: String,
-	pub flair: Flair,
 }
 
-#[allow(dead_code)]
 // Comment with content, post, score and data/time that it was posted
 pub struct Comment {
 	pub id: String,
@@ -43,7 +41,6 @@ pub struct Comment {
 	pub replies: Vec<Comment>,
 }
 
-#[allow(dead_code)]
 // User struct containing metadata about user
 pub struct User {
 	pub name: String,
@@ -53,7 +50,6 @@ pub struct User {
 	pub description: String,
 }
 
-#[allow(dead_code)]
 // Subreddit struct containing metadata about community
 pub struct Subreddit {
 	pub name: String,
@@ -105,19 +101,16 @@ pub fn format_num(num: i64) -> String {
 // JSON PARSING
 //
 
-#[allow(dead_code)]
 // val() function used to parse JSON from Reddit APIs
 pub async fn val(j: &serde_json::Value, k: &str) -> String {
 	String::from(j["data"][k].as_str().unwrap_or(""))
 }
 
-#[allow(dead_code)]
 // nested_val() function used to parse JSON from Reddit APIs
 pub async fn nested_val(j: &serde_json::Value, n: &str, k: &str) -> String {
 	String::from(j["data"][n][k].as_str().unwrap())
 }
 
-#[allow(dead_code)]
 pub async fn fetch_posts(url: String, fallback_title: String) -> Result<(Vec<Post>, String), &'static str> {
 	// Send a request to the url, receive JSON in response
 	let req = request(url).await;
@@ -135,7 +128,7 @@ pub async fn fetch_posts(url: String, fallback_title: String) -> Result<(Vec<Pos
 
 	let mut posts: Vec<Post> = Vec::new();
 
-	for post in post_list.iter() {
+	for post in post_list {
 		let img = if val(post, "thumbnail").await.starts_with("https:/") {
 			format_url(val(post, "thumbnail").await.as_str()).await
 		} else {
@@ -158,8 +151,6 @@ pub async fn fetch_posts(url: String, fallback_title: String) -> Result<(Vec<Pos
 			score: format_num(score),
 			post_type: "link".to_string(),
 			media: img,
-			url: val(post, "permalink").await,
-			time: Utc.timestamp(unix_time, 0).format("%b %e '%y").to_string(),
 			flair: Flair(
 				val(post, "link_flair_text").await,
 				val(post, "link_flair_background_color").await,
@@ -169,6 +160,9 @@ pub async fn fetch_posts(url: String, fallback_title: String) -> Result<(Vec<Pos
 					"white".to_string()
 				},
 			),
+			nsfw: post["data"]["over_18"].as_bool().unwrap_or(false),
+			url: val(post, "permalink").await,
+			time: Utc.timestamp(unix_time, 0).format("%b %e '%y").to_string(),
 		});
 	}
 
@@ -180,7 +174,6 @@ pub async fn fetch_posts(url: String, fallback_title: String) -> Result<(Vec<Pos
 //
 
 // Make a request to a Reddit API and parse the JSON response
-#[allow(dead_code)]
 pub async fn request(mut url: String) -> Result<serde_json::Value, &'static str> {
 	url = format!("https://www.reddit.com/{}", url);
 
