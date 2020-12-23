@@ -41,8 +41,14 @@ Like [Invidious](https://github.com/iv-org/invidious) but for Reddit. Browse the
 
 Feel free to [open an issue](https://github.com/spikecodes/libreddit/issues/new) to have your [selfhosted instance](#deployment) listed here!
 
-- [libredd.it](https://libredd.it) 🇺🇸 (Thank you to [YeapGuy](https://github.com/YeapGuy)!)
-- [libreddit.spike.codes](https://libreddit.spike.codes) 🇺🇸
+### Official
+
+- [libredd.it](https://libredd.it)
+- [libreddit.spike.codes](https://libreddit.spike.codes)
+
+### Community
+
+- [libreddit.dothq.co](https://libreddit.dothq.co/)
 
 ## About
 
