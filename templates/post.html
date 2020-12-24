@@ -24,70 +24,71 @@
 {%- endmacro %}
 
 {% block content %}
-	<div class="post highlighted">
-		<div class="post_left">
-			<h3 class="post_score">{{ post.score }}</h3>
-			{% if post.nsfw %}<div class="nsfw">NSFW</div>{% endif %}
-		</div>
-		<div class="post_right">
-			<h4>
-				<b><a class="post_subreddit" href="/r/{{ post.community }}">r/{{ post.community }}</a></b>
-				&bull;
-				<a class="post_author" href="/u/{{ post.author }}">u/{{ post.author }}</a>
-				{% if post.author_flair.0 != "" %}
-					<small class="author_flair">{{ post.author_flair.0 }}</small>
+	<div id="column_one">
+		<div class="post highlighted">
+			<div class="post_left">
+				<h3 class="post_score">{{ post.score }}</h3>
+				{% if post.nsfw %}<div class="nsfw">NSFW</div>{% endif %}
+			</div>
+			<div class="post_right">
+				<h4>
+					<b><a class="post_subreddit" href="/r/{{ post.community }}">r/{{ post.community }}</a></b>
+					&bull;
+					<a class="post_author" href="/u/{{ post.author }}">u/{{ post.author }}</a>
+					{% if post.author_flair.0 != "" %}
+						<small class="author_flair">{{ post.author_flair.0 }}</small>
+					{% endif %}
+					<span class="datetime">{{ post.time }}</span>
+				</h4>
+				<a href="{{ post.url }}" class="post_title">
+					{{ post.title }}
+					{% if post.flair.0 != "" %}
+						<small class="post_flair" style="color:{{ post.flair.2 }}; background:{{ post.flair.1 }}">{{ post.flair.0 }}</small>
+					{% endif %}
+				</a>
+				{% if post.post_type == "image" %}
+				<img class="post_media" src="{{ post.media }}"/>
+				{% else if post.post_type == "video" %}
+				<video class="post_media" src="{{ post.media }}" controls autoplay loop>
+				{% else if post.post_type == "link" %}
+				<a id="post_url" href="{{ post.media }}">{{ post.media }}</a>
 				{% endif %}
-				<span class="datetime">{{ post.time }}</span>
-			</h4>
-			<a href="{{ post.url }}" class="post_title">
-				{{ post.title }}
-				{% if post.flair.0 != "" %}
-					<small class="post_flair" style="color:{{ post.flair.2 }}; background:{{ post.flair.1 }}">{{ post.flair.0 }}</small>
-				{% endif %}
-			</a>
-			{% if post.post_type == "image" %}
-			<img class="post_media" src="{{ post.media }}"/>
-			{% else if post.post_type == "video" %}
-			<video class="post_media" src="{{ post.media }}" controls autoplay loop>
-			{% else if post.post_type == "link" %}
-			<a id="post_url" href="{{ post.media }}">{{ post.media }}</a>
-			{% endif %}
-			<h4 class="post_body">{{ post.body }}</h4>
+				<h4 class="post_body">{{ post.body }}</h4>
+			</div>
 		</div>
+		<form>
+			<select id="sort" name="sort"> 
+				<option value="confidence" {% if sort == "confidence" %}selected{% endif %}>Best</option> 
+				<option value="top" {% if sort == "top" %}selected{% endif %}>Top</option> 
+				<option value="new" {% if sort == "new" %}selected{% endif %}>New</option> 
+				<option value="controversial" {% if sort == "controversial" %}selected{% endif %}>Controversial</option> 
+				<option value="old" {% if sort == "old" %}selected{% endif %}>Old</option>
+			</select><input id="sort_submit" type="submit" value="&rarr;">
+		</form>
+
+		{% for c in comments -%}
+			<div class="thread">
+				{% call comment(c) %}
+				<div class="replies">
+					{% for reply1 in c.replies %}
+						{% call comment(reply1) %}
+						<div class="replies">
+							{% for reply2 in reply1.replies %}
+								{% call comment(reply2) %}
+								<div class="replies">
+									{% for reply3 in reply2.replies %}
+										{% call comment(reply3) %}
+										{% if reply3.replies.len() > 0 %}
+											<a class="deeper_replies" href="{{ post.url }}{{ reply3.id }}">&rarr; More replies</a>
+										{% endif %}
+										</details></div>
+									{% endfor %}
+								</div></details></div>
+							{% endfor %}
+						</div></details></div>
+					{% endfor %}
+				</div></details></div>
+			</div>
+		{%- endfor %}
 	</div>
-	<form>
-		<select id="sort" name="sort"> 
-			<option value="confidence" {% if sort == "confidence" %}selected{% endif %}>Best</option> 
-			<option value="top" {% if sort == "top" %}selected{% endif %}>Top</option> 
-			<option value="new" {% if sort == "new" %}selected{% endif %}>New</option> 
-			<option value="controversial" {% if sort == "controversial" %}selected{% endif %}>Controversial</option> 
-			<option value="old" {% if sort == "old" %}selected{% endif %}>Old</option>
-		</select><input id="sort_submit" type="submit" value="&rarr;">
-	</form>
-
-	{% for c in comments -%}
-		<div class="thread">
-			{% call comment(c) %}
-			<div class="replies">
-				{% for reply1 in c.replies %}
-					{% call comment(reply1) %}
-					<div class="replies">
-						{% for reply2 in reply1.replies %}
-							{% call comment(reply2) %}
-							<div class="replies">
-								{% for reply3 in reply2.replies %}
-									{% call comment(reply3) %}
-									{% if reply3.replies.len() > 0 %}
-										<a class="deeper_replies" href="{{ post.url }}{{ reply3.id }}">&rarr; More replies</a>
-									{% endif %}
-									</details></div>
-								{% endfor %}
-							</div></details></div>
-						{% endfor %}
-					</div></details></div>
-				{% endfor %}
-			</div></details></div>
-		</div>
-	{%- endfor %}
-
 {% endblock %}

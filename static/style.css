@@ -39,10 +39,11 @@ nav {
 }
 
 main {
+	display: flex;
+	justify-content: center;
 	max-width: 750px;
+	padding: 10px 20px;
 	margin: 0 auto;
-	margin-top: 25px;
-	padding: 0px 10px;
 }
 
 footer {
@@ -71,60 +72,60 @@ a:not(.post_right):hover {
 	background: #151515;
 }
 
+aside {
+	/* background: #151515; */
+	padding: 20px;
+	height: max-content;
+	border-radius: 5px;
+	flex-grow: 1;
+	margin: 80px 20px 0px 20px;
+	background: var(--outside);
+}
+
 #version {
 	color: white;
 	opacity: 25%;
 }
 
-/* Subreddit */
+/* User & Subreddit */
 
-.subreddit {
-	max-width: 750px;
+.user, .subreddit {
+	max-width: 350px;
 	margin: 0 auto;
 	display: flex;
-	padding-bottom: 25px;
+	flex-direction: column;
+	align-items: center;
 }
 
-.subreddit_name {
-	margin-bottom: 10px;
-}
-
-.subreddit_right {
-	display: flex;
-	flex-flow: column;
-	justify-content: center;
-}
-
-.subreddit_icon {
+.user_icon, .subreddit_icon {
 	width: 100px;
 	height: 100px;
+	border: 2px solid var(--accent);
 	border-radius: 100%;
-	padding: 20px;
+	padding: 10px;
+	margin: 10px;
 }
 
-#stats {
+.user_name, .subreddit_name {
 	margin-top: 10px;
 }
 
-/* User */
-
-.user {
-	max-width: 750px;
-	margin: 0 auto;
-	display: flex;
+.user_description, .subreddit_description {
+	margin: 10px 20px;
+	text-align: center;
+	font-size: 15px;
 }
 
-.user_right {
-	display: flex;
-	flex-flow: column;
-	justify-content: center;
+.user_details, .subreddit_details {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	margin-top: 15px;
+	grid-column-gap: 20px;
 }
 
-.user_icon {
-	width: 100px;
-	height: 100px;
-	border-radius: 100%;
-	padding: 20px;
+.user_details > label, .subreddit_details > label {
+	color: var(--accent);
+	font-size: 15px;
 }
 
 /* Sorting */
@@ -176,6 +177,10 @@ a:not(.post_right):hover {
 	background: var(--post);
 	box-shadow: var(--black-contrast);
 	display: flex;
+}
+
+.post.highlighted {
+	margin-top: 20px;
 }
 
 .post:hover {
@@ -470,5 +475,15 @@ td, th {
 
 	.datetime {
 		width: 100%;
+	}
+}
+
+@media screen and (max-width: 800px) {
+	main {
+		flex-direction: column-reverse;
+	}
+
+	aside {
+		margin: 20px 0px 0px 0px;
 	}
 }

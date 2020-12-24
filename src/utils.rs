@@ -46,6 +46,7 @@ pub struct User {
 	pub name: String,
 	pub icon: String,
 	pub karma: i64,
+	pub created: String,
 	pub banner: String,
 	pub description: String,
 }
