@@ -55,14 +55,8 @@ pub async fn render(sub_name: String, sort: Option<String>, ends: (Option<String
 		.unwrap();
 		Ok(HttpResponse::Ok().status(StatusCode::NOT_FOUND).content_type("text/html").body(s))
 	} else {
-		let mut sub = sub_result.unwrap();
+		let sub = sub_result.unwrap();
 		let items = items_result.unwrap();
-
-		sub.icon = if sub.icon != "" {
-			format!(r#"<img class="subreddit_icon" src="{}">"#, sub.icon)
-		} else {
-			String::new()
-		};
 
 		let s = SubredditTemplate {
 			sub: sub,
@@ -95,11 +89,18 @@ async fn subreddit(sub: &String) -> Result<Subreddit, &'static str> {
 	let members = res["data"]["subscribers"].as_u64().unwrap_or(0);
 	let active = res["data"]["accounts_active"].as_u64().unwrap_or(0);
 
+	let community_icon: &str = res["data"]["community_icon"].as_str().unwrap().split("?").collect::<Vec<&str>>()[0];
+	let icon = if community_icon.is_empty() {
+		val(&res, "icon_img").await
+	} else {
+		community_icon.to_string()
+	};
+
 	let sub = Subreddit {
 		name: val(&res, "display_name").await,
 		title: val(&res, "title").await,
 		description: val(&res, "public_description").await,
-		icon: format_url(val(&res, "icon_img").await.as_str()).await,
+		icon: format_url(icon).await,
 		members: format_num(members.try_into().unwrap()),
 		active: format_num(active.try_into().unwrap()),
 	};

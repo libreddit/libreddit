@@ -65,7 +65,7 @@ async fn user(name: &String) -> Result<User, &'static str> {
 	// Parse the JSON output into a User struct
 	Ok(User {
 		name: name.to_string(),
-		icon: format_url(nested_val(&res, "subreddit", "icon_img").await.as_str()).await,
+		icon: format_url(nested_val(&res, "subreddit", "icon_img").await).await,
 		karma: res["data"]["total_karma"].as_i64().unwrap(),
 		banner: nested_val(&res, "subreddit", "banner_img").await,
 		description: nested_val(&res, "subreddit", "public_description").await,

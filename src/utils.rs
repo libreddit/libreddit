@@ -79,7 +79,11 @@ pub struct ErrorTemplate {
 // FORMATTING
 //
 
-pub async fn format_url(url: &str) -> String {
+pub async fn format_url(url: String) -> String {
+	if url.is_empty() {
+		return String::new();
+	};
+
 	#[cfg(feature = "proxy")]
 	return "/proxy/".to_string() + encode(url).as_str();
 
@@ -130,7 +134,7 @@ pub async fn fetch_posts(url: String, fallback_title: String) -> Result<(Vec<Pos
 
 	for post in post_list {
 		let img = if val(post, "thumbnail").await.starts_with("https:/") {
-			format_url(val(post, "thumbnail").await.as_str()).await
+			format_url(val(post, "thumbnail").await).await
 		} else {
 			String::new()
 		};

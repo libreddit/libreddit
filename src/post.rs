@@ -80,13 +80,13 @@ async fn media(data: &serde_json::Value) -> (String, String) {
 	let post_type: &str;
 	let url = if !data["preview"]["reddit_video_preview"]["fallback_url"].is_null() {
 		post_type = "video";
-		format_url(data["preview"]["reddit_video_preview"]["fallback_url"].as_str().unwrap()).await
+		format_url(data["preview"]["reddit_video_preview"]["fallback_url"].as_str().unwrap().to_string()).await
 	} else if !data["secure_media"]["reddit_video"]["fallback_url"].is_null() {
 		post_type = "video";
-		format_url(data["secure_media"]["reddit_video"]["fallback_url"].as_str().unwrap()).await
+		format_url(data["secure_media"]["reddit_video"]["fallback_url"].as_str().unwrap().to_string()).await
 	} else if data["post_hint"].as_str().unwrap_or("") == "image" {
 		post_type = "image";
-		format_url(data["preview"]["images"][0]["source"]["url"].as_str().unwrap()).await
+		format_url(data["preview"]["images"][0]["source"]["url"].as_str().unwrap().to_string()).await
 	} else {
 		post_type = "link";
 		data["url"].as_str().unwrap().to_string()
