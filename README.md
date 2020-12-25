@@ -49,6 +49,7 @@ Feel free to [open an issue](https://github.com/spikecodes/libreddit/issues/new)
 ### Community
 
 - [libreddit.dothq.co](https://libreddit.dothq.co/)
+- [libreddit.insanity.wtf](https://libreddit.insanity.wtf/)
 
 ## About
 
