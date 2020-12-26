@@ -42,11 +42,11 @@
 
 			<footer>
 				{% if ends.0 != "" %}
-				<a href="?before={{ ends.0 }}">PREV</a>
+				<a href="?sort={{ sort }}&before={{ ends.0 }}">PREV</a>
 				{% endif %}
 
 				{% if ends.1 != "" %}
-				<a href="?after={{ ends.1 }}">NEXT</a>
+				<a href="?sort={{ sort }}&after={{ ends.1 }}">NEXT</a>
 				{% endif %}
 			</footer>
 		</div>
