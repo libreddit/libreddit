@@ -7,8 +7,8 @@ Libre + Reddit = [Libreddit](https://libredd.it)
 - 🚀 Fast: written in Rust for blazing fast speeds and safety
 - ☁️ Light: no JavaScript, no ads, no tracking
 - 🕵 Private: all requests are proxied through the server, including media
-- 🔒 Safe: does not rely on Reddit OAuth or require a Reddit API Key 
-- 📱 Responsive: works great on mobile!
+- 🦺 Safe: does not rely on Reddit OAuth or require a Reddit API Key 
+- 🔒 Secure: strong [Content Security Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP) prevents browser requests to Reddit
 
 Like [Invidious](https://github.com/iv-org/invidious) but for Reddit. Browse the coldest takes of [r/unpopularopinion](https://libredd.it/r/unpopularopinion) without being [tracked](#reddit).
 

@@ -80,6 +80,7 @@ pub struct ErrorTemplate {
 // FORMATTING
 //
 
+// Direct urls to proxy if proxy is enabled
 pub async fn format_url(url: String) -> String {
 	if url.is_empty() {
 		return String::new();
@@ -92,6 +93,7 @@ pub async fn format_url(url: String) -> String {
 	return url.to_string();
 }
 
+// Append `m` and `k` for millions and thousands respectively
 pub fn format_num(num: i64) -> String {
 	if num > 1000000 {
 		format!("{}m", num / 1000000)
@@ -116,6 +118,7 @@ pub async fn nested_val(j: &serde_json::Value, n: &str, k: &str) -> String {
 	String::from(j["data"][n][k].as_str().unwrap())
 }
 
+// Fetch posts of a user or subreddit
 pub async fn fetch_posts(url: String, fallback_title: String) -> Result<(Vec<Post>, String), &'static str> {
 	// Send a request to the url, receive JSON in response
 	let req = request(url).await;

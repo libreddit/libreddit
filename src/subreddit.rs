@@ -86,9 +86,11 @@ async fn subreddit(sub: &String) -> Result<Subreddit, &'static str> {
 	// Otherwise, grab the JSON output from the request
 	let res = req.unwrap();
 
+	// Metadata regarding the subreddit
 	let members = res["data"]["subscribers"].as_u64().unwrap_or(0);
 	let active = res["data"]["accounts_active"].as_u64().unwrap_or(0);
 
+	// Fetch subreddit icon either from the community_icon or icon_img value
 	let community_icon: &str = res["data"]["community_icon"].as_str().unwrap().split("?").collect::<Vec<&str>>()[0];
 	let icon = if community_icon.is_empty() {
 		val(&res, "icon_img").await
