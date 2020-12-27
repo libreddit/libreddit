@@ -121,7 +121,7 @@ pub async fn nested_val(j: &serde_json::Value, n: &str, k: &str) -> String {
 // Fetch posts of a user or subreddit
 pub async fn fetch_posts(url: String, fallback_title: String) -> Result<(Vec<Post>, String), &'static str> {
 	// Send a request to the url, receive JSON in response
-	let req = request(url).await;
+	let req = request(url.clone()).await;
 
 	// If the Reddit API returns an error, exit this function
 	if req.is_err() {
@@ -173,6 +173,8 @@ pub async fn fetch_posts(url: String, fallback_title: String) -> Result<(Vec<Pos
 			time: Utc.timestamp(unix_time, 0).format("%b %e '%y").to_string(),
 		});
 	}
+
+	dbg!(url);
 
 	Ok((posts, res["data"]["after"].as_str().unwrap_or("").to_string()))
 }

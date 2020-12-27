@@ -52,6 +52,15 @@
 			</div><br>
 			{% endif %}
 			{% endfor %}
+			<footer>
+				{% if ends.0 != "" %}
+				<a href="?sort={{ sort }}&before={{ ends.0 }}">PREV</a>
+				{% endif %}
+
+				{% if ends.1 != "" %}
+				<a href="?sort={{ sort }}&after={{ ends.1 }}">NEXT</a>
+				{% endif %}
+			</footer>
 		</div>
 		<aside>
 			<div class="user">

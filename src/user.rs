@@ -11,11 +11,22 @@ struct UserTemplate {
 	user: User,
 	posts: Vec<Post>,
 	sort: String,
+	ends: (String, String),
 }
 
-async fn render(username: String, sort: String) -> Result<HttpResponse> {
+async fn render(username: String, sort: Option<String>, ends: (Option<String>, Option<String>)) -> Result<HttpResponse> {
+	let sorting = sort.unwrap_or("new".to_string());
+
+	let before = ends.1.clone().unwrap_or(String::new()); // If there is an after, there must be a before
+
 	// Build the Reddit JSON API url
-	let url: String = format!("user/{}/.json?sort={}", username, sort);
+	let url = match ends.0 {
+		Some(val) => format!("user/{}/.json?sort={}&before={}&count=25", username, sorting, val),
+		None => match ends.1 {
+			Some(val) => format!("user/{}/.json?sort={}&after={}&count=25", username, sorting, val),
+			None => format!("user/{}/.json?sort={}", username, sorting),
+		},
+	};
 
 	let user = user(&username).await;
 	let posts = fetch_posts(url, "Comment".to_string()).await;
@@ -28,10 +39,13 @@ async fn render(username: String, sort: String) -> Result<HttpResponse> {
 		.unwrap();
 		Ok(HttpResponse::Ok().status(StatusCode::NOT_FOUND).content_type("text/html").body(s))
 	} else {
+		let posts_unwrapped = posts.unwrap();
+		
 		let s = UserTemplate {
 			user: user.unwrap(),
-			posts: posts.unwrap().0,
-			sort: sort,
+			posts: posts_unwrapped.0,
+			sort: sorting,
+			ends: (before, posts_unwrapped.1)
 		}
 		.render()
 		.unwrap();
@@ -41,10 +55,7 @@ async fn render(username: String, sort: String) -> Result<HttpResponse> {
 
 // SERVICES
 pub async fn page(web::Path(username): web::Path<String>, params: web::Query<Params>) -> Result<HttpResponse> {
-	match &params.sort {
-		Some(sort) => render(username, sort.to_string()).await,
-		None => render(username, "hot".to_string()).await,
-	}
+	render(username, params.sort.clone(), (params.before.clone(), params.after.clone())).await
 }
 
 // USER
