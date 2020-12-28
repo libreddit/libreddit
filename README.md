@@ -41,15 +41,14 @@ Like [Invidious](https://github.com/iv-org/invidious) but for Reddit. Browse the
 
 Feel free to [open an issue](https://github.com/spikecodes/libreddit/issues/new) to have your [selfhosted instance](#deployment) listed here!
 
-### Official
+| Website | Country | Cloudflare |
+|-|-|-|
+| [libredd.it](https://libredd.it) (official) | 🇺🇸 US  |  |
+| [libreddit.spike.codes](https://libreddit.spike.codes) (official) | 🇺🇸 US  |  |
+| [libreddit.dothq.co](https://libreddit.dothq.co) | 🇺🇸 US  | ✅ |
+| [libreddit.insanity.wtf](https://libreddit.insanity.wtf) | 🇺🇸 US  |  |
 
-- [libredd.it](https://libredd.it)
-- [libreddit.spike.codes](https://libreddit.spike.codes)
-
-### Community
-
-- [libreddit.dothq.co](https://libreddit.dothq.co/)
-- [libreddit.insanity.wtf](https://libreddit.insanity.wtf/)
+A checkmark in the "Cloudflare" category here refers to the use of the reverse proxy, [Cloudflare](https://cloudflare). The checkmark will not be listed for a site which uses Cloudflare DNS but rather the proxying service which grants Cloudflare the ability to monitor traffic to the website.
 
 ## About
 
