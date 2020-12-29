@@ -5,6 +5,7 @@ use base64::decode;
 
 pub async fn handler(web::Path(url): web::Path<String>) -> Result<HttpResponse> {
 	if cfg!(feature = "proxy") {
+		#[cfg(feature = "proxy")]
 		let media: String;
 
 		#[cfg(not(feature = "proxy"))]
