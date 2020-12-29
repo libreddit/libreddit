@@ -46,7 +46,7 @@ Feel free to [open an issue](https://github.com/spikecodes/libreddit/issues/new)
 | [libredd.it](https://libredd.it) (official) | 🇺🇸 US  |  |
 | [libreddit.spike.codes](https://libreddit.spike.codes) (official) | 🇺🇸 US  |  |
 | [libreddit.dothq.co](https://libreddit.dothq.co) | 🇺🇸 US  | ✅ |
-| [libreddit.insanity.wtf](https://libreddit.insanity.wtf) | 🇺🇸 US  |  |
+| [libreddit.insanity.wtf](https://libreddit.insanity.wtf) | 🇺🇸 US  | ✅ |
 
 A checkmark in the "Cloudflare" category here refers to the use of the reverse proxy, [Cloudflare](https://cloudflare). The checkmark will not be listed for a site which uses Cloudflare DNS but rather the proxying service which grants Cloudflare the ability to monitor traffic to the website.
 
