@@ -51,11 +51,13 @@ pub struct User {
 	pub description: String,
 }
 
+#[derive(Default)]
 // Subreddit struct containing metadata about community
 pub struct Subreddit {
 	pub name: String,
 	pub title: String,
 	pub description: String,
+	pub info: String,
 	pub icon: String,
 	pub members: String,
 	pub active: String,
@@ -149,7 +151,7 @@ pub async fn fetch_posts(url: String, fallback_title: String) -> Result<(Vec<Pos
 		posts.push(Post {
 			title: if title.is_empty() { fallback_title.to_owned() } else { title },
 			community: val(post, "subreddit").await,
-			body: val(post, "body").await,
+			body: val(post, "body_html").await,
 			author: val(post, "author").await,
 			author_flair: Flair(
 				val(post, "author_flair_text").await,

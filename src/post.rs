@@ -6,7 +6,6 @@ use async_recursion::async_recursion;
 
 use askama::Template;
 use chrono::{TimeZone, Utc};
-use pulldown_cmark::{html, Options, Parser};
 
 // STRUCTS
 #[derive(Template)]
@@ -27,8 +26,8 @@ async fn render(id: String, sort: Option<String>, comment_id: Option<String>) ->
 
 	// Build the Reddit JSON API url
 	let url: String = match comment_id {
-		None => format!("{}.json?sort={}", id, sorting),
-		Some(val) => format!("{}.json?sort={}&comment={}", id, sorting, val),
+		None => format!("{}.json?sort={}&raw_json=1", id, sorting),
+		Some(val) => format!("{}.json?sort={}&comment={}&raw_json=1", id, sorting, val),
 	};
 
 	// Send a request to the url, receive JSON in response
@@ -95,20 +94,6 @@ async fn media(data: &serde_json::Value) -> (String, String) {
 	(post_type.to_string(), url)
 }
 
-async fn markdown_to_html(md: &str) -> String {
-	let mut options = Options::empty();
-	options.insert(Options::ENABLE_TABLES);
-	options.insert(Options::ENABLE_FOOTNOTES);
-	options.insert(Options::ENABLE_STRIKETHROUGH);
-	options.insert(Options::ENABLE_TASKLISTS);
-	let parser = Parser::new_ext(md, options);
-
-	// Write to String buffer.
-	let mut html_output = String::new();
-	html::push_html(&mut html_output, parser);
-	html_output
-}
-
 // POSTS
 async fn parse_post(json: serde_json::Value) -> Result<Post, &'static str> {
 	// Retrieve post (as opposed to comments) from JSON
@@ -126,7 +111,7 @@ async fn parse_post(json: serde_json::Value) -> Result<Post, &'static str> {
 	let post = Post {
 		title: val(post_data, "title").await,
 		community: val(post_data, "subreddit").await,
-		body: markdown_to_html(post_data["data"]["selftext"].as_str().unwrap()).await,
+		body: val(post_data,"selftext_html").await,
 		author: val(post_data, "author").await,
 		author_flair: Flair(
 			val(post_data, "author_flair_text").await,
@@ -169,7 +154,7 @@ async fn parse_comments(json: serde_json::Value) -> Result<Vec<Comment>, &'stati
 		}
 
 		let score = comment["data"]["score"].as_i64().unwrap_or(0);
-		let body = markdown_to_html(comment["data"]["body"].as_str().unwrap_or("")).await;
+		let body =  val(comment, "body_html").await;
 
 		let replies: Vec<Comment> = if comment["data"]["replies"].is_object() {
 			parse_comments(comment["data"]["replies"].clone()).await.unwrap_or(Vec::new())

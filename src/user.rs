@@ -21,10 +21,10 @@ async fn render(username: String, sort: Option<String>, ends: (Option<String>, O
 
 	// Build the Reddit JSON API url
 	let url = match ends.0 {
-		Some(val) => format!("user/{}/.json?sort={}&before={}&count=25", username, sorting, val),
+		Some(val) => format!("user/{}/.json?sort={}&before={}&count=25&raw_json=1", username, sorting, val),
 		None => match ends.1 {
-			Some(val) => format!("user/{}/.json?sort={}&after={}&count=25", username, sorting, val),
-			None => format!("user/{}/.json?sort={}", username, sorting),
+			Some(val) => format!("user/{}/.json?sort={}&after={}&count=25&raw_json=1", username, sorting, val),
+			None => format!("user/{}/.json?sort={}&raw_json=1", username, sorting),
 		},
 	};
 

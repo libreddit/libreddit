@@ -9,7 +9,7 @@
 
 <div id="{{ item.id }}" class="comment">
 	<div class="comment_left">
-		<h3 class="comment_score">{{ item.score }}</h3>
+		<p class="comment_score">{{ item.score }}</p>
 		<div class="line"></div>
 	</div>
 	<details class="comment_right" open>
@@ -19,7 +19,7 @@
 			{% endif %}
 			&bull; <span class="datetime">{{ item.time }}</span>
 		</summary>
-		<h4 class="comment_body">{{ item.body }}</h4>
+		<p class="comment_body">{{ item.body }}</p>
 
 {%- endmacro %}
 
@@ -27,11 +27,11 @@
 	<div id="column_one">
 		<div class="post highlighted">
 			<div class="post_left">
-				<h3 class="post_score">{{ post.score }}</h3>
+				<p class="post_score">{{ post.score }}</p>
 				{% if post.nsfw %}<div class="nsfw">NSFW</div>{% endif %}
 			</div>
 			<div class="post_right">
-				<h4>
+				<p>
 					<b><a class="post_subreddit" href="/r/{{ post.community }}">r/{{ post.community }}</a></b>
 					&bull;
 					<a class="post_author" href="/u/{{ post.author }}">u/{{ post.author }}</a>
@@ -39,7 +39,7 @@
 						<small class="author_flair">{{ post.author_flair.0 }}</small>
 					{% endif %}
 					<span class="datetime">{{ post.time }}</span>
-				</h4>
+				</p>
 				<a href="{{ post.url }}" class="post_title">
 					{{ post.title }}
 					{% if post.flair.0 != "" %}
@@ -53,7 +53,7 @@
 				{% else if post.post_type == "link" %}
 				<a id="post_url" href="{{ post.media }}">{{ post.media }}</a>
 				{% endif %}
-				<h4 class="post_body">{{ post.body }}</h4>
+				<div class="post_body">{{ post.body }}</div>
 			</div>
 		</div>
 		<form>

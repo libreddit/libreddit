@@ -36,14 +36,7 @@ pub async fn render(sub_name: String, sort: Option<String>, ends: (Option<String
 	let sub_result = if !&sub_name.contains("+") {
 		subreddit(&sub_name).await
 	} else {
-		Ok(Subreddit {
-			name: String::new(),
-			title: String::new(),
-			description: String::new(),
-			icon: String::new(),
-			members: String::new(),
-			active: String::new(),
-		})
+		Ok(Subreddit::default())
 	};
 	let items_result = fetch_posts(url, String::new()).await;
 
@@ -73,7 +66,7 @@ pub async fn render(sub_name: String, sort: Option<String>, ends: (Option<String
 // SUBREDDIT
 async fn subreddit(sub: &String) -> Result<Subreddit, &'static str> {
 	// Build the Reddit JSON API url
-	let url: String = format!("r/{}/about.json", sub);
+	let url: String = format!("r/{}/about.json?raw_json=1", sub);
 
 	// Send a request to the url, receive JSON in response
 	let req = request(url).await;
@@ -102,6 +95,7 @@ async fn subreddit(sub: &String) -> Result<Subreddit, &'static str> {
 		name: val(&res, "display_name").await,
 		title: val(&res, "title").await,
 		description: val(&res, "public_description").await,
+		info: val(&res, "description_html").await.replace("\\", ""),
 		icon: format_url(icon).await,
 		members: format_num(members.try_into().unwrap()),
 		active: format_num(active.try_into().unwrap()),
