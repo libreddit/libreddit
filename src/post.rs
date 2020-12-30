@@ -1,5 +1,5 @@
 // CRATES
-use crate::utils::{format_num, format_url, request, val, Comment, ErrorTemplate, Flair, Params, Post};
+use crate::utils::{format_num, format_url, request, val, Comment, ErrorTemplate, Flair, Flags, Params, Post};
 use actix_web::{http::StatusCode, web, HttpResponse, Result};
 
 use async_recursion::async_recursion;
@@ -130,7 +130,10 @@ async fn parse_post(json: serde_json::Value) -> Result<Post, &'static str> {
 				"white".to_string()
 			},
 		),
-		nsfw: post_data["data"]["over_18"].as_bool().unwrap_or(false),
+		flags: Flags {
+			nsfw: post_data["data"]["over_18"].as_bool().unwrap_or(false),
+			stickied: post_data["data"]["stickied"].as_bool().unwrap_or(false)
+		},
 		media: media.1,
 		time: Utc.timestamp(unix_time, 0).format("%b %e %Y %H:%M UTC").to_string(),
 	};

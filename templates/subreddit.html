@@ -22,10 +22,10 @@
 				</select>{% endif %}<input id="sort_submit" type="submit" value="&rarr;">
 			</form>
 			{% for post in posts %}
-			<div class="post">
+			<div class="post {% if post.flags.stickied %}stickied{% endif %}">
 				<div class="post_left">
 					<p class="post_score">{{ post.score }}</p>
-					{% if post.nsfw %}<div class="nsfw">NSFW</div>{% endif %}
+					{% if post.flags.nsfw %}<div class="nsfw">NSFW</div>{% endif %}
 				</div>
 				<div class="post_right">
 					<p>

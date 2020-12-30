@@ -13,6 +13,11 @@ use base64::encode;
 //
 // Post flair with text, background color and foreground color
 pub struct Flair(pub String, pub String, pub String);
+// Post flags with nsfw and stickied
+pub struct Flags {
+	pub nsfw: bool,
+	pub stickied: bool
+}
 
 // Post containing content, metadata and media
 pub struct Post {
@@ -25,7 +30,7 @@ pub struct Post {
 	pub score: String,
 	pub post_type: String,
 	pub flair: Flair,
-	pub nsfw: bool,
+	pub flags: Flags,
 	pub media: String,
 	pub time: String,
 }
@@ -171,7 +176,10 @@ pub async fn fetch_posts(url: String, fallback_title: String) -> Result<(Vec<Pos
 					"white".to_string()
 				},
 			),
-			nsfw: post["data"]["over_18"].as_bool().unwrap_or(false),
+			flags: Flags {
+				nsfw: post["data"]["over_18"].as_bool().unwrap_or(false),
+				stickied: post["data"]["stickied"].as_bool().unwrap_or(false)
+			},
 			url: val(post, "permalink").await,
 			time: Utc.timestamp(unix_time, 0).format("%b %e '%y").to_string(),
 		});

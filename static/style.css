@@ -237,6 +237,12 @@ aside {
 	font-weight: bold;
 }
 
+.stickied {
+	--accent: #5cff85;
+	border: 1px solid #5cff85;
+	padding: 5px;
+}
+
 .post_subreddit {
 	font-weight: bold;
 }
