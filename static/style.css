@@ -15,7 +15,6 @@
 	margin: 0;
 	color: white;
 	font-family: sans-serif;
-	outline: none;
 }
 
 body {
@@ -32,9 +31,8 @@ nav {
 	font-size: 20px;
 }
 
-#lib, #github {
-	color: white;
-}
+nav #lib, nav #github, nav #version { color: white; }
+nav #version { opacity: 25%; }
 
 main {
 	display: flex;
@@ -78,10 +76,6 @@ aside {
 	max-width: 350px;
 }
 
-#version {
-	color: white;
-	opacity: 25%;
-}
 
 /* User & Subreddit */
 
