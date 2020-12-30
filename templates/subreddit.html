@@ -9,10 +9,17 @@
 		<div id="column_one">
 			<form>
 				<select id="sort" name="sort"> 
-					<option value="hot" {% if sort == "hot" %}selected{% endif %}>Hot</option>
-					<option value="new" {% if sort == "new" %}selected{% endif %}>New</option> 
-					<option value="top" {% if sort == "top" %}selected{% endif %}>Top</option> 
-				</select><input id="sort_submit" type="submit" value="&rarr;">
+					<option value="hot" {% if sort.0 == "hot" %}selected{% endif %}>Hot</option>
+					<option value="new" {% if sort.0 == "new" %}selected{% endif %}>New</option> 
+					<option value="top" {% if sort.0 == "top" %}selected{% endif %}>Top</option> 
+				</select>{% if sort.0 == "top" %}<select id="timeframe" name="t"> 
+					<option value="hour" {% if sort.1 == "hour" %}selected{% endif %}>Hour</option> 
+					<option value="day" {% if sort.1 == "day" || sort.1 == "" %}selected{% endif %}>Day</option>
+					<option value="week" {% if sort.1 == "week" %}selected{% endif %}>Week</option>
+					<option value="month" {% if sort.1 == "month" %}selected{% endif %}>Month</option> 
+					<option value="year" {% if sort.1 == "year" %}selected{% endif %}>Year</option> 
+					<option value="all" {% if sort.1 == "all" %}selected{% endif %}>All</option>
+				</select>{% endif %}<input id="sort_submit" type="submit" value="&rarr;">
 			</form>
 			{% for post in posts %}
 			<div class="post">
@@ -42,11 +49,11 @@
 
 			<footer>
 				{% if ends.0 != "" %}
-				<a href="?sort={{ sort }}&before={{ ends.0 }}">PREV</a>
+				<a href="?sort={{ sort.0 }}&before={{ ends.0 }}">PREV</a>
 				{% endif %}
 
 				{% if ends.1 != "" %}
-				<a href="?sort={{ sort }}&after={{ ends.1 }}">NEXT</a>
+				<a href="?sort={{ sort.0 }}&after={{ ends.1 }}">NEXT</a>
 				{% endif %}
 			</footer>
 		</div>

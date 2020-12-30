@@ -10,21 +10,23 @@ use chrono::{TimeZone, Utc};
 struct UserTemplate {
 	user: User,
 	posts: Vec<Post>,
-	sort: String,
+	sort: (String, String),
 	ends: (String, String),
 }
 
-async fn render(username: String, sort: Option<String>, ends: (Option<String>, Option<String>)) -> Result<HttpResponse> {
+async fn render(username: String, sort: Option<String>, t: Option<String>, ends: (Option<String>, Option<String>)) -> Result<HttpResponse> {
 	let sorting = sort.unwrap_or("new".to_string());
 
 	let before = ends.1.clone().unwrap_or(String::new()); // If there is an after, there must be a before
 
+	let timeframe = match &t { Some(val) => format!("&t={}", val), None => String::new() };
+
 	// Build the Reddit JSON API url
 	let url = match ends.0 {
-		Some(val) => format!("user/{}/.json?sort={}&before={}&count=25&raw_json=1", username, sorting, val),
+		Some(val) => format!("user/{}/.json?sort={}&before={}&count=25&raw_json=1{}", username, sorting, val, timeframe),
 		None => match ends.1 {
-			Some(val) => format!("user/{}/.json?sort={}&after={}&count=25&raw_json=1", username, sorting, val),
-			None => format!("user/{}/.json?sort={}&raw_json=1", username, sorting),
+			Some(val) => format!("user/{}/.json?sort={}&after={}&count=25&raw_json=1{}", username, sorting, val, timeframe),
+			None => format!("user/{}/.json?sort={}&raw_json=1{}", username, sorting, timeframe),
 		},
 	};
 
@@ -44,7 +46,7 @@ async fn render(username: String, sort: Option<String>, ends: (Option<String>, O
 		let s = UserTemplate {
 			user: user.unwrap(),
 			posts: posts_unwrapped.0,
-			sort: sorting,
+			sort: (sorting, t.unwrap_or(String::new())),
 			ends: (before, posts_unwrapped.1)
 		}
 		.render()
@@ -55,7 +57,7 @@ async fn render(username: String, sort: Option<String>, ends: (Option<String>, O
 
 // SERVICES
 pub async fn page(web::Path(username): web::Path<String>, params: web::Query<Params>) -> Result<HttpResponse> {
-	render(username, params.sort.clone(), (params.before.clone(), params.after.clone())).await
+	render(username, params.sort.clone(), params.t.clone(), (params.before.clone(), params.after.clone())).await
 }
 
 // USER

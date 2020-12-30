@@ -8,21 +8,23 @@ use askama::Template;
 #[template(path = "popular.html", escape = "none")]
 struct PopularTemplate {
 	posts: Vec<Post>,
-	sort: String,
+	sort: (String, String),
 	ends: (String, String),
 }
 
 // RENDER
-async fn render(sub_name: String, sort: Option<String>, ends: (Option<String>, Option<String>)) -> Result<HttpResponse> {
+async fn render(sort: Option<String>, t: Option<String>, ends: (Option<String>, Option<String>)) -> Result<HttpResponse> {
 	let sorting = sort.unwrap_or("hot".to_string());
 	let before = ends.1.clone().unwrap_or(String::new()); // If there is an after, there must be a before
 
+	let timeframe = match &t { Some(val) => format!("&t={}", val), None => String::new() };
+
 	// Build the Reddit JSON API url
 	let url = match ends.0 {
-		Some(val) => format!("r/{}/{}.json?before={}&count=25", sub_name, sorting, val),
+		Some(val) => format!("r/popular/{}.json?before={}&count=25{}", sorting, val, timeframe),
 		None => match ends.1 {
-			Some(val) => format!("r/{}/{}.json?after={}&count=25", sub_name, sorting, val),
-			None => format!("r/{}/{}.json", sub_name, sorting),
+			Some(val) => format!("r/popular/{}.json?after={}&count=25{}", sorting, val, timeframe),
+			None => format!("r/popular/{}.json?{}", sorting, timeframe),
 		},
 	};
 
@@ -40,7 +42,7 @@ async fn render(sub_name: String, sort: Option<String>, ends: (Option<String>, O
 
 		let s = PopularTemplate {
 			posts: items.0,
-			sort: sorting,
+			sort: (sorting, t.unwrap_or(String::new())),
 			ends: (before, items.1),
 		}
 		.render()
@@ -51,5 +53,5 @@ async fn render(sub_name: String, sort: Option<String>, ends: (Option<String>, O
 
 // SERVICES
 pub async fn page(params: web::Query<Params>) -> Result<HttpResponse> {
-	render("popular".to_string(), params.sort.clone(), (params.before.clone(), params.after.clone())).await
+	render(params.sort.clone(), params.t.clone(), (params.before.clone(), params.after.clone())).await
 }

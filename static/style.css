@@ -138,7 +138,7 @@ aside {
 
 /* Sorting */
 
-#sort {
+#sort, #timeframe {
 	background: var(--outside);
 	box-shadow: var(--black-contrast);
 	border: 0;
@@ -150,6 +150,11 @@ aside {
 	appearance: none;
 }
 
+#timeframe {
+	border-radius: 0;
+	border-left: 4px solid var(--highlighted);
+}
+
 #sort_submit {
 	background: var(--highlighted);
 	border: 0;
@@ -158,7 +163,7 @@ aside {
 	border-radius: 0 5px 5px 0;
 }
 
-#sort:hover { background: var(--foreground); }
+#sort:hover, #timeframe:hover { background: var(--foreground); }
 #sort_submit:hover { color: var(--accent); }
 
 #sort > div, footer > a {
@@ -498,7 +503,7 @@ td, th {
 		max-width: 100%;
 	}
 
-	#sidebar {
+	#user, #sidebar {
 		margin: 20px 0;
 	}
 }
