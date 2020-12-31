@@ -1,25 +1,27 @@
 {% extends "base.html" %}
+{% import "utils.html" as utils %}
 
-{% if sub.name != "" %}
 {% block title %}r/{{ sub.name }}: {{ sub.description }}{% endblock %}
-{% endif %}
+
+{% block search %}
+	{% call utils::search(["/r/", sub.name.as_str()].concat(), "") %}
+{% endblock %}
 
 {% block body %}
-	<main style="max-width: 1000px;">
+	<main>
 		<div id="column_one">
-			<form>
-				<select id="sort" name="sort"> 
-					<option value="hot" {% if sort.0 == "hot" %}selected{% endif %}>Hot</option>
-					<option value="new" {% if sort.0 == "new" %}selected{% endif %}>New</option> 
-					<option value="top" {% if sort.0 == "top" %}selected{% endif %}>Top</option> 
-				</select>{% if sort.0 == "top" %}<select id="timeframe" name="t"> 
-					<option value="hour" {% if sort.1 == "hour" %}selected{% endif %}>Hour</option> 
-					<option value="day" {% if sort.1 == "day" || sort.1 == "" %}selected{% endif %}>Day</option>
-					<option value="week" {% if sort.1 == "week" %}selected{% endif %}>Week</option>
-					<option value="month" {% if sort.1 == "month" %}selected{% endif %}>Month</option> 
-					<option value="year" {% if sort.1 == "year" %}selected{% endif %}>Year</option> 
-					<option value="all" {% if sort.1 == "all" %}selected{% endif %}>All</option>
-				</select>{% endif %}<input id="sort_submit" type="submit" value="&rarr;">
+			<form id="sort">
+				<div id="sort_options">
+					{% if sub.name.is_empty() %}
+						{% call utils::sort("", ["hot", "new", "top", "rising"], sort.0) %}
+					{% else %}
+						{% call utils::sort(["/r/", sub.name.as_str()].concat(), ["hot", "new", "top", "rising"], sort.0) %}
+					{% endif %}
+				</div>
+				{% if sort.0 == "top" %}<select id="timeframe" name="t"> 
+					{% call utils::options(sort.1, ["hour", "day", "week", "month", "year", "all"], "day") %}
+					<input id="sort_submit" type="submit" value="&rarr;">
+				</select>{% endif %}
 			</form>
 			{% for post in posts %}
 			<div class="post {% if post.flags.stickied %}stickied{% endif %}">

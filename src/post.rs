@@ -1,6 +1,6 @@
 // CRATES
-use crate::utils::{format_num, format_url, request, val, Comment, ErrorTemplate, Flair, Flags, Params, Post};
-use actix_web::{http::StatusCode, web, HttpResponse, Result};
+use crate::utils::{format_num, format_url, param, request, val, Comment, ErrorTemplate, Flags, Flair, Post};
+use actix_web::{http::StatusCode, HttpRequest, HttpResponse, Result};
 
 use async_recursion::async_recursion;
 
@@ -16,22 +16,17 @@ struct PostTemplate {
 	sort: String,
 }
 
-async fn render(id: String, sort: Option<String>, comment_id: Option<String>) -> Result<HttpResponse> {
+pub async fn item(req: HttpRequest) -> Result<HttpResponse> {
+	let path = format!("{}.json?{}&raw_json=1", req.path(), req.query_string());
+	let sort = param(&path, "sort").await;
+	let id = req.match_info().get("id").unwrap_or("").to_string();
+
 	// Log the post ID being fetched in debug mode
 	#[cfg(debug_assertions)]
 	dbg!(&id);
 
-	// Handling sort paramater
-	let sorting: String = sort.unwrap_or("confidence".to_string());
-
-	// Build the Reddit JSON API url
-	let url: String = match comment_id {
-		None => format!("{}.json?sort={}&raw_json=1", id, sorting),
-		Some(val) => format!("{}.json?sort={}&comment={}&raw_json=1", id, sorting, val),
-	};
-
 	// Send a request to the url, receive JSON in response
-	let req = request(url).await;
+	let req = request(path.clone()).await;
 
 	// If the Reddit API returns an error, exit and send error page to user
 	if req.is_err() {
@@ -41,37 +36,18 @@ async fn render(id: String, sort: Option<String>, comment_id: Option<String>) ->
 		.render()
 		.unwrap();
 		return Ok(HttpResponse::Ok().status(StatusCode::NOT_FOUND).content_type("text/html").body(s));
+	} else {
+		// Otherwise, grab the JSON output from the request
+		let res = req.unwrap();
+
+		// Parse the JSON into Post and Comment structs
+		let post = parse_post(res[0].clone()).await.unwrap();
+		let comments = parse_comments(res[1].clone()).await.unwrap();
+
+		// Use the Post and Comment structs to generate a website to show users
+		let s = PostTemplate { comments, post, sort }.render().unwrap();
+		Ok(HttpResponse::Ok().content_type("text/html").body(s))
 	}
-
-	// Otherwise, grab the JSON output from the request
-	let res = req.unwrap();
-
-	// Parse the JSON into Post and Comment structs
-	let post = parse_post(res[0].clone()).await;
-	let comments = parse_comments(res[1].clone()).await;
-
-	// Use the Post and Comment structs to generate a website to show users
-	let s = PostTemplate {
-		comments: comments.unwrap(),
-		post: post.unwrap(),
-		sort: sorting,
-	}
-	.render()
-	.unwrap();
-	Ok(HttpResponse::Ok().content_type("text/html").body(s))
-}
-
-// SERVICES
-pub async fn short(web::Path(id): web::Path<String>, params: web::Query<Params>) -> Result<HttpResponse> {
-	render(id, params.sort.clone(), None).await
-}
-
-pub async fn comment(web::Path((_sub, id, _title, comment_id)): web::Path<(String, String, String, String)>, params: web::Query<Params>) -> Result<HttpResponse> {
-	render(id, params.sort.clone(), Some(comment_id)).await
-}
-
-pub async fn page(web::Path((_sub, id)): web::Path<(String, String)>, params: web::Query<Params>) -> Result<HttpResponse> {
-	render(id, params.sort.clone(), None).await
 }
 
 // UTILITIES
@@ -111,7 +87,7 @@ async fn parse_post(json: serde_json::Value) -> Result<Post, &'static str> {
 	let post = Post {
 		title: val(post_data, "title").await,
 		community: val(post_data, "subreddit").await,
-		body: val(post_data,"selftext_html").await,
+		body: val(post_data, "selftext_html").await,
 		author: val(post_data, "author").await,
 		author_flair: Flair(
 			val(post_data, "author_flair_text").await,
@@ -132,7 +108,7 @@ async fn parse_post(json: serde_json::Value) -> Result<Post, &'static str> {
 		),
 		flags: Flags {
 			nsfw: post_data["data"]["over_18"].as_bool().unwrap_or(false),
-			stickied: post_data["data"]["stickied"].as_bool().unwrap_or(false)
+			stickied: post_data["data"]["stickied"].as_bool().unwrap_or(false),
 		},
 		media: media.1,
 		time: Utc.timestamp(unix_time, 0).format("%b %e %Y %H:%M UTC").to_string(),
@@ -157,7 +133,7 @@ async fn parse_comments(json: serde_json::Value) -> Result<Vec<Comment>, &'stati
 		}
 
 		let score = comment["data"]["score"].as_i64().unwrap_or(0);
-		let body =  val(comment, "body_html").await;
+		let body = val(comment, "body_html").await;
 
 		let replies: Vec<Comment> = if comment["data"]["replies"].is_object() {
 			parse_comments(comment["data"]["replies"].clone()).await.unwrap_or(Vec::new())

@@ -1,0 +1,28 @@
+{% macro options(current, values, default) -%}
+	{% for value in values %}
+		<option value="{{ value }}" {% if current == value || (current == "" && value == default) %}selected{% endif %}>
+			{{ format!("{}{}", value.get(0..1).unwrap().to_uppercase(), value.get(1..).unwrap()) }}
+		</option>
+	{% endfor %}
+{%- endmacro %}
+
+{% macro sort(root, methods, selected) -%}
+	{% for method in methods %}
+		<a {% if method == selected %}class="selected"{% endif %} href="{{ root }}/{{ method }}">
+			{{ format!("{}{}", method.get(0..1).unwrap().to_uppercase(), method.get(1..).unwrap()) }}
+		</a>
+	{% endfor %}
+{%- endmacro %}
+
+{% macro search(root, search) -%}
+<form action="{% if root != "/r/" %}{{ root }}{% endif %}/search/" id="searchbox">
+	<input id="search" type="text" name="q" placeholder="Search" value="{{ search }}">
+	{% if root != "/r/" %}
+	<div id="inside">
+		<input type="checkbox" name="restrict_sr" id="restrict_sr" checked="checked" data-com.bitwarden.browser.user-edited="yes">
+		<label for="restrict_sr">in {{ root }}</label>
+	</div>
+	{% endif %}
+	<input type="submit" value="&rarr;">
+</form>
+{%- endmacro %}

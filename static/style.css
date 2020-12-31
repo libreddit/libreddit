@@ -10,6 +10,11 @@
 	--black-contrast: 0 1px 3px rgba(0,0,0,0.5);
 }
 
+::selection {
+	color: var(--background);
+	background: var(--accent);
+}
+
 * {
 	transition: 0.2s all;
 	margin: 0;
@@ -25,10 +30,12 @@ body {
 nav {
 	display: flex;
 	justify-content: space-between;
+	align-items: center;
 	color: var(--accent);
 	background: var(--outside);
-	padding: 15px;
+	padding: 5px 15px;
 	font-size: 20px;
+	height: 40px;
 }
 
 nav #lib, nav #github, nav #version { color: white; }
@@ -45,6 +52,10 @@ main {
 footer {
 	display: flex;
 	justify-content: center;
+}
+
+footer > a {
+	margin-right: 5px;
 }
 
 button {
@@ -75,7 +86,6 @@ aside {
 	margin: 20px 20px 0 20px;
 	max-width: 350px;
 }
-
 
 /* User & Subreddit */
 
@@ -130,53 +140,112 @@ aside {
 	font-size: 15px;
 }
 
-/* Sorting */
+/* Sorting and Search */
 
-#sort, #timeframe {
+select {
 	background: var(--outside);
-	box-shadow: var(--black-contrast);
+}
+
+select, #search {
 	border: 0;
 	padding: 0 15px;
-	margin-bottom: 20px;
 	height: 40px;
 	font-size: 15px;
-	border-radius: 5px 0 0 5px;
 	appearance: none;
+	border-radius: 5px 0px 0px 5px;
 }
+
+#searchbox {
+	display: flex;
+	box-shadow: var(--black-contrast);
+}
+
+#searchbox > *, #sort_submit {
+	background: var(--highlighted);
+	height: 40px;
+}
+
+#search {
+	border-right: 2px var(--outside) solid;
+	min-width: 0;
+	flex-grow: 1;
+}
+
+#inside {
+	display: flex;
+	font-size: 15px;
+	align-items: center;
+	border-right: 2px var(--outside) solid;
+	height: 40px;
+	padding: 0 10px;
+}
+
+#restrict_sr { margin-right: 5px; }
+
+input[type="submit"] {
+	border: 0;
+	border-radius: 0px 5px 5px 0px;
+}
+
+select:hover { background: var(--foreground); }
+input[type="submit"]:hover { color: var(--accent); }
 
 #timeframe {
-	border-radius: 0;
-	border-left: 4px solid var(--highlighted);
+	border-radius: 5px 0px 0px 5px;
+	margin-left: 10px;
 }
 
-#sort_submit {
+#search_sort {
 	background: var(--highlighted);
-	border: 0;
-	font-size: 15px;
-	height: 40px;
-	border-radius: 0 5px 5px 0;
+	border-radius: 5px;
+	overflow: hidden;
 }
 
-#sort:hover, #timeframe:hover { background: var(--foreground); }
-#sort_submit:hover { color: var(--accent); }
+#search_sort > #search {
+	border: 0;
+	background: transparent;
+}
 
-#sort > div, footer > a {
+#search_sort > :not(:first-child), #search_sort > #sort_options {
+	margin: 0;
+	border-radius: 0;
+	border-right: 0;
+	border-left: 2px solid var(--background);
+	box-shadow: none;
+	background: transparent;
+}
+
+#sort_options {
+	height: 40px;
+}
+
+#sort, #search_sort {
+	display: flex;
+	align-items: center;
+	margin-bottom: 20px;
+}
+
+#sort_options, footer > a {
+	border-radius: 5px;
 	box-shadow: var(--black-contrast);
 	background: var(--outside);
+	display: flex;
+	overflow: hidden;
+}
+
+#sort_options > a, footer > a {
 	color: lightgrey;
-	border-radius: 5px;
-	margin-right: 5px;
 	padding: 10px 20px;
 	text-align: center;
 	cursor: pointer;
 }
 
-#sort > div.selected {
+#sort_options > a.selected {
 	background: var(--accent);
 	color: black;
 }
 
-#sort > div:hover {
+#sort_options > a:not(.selected):hover {
 	background: var(--foreground);
 }
 
@@ -243,6 +312,7 @@ aside {
 
 .post_title {
 	font-size: 18px;
+	line-height: 1.5;
 }
 
 .post_right {
@@ -283,7 +353,6 @@ aside {
 	background: var(--accent);
 	color: black;
 	padding: 5px;
-	margin-right: 5px;
 	border-radius: 5px;
 	font-size: 12px;
 	font-weight: bold;
@@ -494,9 +563,8 @@ td, th {
 }
 
 @media screen and (max-width: 800px) {
-	main {
-		flex-direction: column-reverse;
-	}
+	main { flex-direction: column-reverse; }
+	nav { flex-direction: column; }
 
 	aside {
 		margin: 20px 0 0 0;

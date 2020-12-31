@@ -18,7 +18,6 @@ Like [Invidious](https://github.com/iv-org/invidious) but for Reddit. Browse the
 - [About](#about)
   - [Elsewhere](#elsewhere)
   - [Info](#info)
-  - [In Progress](#in-progress)
   - [Teddit Comparison](#how-does-it-compare-to-teddit)
 - [Comparison](#comparison)
   - [Speed](#speed)
@@ -66,9 +65,6 @@ Libreddit hopes to provide an easier way to browse Reddit, without the ads, trac
 
 Libreddit currently implements most of Reddit's functionalities but still lacks a few features that are being worked on below.
 
-### In Progress
-- Searching
-
 ### How does it compare to Teddit?
 
 Teddit is another awesome open source project designed to provide an alternative frontend to Reddit. There is no connection between the two and you're welcome to use whichever one you favor. Competition fosters innovation and Teddit's release has motivated me to build Libreddit into an even more polished product.
@@ -76,7 +72,6 @@ Teddit is another awesome open source project designed to provide an alternative
 If you are looking to compare, the biggest differences I have noticed are:
 - Libreddit is themed around Reddit's redesign whereas Teddit appears to stick much closer to Reddit's old design. This may suit some users better as design is always subjective.
 - Libreddit is written in [Rust](https://www.rust-lang.org) for speed and memory safety. It uses [Actix Web](https://actix.rs), which was [benchmarked as the fastest web server for single queries](https://www.techempower.com/benchmarks/#hw=ph&test=db).
-- Unlike Teddit (at the time of writing this), Libreddit does not require a Reddit API key to host. 
 
 ## Comparison
 

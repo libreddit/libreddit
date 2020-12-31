@@ -1,22 +1,24 @@
 {% extends "base.html" %}
+{% import "utils.html" as utils %}
+
 {% block content %}
 	<div id="column_one">
-		<form>
-			<select id="sort" name="sort"> 
-				<option value="best" {% if sort.0 == "best" %}selected{% endif %}>Best</option> 
-				<option value="hot" {% if sort.0 == "hot" %}selected{% endif %}>Hot</option>
-				<option value="new" {% if sort.0 == "new" %}selected{% endif %}>New</option> 
-				<option value="top" {% if sort.0 == "top" %}selected{% endif %}>Top</option> 
-			</select>{% if sort.0 == "top" %}<select id="timeframe" name="t"> 
-				<option value="hour" {% if sort.1 == "hour" %}selected{% endif %}>Hour</option> 
-				<option value="day" {% if sort.1 == "day" || sort.1 == "" %}selected{% endif %}>Day</option>
-				<option value="week" {% if sort.1 == "week" %}selected{% endif %}>Week</option>
-				<option value="month" {% if sort.1 == "month" %}selected{% endif %}>Month</option> 
-				<option value="year" {% if sort.1 == "year" %}selected{% endif %}>Year</option> 
-				<option value="all" {% if sort.1 == "all" %}selected{% endif %}>All</option>
+		<form id="search_sort">
+			<input id="search" type="text" name="q" placeholder="Search" value="{{ query }}">
+			{% if sub != "" %}
+			<div id="inside">
+				<input type="checkbox" name="restrict_sr" id="restrict_sr" checked="checked" data-com.bitwarden.browser.user-edited="yes">
+				<label for="restrict_sr">in r/{{ sub }}</label>
+			</div>
+			{% endif %}
+			<select id="sort_options" name="sort">
+				{% call utils::options(sort.0, ["relevance", "hot", "top", "new", "comments"], "") %}
+			</select>{% if sort.0 != "new" %}<select id="timeframe" name="t"> 
+				{% call utils::options(sort.1, ["hour", "day", "week", "month", "year", "all"], "all") %}
 			</select>{% endif %}<input id="sort_submit" type="submit" value="&rarr;">
 		</form>
 		{% for post in posts %}
+		{% if post.title != "Comment" %}
 		<div class="post">
 			<div class="post_left">
 				<p class="post_score">{{ post.score }}</p>
@@ -40,6 +42,21 @@
 			</div>
 			<img class="post_thumbnail" src="{{ post.media }}">
 		</div><br>
+		{% else %}
+			<div class="comment">
+				<div class="comment_left">
+					<p class="comment_score">{{ post.score }}</p>
+					<div class="line"></div>
+				</div>
+				<details class="comment_right" open>
+					<summary class="comment_data">
+						<a class="comment_link" href="{{ post.url }}">COMMENT</a>
+						<span class="datetime">{{ post.time }}</span>
+					</summary>
+					<p class="comment_body">{{ post.body }}</p>
+				</details>
+			</div><br>
+		{% endif %}
 		{% endfor %}
 
 		<footer>

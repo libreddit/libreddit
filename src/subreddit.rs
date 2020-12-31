@@ -1,6 +1,6 @@
 // CRATES
-use crate::utils::{fetch_posts, format_num, format_url, request, val, ErrorTemplate, Params, Post, Subreddit};
-use actix_web::{http::StatusCode, web, HttpResponse, Result};
+use crate::utils::{fetch_posts, format_num, format_url, param, request, val, ErrorTemplate, Post, Subreddit};
+use actix_web::{http::StatusCode, HttpRequest, HttpResponse, Result};
 use askama::Template;
 use std::convert::TryInto;
 
@@ -15,49 +15,35 @@ struct SubredditTemplate {
 }
 
 // SERVICES
-#[allow(dead_code)]
-pub async fn page(web::Path(sub): web::Path<String>, params: web::Query<Params>) -> Result<HttpResponse> {
-	render(sub, params.sort.clone(), params.t.clone(), (params.before.clone(), params.after.clone())).await
-}
+// web::Path(sub): web::Path<String>, params: web::Query<Params>
+pub async fn page(req: HttpRequest) -> Result<HttpResponse> {
+	let path = format!("{}.json?{}", req.path(), req.query_string());
+	let sub = req.match_info().get("sub").unwrap_or("popular").to_string();
+	let sort = req.match_info().get("sort").unwrap_or("hot").to_string();
 
-pub async fn render(sub_name: String, sort: Option<String>, t: Option<String>, ends: (Option<String>, Option<String>)) -> Result<HttpResponse> {
-	let sorting = sort.unwrap_or("hot".to_string());
-	let before = ends.1.clone().unwrap_or(String::new()); // If there is an after, there must be a before
-
-	let timeframe = match &t { Some(val) => format!("&t={}", val), None => String::new() };
-
-	// Build the Reddit JSON API url
-	let url = match ends.0 {
-		Some(val) => format!("r/{}/{}.json?before={}&count=25{}", sub_name, sorting, val, timeframe),
-		None => match ends.1 {
-			Some(val) => format!("r/{}/{}.json?after={}&count=25{}", sub_name, sorting, val, timeframe),
-			None => format!("r/{}/{}.json?{}", sub_name, sorting, timeframe),
-		},
-	};
-
-	let sub_result = if !&sub_name.contains("+") {
-		subreddit(&sub_name).await
+	let sub_result = if !&sub.contains("+") && sub != "popular" {
+		subreddit(&sub).await
 	} else {
 		Ok(Subreddit::default())
 	};
-	let items_result = fetch_posts(url, String::new()).await;
+	let posts = fetch_posts(path.clone(), String::new()).await;
 
-	if sub_result.is_err() || items_result.is_err() {
+	if posts.is_err() {
 		let s = ErrorTemplate {
-			message: sub_result.err().unwrap().to_string(),
+			message: posts.err().unwrap().to_string(),
 		}
 		.render()
 		.unwrap();
 		Ok(HttpResponse::Ok().status(StatusCode::NOT_FOUND).content_type("text/html").body(s))
 	} else {
-		let sub = sub_result.unwrap();
-		let items = items_result.unwrap();
+		let sub = sub_result.unwrap_or(Subreddit::default());
+		let items = posts.unwrap();
 
 		let s = SubredditTemplate {
 			sub: sub,
 			posts: items.0,
-			sort: (sorting, t.unwrap_or(String::new())),
-			ends: (before, items.1),
+			sort: (sort, param(&path, "t").await),
+			ends: (param(&path, "after").await, items.1),
 		}
 		.render()
 		.unwrap();

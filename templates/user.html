@@ -1,20 +1,19 @@
 {% extends "base.html" %}
+{% import "utils.html" as utils %}
+
+{% block search %}
+	{% call utils::search("".to_owned(), "", "") %}
+{% endblock %}
+
 {% block title %}Libreddit: u/{{ user.name }}{% endblock %}
 {% block body %}
 	<main style="max-width: 1000px;">
 		<div id="column_one">
-			<form>
-				<select id="sort" name="sort"> 
-					<option value="hot" {% if sort.0 == "hot" %}selected{% endif %}>Hot</option>
-					<option value="new" {% if sort.0 == "new" %}selected{% endif %}>New</option> 
-					<option value="top" {% if sort.0 == "top" %}selected{% endif %}>Top</option> 
+			<form id="sort">
+				<select name="sort"> 
+					{% call utils::options(sort.0, ["hot", "new", "top"], "") %}
 				</select>{% if sort.0 == "top" %}<select id="timeframe" name="t"> 
-					<option value="hour" {% if sort.1 == "hour" %}selected{% endif %}>Hour</option> 
-					<option value="day" {% if sort.1 == "day" %}selected{% endif %}>Day</option>
-					<option value="week" {% if sort.1 == "week" %}selected{% endif %}>Week</option>
-					<option value="month" {% if sort.1 == "month" %}selected{% endif %}>Month</option> 
-					<option value="year" {% if sort.1 == "year" %}selected{% endif %}>Year</option> 
-					<option value="all" {% if sort.1 == "all" || sort.1 == "" %}selected{% endif %}>All</option>
+					{% call utils::options(sort.1, ["hour", "day", "week", "month", "year", "all"], "all") %}
 				</select>{% endif %}<input id="sort_submit" type="submit" value="&rarr;">
 			</form>
 			{% for post in posts %}
