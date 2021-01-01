@@ -26,7 +26,7 @@ pub async fn item(req: HttpRequest) -> Result<HttpResponse> {
 	dbg!(&id);
 
 	// Send a request to the url, receive JSON in response
-	let req = request(path.clone()).await;
+	let req = request(&path).await;
 
 	// If the Reddit API returns an error, exit and send error page to user
 	if req.is_err() {
@@ -36,8 +36,8 @@ pub async fn item(req: HttpRequest) -> Result<HttpResponse> {
 		let res = req.unwrap();
 
 		// Parse the JSON into Post and Comment structs
-		let post = parse_post(res[0].clone()).await.unwrap();
-		let comments = parse_comments(res[1].clone()).await.unwrap();
+		let post = parse_post(&res[0]).await.unwrap();
+		let comments = parse_comments(&res[1]).await.unwrap();
 
 		// Use the Post and Comment structs to generate a website to show users
 		let s = PostTemplate { comments, post, sort }.render().unwrap();
@@ -66,7 +66,7 @@ async fn media(data: &serde_json::Value) -> (String, String) {
 }
 
 // POSTS
-async fn parse_post(json: serde_json::Value) -> Result<Post, &'static str> {
+async fn parse_post(json: &serde_json::Value) -> Result<Post, &'static str> {
 	// Retrieve post (as opposed to comments) from JSON
 	let post_data: &serde_json::Value = &json["data"]["children"][0];
 
@@ -114,7 +114,7 @@ async fn parse_post(json: serde_json::Value) -> Result<Post, &'static str> {
 
 // COMMENTS
 #[async_recursion]
-async fn parse_comments(json: serde_json::Value) -> Result<Vec<Comment>, &'static str> {
+async fn parse_comments(json: &serde_json::Value) -> Result<Vec<Comment>, &'static str> {
 	// Separate the comment JSON into a Vector of comments
 	let comment_data = json["data"]["children"].as_array().unwrap();
 
@@ -131,7 +131,7 @@ async fn parse_comments(json: serde_json::Value) -> Result<Vec<Comment>, &'stati
 		let body = val(comment, "body_html");
 
 		let replies: Vec<Comment> = if comment["data"]["replies"].is_object() {
-			parse_comments(comment["data"]["replies"].clone()).await.unwrap_or_default()
+			parse_comments(&comment["data"]["replies"]).await.unwrap_or_default()
 		} else {
 			Vec::new()
 		};

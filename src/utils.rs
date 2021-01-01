@@ -139,9 +139,9 @@ pub fn nested_val(j: &serde_json::Value, n: &str, k: &str) -> String {
 }
 
 // Fetch posts of a user or subreddit
-pub async fn fetch_posts(path: String, fallback_title: String) -> Result<(Vec<Post>, String), &'static str> {
+pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post>, String), &'static str> {
 	// Send a request to the url, receive JSON in response
-	let req = request(path.clone()).await;
+	let req = request(path).await;
 
 	// If the Reddit API returns an error, exit this function
 	if req.is_err() {
@@ -211,7 +211,7 @@ pub async fn error(message: String) -> Result<HttpResponse> {
 }
 
 // Make a request to a Reddit API and parse the JSON response
-pub async fn request(path: String) -> Result<serde_json::Value, &'static str> {
+pub async fn request(path: &str) -> Result<serde_json::Value, &'static str> {
 	let url = format!("https://www.reddit.com/{}", path);
 
 	// --- actix-web::client ---

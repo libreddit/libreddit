@@ -26,7 +26,7 @@ pub async fn page(req: HttpRequest) -> Result<HttpResponse> {
 	} else {
 		Ok(Subreddit::default())
 	};
-	let posts = fetch_posts(path.clone(), String::new()).await;
+	let posts = fetch_posts(&path, String::new()).await;
 
 	if posts.is_err() {
 		error(posts.err().unwrap().to_string()).await
@@ -52,7 +52,7 @@ async fn subreddit(sub: &str) -> Result<Subreddit, &'static str> {
 	let url: String = format!("r/{}/about.json?raw_json=1", sub);
 
 	// Send a request to the url, receive JSON in response
-	let req = request(url).await;
+	let req = request(&url).await;
 
 	// If the Reddit API returns an error, exit this function
 	if req.is_err() {

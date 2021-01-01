@@ -26,7 +26,7 @@ pub async fn find(req: HttpRequest) -> Result<HttpResponse> {
 	};
 	let sub = req.match_info().get("sub").unwrap_or("").to_string();
 
-	let posts = fetch_posts(path.clone(), String::new()).await;
+	let posts = fetch_posts(&path, String::new()).await;
 
 	if posts.is_err() {
 		error(posts.err().unwrap().to_string()).await

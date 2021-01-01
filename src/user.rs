@@ -24,7 +24,7 @@ pub async fn profile(req: HttpRequest) -> Result<HttpResponse> {
 
 	// Request user profile data and user posts/comments from Reddit
 	let user = user(&username).await;
-	let posts = fetch_posts(path.clone(), "Comment".to_string()).await;
+	let posts = fetch_posts(&path, "Comment".to_string()).await;
 
 	// If there is an error show error page
 	if user.is_err() || posts.is_err() {
@@ -44,18 +44,13 @@ pub async fn profile(req: HttpRequest) -> Result<HttpResponse> {
 	}
 }
 
-// SERVICES
-// pub async fn page(web::Path(username): web::Path<String>, params: web::Query<Params>) -> Result<HttpResponse> {
-// 	render(username, params.sort.clone(), params.t.clone(), (params.before.clone(), params.after.clone())).await
-// }
-
 // USER
 async fn user(name: &str) -> Result<User, &'static str> {
 	// Build the Reddit JSON API path
 	let path: String = format!("user/{}/about.json", name);
 
 	// Send a request to the url, receive JSON in response
-	let req = request(path).await;
+	let req = request(&path).await;
 
 	// If the Reddit API returns an error, exit this function
 	if req.is_err() {

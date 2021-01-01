@@ -38,7 +38,7 @@ async fn main() -> std::io::Result<()> {
 	}
 
 	// start http server
-	println!("Running Libreddit v{} on {}!", env!("CARGO_PKG_VERSION"), address.clone());
+	println!("Running Libreddit v{} on {}!", env!("CARGO_PKG_VERSION"), &address);
 
 	HttpServer::new(|| {
 		App::new()
@@ -71,7 +71,7 @@ async fn main() -> std::io::Result<()> {
 			.route("/r/{sub}/comments/{id}/{title}/", web::get().to(post::item))
 			.route("/r/{sub}/comments/{id}/{title}/{comment_id}/", web::get().to(post::item))
 	})
-	.bind(address.clone())
+	.bind(&address)
 	.unwrap_or_else(|_| panic!("Cannot bind to the address: {}", address))
 	.run()
 	.await
