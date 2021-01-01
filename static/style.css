@@ -35,7 +35,7 @@ nav {
 	background: var(--outside);
 	padding: 5px 15px;
 	font-size: 20px;
-	height: 40px;
+	min-height: 40px;
 }
 
 nav #lib, nav #github, nav #version { color: white; }
@@ -198,7 +198,7 @@ input[type="submit"]:hover { color: var(--accent); }
 #search_sort {
 	background: var(--highlighted);
 	border-radius: 5px;
-	overflow: hidden;
+	overflow: auto;
 }
 
 #search_sort > #search {
@@ -230,7 +230,7 @@ input[type="submit"]:hover { color: var(--accent); }
 	box-shadow: var(--black-contrast);
 	background: var(--outside);
 	display: flex;
-	overflow: hidden;
+	overflow: auto;
 }
 
 #sort_options > a, footer > a {
@@ -571,7 +571,8 @@ td, th {
 		max-width: 100%;
 	}
 
-	#user, #sidebar {
-		margin: 20px 0;
-	}
+	#user, #sidebar { margin: 20px 0;	}
+	#logo { margin: 5px auto; }
+	#searchbox { width: 100%; }
+	#github {	display: none; }
 }

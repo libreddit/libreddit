@@ -1,7 +1,10 @@
 {% extends "base.html" %}
 {% import "utils.html" as utils %}
 
-{% block title %}r/{{ sub.name }}: {{ sub.description }}{% endblock %}
+{% block title %}
+	{% if sub.name != "" %}r/{{ sub.name }}: {{ sub.description }}
+	{% else %}Libreddit{% endif %}
+{% endblock %}
 
 {% block search %}
 	{% call utils::search(["/r/", sub.name.as_str()].concat(), "") %}
