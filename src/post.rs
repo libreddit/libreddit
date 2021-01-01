@@ -18,7 +18,7 @@ struct PostTemplate {
 
 pub async fn item(req: HttpRequest) -> Result<HttpResponse> {
 	let path = format!("{}.json?{}&raw_json=1", req.path(), req.query_string());
-	let sort = param(&path, "sort").await;
+	let sort = param(&path, "sort");
 	let id = req.match_info().get("id").unwrap_or("").to_string();
 
 	// Log the post ID being fetched in debug mode
@@ -80,22 +80,22 @@ async fn parse_post(json: serde_json::Value) -> Result<Post, &'static str> {
 
 	// Build a post using data parsed from Reddit post API
 	let post = Post {
-		title: val(post_data, "title").await,
-		community: val(post_data, "subreddit").await,
-		body: val(post_data, "selftext_html").await,
-		author: val(post_data, "author").await,
+		title: val(post_data, "title"),
+		community: val(post_data, "subreddit"),
+		body: val(post_data, "selftext_html"),
+		author: val(post_data, "author"),
 		author_flair: Flair(
-			val(post_data, "author_flair_text").await,
-			val(post_data, "author_flair_background_color").await,
-			val(post_data, "author_flair_text_color").await,
+			val(post_data, "author_flair_text"),
+			val(post_data, "author_flair_background_color"),
+			val(post_data, "author_flair_text_color"),
 		),
-		url: val(post_data, "permalink").await,
+		url: val(post_data, "permalink"),
 		score: format_num(score),
 		post_type: media.0,
 		flair: Flair(
-			val(post_data, "link_flair_text").await,
-			val(post_data, "link_flair_background_color").await,
-			if val(post_data, "link_flair_text_color").await == "dark" {
+			val(post_data, "link_flair_text"),
+			val(post_data, "link_flair_background_color"),
+			if val(post_data, "link_flair_text_color") == "dark" {
 				"black".to_string()
 			} else {
 				"white".to_string()
@@ -128,25 +128,25 @@ async fn parse_comments(json: serde_json::Value) -> Result<Vec<Comment>, &'stati
 		}
 
 		let score = comment["data"]["score"].as_i64().unwrap_or(0);
-		let body = val(comment, "body_html").await;
+		let body = val(comment, "body_html");
 
 		let replies: Vec<Comment> = if comment["data"]["replies"].is_object() {
-			parse_comments(comment["data"]["replies"].clone()).await.unwrap_or(Vec::new())
+			parse_comments(comment["data"]["replies"].clone()).await.unwrap_or_default()
 		} else {
 			Vec::new()
 		};
 
 		comments.push(Comment {
-			id: val(comment, "id").await,
-			body: body,
-			author: val(comment, "author").await,
+			id: val(comment, "id"),
+			body,
+			author: val(comment, "author"),
 			score: format_num(score),
 			time: Utc.timestamp(unix_time, 0).format("%b %e %Y %H:%M UTC").to_string(),
-			replies: replies,
+			replies,
 			flair: Flair(
-				val(comment, "author_flair_text").await,
-				val(comment, "author_flair_background_color").await,
-				val(comment, "author_flair_text_color").await,
+				val(comment, "author_flair_text"),
+				val(comment, "author_flair_background_color"),
+				val(comment, "author_flair_text_color"),
 			),
 		});
 	}

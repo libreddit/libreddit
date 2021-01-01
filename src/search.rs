@@ -18,11 +18,11 @@ struct SearchTemplate {
 // SERVICES
 pub async fn find(req: HttpRequest) -> Result<HttpResponse> {
 	let path = format!("{}.json?{}", req.path(), req.query_string());
-	let q = param(&path, "q").await;
-	let sort = if param(&path, "sort").await.is_empty() {
+	let q = param(&path, "q");
+	let sort = if param(&path, "sort").is_empty() {
 		"relevance".to_string()
 	} else {
-		param(&path, "sort").await
+		param(&path, "sort")
 	};
 	let sub = req.match_info().get("sub").unwrap_or("").to_string();
 
@@ -36,9 +36,9 @@ pub async fn find(req: HttpRequest) -> Result<HttpResponse> {
 		let s = SearchTemplate {
 			posts: items.0,
 			query: q,
-			sub: sub,
-			sort: (sort, param(&path, "t").await),
-			ends: (param(&path, "after").await, items.1),
+			sub,
+			sort: (sort, param(&path, "t")),
+			ends: (param(&path, "after"), items.1),
 		}
 		.render()
 		.unwrap();

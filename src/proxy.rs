@@ -23,7 +23,7 @@ pub async fn handler(web::Path(url): web::Path<String>) -> Result<HttpResponse> 
 			.send()
 			.await
 			.map_err(Error::from)
-			.and_then(|res| Ok(HttpResponse::build(res.status()).streaming(res)))
+			.map(|res| HttpResponse::build(res.status()).streaming(res))
 	} else {
 		Ok(HttpResponse::Ok().body(""))
 	}

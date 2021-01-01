@@ -94,7 +94,7 @@ pub struct ErrorTemplate {
 //
 
 // Grab a query param from a url
-pub async fn param(path: &String, value: &str) -> String {
+pub fn param(path: &str, value: &str) -> String {
 	let url = Url::parse(format!("https://reddit.com/{}", path).as_str()).unwrap();
 	let pairs: std::collections::HashMap<_, _> = url.query_pairs().into_owned().collect();
 	pairs.get(value).unwrap_or(&String::new()).to_owned()
@@ -129,12 +129,12 @@ pub fn format_num(num: i64) -> String {
 //
 
 // val() function used to parse JSON from Reddit APIs
-pub async fn val(j: &serde_json::Value, k: &str) -> String {
+pub fn val(j: &serde_json::Value, k: &str) -> String {
 	String::from(j["data"][k].as_str().unwrap_or(""))
 }
 
 // nested_val() function used to parse JSON from Reddit APIs
-pub async fn nested_val(j: &serde_json::Value, n: &str, k: &str) -> String {
+pub fn nested_val(j: &serde_json::Value, n: &str, k: &str) -> String {
 	String::from(j["data"][n][k].as_str().unwrap())
 }
 
@@ -157,32 +157,32 @@ pub async fn fetch_posts(path: String, fallback_title: String) -> Result<(Vec<Po
 	let mut posts: Vec<Post> = Vec::new();
 
 	for post in post_list {
-		let img = if val(post, "thumbnail").await.starts_with("https:/") {
-			format_url(val(post, "thumbnail").await).await
+		let img = if val(post, "thumbnail").starts_with("https:/") {
+			format_url(val(post, "thumbnail")).await
 		} else {
 			String::new()
 		};
 		let unix_time: i64 = post["data"]["created_utc"].as_f64().unwrap().round() as i64;
 		let score = post["data"]["score"].as_i64().unwrap();
-		let title = val(post, "title").await;
+		let title = val(post, "title");
 
 		posts.push(Post {
 			title: if title.is_empty() { fallback_title.to_owned() } else { title },
-			community: val(post, "subreddit").await,
-			body: val(post, "body_html").await,
-			author: val(post, "author").await,
+			community: val(post, "subreddit"),
+			body: val(post, "body_html"),
+			author: val(post, "author"),
 			author_flair: Flair(
-				val(post, "author_flair_text").await,
-				val(post, "author_flair_background_color").await,
-				val(post, "author_flair_text_color").await,
+				val(post, "author_flair_text"),
+				val(post, "author_flair_background_color"),
+				val(post, "author_flair_text_color"),
 			),
 			score: format_num(score),
 			post_type: "link".to_string(),
 			media: img,
 			flair: Flair(
-				val(post, "link_flair_text").await,
-				val(post, "link_flair_background_color").await,
-				if val(post, "link_flair_text_color").await == "dark" {
+				val(post, "link_flair_text"),
+				val(post, "link_flair_background_color"),
+				if val(post, "link_flair_text_color") == "dark" {
 					"black".to_string()
 				} else {
 					"white".to_string()
@@ -192,7 +192,7 @@ pub async fn fetch_posts(path: String, fallback_title: String) -> Result<(Vec<Po
 				nsfw: post["data"]["over_18"].as_bool().unwrap_or(false),
 				stickied: post["data"]["stickied"].as_bool().unwrap_or(false),
 			},
-			url: val(post, "permalink").await,
+			url: val(post, "permalink"),
 			time: Utc.timestamp(unix_time, 0).format("%b %e '%y").to_string(),
 		});
 	}
@@ -244,10 +244,12 @@ pub async fn request(path: String) -> Result<serde_json::Value, &'static str> {
 	let json: Value = from_str(body.as_str()).unwrap_or(Value::Null);
 
 	if !success {
-		println!("! {} - {}", url, "Page not found");
+		#[cfg(debug_assertions)]
+		dbg!(format!("{} - Page not found", url));
 		Err("Page not found")
 	} else if json == Value::Null {
-		println!("! {} - {}", url, "Failed to parse page JSON data");
+		#[cfg(debug_assertions)]
+		dbg!(format!("{} - Failed to parse page JSON data", url));
 		Err("Failed to parse page JSON data")
 	} else {
 		Ok(json)

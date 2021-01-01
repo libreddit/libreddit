@@ -21,7 +21,7 @@ pub async fn page(req: HttpRequest) -> Result<HttpResponse> {
 	let sub = req.match_info().get("sub").unwrap_or("popular").to_string();
 	let sort = req.match_info().get("sort").unwrap_or("hot").to_string();
 
-	let sub_result = if !&sub.contains("+") && sub != "popular" {
+	let sub_result = if !&sub.contains('+') && sub != "popular" {
 		subreddit(&sub).await
 	} else {
 		Ok(Subreddit::default())
@@ -31,14 +31,14 @@ pub async fn page(req: HttpRequest) -> Result<HttpResponse> {
 	if posts.is_err() {
 		error(posts.err().unwrap().to_string()).await
 	} else {
-		let sub = sub_result.unwrap_or(Subreddit::default());
+		let sub = sub_result.unwrap_or_default();
 		let items = posts.unwrap();
 
 		let s = SubredditTemplate {
-			sub: sub,
+			sub,
 			posts: items.0,
-			sort: (sort, param(&path, "t").await),
-			ends: (param(&path, "after").await, items.1),
+			sort: (sort, param(&path, "t")),
+			ends: (param(&path, "after"), items.1),
 		}
 		.render()
 		.unwrap();
@@ -47,7 +47,7 @@ pub async fn page(req: HttpRequest) -> Result<HttpResponse> {
 }
 
 // SUBREDDIT
-async fn subreddit(sub: &String) -> Result<Subreddit, &'static str> {
+async fn subreddit(sub: &str) -> Result<Subreddit, &'static str> {
 	// Build the Reddit JSON API url
 	let url: String = format!("r/{}/about.json?raw_json=1", sub);
 
@@ -67,18 +67,14 @@ async fn subreddit(sub: &String) -> Result<Subreddit, &'static str> {
 	let active = res["data"]["accounts_active"].as_u64().unwrap_or(0);
 
 	// Fetch subreddit icon either from the community_icon or icon_img value
-	let community_icon: &str = res["data"]["community_icon"].as_str().unwrap_or("").split("?").collect::<Vec<&str>>()[0];
-	let icon = if community_icon.is_empty() {
-		val(&res, "icon_img").await
-	} else {
-		community_icon.to_string()
-	};
+	let community_icon: &str = res["data"]["community_icon"].as_str().unwrap_or("").split('?').collect::<Vec<&str>>()[0];
+	let icon = if community_icon.is_empty() { val(&res, "icon_img") } else { community_icon.to_string() };
 
 	let sub = Subreddit {
-		name: val(&res, "display_name").await,
-		title: val(&res, "title").await,
-		description: val(&res, "public_description").await,
-		info: val(&res, "description_html").await.replace("\\", ""),
+		name: val(&res, "display_name"),
+		title: val(&res, "title"),
+		description: val(&res, "public_description"),
+		info: val(&res, "description_html").replace("\\", ""),
 		icon: format_url(icon).await,
 		members: format_num(members.try_into().unwrap_or(0)),
 		active: format_num(active.try_into().unwrap_or(0)),

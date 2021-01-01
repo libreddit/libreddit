@@ -31,7 +31,7 @@ async fn main() -> std::io::Result<()> {
 	if args.len() > 1 {
 		for arg in args {
 			if arg.starts_with("--address=") || arg.starts_with("-a=") {
-				let split: Vec<&str> = arg.split("=").collect();
+				let split: Vec<&str> = arg.split('=').collect();
 				address = split[1].to_string();
 			}
 		}
@@ -48,7 +48,7 @@ async fn main() -> std::io::Result<()> {
 			.default_service(web::get().to(utils::error))
 			// GENERAL SERVICES
 			.route("/style.css/", web::get().to(style))
-			.route("/favicon.ico/", web::get().to(|| HttpResponse::Ok()))
+			.route("/favicon.ico/", web::get().to(HttpResponse::Ok))
 			.route("/robots.txt/", web::get().to(robots))
 			// PROXY SERVICE
 			.route("/proxy/{url:.*}/", web::get().to(proxy::handler))
@@ -72,7 +72,7 @@ async fn main() -> std::io::Result<()> {
 			.route("/r/{sub}/comments/{id}/{title}/{comment_id}/", web::get().to(post::item))
 	})
 	.bind(address.clone())
-	.expect(format!("Cannot bind to the address: {}", address).as_str())
+	.unwrap_or_else(|_| panic!("Cannot bind to the address: {}", address))
 	.run()
 	.await
 }
