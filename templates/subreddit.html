@@ -2,7 +2,8 @@
 {% import "utils.html" as utils %}
 
 {% block title %}
-	{% if sub.name != "" %}r/{{ sub.name }}: {{ sub.description }}
+	{% if sub.title != "" %}{{ sub.title }}
+	{% else if sub.name != "" %}{{ sub.name }}
 	{% else %}Libreddit{% endif %}
 {% endblock %}
 
@@ -66,6 +67,7 @@
 		<aside>
 			<div id="subreddit">
 				<img id="subreddit_icon" src="{{ sub.icon }}">
+				<p id="subreddit_title">{{ sub.title }}</p>
 				<p id="subreddit_name">r/{{ sub.name }}</p>
 				<p id="subreddit_description">{{ sub.description }}</p>
 				<div id="subreddit_details">

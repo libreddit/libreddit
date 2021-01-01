@@ -50,6 +50,7 @@ pub struct Comment {
 // User struct containing metadata about user
 pub struct User {
 	pub name: String,
+	pub title: String,
 	pub icon: String,
 	pub karma: i64,
 	pub created: String,
@@ -193,8 +194,6 @@ pub async fn fetch_posts(path: String, fallback_title: String) -> Result<(Vec<Po
 			time: Utc.timestamp(unix_time, 0).format("%b %e '%y").to_string(),
 		});
 	}
-
-	dbg!(path);
 
 	Ok((posts, res["data"]["after"].as_str().unwrap_or("").to_string()))
 }

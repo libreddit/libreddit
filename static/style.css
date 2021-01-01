@@ -44,10 +44,12 @@ nav #version { opacity: 25%; }
 main {
 	display: flex;
 	justify-content: center;
-	max-width: 750px;
+	max-width: 1000px;
 	padding: 10px 20px;
 	margin: 20px auto;
 }
+
+#column_one { max-width: 750px; }
 
 footer {
 	display: flex;
@@ -100,9 +102,9 @@ aside {
 	border-radius: 5px;
 }
 
-#sidebar, #sidebar_contents {
-	margin-top: 20px;
-}
+#user *, #subreddit * { text-align: center; }
+
+#sidebar, #sidebar_contents { margin-top: 20px; }
 
 #sidebar_label {
 	border: 2px solid var(--highlighted);
@@ -118,20 +120,22 @@ aside {
 	margin: 10px;
 }
 
-#user_name, #subreddit_name {
-	margin-top: 10px;
+#user_title, #subreddit_title {
+	margin: 0 20px;
+	font-size: 20px;
+	font-weight: bold;
 }
 
 #user_description, #subreddit_description {
-	margin: 10px 20px;
-	text-align: center;
+	margin: 0 20px;
 	font-size: 15px;
 }
+
+#user_name, #subreddit_name, #user_icon, #subreddit_icon, #user_description, #subreddit_description { margin-bottom: 20px; }
 
 #user_details, #subreddit_details {
 	display: grid;
 	grid-template-columns: repeat(2, 1fr);
-	margin-top: 15px;
 	grid-column-gap: 20px;
 }
 
@@ -566,8 +570,8 @@ td, th {
 	main { flex-direction: column-reverse; }
 	nav { flex-direction: column; }
 
-	aside {
-		margin: 20px 0 0 0;
+	aside, #subreddit, #user {
+		margin: 0;
 		max-width: 100%;
 	}
 

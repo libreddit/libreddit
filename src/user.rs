@@ -56,17 +56,17 @@ pub async fn profile(req: HttpRequest) -> Result<HttpResponse> {
 
 // USER
 async fn user(name: &String) -> Result<User, &'static str> {
-	// Build the Reddit JSON API url
-	let url: String = format!("user/{}/about.json", name);
-
+	// Build the Reddit JSON API path
+	let path: String = format!("user/{}/about.json", name);
+	
 	// Send a request to the url, receive JSON in response
-	let req = request(url).await;
-
+	let req = request(path).await;
+	
 	// If the Reddit API returns an error, exit this function
 	if req.is_err() {
 		return Err(req.err().unwrap());
 	}
-
+	
 	// Otherwise, grab the JSON output from the request
 	let res = req.unwrap();
 
@@ -76,6 +76,7 @@ async fn user(name: &String) -> Result<User, &'static str> {
 	// Parse the JSON output into a User struct
 	Ok(User {
 		name: name.to_string(),
+		title: nested_val(&res, "subreddit", "title").await,
 		icon: format_url(nested_val(&res, "subreddit", "icon_img").await).await,
 		karma: res["data"]["total_karma"].as_i64().unwrap(),
 		created: Utc.timestamp(created, 0).format("%b %e, %Y").to_string(),

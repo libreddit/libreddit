@@ -5,7 +5,7 @@
 	{% call utils::search("".to_owned(), "", "") %}
 {% endblock %}
 
-{% block title %}Libreddit: u/{{ user.name }}{% endblock %}
+{% block title %}{{ user.name.replace("u/", "") }} (u/{{ user.name }}) - Libreddit{% endblock %}
 {% block body %}
 	<main style="max-width: 1000px;">
 		<div id="column_one">
@@ -72,6 +72,7 @@
 		<aside>
 			<div id="user">
 				<img id="user_icon" src="{{ user.icon }}">
+				<p id="user_title">{{ user.title }}</p>
 				<p id="user_name">u/{{ user.name }}</p>
 				<div id="user_description">{{ user.description }}</div>
 				<div id="user_details">

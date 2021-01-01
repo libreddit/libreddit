@@ -72,7 +72,7 @@ async fn subreddit(sub: &String) -> Result<Subreddit, &'static str> {
 	let active = res["data"]["accounts_active"].as_u64().unwrap_or(0);
 
 	// Fetch subreddit icon either from the community_icon or icon_img value
-	let community_icon: &str = res["data"]["community_icon"].as_str().unwrap().split("?").collect::<Vec<&str>>()[0];
+	let community_icon: &str = res["data"]["community_icon"].as_str().unwrap_or("").split("?").collect::<Vec<&str>>()[0];
 	let icon = if community_icon.is_empty() {
 		val(&res, "icon_img").await
 	} else {
@@ -85,8 +85,8 @@ async fn subreddit(sub: &String) -> Result<Subreddit, &'static str> {
 		description: val(&res, "public_description").await,
 		info: val(&res, "description_html").await.replace("\\", ""),
 		icon: format_url(icon).await,
-		members: format_num(members.try_into().unwrap()),
-		active: format_num(active.try_into().unwrap()),
+		members: format_num(members.try_into().unwrap_or(0)),
+		active: format_num(active.try_into().unwrap_or(0)),
 	};
 
 	Ok(sub)

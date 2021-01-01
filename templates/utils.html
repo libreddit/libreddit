@@ -15,9 +15,9 @@
 {%- endmacro %}
 
 {% macro search(root, search) -%}
-<form action="{% if root != "/r/" %}{{ root }}{% endif %}/search/" id="searchbox">
+<form action="{% if root != "/r/" && !root.is_empty() %}{{ root }}{% endif %}/search/" id="searchbox">
 	<input id="search" type="text" name="q" placeholder="Search" value="{{ search }}">
-	{% if root != "/r/" %}
+	{% if root != "/r/" && !root.is_empty() %}
 	<div id="inside">
 		<input type="checkbox" name="restrict_sr" id="restrict_sr" checked="checked" data-com.bitwarden.browser.user-edited="yes">
 		<label for="restrict_sr">in {{ root }}</label>
