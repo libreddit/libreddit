@@ -4,7 +4,7 @@
 use actix_web::{http::StatusCode, HttpResponse, Result};
 use askama::Template;
 use chrono::{TimeZone, Utc};
-use serde_json::{from_str, Value};
+use serde_json::{from_str};
 use url::Url;
 // use surf::{client, get, middleware::Redirect};
 
@@ -135,24 +135,27 @@ pub fn val(j: &serde_json::Value, k: &str) -> String {
 
 // nested_val() function used to parse JSON from Reddit APIs
 pub fn nested_val(j: &serde_json::Value, n: &str, k: &str) -> String {
-	String::from(j["data"][n][k].as_str().unwrap())
+	String::from(j["data"][n][k].as_str().unwrap_or_default())
 }
 
 // Fetch posts of a user or subreddit
 pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post>, String), &'static str> {
-	// Send a request to the url, receive JSON in response
-	let req = request(path).await;
+	let res;
+	let post_list;
 
-	// If the Reddit API returns an error, exit this function
-	if req.is_err() {
-		return Err(req.err().unwrap());
+	// Send a request to the url
+	match request(&path).await {
+		// If success, receive JSON in response
+		Ok(response) => { res = response; },
+		// If the Reddit API returns an error, exit this function
+		Err(msg) => return Err(msg)
 	}
 
-	// Otherwise, grab the JSON output from the request
-	let res = req.unwrap();
-
 	// Fetch the list of posts from the JSON response
-	let post_list = res["data"]["children"].as_array().unwrap();
+	match res["data"]["children"].as_array() {
+		Some(list) => { post_list = list },
+		None => { return Err("No posts found") }
+	}
 
 	let mut posts: Vec<Post> = Vec::new();
 
@@ -162,8 +165,8 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 		} else {
 			String::new()
 		};
-		let unix_time: i64 = post["data"]["created_utc"].as_f64().unwrap().round() as i64;
-		let score = post["data"]["score"].as_i64().unwrap();
+		let unix_time: i64 = post["data"]["created_utc"].as_f64().unwrap_or_default().round() as i64;
+		let score = post["data"]["score"].as_i64().unwrap_or_default();
 		let title = val(post, "title");
 
 		posts.push(Post {
@@ -206,7 +209,7 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 
 pub async fn error(message: String) -> Result<HttpResponse> {
 	let msg = if message.is_empty() { "Page not found".to_string() } else { message };
-	let body = ErrorTemplate { message: msg }.render().unwrap();
+	let body = ErrorTemplate { message: msg }.render().unwrap_or_default();
 	Ok(HttpResponse::Ok().status(StatusCode::NOT_FOUND).content_type("text/html").body(body))
 }
 
@@ -236,22 +239,22 @@ pub async fn request(path: &str) -> Result<serde_json::Value, &'static str> {
 	// --- reqwest ---
 	let res = reqwest::get(&url).await.unwrap();
 	// Read the status from the response
-	let success = res.status().is_success();
-	// Read the body of the response
-	let body = res.text().await.unwrap();
-
-	// Parse the response from Reddit as JSON
-	let json: Value = from_str(body.as_str()).unwrap_or(Value::Null);
-
-	if !success {
-		#[cfg(debug_assertions)]
-		dbg!(format!("{} - Page not found", url));
-		Err("Page not found")
-	} else if json == Value::Null {
-		#[cfg(debug_assertions)]
-		dbg!(format!("{} - Failed to parse page JSON data", url));
-		Err("Failed to parse page JSON data")
-	} else {
-		Ok(json)
+	match res.status().is_success() {
+		true => {
+			// Parse the response from Reddit as JSON
+			match from_str(res.text().await.unwrap_or_default().as_str()) {
+				Ok(json) => Ok(json),
+				Err(_) => {
+					#[cfg(debug_assertions)]
+					dbg!(format!("{} - Failed to parse page JSON data", url));
+					Err("Failed to parse page JSON data")
+				}
+			}
+		},
+		false => {
+			#[cfg(debug_assertions)]
+			dbg!(format!("{} - Page not found", url));
+			Err("Page not found")
+		}
 	}
 }

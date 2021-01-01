@@ -2,7 +2,6 @@
 use crate::utils::{error, fetch_posts, format_num, format_url, param, request, val, Post, Subreddit};
 use actix_web::{HttpRequest, HttpResponse, Result};
 use askama::Template;
-use std::convert::TryInto;
 
 // STRUCTS
 #[derive(Template)]
@@ -22,49 +21,45 @@ pub async fn page(req: HttpRequest) -> Result<HttpResponse> {
 	let sort = req.match_info().get("sort").unwrap_or("hot").to_string();
 
 	let sub_result = if !&sub.contains('+') && sub != "popular" {
-		subreddit(&sub).await
+		subreddit(&sub).await.unwrap_or_default()
 	} else {
-		Ok(Subreddit::default())
+		Subreddit::default()
 	};
-	let posts = fetch_posts(&path, String::new()).await;
 
-	if posts.is_err() {
-		error(posts.err().unwrap().to_string()).await
-	} else {
-		let sub = sub_result.unwrap_or_default();
-		let items = posts.unwrap();
-
-		let s = SubredditTemplate {
-			sub,
-			posts: items.0,
-			sort: (sort, param(&path, "t")),
-			ends: (param(&path, "after"), items.1),
-		}
-		.render()
-		.unwrap();
-		Ok(HttpResponse::Ok().content_type("text/html").body(s))
+	match fetch_posts(&path, String::new()).await {
+		Ok(items) => {
+			let s = SubredditTemplate {
+				sub: sub_result,
+				posts: items.0,
+				sort: (sort, param(&path, "t")),
+				ends: (param(&path, "after"), items.1),
+			}
+			.render()
+			.unwrap();
+			Ok(HttpResponse::Ok().content_type("text/html").body(s))
+		},
+		Err(msg) => error(msg.to_string()).await
 	}
 }
 
 // SUBREDDIT
 async fn subreddit(sub: &str) -> Result<Subreddit, &'static str> {
 	// Build the Reddit JSON API url
-	let url: String = format!("r/{}/about.json?raw_json=1", sub);
+	let path: String = format!("r/{}/about.json?raw_json=1", sub);
 
-	// Send a request to the url, receive JSON in response
-	let req = request(&url).await;
+	let res;
 
-	// If the Reddit API returns an error, exit this function
-	if req.is_err() {
-		return Err(req.err().unwrap());
+	// Send a request to the url
+	match request(&path).await {
+		// If success, receive JSON in response
+		Ok(response) => { res = response; },
+		// If the Reddit API returns an error, exit this function
+		Err(msg) => return Err(msg)
 	}
 
-	// Otherwise, grab the JSON output from the request
-	let res = req.unwrap();
-
 	// Metadata regarding the subreddit
-	let members = res["data"]["subscribers"].as_u64().unwrap_or(0);
-	let active = res["data"]["accounts_active"].as_u64().unwrap_or(0);
+	let members: i64 = res["data"]["subscribers"].as_u64().unwrap_or_default() as i64;
+	let active: i64 = res["data"]["accounts_active"].as_u64().unwrap_or_default() as i64;
 
 	// Fetch subreddit icon either from the community_icon or icon_img value
 	let community_icon: &str = res["data"]["community_icon"].as_str().unwrap_or("").split('?').collect::<Vec<&str>>()[0];
@@ -76,8 +71,8 @@ async fn subreddit(sub: &str) -> Result<Subreddit, &'static str> {
 		description: val(&res, "public_description"),
 		info: val(&res, "description_html").replace("\\", ""),
 		icon: format_url(icon).await,
-		members: format_num(members.try_into().unwrap_or(0)),
-		active: format_num(active.try_into().unwrap_or(0)),
+		members: format_num(members),
+		active: format_num(active),
 	};
 
 	Ok(sub)

@@ -24,24 +24,21 @@ pub async fn item(req: HttpRequest) -> Result<HttpResponse> {
 	// Log the post ID being fetched in debug mode
 	#[cfg(debug_assertions)]
 	dbg!(&id);
-
+	
 	// Send a request to the url, receive JSON in response
-	let req = request(&path).await;
-
-	// If the Reddit API returns an error, exit and send error page to user
-	if req.is_err() {
-		error(req.err().unwrap().to_string()).await
-	} else {
+	match request(&path).await {
 		// Otherwise, grab the JSON output from the request
-		let res = req.unwrap();
+		Ok(res) => {
+			// Parse the JSON into Post and Comment structs
+			let post = parse_post(&res[0]).await.unwrap();
+			let comments = parse_comments(&res[1]).await.unwrap();
 
-		// Parse the JSON into Post and Comment structs
-		let post = parse_post(&res[0]).await.unwrap();
-		let comments = parse_comments(&res[1]).await.unwrap();
-
-		// Use the Post and Comment structs to generate a website to show users
-		let s = PostTemplate { comments, post, sort }.render().unwrap();
-		Ok(HttpResponse::Ok().content_type("text/html").body(s))
+			// Use the Post and Comment structs to generate a website to show users
+			let s = PostTemplate { comments, post, sort }.render().unwrap();
+			Ok(HttpResponse::Ok().content_type("text/html").body(s))
+		},
+		// If the Reddit API returns an error, exit and send error page to user
+		Err(msg) => error(msg.to_string()).await
 	}
 }
 

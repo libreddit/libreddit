@@ -26,22 +26,19 @@ pub async fn find(req: HttpRequest) -> Result<HttpResponse> {
 	};
 	let sub = req.match_info().get("sub").unwrap_or("").to_string();
 
-	let posts = fetch_posts(&path, String::new()).await;
-
-	if posts.is_err() {
-		error(posts.err().unwrap().to_string()).await
-	} else {
-		let items = posts.unwrap();
-
-		let s = SearchTemplate {
-			posts: items.0,
-			query: q,
-			sub,
-			sort: (sort, param(&path, "t")),
-			ends: (param(&path, "after"), items.1),
-		}
-		.render()
-		.unwrap();
-		Ok(HttpResponse::Ok().content_type("text/html").body(s))
+	match fetch_posts(&path, String::new()).await {
+		Ok(posts) => {
+			let s = SearchTemplate {
+				posts: posts.0,
+				query: q,
+				sub,
+				sort: (sort, param(&path, "t")),
+				ends: (param(&path, "after"), posts.1),
+			}
+			.render()
+			.unwrap();
+			Ok(HttpResponse::Ok().content_type("text/html").body(s))
+		},
+		Err(msg) => error(msg.to_string()).await
 	}
 }

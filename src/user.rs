@@ -25,22 +25,21 @@ pub async fn profile(req: HttpRequest) -> Result<HttpResponse> {
 	// Request user profile data and user posts/comments from Reddit
 	let user = user(&username).await;
 	let posts = fetch_posts(&path, "Comment".to_string()).await;
-
-	// If there is an error show error page
-	if user.is_err() || posts.is_err() {
-		error(user.err().unwrap().to_string()).await
-	} else {
-		let posts_unwrapped = posts.unwrap();
-
-		let s = UserTemplate {
-			user: user.unwrap(),
-			posts: posts_unwrapped.0,
-			sort: (sort, param(&path, "t")),
-			ends: (param(&path, "after"), posts_unwrapped.1),
-		}
-		.render()
-		.unwrap();
-		Ok(HttpResponse::Ok().content_type("text/html").body(s))
+	
+	match posts {
+		Ok(items) => {
+			let s = UserTemplate {
+				user: user.unwrap(),
+				posts: items.0,
+				sort: (sort, param(&path, "t")),
+				ends: (param(&path, "after"), items.1),
+			}
+			.render()
+			.unwrap();
+			Ok(HttpResponse::Ok().content_type("text/html").body(s))
+		},
+		// If there is an error show error page
+		Err(msg) => error(msg.to_string()).await
 	}
 }
 
@@ -49,16 +48,15 @@ async fn user(name: &str) -> Result<User, &'static str> {
 	// Build the Reddit JSON API path
 	let path: String = format!("user/{}/about.json", name);
 
-	// Send a request to the url, receive JSON in response
-	let req = request(&path).await;
+	let res;
 
-	// If the Reddit API returns an error, exit this function
-	if req.is_err() {
-		return Err(req.err().unwrap());
+	// Send a request to the url
+	match request(&path).await {
+		// If success, receive JSON in response
+		Ok(response) => { res = response; },
+		// If the Reddit API returns an error, exit this function
+		Err(msg) => return Err(msg)
 	}
-
-	// Otherwise, grab the JSON output from the request
-	let res = req.unwrap();
 
 	// Grab creation date as unix timestamp
 	let created: i64 = res["data"]["created"].as_f64().unwrap().round() as i64;
