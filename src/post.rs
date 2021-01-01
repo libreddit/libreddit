@@ -1,6 +1,6 @@
 // CRATES
-use crate::utils::{format_num, format_url, param, request, val, Comment, ErrorTemplate, Flags, Flair, Post};
-use actix_web::{http::StatusCode, HttpRequest, HttpResponse, Result};
+use crate::utils::{error, format_num, format_url, param, request, val, Comment, Flags, Flair, Post};
+use actix_web::{HttpRequest, HttpResponse, Result};
 
 use async_recursion::async_recursion;
 
@@ -30,12 +30,7 @@ pub async fn item(req: HttpRequest) -> Result<HttpResponse> {
 
 	// If the Reddit API returns an error, exit and send error page to user
 	if req.is_err() {
-		let s = ErrorTemplate {
-			message: req.err().unwrap().to_string(),
-		}
-		.render()
-		.unwrap();
-		return Ok(HttpResponse::Ok().status(StatusCode::NOT_FOUND).content_type("text/html").body(s));
+		error(req.err().unwrap().to_string()).await
 	} else {
 		// Otherwise, grab the JSON output from the request
 		let res = req.unwrap();

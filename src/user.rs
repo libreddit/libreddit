@@ -1,6 +1,6 @@
 // CRATES
-use crate::utils::{fetch_posts, format_url, nested_val, param, request, ErrorTemplate, Post, User};
-use actix_web::{http::StatusCode, HttpRequest, HttpResponse, Result};
+use crate::utils::{error, fetch_posts, format_url, nested_val, param, request, Post, User};
+use actix_web::{HttpRequest, HttpResponse, Result};
 use askama::Template;
 use chrono::{TimeZone, Utc};
 
@@ -28,12 +28,7 @@ pub async fn profile(req: HttpRequest) -> Result<HttpResponse> {
 
 	// If there is an error show error page
 	if user.is_err() || posts.is_err() {
-		let s = ErrorTemplate {
-			message: user.err().unwrap().to_string(),
-		}
-		.render()
-		.unwrap();
-		Ok(HttpResponse::Ok().status(StatusCode::NOT_FOUND).content_type("text/html").body(s))
+		error(user.err().unwrap().to_string()).await
 	} else {
 		let posts_unwrapped = posts.unwrap();
 
@@ -58,15 +53,15 @@ pub async fn profile(req: HttpRequest) -> Result<HttpResponse> {
 async fn user(name: &String) -> Result<User, &'static str> {
 	// Build the Reddit JSON API path
 	let path: String = format!("user/{}/about.json", name);
-	
+
 	// Send a request to the url, receive JSON in response
 	let req = request(path).await;
-	
+
 	// If the Reddit API returns an error, exit this function
 	if req.is_err() {
 		return Err(req.err().unwrap());
 	}
-	
+
 	// Otherwise, grab the JSON output from the request
 	let res = req.unwrap();
 

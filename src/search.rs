@@ -1,6 +1,6 @@
 // CRATES
-use crate::utils::{fetch_posts, param, ErrorTemplate, Post};
-use actix_web::{http::StatusCode, HttpRequest, HttpResponse, Result};
+use crate::utils::{error, fetch_posts, param, Post};
+use actix_web::{HttpRequest, HttpResponse, Result};
 use askama::Template;
 
 // STRUCTS
@@ -16,7 +16,7 @@ struct SearchTemplate {
 }
 
 // SERVICES
-pub async fn page(req: HttpRequest) -> Result<HttpResponse> {
+pub async fn find(req: HttpRequest) -> Result<HttpResponse> {
 	let path = format!("{}.json?{}", req.path(), req.query_string());
 	let q = param(&path, "q").await;
 	let sort = if param(&path, "sort").await.is_empty() {
@@ -29,12 +29,7 @@ pub async fn page(req: HttpRequest) -> Result<HttpResponse> {
 	let posts = fetch_posts(path.clone(), String::new()).await;
 
 	if posts.is_err() {
-		let s = ErrorTemplate {
-			message: posts.err().unwrap().to_string(),
-		}
-		.render()
-		.unwrap();
-		Ok(HttpResponse::Ok().status(StatusCode::NOT_FOUND).content_type("text/html").body(s))
+		error(posts.err().unwrap().to_string()).await
 	} else {
 		let items = posts.unwrap();
 

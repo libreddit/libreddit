@@ -1,6 +1,6 @@
 // CRATES
-use crate::utils::{fetch_posts, format_num, format_url, param, request, val, ErrorTemplate, Post, Subreddit};
-use actix_web::{http::StatusCode, HttpRequest, HttpResponse, Result};
+use crate::utils::{error, fetch_posts, format_num, format_url, param, request, val, Post, Subreddit};
+use actix_web::{HttpRequest, HttpResponse, Result};
 use askama::Template;
 use std::convert::TryInto;
 
@@ -29,12 +29,7 @@ pub async fn page(req: HttpRequest) -> Result<HttpResponse> {
 	let posts = fetch_posts(path.clone(), String::new()).await;
 
 	if posts.is_err() {
-		let s = ErrorTemplate {
-			message: posts.err().unwrap().to_string(),
-		}
-		.render()
-		.unwrap();
-		Ok(HttpResponse::Ok().status(StatusCode::NOT_FOUND).content_type("text/html").body(s))
+		error(posts.err().unwrap().to_string()).await
 	} else {
 		let sub = sub_result.unwrap_or(Subreddit::default());
 		let items = posts.unwrap();

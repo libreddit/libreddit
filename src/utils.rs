@@ -1,6 +1,8 @@
 //
 // CRATES
 //
+use actix_web::{http::StatusCode, HttpResponse, Result};
+use askama::Template;
 use chrono::{TimeZone, Utc};
 use serde_json::{from_str, Value};
 use url::Url;
@@ -81,7 +83,7 @@ pub struct Params {
 }
 
 // Error template
-#[derive(askama::Template)]
+#[derive(Template)]
 #[template(path = "error.html", escape = "none")]
 pub struct ErrorTemplate {
 	pub message: String,
@@ -201,6 +203,12 @@ pub async fn fetch_posts(path: String, fallback_title: String) -> Result<(Vec<Po
 //
 // NETWORKING
 //
+
+pub async fn error(message: String) -> Result<HttpResponse> {
+	let msg = if message.is_empty() { "Page not found".to_string() } else { message };
+	let body = ErrorTemplate { message: msg }.render().unwrap();
+	Ok(HttpResponse::Ok().status(StatusCode::NOT_FOUND).content_type("text/html").body(body))
+}
 
 // Make a request to a Reddit API and parse the JSON response
 pub async fn request(path: String) -> Result<serde_json::Value, &'static str> {
