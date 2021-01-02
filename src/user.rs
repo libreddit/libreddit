@@ -25,7 +25,7 @@ pub async fn profile(req: HttpRequest) -> Result<HttpResponse> {
 	// Request user profile data and user posts/comments from Reddit
 	let user = user(&username).await;
 	let posts = fetch_posts(&path, "Comment".to_string()).await;
-	
+
 	match posts {
 		Ok(items) => {
 			let s = UserTemplate {
@@ -37,9 +37,9 @@ pub async fn profile(req: HttpRequest) -> Result<HttpResponse> {
 			.render()
 			.unwrap();
 			Ok(HttpResponse::Ok().content_type("text/html").body(s))
-		},
+		}
 		// If there is an error show error page
-		Err(msg) => error(msg.to_string()).await
+		Err(msg) => error(msg.to_string()).await,
 	}
 }
 
@@ -53,9 +53,11 @@ async fn user(name: &str) -> Result<User, &'static str> {
 	// Send a request to the url
 	match request(&path).await {
 		// If success, receive JSON in response
-		Ok(response) => { res = response; },
+		Ok(response) => {
+			res = response;
+		}
 		// If the Reddit API returns an error, exit this function
-		Err(msg) => return Err(msg)
+		Err(msg) => return Err(msg),
 	}
 
 	// Grab creation date as unix timestamp

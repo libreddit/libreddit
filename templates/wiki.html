@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% import "utils.html" as utils %}
+
+{% block title %}
+	{% if sub != "" %}{{ sub }}
+	{% else %}Libreddit{% endif %}
+{% endblock %}
+
+{% block search %}
+	{% call utils::search(["/r/", sub.as_str()].concat(), "") %}
+{% endblock %}
+
+{% block body %}
+	<main>
+		<div id="column_one">
+			<div id="top">
+				<a href="/r/{{ sub }}">Posts</a>
+				<div>Wiki</div>
+			</div>
+			<div id="wiki">
+				{{ wiki }}
+			</div>
+		</div>
+	</main>
+{% endblock %}

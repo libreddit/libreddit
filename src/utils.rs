@@ -4,7 +4,7 @@
 use actix_web::{http::StatusCode, HttpResponse, Result};
 use askama::Template;
 use chrono::{TimeZone, Utc};
-use serde_json::{from_str};
+use serde_json::from_str;
 use url::Url;
 // use surf::{client, get, middleware::Redirect};
 
@@ -70,6 +70,7 @@ pub struct Subreddit {
 	pub icon: String,
 	pub members: String,
 	pub active: String,
+	pub wiki: bool,
 }
 
 // Parser for query params, used in sorting (eg. /r/rust/?sort=hot)
@@ -130,7 +131,7 @@ pub fn format_num(num: i64) -> String {
 
 // val() function used to parse JSON from Reddit APIs
 pub fn val(j: &serde_json::Value, k: &str) -> String {
-	String::from(j["data"][k].as_str().unwrap_or(""))
+	String::from(j["data"][k].as_str().unwrap_or_default())
 }
 
 // nested_val() function used to parse JSON from Reddit APIs
@@ -146,15 +147,17 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 	// Send a request to the url
 	match request(&path).await {
 		// If success, receive JSON in response
-		Ok(response) => { res = response; },
+		Ok(response) => {
+			res = response;
+		}
 		// If the Reddit API returns an error, exit this function
-		Err(msg) => return Err(msg)
+		Err(msg) => return Err(msg),
 	}
 
 	// Fetch the list of posts from the JSON response
 	match res["data"]["children"].as_array() {
-		Some(list) => { post_list = list },
-		None => { return Err("No posts found") }
+		Some(list) => post_list = list,
+		None => return Err("No posts found"),
 	}
 
 	let mut posts: Vec<Post> = Vec::new();
@@ -250,7 +253,7 @@ pub async fn request(path: &str) -> Result<serde_json::Value, &'static str> {
 					Err("Failed to parse page JSON data")
 				}
 			}
-		},
+		}
 		false => {
 			#[cfg(debug_assertions)]
 			dbg!(format!("{} - Page not found", url));

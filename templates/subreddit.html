@@ -66,15 +66,23 @@
 		{% if sub.name != "" %}
 		<aside>
 			<div id="subreddit">
-				<img id="subreddit_icon" src="{{ sub.icon }}">
-				<p id="subreddit_title">{{ sub.title }}</p>
-				<p id="subreddit_name">r/{{ sub.name }}</p>
-				<p id="subreddit_description">{{ sub.description }}</p>
-				<div id="subreddit_details">
-					<label>Members</label>
-					<label>Active</label>
-					<div>{{ sub.members }}</div>
-					<div>{{ sub.active }}</div>
+				{% if sub.wiki %}
+				<div id="top">
+					<div>Posts</div>
+					<a href="/r/{{ sub.name }}/wiki/index">Wiki</a>
+				</div>
+				{% endif %}
+				<div id="sub_meta">
+					<img id="sub_icon" src="{{ sub.icon }}">
+					<p id="sub_title">{{ sub.title }}</p>
+					<p id="sub_name">r/{{ sub.name }}</p>
+					<p id="sub_description">{{ sub.description }}</p>
+					<div id="sub_details">
+						<label>Members</label>
+						<label>Active</label>
+						<div>{{ sub.members }}</div>
+						<div>{{ sub.active }}</div>
+					</div>
 				</div>
 			</div>
 			<details id="sidebar">

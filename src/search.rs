@@ -38,7 +38,7 @@ pub async fn find(req: HttpRequest) -> Result<HttpResponse> {
 			.render()
 			.unwrap();
 			Ok(HttpResponse::Ok().content_type("text/html").body(s))
-		},
-		Err(msg) => error(msg.to_string()).await
+		}
+		Err(msg) => error(msg.to_string()).await,
 	}
 }

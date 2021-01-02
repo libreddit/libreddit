@@ -24,7 +24,6 @@
 
 body {
 	background: var(--background);
-	visibility: visible !important;
 }
 
 nav {
@@ -49,7 +48,11 @@ main {
 	margin: 20px auto;
 }
 
-#column_one { max-width: 750px; }
+#column_one {
+	max-width: 750px;
+	border-radius: 5px;
+	overflow: hidden;
+}
 
 footer {
 	display: flex;
@@ -100,9 +103,13 @@ aside {
 	height: max-content;
 	background: var(--outside);
 	border-radius: 5px;
+	overflow: hidden;
 }
 
 #user *, #subreddit * { text-align: center; }
+
+#subreddit { padding: 0; }
+#sub_meta { padding: 20px; }
 
 #sidebar, #sidebar_contents { margin-top: 20px; }
 
@@ -111,7 +118,7 @@ aside {
 	padding: 10px;
 }
 
-#user_icon, #subreddit_icon {
+#user_icon, #sub_icon {
 	width: 100px;
 	height: 100px;
 	border: 2px solid var(--accent);
@@ -120,28 +127,53 @@ aside {
 	margin: 10px;
 }
 
-#user_title, #subreddit_title {
+#user_title, #sub_title {
 	margin: 0 20px;
 	font-size: 20px;
 	font-weight: bold;
 }
 
-#user_description, #subreddit_description {
+#user_description, #sub_description {
 	margin: 0 20px;
 	font-size: 15px;
 }
 
-#user_name, #subreddit_name, #user_icon, #subreddit_icon, #user_description, #subreddit_description { margin-bottom: 20px; }
+#user_name, #sub_name, #user_icon, #sub_icon, #user_description, #sub_description { margin-bottom: 20px; }
 
-#user_details, #subreddit_details {
+#user_details, #sub_details {
 	display: grid;
 	grid-template-columns: repeat(2, 1fr);
 	grid-column-gap: 20px;
 }
 
-#user_details > label, #subreddit_details > label {
+#user_details > label, #sub_details > label {
 	color: var(--accent);
 	font-size: 15px;
+}
+
+/* Wiki Pages */
+
+#wiki {
+	background: var(--foreground);
+	padding: 35px;
+}
+
+#top {
+	background: var(--highlighted);
+	font-size: 18px;
+	width: 100%;
+	display: flex;
+}
+
+#top > * {
+	flex-grow: 1;
+	text-align: center;
+	height: 40px;
+	line-height: 40px;
+}
+
+#top > div {
+	border-bottom: 2px solid white;
 }
 
 /* Sorting and Search */
@@ -500,11 +532,11 @@ input[type="submit"]:hover { color: var(--accent); }
 }
 
 .md a {
-	text-decoration: underline;
 	color: var(--accent);
 }
 
 .md li { margin: 10px 0; }
+.toc_child { list-style: none; }
 
 .md pre {
 	background: var(--outside);
