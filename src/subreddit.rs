@@ -18,6 +18,7 @@ struct SubredditTemplate {
 struct WikiTemplate {
 	sub: String,
 	wiki: String,
+	page: String
 }
 
 // SERVICES
@@ -58,6 +59,7 @@ pub async fn wiki(req: HttpRequest) -> Result<HttpResponse> {
 			let s = WikiTemplate {
 				sub: sub.to_string(),
 				wiki: res["data"]["content_html"].as_str().unwrap().to_string(),
+				page: page.to_string()
 			}
 			.render()
 			.unwrap();
