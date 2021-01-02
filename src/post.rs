@@ -1,5 +1,5 @@
 // CRATES
-use crate::utils::{error, format_num, format_url, param, request, val, Comment, Flags, Flair, Post};
+use crate::utils::{error, format_num, format_url, param, request, rewrite_url, val, Comment, Flags, Flair, Post};
 use actix_web::{HttpRequest, HttpResponse, Result};
 
 use async_recursion::async_recursion;
@@ -79,7 +79,7 @@ async fn parse_post(json: &serde_json::Value) -> Result<Post, &'static str> {
 	let post = Post {
 		title: val(post_data, "title"),
 		community: val(post_data, "subreddit"),
-		body: val(post_data, "selftext_html"),
+		body: rewrite_url(&val(post_data, "selftext_html")).await,
 		author: val(post_data, "author"),
 		author_flair: Flair(
 			val(post_data, "author_flair_text"),
@@ -125,7 +125,7 @@ async fn parse_comments(json: &serde_json::Value) -> Result<Vec<Comment>, &'stat
 		}
 
 		let score = comment["data"]["score"].as_i64().unwrap_or(0);
-		let body = val(comment, "body_html");
+		let body = rewrite_url(&val(comment, "body_html")).await;
 
 		let replies: Vec<Comment> = if comment["data"]["replies"].is_object() {
 			parse_comments(&comment["data"]["replies"]).await.unwrap_or_default()

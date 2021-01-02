@@ -59,6 +59,8 @@ async fn main() -> std::io::Result<()> {
 			.route("/u/{username}/", web::get().to(user::profile))
 			.route("/user/{username}/", web::get().to(user::profile))
 			// WIKI SERVICES
+			.route("/wiki/", web::get().to(subreddit::wiki))
+			.route("/wiki/{page}/", web::get().to(subreddit::wiki))
 			.route("/r/{sub}/wiki/", web::get().to(subreddit::wiki))
 			.route("/r/{sub}/wiki/{page}/", web::get().to(subreddit::wiki))
 			// SUBREDDIT SERVICES

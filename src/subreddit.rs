@@ -1,5 +1,5 @@
 // CRATES
-use crate::utils::{error, fetch_posts, format_num, format_url, param, request, val, Post, Subreddit};
+use crate::utils::{error, fetch_posts, format_num, format_url, param, request, rewrite_url, val, Post, Subreddit};
 use actix_web::{HttpRequest, HttpResponse, Result};
 use askama::Template;
 
@@ -18,7 +18,7 @@ struct SubredditTemplate {
 struct WikiTemplate {
 	sub: String,
 	wiki: String,
-	page: String
+	page: String,
 }
 
 // SERVICES
@@ -50,7 +50,7 @@ pub async fn page(req: HttpRequest) -> Result<HttpResponse> {
 }
 
 pub async fn wiki(req: HttpRequest) -> Result<HttpResponse> {
-	let sub = req.match_info().get("sub").unwrap();
+	let sub = req.match_info().get("sub").unwrap_or("reddit.com");
 	let page = req.match_info().get("page").unwrap_or("index");
 	let path: String = format!("r/{}/wiki/{}.json?raw_json=1", sub, page);
 
@@ -58,8 +58,8 @@ pub async fn wiki(req: HttpRequest) -> Result<HttpResponse> {
 		Ok(res) => {
 			let s = WikiTemplate {
 				sub: sub.to_string(),
-				wiki: res["data"]["content_html"].as_str().unwrap().to_string(),
-				page: page.to_string()
+				wiki: rewrite_url(res["data"]["content_html"].as_str().unwrap()).await,
+				page: page.to_string(),
 			}
 			.render()
 			.unwrap();
@@ -90,7 +90,7 @@ async fn subreddit(sub: &str) -> Result<Subreddit, &'static str> {
 				name: val(&res, "display_name"),
 				title: val(&res, "title"),
 				description: val(&res, "public_description"),
-				info: val(&res, "description_html").replace("\\", ""),
+				info: rewrite_url(&val(&res, "description_html").replace("\\", "")).await,
 				icon: format_url(icon).await,
 				members: format_num(members),
 				active: format_num(active),

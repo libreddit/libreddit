@@ -4,6 +4,7 @@
 use actix_web::{http::StatusCode, HttpResponse, Result};
 use askama::Template;
 use chrono::{TimeZone, Utc};
+use regex::Regex;
 use serde_json::from_str;
 use url::Url;
 // use surf::{client, get, middleware::Redirect};
@@ -114,6 +115,12 @@ pub async fn format_url(url: String) -> String {
 	return url.to_string();
 }
 
+// Rewrite Reddit links to Libreddit in body of text
+pub async fn rewrite_url(text: &str) -> String {
+	let re = Regex::new(r#"href="(https://|http://|)(www.|)(reddit).(com)/"#).unwrap();
+	re.replace_all(text, r#"href="/"#).to_string()
+}
+
 // Append `m` and `k` for millions and thousands respectively
 pub fn format_num(num: i64) -> String {
 	if num > 1000000 {
@@ -175,7 +182,7 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 		posts.push(Post {
 			title: if title.is_empty() { fallback_title.to_owned() } else { title },
 			community: val(post, "subreddit"),
-			body: val(post, "body_html"),
+			body: rewrite_url(&val(post, "body_html")).await,
 			author: val(post, "author"),
 			author_flair: Flair(
 				val(post, "author_flair_text"),

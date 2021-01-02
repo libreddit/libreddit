@@ -1013,6 +1013,7 @@ dependencies = [
  "async-recursion",
  "base64 0.13.0",
  "chrono",
+ "regex",
  "reqwest",
  "serde",
  "serde_json",
