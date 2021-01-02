@@ -58,7 +58,7 @@ pub async fn wiki(req: HttpRequest) -> Result<HttpResponse> {
 		Ok(res) => {
 			let s = WikiTemplate {
 				sub: sub.to_string(),
-				wiki: rewrite_url(res["data"]["content_html"].as_str().unwrap()).await,
+				wiki: rewrite_url(res["data"]["content_html"].as_str().unwrap()),
 				page: page.to_string(),
 			}
 			.render()
@@ -90,8 +90,8 @@ async fn subreddit(sub: &str) -> Result<Subreddit, &'static str> {
 				name: val(&res, "display_name"),
 				title: val(&res, "title"),
 				description: val(&res, "public_description"),
-				info: rewrite_url(&val(&res, "description_html").replace("\\", "")).await,
-				icon: format_url(icon).await,
+				info: rewrite_url(&val(&res, "description_html").replace("\\", "")),
+				icon: format_url(icon),
 				members: format_num(members),
 				active: format_num(active),
 				wiki: res["data"]["wiki_enabled"].as_bool().unwrap_or_default(),

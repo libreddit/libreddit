@@ -47,13 +47,13 @@ async fn media(data: &serde_json::Value) -> (String, String) {
 	let post_type: &str;
 	let url = if !data["preview"]["reddit_video_preview"]["fallback_url"].is_null() {
 		post_type = "video";
-		format_url(data["preview"]["reddit_video_preview"]["fallback_url"].as_str().unwrap().to_string()).await
+		format_url(data["preview"]["reddit_video_preview"]["fallback_url"].as_str().unwrap().to_string())
 	} else if !data["secure_media"]["reddit_video"]["fallback_url"].is_null() {
 		post_type = "video";
-		format_url(data["secure_media"]["reddit_video"]["fallback_url"].as_str().unwrap().to_string()).await
+		format_url(data["secure_media"]["reddit_video"]["fallback_url"].as_str().unwrap().to_string())
 	} else if data["post_hint"].as_str().unwrap_or("") == "image" {
 		post_type = "image";
-		format_url(data["preview"]["images"][0]["source"]["url"].as_str().unwrap().to_string()).await
+		format_url(data["preview"]["images"][0]["source"]["url"].as_str().unwrap().to_string())
 	} else {
 		post_type = "link";
 		data["url"].as_str().unwrap().to_string()
@@ -79,7 +79,7 @@ async fn parse_post(json: &serde_json::Value) -> Result<Post, &'static str> {
 	let post = Post {
 		title: val(post_data, "title"),
 		community: val(post_data, "subreddit"),
-		body: rewrite_url(&val(post_data, "selftext_html")).await,
+		body: rewrite_url(&val(post_data, "selftext_html")),
 		author: val(post_data, "author"),
 		author_flair: Flair(
 			val(post_data, "author_flair_text"),
@@ -125,7 +125,7 @@ async fn parse_comments(json: &serde_json::Value) -> Result<Vec<Comment>, &'stat
 		}
 
 		let score = comment["data"]["score"].as_i64().unwrap_or(0);
-		let body = rewrite_url(&val(comment, "body_html")).await;
+		let body = rewrite_url(&val(comment, "body_html"));
 
 		let replies: Vec<Comment> = if comment["data"]["replies"].is_object() {
 			parse_comments(&comment["data"]["replies"]).await.unwrap_or_default()

@@ -103,7 +103,7 @@ pub fn param(path: &str, value: &str) -> String {
 }
 
 // Direct urls to proxy if proxy is enabled
-pub async fn format_url(url: String) -> String {
+pub fn format_url(url: String) -> String {
 	if url.is_empty() {
 		return String::new();
 	};
@@ -116,7 +116,7 @@ pub async fn format_url(url: String) -> String {
 }
 
 // Rewrite Reddit links to Libreddit in body of text
-pub async fn rewrite_url(text: &str) -> String {
+pub fn rewrite_url(text: &str) -> String {
 	let re = Regex::new(r#"href="(https://|http://|)(www.|)(reddit).(com)/"#).unwrap();
 	re.replace_all(text, r#"href="/"#).to_string()
 }
@@ -171,7 +171,7 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 
 	for post in post_list {
 		let img = if val(post, "thumbnail").starts_with("https:/") {
-			format_url(val(post, "thumbnail")).await
+			format_url(val(post, "thumbnail"))
 		} else {
 			String::new()
 		};
@@ -182,7 +182,7 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 		posts.push(Post {
 			title: if title.is_empty() { fallback_title.to_owned() } else { title },
 			community: val(post, "subreddit"),
-			body: rewrite_url(&val(post, "body_html")).await,
+			body: rewrite_url(&val(post, "body_html")),
 			author: val(post, "author"),
 			author_flair: Flair(
 				val(post, "author_flair_text"),

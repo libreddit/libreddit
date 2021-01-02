@@ -67,7 +67,7 @@ async fn user(name: &str) -> Result<User, &'static str> {
 	Ok(User {
 		name: name.to_string(),
 		title: nested_val(&res, "subreddit", "title"),
-		icon: format_url(nested_val(&res, "subreddit", "icon_img")).await,
+		icon: format_url(nested_val(&res, "subreddit", "icon_img")),
 		karma: res["data"]["total_karma"].as_i64().unwrap(),
 		created: Utc.timestamp(created, 0).format("%b %e, %Y").to_string(),
 		banner: nested_val(&res, "subreddit", "banner_img"),
