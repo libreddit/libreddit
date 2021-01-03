@@ -97,7 +97,7 @@ pub struct ErrorTemplate {
 
 // Grab a query param from a url
 pub fn param(path: &str, value: &str) -> String {
-	let url = Url::parse(format!("https://reddit.com/{}", path).as_str()).unwrap();
+	let url = Url::parse(format!("https://libredd.it/{}", path).as_str()).unwrap();
 	let pairs: std::collections::HashMap<_, _> = url.query_pairs().into_owned().collect();
 	pairs.get(value).unwrap_or(&String::new()).to_owned()
 }

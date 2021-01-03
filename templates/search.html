@@ -1,22 +1,22 @@
 {% extends "base.html" %}
 {% import "utils.html" as utils %}
 
-{% block title %}Libreddit: search results - {{ query }}{% endblock %}
+{% block title %}Libreddit: search results - {{ params.q }}{% endblock %}
 
 {% block content %}
 	<div id="column_one">
 		<form id="search_sort">
-			<input id="search" type="text" name="q" placeholder="Search" value="{{ query }}">
+			<input id="search" type="text" name="q" placeholder="Search" value="{{ params.q }}">
 			{% if sub != "" %}
 			<div id="inside">
-				<input type="checkbox" name="restrict_sr" id="restrict_sr">
+				<input type="checkbox" name="restrict_sr" id="restrict_sr" {% if params.restrict_sr != "" %}checked{% endif %}>
 				<label for="restrict_sr">in r/{{ sub }}</label>
 			</div>
 			{% endif %}
 			<select id="sort_options" name="sort">
-				{% call utils::options(sort.0, ["relevance", "hot", "top", "new", "comments"], "") %}
-			</select>{% if sort.0 != "new" %}<select id="timeframe" name="t"> 
-				{% call utils::options(sort.1, ["hour", "day", "week", "month", "year", "all"], "all") %}
+				{% call utils::options(params.sort, ["relevance", "hot", "top", "new", "comments"], "") %}
+			</select>{% if params.sort != "new" %}<select id="timeframe" name="t"> 
+				{% call utils::options(params.t, ["hour", "day", "week", "month", "year", "all"], "all") %}
 			</select>{% endif %}<input id="sort_submit" type="submit" value="&rarr;">
 		</form>
 		{% for post in posts %}
@@ -62,12 +62,16 @@
 		{% endfor %}
 
 		<footer>
-			{% if ends.0 != "" %}
-			<a href="?sort={{ sort.0 }}{% if sort.0 == "top" %}&t={{ sort.1 }}{% endif %}&before={{ ends.0 }}">PREV</a>
+			{% if params.before != "" %}
+			<a href="?q={{ params.q }}&restrict_sr={{ params.restrict_sr }}
+				&sort={{ params.sort }}&t={{ params.t }}
+				&before={{ params.before }}">PREV</a>
 			{% endif %}
 
-			{% if ends.1 != "" %}
-			<a href="?sort={{ sort.0 }}{% if sort.0 == "top" %}&t={{ sort.1 }}{% endif %}&after={{ ends.1 }}">NEXT</a>
+			{% if params.after != "" %}
+			<a href="?q={{ params.q }}&restrict_sr={{ params.restrict_sr }}
+				&sort={{ params.sort }}&t={{ params.t }}
+				&after={{ params.after }}">NEXT</a>
 			{% endif %}
 		</footer>
 	</div>

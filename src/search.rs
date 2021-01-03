@@ -4,20 +4,26 @@ use actix_web::{HttpRequest, HttpResponse};
 use askama::Template;
 
 // STRUCTS
+struct SearchParams {
+	q: String,
+	sort: String,
+	t: String,
+	before: String,
+	after: String,
+	restrict_sr: String,
+}
+
 #[derive(Template)]
 #[template(path = "search.html", escape = "none")]
 struct SearchTemplate {
 	posts: Vec<Post>,
-	query: String,
 	sub: String,
-	sort: (String, String),
-	ends: (String, String),
+	params: SearchParams,
 }
 
 // SERVICES
 pub async fn find(req: HttpRequest) -> HttpResponse {
 	let path = format!("{}.json?{}", req.path(), req.query_string());
-	let q = param(&path, "q");
 	let sort = if param(&path, "sort").is_empty() {
 		"relevance".to_string()
 	} else {
@@ -29,10 +35,15 @@ pub async fn find(req: HttpRequest) -> HttpResponse {
 		Ok(posts) => HttpResponse::Ok().content_type("text/html").body(
 			SearchTemplate {
 				posts: posts.0,
-				query: q,
 				sub,
-				sort: (sort, param(&path, "t")),
-				ends: (param(&path, "after"), posts.1),
+				params: SearchParams {
+					q: param(&path, "q"),
+					sort,
+					t: param(&path, "t"),
+					before: param(&path, "after"),
+					after: posts.1,
+					restrict_sr: param(&path, "restrict_sr"),
+				},
 			}
 			.render()
 			.unwrap(),
