@@ -14,7 +14,8 @@ struct UserTemplate {
 	ends: (String, String),
 }
 
-pub async fn profile(req: HttpRequest) -> Result<HttpResponse> {
+// FUNCTIONS
+pub async fn profile(req: HttpRequest) -> HttpResponse {
 	// Build the Reddit JSON API path
 	let path = format!("{}.json?{}&raw_json=1", req.path(), req.query_string());
 
@@ -36,7 +37,7 @@ pub async fn profile(req: HttpRequest) -> Result<HttpResponse> {
 			}
 			.render()
 			.unwrap();
-			Ok(HttpResponse::Ok().content_type("text/html").body(s))
+			HttpResponse::Ok().content_type("text/html").body(s)
 		}
 		// If there is an error show error page
 		Err(msg) => error(msg.to_string()).await,

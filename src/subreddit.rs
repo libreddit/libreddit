@@ -22,7 +22,7 @@ struct WikiTemplate {
 }
 
 // SERVICES
-pub async fn page(req: HttpRequest) -> Result<HttpResponse> {
+pub async fn page(req: HttpRequest) -> HttpResponse {
 	let path = format!("{}.json?{}", req.path(), req.query_string());
 	let sub = req.match_info().get("sub").unwrap_or("popular").to_string();
 	let sort = req.match_info().get("sort").unwrap_or("hot").to_string();
@@ -43,13 +43,13 @@ pub async fn page(req: HttpRequest) -> Result<HttpResponse> {
 			}
 			.render()
 			.unwrap();
-			Ok(HttpResponse::Ok().content_type("text/html").body(s))
+			HttpResponse::Ok().content_type("text/html").body(s)
 		}
 		Err(msg) => error(msg.to_string()).await,
 	}
 }
 
-pub async fn wiki(req: HttpRequest) -> Result<HttpResponse> {
+pub async fn wiki(req: HttpRequest) -> HttpResponse {
 	let sub = req.match_info().get("sub").unwrap_or("reddit.com");
 	let page = req.match_info().get("page").unwrap_or("index");
 	let path: String = format!("r/{}/wiki/{}.json?raw_json=1", sub, page);
@@ -63,7 +63,7 @@ pub async fn wiki(req: HttpRequest) -> Result<HttpResponse> {
 			}
 			.render()
 			.unwrap();
-			Ok(HttpResponse::Ok().content_type("text/html").body(s))
+			HttpResponse::Ok().content_type("text/html").body(s)
 		}
 		Err(msg) => error(msg.to_string()).await,
 	}

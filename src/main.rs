@@ -5,6 +5,7 @@ use actix_web::{get, middleware::NormalizePath, web, App, HttpResponse, HttpServ
 mod post;
 mod proxy;
 mod search;
+// mod settings;
 mod subreddit;
 mod user;
 mod utils;
@@ -50,6 +51,9 @@ async fn main() -> std::io::Result<()> {
 			.route("/style.css/", web::get().to(style))
 			.route("/favicon.ico/", web::get().to(HttpResponse::Ok))
 			.route("/robots.txt/", web::get().to(robots))
+			// SETTINGS SERVICE
+			// .route("/settings/", web::get().to(settings::get))
+			// .route("/settings/save/", web::post().to(settings::set))
 			// PROXY SERVICE
 			.route("/proxy/{url:.*}/", web::get().to(proxy::handler))
 			// SEARCH SERVICES

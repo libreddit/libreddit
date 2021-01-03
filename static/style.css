@@ -599,8 +599,15 @@ td, th {
 }
 
 @media screen and (max-width: 800px) {
-	main { flex-direction: column-reverse; }
-	nav { flex-direction: column; }
+	main {
+		flex-direction: column-reverse;
+		padding: 10px;
+		margin: 10px 0;
+	}
+	nav {
+		flex-direction: column;
+		margin: 10px;
+	}
 
 	aside, #subreddit, #user {
 		margin: 0;

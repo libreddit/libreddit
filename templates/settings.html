@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% import "utils.html" as utils %}
+
+{% block title %}Libreddit Settings{% endblock %}
+
+{% block search %}
+	{% call utils::search("".to_owned(), "", "") %}
+{% endblock %}
+
+{% block body %}
+	<main>
+		<form action="/settings/save" method="POST">
+			<label for="pref_nsfw">NSFW</label>
+			<input type="checkbox" name="pref_nsfw" id="pref_nsfw" {% if pref_nsfw == "on" %}checked{% endif %}>
+			<input id="sort_submit" type="submit" value="&rarr;">
+		</form>
+	</main>
+{% endblock %}

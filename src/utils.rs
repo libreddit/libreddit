@@ -1,16 +1,16 @@
+// use std::collections::HashMap;
+
 //
 // CRATES
 //
-use actix_web::{http::StatusCode, HttpResponse, Result};
+use actix_web::{HttpResponse, Result};
 use askama::Template;
+use base64::encode;
 use chrono::{TimeZone, Utc};
 use regex::Regex;
 use serde_json::from_str;
 use url::Url;
 // use surf::{client, get, middleware::Redirect};
-
-#[cfg(feature = "proxy")]
-use base64::encode;
 
 //
 // STRUCTS
@@ -102,17 +102,31 @@ pub fn param(path: &str, value: &str) -> String {
 	pairs.get(value).unwrap_or(&String::new()).to_owned()
 }
 
+// Cookies from request
+// pub fn cookies(req: HttpRequest) -> HashMap<String, String> {
+// 	let mut result: HashMap<String, String> = HashMap::new();
+
+// 	let cookies: Vec<Cookie> = req
+// 		.headers()
+// 		.get_all("Cookie")
+// 		.map(|value| value.to_str().unwrap())
+// 		.map(|unparsed| Cookie::parse(unparsed).unwrap())
+// 		.collect();
+
+// 	for cookie in cookies {
+// 		result.insert(cookie.name().to_string(), cookie.value().to_string());
+// 	}
+
+// 	result
+// }
+
 // Direct urls to proxy if proxy is enabled
 pub fn format_url(url: String) -> String {
 	if url.is_empty() {
 		return String::new();
 	};
 
-	#[cfg(feature = "proxy")]
-	return "/proxy/".to_string() + encode(url).as_str();
-
-	#[cfg(not(feature = "proxy"))]
-	return url.to_string();
+	format!("/proxy/{}", encode(url).as_str())
 }
 
 // Rewrite Reddit links to Libreddit in body of text
@@ -217,10 +231,10 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 // NETWORKING
 //
 
-pub async fn error(message: String) -> Result<HttpResponse> {
+pub async fn error(message: String) -> HttpResponse {
 	let msg = if message.is_empty() { "Page not found".to_string() } else { message };
 	let body = ErrorTemplate { message: msg }.render().unwrap_or_default();
-	Ok(HttpResponse::Ok().status(StatusCode::NOT_FOUND).content_type("text/html").body(body))
+	HttpResponse::NotFound().content_type("text/html").body(body)
 }
 
 // Make a request to a Reddit API and parse the JSON response

@@ -16,7 +16,7 @@ struct PostTemplate {
 	sort: String,
 }
 
-pub async fn item(req: HttpRequest) -> Result<HttpResponse> {
+pub async fn item(req: HttpRequest) -> HttpResponse {
 	let path = format!("{}.json?{}&raw_json=1", req.path(), req.query_string());
 	let sort = param(&path, "sort");
 	let id = req.match_info().get("id").unwrap_or("").to_string();
@@ -35,7 +35,7 @@ pub async fn item(req: HttpRequest) -> Result<HttpResponse> {
 
 			// Use the Post and Comment structs to generate a website to show users
 			let s = PostTemplate { comments, post, sort }.render().unwrap();
-			Ok(HttpResponse::Ok().content_type("text/html").body(s))
+			HttpResponse::Ok().content_type("text/html").body(s)
 		}
 		// If the Reddit API returns an error, exit and send error page to user
 		Err(msg) => error(msg.to_string()).await,

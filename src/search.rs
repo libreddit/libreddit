@@ -1,11 +1,10 @@
 // CRATES
 use crate::utils::{error, fetch_posts, param, Post};
-use actix_web::{HttpRequest, HttpResponse, Result};
+use actix_web::{HttpRequest, HttpResponse};
 use askama::Template;
 
 // STRUCTS
 #[derive(Template)]
-#[allow(dead_code)]
 #[template(path = "search.html", escape = "none")]
 struct SearchTemplate {
 	posts: Vec<Post>,
@@ -16,7 +15,7 @@ struct SearchTemplate {
 }
 
 // SERVICES
-pub async fn find(req: HttpRequest) -> Result<HttpResponse> {
+pub async fn find(req: HttpRequest) -> HttpResponse {
 	let path = format!("{}.json?{}", req.path(), req.query_string());
 	let q = param(&path, "q");
 	let sort = if param(&path, "sort").is_empty() {
@@ -27,8 +26,8 @@ pub async fn find(req: HttpRequest) -> Result<HttpResponse> {
 	let sub = req.match_info().get("sub").unwrap_or("").to_string();
 
 	match fetch_posts(&path, String::new()).await {
-		Ok(posts) => {
-			let s = SearchTemplate {
+		Ok(posts) => HttpResponse::Ok().content_type("text/html").body(
+			SearchTemplate {
 				posts: posts.0,
 				query: q,
 				sub,
@@ -36,9 +35,8 @@ pub async fn find(req: HttpRequest) -> Result<HttpResponse> {
 				ends: (param(&path, "after"), posts.1),
 			}
 			.render()
-			.unwrap();
-			Ok(HttpResponse::Ok().content_type("text/html").body(s))
-		}
+			.unwrap(),
+		),
 		Err(msg) => error(msg.to_string()).await,
 	}
 }
