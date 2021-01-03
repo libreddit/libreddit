@@ -606,7 +606,7 @@ td, th {
 	}
 	nav {
 		flex-direction: column;
-		margin: 10px;
+		padding: 10px;
 	}
 
 	aside, #subreddit, #user {
