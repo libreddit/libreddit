@@ -5,10 +5,15 @@ use base64::decode;
 
 pub async fn handler(web::Path(b64): web::Path<String>) -> Result<HttpResponse> {
 	let domains = vec![
+		// THUMBNAILS
 		"a.thumbs.redditmedia.com",
 		"b.thumbs.redditmedia.com",
+		// ICONS
+		"styles.redditmedia.com",
+		// PREVIEWS
 		"preview.redd.it",
 		"external-preview.redd.it",
+		// MEDIA
 		"i.redd.it",
 		"v.redd.it",
 	];
