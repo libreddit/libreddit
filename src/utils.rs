@@ -25,13 +25,15 @@ pub struct Flags {
 
 // Post containing content, metadata and media
 pub struct Post {
+	pub id: String,
 	pub title: String,
 	pub community: String,
 	pub body: String,
 	pub author: String,
 	pub author_flair: Flair,
-	pub url: String,
+	pub permalink: String,
 	pub score: String,
+	pub upvote_ratio: i64,
 	pub post_type: String,
 	pub flair: Flair,
 	pub flags: Flags,
@@ -191,9 +193,11 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 		};
 		let unix_time: i64 = post["data"]["created_utc"].as_f64().unwrap_or_default().round() as i64;
 		let score = post["data"]["score"].as_i64().unwrap_or_default();
+		let ratio: f64 = post["data"]["upvote_ratio"].as_f64().unwrap_or(1.0) * 100.0;
 		let title = val(post, "title");
 
 		posts.push(Post {
+			id: val(post, "id"),
 			title: if title.is_empty() { fallback_title.to_owned() } else { title },
 			community: val(post, "subreddit"),
 			body: rewrite_url(&val(post, "body_html")),
@@ -204,6 +208,7 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 				val(post, "author_flair_text_color"),
 			),
 			score: format_num(score),
+			upvote_ratio: ratio as i64,
 			post_type: "link".to_string(),
 			media: img,
 			flair: Flair(
@@ -219,7 +224,7 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 				nsfw: post["data"]["over_18"].as_bool().unwrap_or(false),
 				stickied: post["data"]["stickied"].as_bool().unwrap_or(false),
 			},
-			url: val(post, "permalink"),
+			permalink: val(post, "permalink"),
 			time: Utc.timestamp(unix_time, 0).format("%b %e '%y").to_string(),
 		});
 	}

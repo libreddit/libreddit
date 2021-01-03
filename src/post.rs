@@ -64,48 +64,49 @@ async fn media(data: &serde_json::Value) -> (String, String) {
 // POSTS
 async fn parse_post(json: &serde_json::Value) -> Result<Post, &'static str> {
 	// Retrieve post (as opposed to comments) from JSON
-	let post_data: &serde_json::Value = &json["data"]["children"][0];
+	let post: &serde_json::Value = &json["data"]["children"][0];
 
 	// Grab UTC time as unix timestamp
-	let unix_time: i64 = post_data["data"]["created_utc"].as_f64().unwrap().round() as i64;
-	// Parse post score
-	let score = post_data["data"]["score"].as_i64().unwrap();
+	let unix_time: i64 = post["data"]["created_utc"].as_f64().unwrap().round() as i64;
+	// Parse post score and upvote ratio
+	let score = post["data"]["score"].as_i64().unwrap();
+	let ratio: f64 = post["data"]["upvote_ratio"].as_f64().unwrap_or(1.0) * 100.0;
 
 	// Determine the type of media along with the media URL
-	let media = media(&post_data["data"]).await;
+	let media = media(&post["data"]).await;
 
 	// Build a post using data parsed from Reddit post API
-	let post = Post {
-		title: val(post_data, "title"),
-		community: val(post_data, "subreddit"),
-		body: rewrite_url(&val(post_data, "selftext_html")),
-		author: val(post_data, "author"),
+	Ok(Post {
+		id: val(post, "id"),
+		title: val(post, "title"),
+		community: val(post, "subreddit"),
+		body: rewrite_url(&val(post, "selftext_html")),
+		author: val(post, "author"),
 		author_flair: Flair(
-			val(post_data, "author_flair_text"),
-			val(post_data, "author_flair_background_color"),
-			val(post_data, "author_flair_text_color"),
+			val(post, "author_flair_text"),
+			val(post, "author_flair_background_color"),
+			val(post, "author_flair_text_color"),
 		),
-		url: val(post_data, "permalink"),
+		permalink: val(post, "permalink"),
 		score: format_num(score),
+		upvote_ratio: ratio as i64,
 		post_type: media.0,
 		flair: Flair(
-			val(post_data, "link_flair_text"),
-			val(post_data, "link_flair_background_color"),
-			if val(post_data, "link_flair_text_color") == "dark" {
+			val(post, "link_flair_text"),
+			val(post, "link_flair_background_color"),
+			if val(post, "link_flair_text_color") == "dark" {
 				"black".to_string()
 			} else {
 				"white".to_string()
 			},
 		),
 		flags: Flags {
-			nsfw: post_data["data"]["over_18"].as_bool().unwrap_or(false),
-			stickied: post_data["data"]["stickied"].as_bool().unwrap_or(false),
+			nsfw: post["data"]["over_18"].as_bool().unwrap_or(false),
+			stickied: post["data"]["stickied"].as_bool().unwrap_or(false),
 		},
 		media: media.1,
 		time: Utc.timestamp(unix_time, 0).format("%b %e %Y %H:%M UTC").to_string(),
-	};
-
-	Ok(post)
+	})
 }
 
 // COMMENTS

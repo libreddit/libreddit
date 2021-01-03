@@ -48,7 +48,7 @@
 					{% endif %}
 					<span class="datetime">{{ post.time }}</span>
 				</p>
-				<a href="{{ post.url }}" class="post_title">
+				<a href="{{ post.permalink }}" class="post_title">
 					{{ post.title }}
 					{% if post.flair.0 != "" %}
 						<small class="post_flair" style="color:{{ post.flair.2 }}; background:{{ post.flair.1 }}">{{ post.flair.0 }}</small>
@@ -62,6 +62,13 @@
 				<a id="post_url" href="{{ post.media }}">{{ post.media }}</a>
 				{% endif %}
 				<div class="post_body">{{ post.body }}</div>
+				<div id="post_footer">
+					<ul id="post_links">
+						<li><a href="/{{ post.id }}">permalink</a></li>
+						<li><a href="https://reddit.com/{{ post.id }}">reddit</a></li>
+					</ul>
+					<p>{{ post.upvote_ratio }}% Upvoted</p>
+				</div>
 			</div>
 		</div>
 		<form id="sort">
@@ -83,7 +90,7 @@
 									{% for reply3 in reply2.replies %}
 										{% call comment(reply3) %}
 										{% if reply3.replies.len() > 0 %}
-											<a class="deeper_replies" href="{{ post.url }}{{ reply3.id }}">&rarr; More replies</a>
+											<a class="deeper_replies" href="{{ post.permalink }}{{ reply3.id }}">&rarr; More replies</a>
 										{% endif %}
 										</details></div>
 									{% endfor %}

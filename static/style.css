@@ -326,6 +326,24 @@ input[type="submit"]:hover { color: var(--accent); }
 	font-size: 16px;
 }
 
+#post_footer {
+	display: flex;
+	justify-content: space-between;
+	opacity: 0.5;
+	font-size: 14px;
+}
+
+#post_links {
+	display: flex;
+	list-style: none;
+	padding: 0;
+	font-weight: bold;
+}
+
+#post_links > li {
+	margin-right: 15px;
+}
+
 .nsfw {
 	color: #FF5C5D;
 	margin-top: 20px;
