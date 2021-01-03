@@ -19,11 +19,10 @@ struct PostTemplate {
 pub async fn item(req: HttpRequest) -> HttpResponse {
 	let path = format!("{}.json?{}&raw_json=1", req.path(), req.query_string());
 	let sort = param(&path, "sort");
-	let id = req.match_info().get("id").unwrap_or("").to_string();
 
 	// Log the post ID being fetched in debug mode
 	#[cfg(debug_assertions)]
-	dbg!(&id);
+	dbg!(req.match_info().get("id").unwrap_or(""));
 
 	// Send a request to the url, receive JSON in response
 	match request(&path).await {
