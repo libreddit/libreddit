@@ -10,6 +10,7 @@ pub async fn handler(web::Path(b64): web::Path<String>) -> Result<HttpResponse> 
 		"b.thumbs.redditmedia.com",
 		// ICONS
 		"styles.redditmedia.com",
+		"www.redditstatic.com",
 		// PREVIEWS
 		"preview.redd.it",
 		"external-preview.redd.it",
