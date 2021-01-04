@@ -69,10 +69,10 @@ async fn main() -> std::io::Result<()> {
 			.route("/r/{sub}/wiki/{page}/", web::get().to(subreddit::wiki))
 			// SUBREDDIT SERVICES
 			.route("/r/{sub}/", web::get().to(subreddit::page))
-			.route("/r/{sub}/{sort:hot|new|top|rising}/", web::get().to(subreddit::page))
+			.route("/r/{sub}/{sort:hot|new|top|rising|controversial}/", web::get().to(subreddit::page))
 			// POPULAR SERVICES
 			.route("/", web::get().to(subreddit::page))
-			.route("/{sort:best|hot|new|top|rising}/", web::get().to(subreddit::page))
+			.route("/{sort:best|hot|new|top|rising|controversial}/", web::get().to(subreddit::page))
 			// POST SERVICES
 			.route("/{id:.{5,6}}/", web::get().to(post::item))
 			.route("/r/{sub}/comments/{id}/{title}/", web::get().to(post::item))
