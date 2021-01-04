@@ -13,8 +13,8 @@
 	<meta name="author" content="u/{{ post.author }}">
 {% endblock %}
 
+<!-- OPEN COMMENT MACRO -->
 {% macro comment(item) -%}
-
 <div id="{{ item.id }}" class="comment">
 	<div class="comment_left">
 		<p class="comment_score">{{ item.score }}</p>
@@ -28,18 +28,24 @@
 			&bull; <span class="datetime">{{ item.time }}</span>
 		</summary>
 		<p class="comment_body">{{ item.body }}</p>
-
 {%- endmacro %}
+
+<!-- CLOSE COMMENT MACRO -->
+{% macro close() %}
+</details></div>
+{% endmacro %}
 
 {% block content %}
 	<div id="column_one">
-		<div class="post highlighted">
+
+		<!-- POST CONTENT -->
+		<div class="post highlighted panel">
 			<div class="post_left">
 				<p class="post_score">{{ post.score }}</p>
 				{% if post.flags.nsfw %}<div class="nsfw">NSFW</div>{% endif %}
 			</div>
 			<div class="post_right">
-				<p>
+				<p class="post_header">
 					<b><a class="post_subreddit" href="/r/{{ post.community }}">r/{{ post.community }}</a></b>
 					&bull;
 					<a class="post_author" href="/u/{{ post.author }}">u/{{ post.author }}</a>
@@ -71,35 +77,38 @@
 				</div>
 			</div>
 		</div>
+
+		<!-- SORT FORM -->
 		<form id="sort">
 			<select name="sort"> 
 				{% call utils::options(sort, ["confidence", "top", "new", "controversial", "old"], "") %}
 			</select><input id="sort_submit" type="submit" value="&rarr;">
 		</form>
 
+		<!-- COMMENTS -->
 		{% for c in comments -%}
-			<div class="thread">
-				{% call comment(c) %}
-				<div class="replies">
-					{% for reply1 in c.replies %}
-						{% call comment(reply1) %}
-						<div class="replies">
-							{% for reply2 in reply1.replies %}
-								{% call comment(reply2) %}
-								<div class="replies">
-									{% for reply3 in reply2.replies %}
-										{% call comment(reply3) %}
-										{% if reply3.replies.len() > 0 %}
-											<a class="deeper_replies" href="{{ post.permalink }}{{ reply3.id }}">&rarr; More replies</a>
-										{% endif %}
-										</details></div>
-									{% endfor %}
-								</div></details></div>
-							{% endfor %}
-						</div></details></div>
+		<div class="thread">
+			<!-- EACH COMMENT -->
+			{% call comment(c) %}
+			<div class="replies">{% for reply1 in c.replies %}{% call comment(reply1) %}
+				<!-- FIRST-LEVEL REPLIES -->
+				<div class="replies">{% for reply2 in reply1.replies %}{% call comment(reply2) %}
+					<!-- SECOND-LEVEL REPLIES -->
+					<div class="replies">{% for reply3 in reply2.replies %}{% call comment(reply3) %}
+						<!-- THIRD-LEVEL REPLIES -->
+						{% if reply3.replies.len() > 0 %}
+							<!-- LINK TO CONTINUE REPLIES -->
+							<a class="deeper_replies" href="{{ post.permalink }}{{ reply3.id }}">&rarr; More replies</a>
+						{% endif %}
+						{% call close() %}
 					{% endfor %}
-				</div></details></div>
-			</div>
+					</div>{% call close() %}
+				{% endfor %}
+				</div>{% call close() %}
+			{% endfor %}
+			</div>{% call close() %}
+		</div>
 		{%- endfor %}
+
 	</div>
 {% endblock %}

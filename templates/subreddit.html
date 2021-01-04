@@ -28,13 +28,13 @@
 				</select>{% endif %}
 			</form>
 			{% for post in posts %}
-			<div class="post {% if post.flags.stickied %}stickied{% endif %}">
+			<div class="post {% if post.flags.stickied %}stickied{% endif %} panel">
 				<div class="post_left">
 					<p class="post_score">{{ post.score }}</p>
 					{% if post.flags.nsfw %}<div class="nsfw">NSFW</div>{% endif %}
 				</div>
 				<div class="post_right">
-					<p>
+					<p class="post_header">
 						<b><a class="post_subreddit" href="/r/{{ post.community }}">r/{{ post.community }}</a></b>
 						&bull; <a class="post_author" href="/u/{{ post.author }}">u/{{ post.author }}</a>
 						{% if post.author_flair.0 != "" %}
@@ -50,7 +50,7 @@
 					</p>
 				</div>
 				<img class="post_thumbnail" src="{{ post.media }}">
-			</div><br>
+			</div>
 			{% endfor %}
 
 			<footer>
@@ -65,7 +65,7 @@
 		</div>
 		{% if sub.name != "" %}
 		<aside>
-			<div id="subreddit">
+			<div class="panel" id="subreddit">
 				{% if sub.wiki %}
 				<div id="top">
 					<div>Posts</div>
@@ -85,7 +85,7 @@
 					</div>
 				</div>
 			</div>
-			<details id="sidebar">
+			<details class="panel" id="sidebar">
 				<summary id="sidebar_label">Sidebar</summary>
 				<div id="sidebar_contents">{{ sub.info }}</div>
 			</details>

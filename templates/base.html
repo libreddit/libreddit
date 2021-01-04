@@ -12,12 +12,14 @@
 		{% endblock %}
 		</head>
 	<body>
+		<!-- NAVIGATION BAR -->
 		<nav>
 			<a id="logo" href="/"><span id="lib">lib</span>reddit. <span id="version">v{{ env!("CARGO_PKG_VERSION") }}</span></a>
 			{% block search %}{% endblock %}
 			<a id="github" href="https://github.com/spikecodes/libreddit">GITHUB</a>
 		</nav>
 		
+		<!-- MAIN CONTENT -->
 		{% block body %}
 		<main>
 			{% block content %}

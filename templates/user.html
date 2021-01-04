@@ -18,13 +18,13 @@
 			</form>
 			{% for post in posts %}
 			{% if post.title != "Comment" %}
-			<div class='post'>
+			<div class="post panel">
 				<div class="post_left">
 					<p class="post_score">{{ post.score }}</p>
 					{% if post.flags.nsfw %}<div class="nsfw">NSFW</div>{% endif %}
 				</div>
 				<div class="post_right">
-					<p>
+					<p class="post_header">
 						<b><a class="post_subreddit" href="/r/{{ post.community }}">r/{{ post.community }}</a></b>
 						&bull; <a class="post_author" href="/u/{{ post.author }}">u/{{ post.author }}</a>
 						{% if post.author_flair.0 != "" %}
@@ -42,7 +42,7 @@
 					</p>
 				</div>
 				<img class="post_thumbnail" src="{{ post.media }}">
-			</div><br>
+			</div>
 			{% else %}
 			<div class="comment">
 				<div class="comment_left">
@@ -56,7 +56,7 @@
 					</summary>
 					<p class="comment_body">{{ post.body }}</p>
 				</details>
-			</div><br>
+			</div>
 			{% endif %}
 			{% endfor %}
 			<footer>
@@ -70,7 +70,7 @@
 			</footer>
 		</div>
 		<aside>
-			<div id="user">
+			<div class="panel" id="user">
 				<img id="user_icon" src="{{ user.icon }}">
 				<p id="user_title">{{ user.title }}</p>
 				<p id="user_name">u/{{ user.name }}</p>
