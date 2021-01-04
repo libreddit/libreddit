@@ -22,7 +22,7 @@
 						{% call utils::sort(["/r/", sub.name.as_str()].concat(), ["hot", "new", "top", "rising", "controversial"], sort.0) %}
 					{% endif %}
 				</div>
-				{% if sort.0 == "top" %}<select id="timeframe" name="t"> 
+				{% if sort.0 == "top" || sort.0 == "controversial" %}<select id="timeframe" name="t"> 
 					{% call utils::options(sort.1, ["hour", "day", "week", "month", "year", "all"], "day") %}
 					<input id="sort_submit" type="submit" value="&rarr;">
 				</select>{% endif %}
