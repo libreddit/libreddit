@@ -58,7 +58,7 @@ pub async fn wiki(req: HttpRequest) -> HttpResponse {
 		Ok(res) => {
 			let s = WikiTemplate {
 				sub: sub.to_string(),
-				wiki: rewrite_url(res["data"]["content_html"].as_str().unwrap()),
+				wiki: rewrite_url(res["data"]["content_html"].as_str().unwrap_or_default()),
 				page: page.to_string(),
 			}
 			.render()

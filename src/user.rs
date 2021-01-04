@@ -62,14 +62,14 @@ async fn user(name: &str) -> Result<User, &'static str> {
 	}
 
 	// Grab creation date as unix timestamp
-	let created: i64 = res["data"]["created"].as_f64().unwrap().round() as i64;
+	let created: i64 = res["data"]["created"].as_f64().unwrap_or(0.0).round() as i64;
 
 	// Parse the JSON output into a User struct
 	Ok(User {
 		name: name.to_string(),
 		title: nested_val(&res, "subreddit", "title"),
 		icon: format_url(nested_val(&res, "subreddit", "icon_img")),
-		karma: res["data"]["total_karma"].as_i64().unwrap(),
+		karma: res["data"]["total_karma"].as_i64().unwrap_or(0),
 		created: Utc.timestamp(created, 0).format("%b %e, %Y").to_string(),
 		banner: nested_val(&res, "subreddit", "banner_img"),
 		description: nested_val(&res, "subreddit", "public_description"),

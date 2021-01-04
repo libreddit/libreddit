@@ -21,7 +21,7 @@ pub async fn handler(web::Path(b64): web::Path<String>) -> Result<HttpResponse> 
 
 	match decode(b64) {
 		Ok(bytes) => {
-			let media = String::from_utf8(bytes).unwrap();
+			let media = String::from_utf8(bytes).unwrap_or_default();
 
 			match Url::parse(media.as_str()) {
 				Ok(url) => {

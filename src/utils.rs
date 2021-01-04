@@ -266,24 +266,32 @@ pub async fn request(path: &str) -> Result<serde_json::Value, &'static str> {
 	// let body = res.body_string().await.unwrap();
 
 	// --- reqwest ---
-	let res = reqwest::get(&url).await.unwrap();
-	// Read the status from the response
-	match res.status().is_success() {
-		true => {
-			// Parse the response from Reddit as JSON
-			match from_str(res.text().await.unwrap_or_default().as_str()) {
-				Ok(json) => Ok(json),
-				Err(_) => {
+	match reqwest::get(&url).await {
+		Ok(res) => {
+			// Read the status from the response
+			match res.status().is_success() {
+				true => {
+					// Parse the response from Reddit as JSON
+					match from_str(res.text().await.unwrap_or_default().as_str()) {
+						Ok(json) => Ok(json),
+						Err(_) => {
+							#[cfg(debug_assertions)]
+							dbg!(format!("{} - Failed to parse page JSON data", url));
+							Err("Failed to parse page JSON data")
+						}
+					}
+				}
+				false => {
 					#[cfg(debug_assertions)]
-					dbg!(format!("{} - Failed to parse page JSON data", url));
-					Err("Failed to parse page JSON data")
+					dbg!(format!("{} - Page not found", url));
+					Err("Page not found")
 				}
 			}
-		}
-		false => {
+		},
+		Err(e) => {
 			#[cfg(debug_assertions)]
-			dbg!(format!("{} - Page not found", url));
-			Err("Page not found")
+			dbg!(format!("{} - {}", url, e));
+			Err("Couldn't send request to Reddit")
 		}
 	}
 }

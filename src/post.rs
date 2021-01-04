@@ -46,16 +46,16 @@ async fn media(data: &serde_json::Value) -> (String, String) {
 	let post_type: &str;
 	let url = if !data["preview"]["reddit_video_preview"]["fallback_url"].is_null() {
 		post_type = "video";
-		format_url(data["preview"]["reddit_video_preview"]["fallback_url"].as_str().unwrap().to_string())
+		format_url(data["preview"]["reddit_video_preview"]["fallback_url"].as_str().unwrap_or_default().to_string())
 	} else if !data["secure_media"]["reddit_video"]["fallback_url"].is_null() {
 		post_type = "video";
-		format_url(data["secure_media"]["reddit_video"]["fallback_url"].as_str().unwrap().to_string())
+		format_url(data["secure_media"]["reddit_video"]["fallback_url"].as_str().unwrap_or_default().to_string())
 	} else if data["post_hint"].as_str().unwrap_or("") == "image" {
 		post_type = "image";
-		format_url(data["preview"]["images"][0]["source"]["url"].as_str().unwrap().to_string())
+		format_url(data["preview"]["images"][0]["source"]["url"].as_str().unwrap_or_default().to_string())
 	} else {
 		post_type = "link";
-		data["url"].as_str().unwrap().to_string()
+		data["url"].as_str().unwrap_or_default().to_string()
 	};
 
 	(post_type.to_string(), url)
@@ -67,9 +67,9 @@ async fn parse_post(json: &serde_json::Value) -> Result<Post, &'static str> {
 	let post: &serde_json::Value = &json["data"]["children"][0];
 
 	// Grab UTC time as unix timestamp
-	let unix_time: i64 = post["data"]["created_utc"].as_f64().unwrap().round() as i64;
+	let unix_time: i64 = post["data"]["created_utc"].as_f64().unwrap_or_default().round() as i64;
 	// Parse post score and upvote ratio
-	let score = post["data"]["score"].as_i64().unwrap();
+	let score = post["data"]["score"].as_i64().unwrap_or_default();
 	let ratio: f64 = post["data"]["upvote_ratio"].as_f64().unwrap_or(1.0) * 100.0;
 
 	// Determine the type of media along with the media URL
