@@ -124,7 +124,7 @@ pub fn param(path: &str, value: &str) -> String {
 
 // Direct urls to proxy if proxy is enabled
 pub fn format_url(url: String) -> String {
-	if url.is_empty() || url == "self" || url == "default" {
+	if url.is_empty() || url == "self" || url == "default" || url == "nsfw" {
 		String::new()
 	} else {
 		format!("/proxy/{}", encode(url).as_str())
