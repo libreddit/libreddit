@@ -391,6 +391,7 @@ input[type="submit"]:hover { color: var(--accent); }
 .post_media {
 	max-width: 90%;
 	align-self: center;
+	margin-top: 15px;
 }
 
 .post_body {

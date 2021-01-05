@@ -1006,7 +1006,7 @@ checksum = "1482821306169ec4d07f6aca392a4681f66c75c9918aa49641a2595db64053cb"
 
 [[package]]
 name = "libreddit"
-version = "0.2.5"
+version = "0.2.6"
 dependencies = [
  "actix-web",
  "askama",
