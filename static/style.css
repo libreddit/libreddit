@@ -16,7 +16,6 @@
 }
 
 * {
-	transition: 0.2s all;
 	margin: 0;
 	color: white;
 	font-family: sans-serif;
@@ -77,6 +76,7 @@ hr {
 a {
 	color: inherit;
 	text-decoration: none;
+	transition: 0.2s all;
 }
 
 a:not(.post_right):hover {
@@ -184,6 +184,7 @@ aside {
 
 select {
 	background: var(--outside);
+	transition: 0.2s all;
 }
 
 select, #search {
@@ -223,6 +224,7 @@ select, #search {
 input[type="submit"] {
 	border: 0;
 	border-radius: 0px 5px 5px 0px;
+	transition: 0.2s all;
 }
 
 select:hover { background: var(--foreground); }
@@ -283,6 +285,7 @@ input[type="submit"]:hover { color: var(--accent); }
 	padding: 10px 20px;
 	text-align: center;
 	cursor: pointer;
+	transition: 0.2s all;
 }
 
 #sort_options > a.selected {
@@ -301,6 +304,7 @@ input[type="submit"]:hover { color: var(--accent); }
 	background: var(--post);
 	box-shadow: var(--black-contrast);
 	display: flex;
+	transition: 0.2s all;
 }
 
 .post:not(:last-child) { margin-bottom: 10px; }
@@ -332,6 +336,7 @@ input[type="submit"]:hover { color: var(--accent); }
 	border-radius: 5px 0 0 5px;
 	flex-direction: column;
 	min-width: 50px;
+	transition: 0.2s all;
 }
 
 .post_score {
@@ -368,7 +373,7 @@ input[type="submit"]:hover { color: var(--accent); }
 }
 
 .post_text {
-	padding: 15px 20px;
+	padding: 15px;
 	display: flex;
 	flex-direction: column;
 }
@@ -618,6 +623,13 @@ td, th {
 
 	.post_left {
 		border-radius: 0 0 5px 5px;
+		flex-direction: row;
+    justify-content: center;
+    align-items: center;
+	}
+
+	.nsfw {
+		margin: 5px 0px 5px 10px;
 	}
 
 	.post_score {
