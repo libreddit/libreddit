@@ -97,6 +97,11 @@ aside {
 	border: 1px solid var(--highlighted);
 }
 
+.dot {
+	font-size: 12px;
+	opacity: 0.5;
+}
+
 /* User & Subreddit */
 
 #user, #subreddit, #sidebar {
@@ -304,6 +309,10 @@ input[type="submit"]:hover { color: var(--accent); }
 	margin: 20px 0;
 }
 
+.post.highlighted > .post_right {
+	flex-direction: column;
+}
+
 .post:hover {
 	background: var(--foreground);
 }
@@ -314,7 +323,6 @@ input[type="submit"]:hover { color: var(--accent); }
 
 .post_left, .post_right {
 	display: flex;
-	flex-direction: column;
 	overflow-wrap: break-word;
 }
 
@@ -322,13 +330,13 @@ input[type="submit"]:hover { color: var(--accent); }
 	text-align: center;
 	background: var(--foreground);
 	border-radius: 5px 0 0 5px;
+	flex-direction: column;
 	min-width: 50px;
 }
 
 .post_score {
 	margin-top: 20px;
 	color: var(--accent);
-	font-size: 16px;
 }
 
 #post_footer {
@@ -356,12 +364,19 @@ input[type="submit"]:hover { color: var(--accent); }
 .post_title {
 	font-size: 16px;
 	line-height: 1.5;
+	margin-top: 10px;
+}
+
+.post_text {
+	padding: 15px 20px;
+	display: flex;
+	flex-direction: column;
 }
 
 .post_right {
-	padding: 15px 20px;
 	flex-grow: 1;
 	flex-shrink: 1;
+	justify-content: space-between;
 }
 
 .post_right > * {
@@ -381,13 +396,13 @@ input[type="submit"]:hover { color: var(--accent); }
 
 #post_url {
 	color: var(--accent);
+	margin-top: 10px;
 }
 
 .post_thumbnail {
 	object-fit: cover;
 	width: auto;
 	flex-shrink: 0;
-	margin: 10px;
 	border-radius: 5px;
 	border: 1px solid var(--foreground);
 	max-width: 20%;
@@ -477,7 +492,7 @@ input[type="submit"]:hover { color: var(--accent); }
 }
 
 .comment_data > * {
-	margin: 5px;
+	margin-right: 5px;
 }
 
 .comment_image {
@@ -515,7 +530,7 @@ input[type="submit"]:hover { color: var(--accent); }
 }
 
 .datetime {
-	opacity: 0.75;
+	opacity: 0.5;
 }
 
 .line {
@@ -597,20 +612,16 @@ td, th {
 		flex-direction: column-reverse;
 	}
 
+	.post_header {
+		font-size: 14px;
+	}
+
 	.post_left {
 		border-radius: 0 0 5px 5px;
 	}
 
-	.post_right {
-		padding: 20px;
-	}
-
 	.post_score {
 		margin: 5px 0;
-	}
-
-	.post_thumbnail {
-		max-width: initial;
 	}
 
 	.replies > .comment {

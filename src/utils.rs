@@ -124,11 +124,11 @@ pub fn param(path: &str, value: &str) -> String {
 
 // Direct urls to proxy if proxy is enabled
 pub fn format_url(url: String) -> String {
-	if url.is_empty() {
-		return String::new();
-	};
-
-	format!("/proxy/{}", encode(url).as_str())
+	if url.is_empty() || url == "self" || url == "default" {
+		String::new()
+	} else {
+		format!("/proxy/{}", encode(url).as_str())
+	}
 }
 
 // Rewrite Reddit links to Libreddit in body of text
@@ -185,12 +185,9 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 
 	let mut posts: Vec<Post> = Vec::new();
 
+	// For each post from posts list
 	for post in post_list {
-		let img = if val(post, "thumbnail").starts_with("https:/") {
-			format_url(val(post, "thumbnail"))
-		} else {
-			String::new()
-		};
+		let img = format_url(val(post, "thumbnail"));
 		let unix_time: i64 = post["data"]["created_utc"].as_f64().unwrap_or_default().round() as i64;
 		let score = post["data"]["score"].as_i64().unwrap_or_default();
 		let ratio: f64 = post["data"]["upvote_ratio"].as_f64().unwrap_or(1.0) * 100.0;
@@ -221,23 +218,22 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 				},
 			),
 			flags: Flags {
-				nsfw: post["data"]["over_18"].as_bool().unwrap_or(false),
-				stickied: post["data"]["stickied"].as_bool().unwrap_or(false),
+				nsfw: post["data"]["over_18"].as_bool().unwrap_or_default(),
+				stickied: post["data"]["stickied"].as_bool().unwrap_or_default(),
 			},
 			permalink: val(post, "permalink"),
 			time: Utc.timestamp(unix_time, 0).format("%b %e '%y").to_string(),
 		});
 	}
 
-	Ok((posts, res["data"]["after"].as_str().unwrap_or("").to_string()))
+	Ok((posts, res["data"]["after"].as_str().unwrap_or_default().to_string()))
 }
 
 //
 // NETWORKING
 //
 
-pub async fn error(message: String) -> HttpResponse {
-	let msg = if message.is_empty() { "Page not found".to_string() } else { message };
+pub async fn error(msg: String) -> HttpResponse {
 	let body = ErrorTemplate { message: msg }.render().unwrap_or_default();
 	HttpResponse::NotFound().content_type("text/html").body(body)
 }
@@ -246,26 +242,7 @@ pub async fn error(message: String) -> HttpResponse {
 pub async fn request(path: &str) -> Result<serde_json::Value, &'static str> {
 	let url = format!("https://www.reddit.com/{}", path);
 
-	// --- actix-web::client ---
-	// let client = actix_web::client::Client::default();
-	// let res = client
-	// 	.get(url)
-	// 	.send()
-	// 	.await?
-	// 	.body()
-	// 	.limit(1000000)
-	// 	.await?;
-
-	// let body = std::str::from_utf8(res.as_ref())?; // .as_ref converts Bytes to [u8]
-
-	// --- surf ---
-	// let req = get(&url).header("User-Agent", "libreddit");
-	// let client = client().with(Redirect::new(5));
-	// let mut res = client.send(req).await.unwrap();
-	// let success = res.status().is_success();
-	// let body = res.body_string().await.unwrap();
-
-	// --- reqwest ---
+	// Send request using reqwest
 	match reqwest::get(&url).await {
 		Ok(res) => {
 			// Read the status from the response
@@ -281,13 +258,15 @@ pub async fn request(path: &str) -> Result<serde_json::Value, &'static str> {
 						}
 					}
 				}
+				// If Reddit returns error, tell user Page Not Found
 				false => {
 					#[cfg(debug_assertions)]
 					dbg!(format!("{} - Page not found", url));
 					Err("Page not found")
 				}
 			}
-		},
+		}
+		// If can't send request to Reddit, return this to user
 		Err(e) => {
 			#[cfg(debug_assertions)]
 			dbg!(format!("{} - {}", url, e));

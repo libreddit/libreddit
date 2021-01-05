@@ -25,7 +25,8 @@
 			{% if item.flair.0 != "" %}
 				<small class="author_flair">{{ item.flair.0 }}</small>
 			{% endif %}
-			&bull; <span class="datetime">{{ item.time }}</span>
+			<span class="dot">&bull;</span>
+			<span class="datetime">{{ item.time }}</span>
 		</summary>
 		<p class="comment_body">{{ item.body }}</p>
 {%- endmacro %}
@@ -45,35 +46,41 @@
 				{% if post.flags.nsfw %}<div class="nsfw">NSFW</div>{% endif %}
 			</div>
 			<div class="post_right">
-				<p class="post_header">
-					<b><a class="post_subreddit" href="/r/{{ post.community }}">r/{{ post.community }}</a></b>
-					&bull;
-					<a class="post_author" href="/u/{{ post.author }}">u/{{ post.author }}</a>
-					{% if post.author_flair.0 != "" %}
-						<small class="author_flair">{{ post.author_flair.0 }}</small>
+				<div class="post_text">
+					<p class="post_header">
+						<a class="post_subreddit" href="/r/{{ post.community }}">r/{{ post.community }}</a>
+						<span class="dot">&bull;</span>
+						<a class="post_author" href="/u/{{ post.author }}">u/{{ post.author }}</a>
+						{% if post.author_flair.0 != "" %}
+							<small class="author_flair">{{ post.author_flair.0 }}</small>
+						{% endif %}
+						<span class="datetime">{{ post.time }}</span>
+					</p>
+					<a href="{{ post.permalink }}" class="post_title">
+						{{ post.title }}
+						{% if post.flair.0 != "" %}
+							<small class="post_flair" style="color:{{ post.flair.2 }}; background:{{ post.flair.1 }}">{{ post.flair.0 }}</small>
+						{% endif %}
+					</a>
+
+					<!-- POST MEDIA -->
+					{% if post.post_type == "image" %}
+					<img class="post_media" src="{{ post.media }}"/>
+					{% else if post.post_type == "video" %}
+					<video class="post_media" src="{{ post.media }}" controls autoplay loop>
+					{% else if post.post_type == "link" %}
+					<a id="post_url" href="{{ post.media }}">{{ post.media }}</a>
 					{% endif %}
-					<span class="datetime">{{ post.time }}</span>
-				</p>
-				<a href="{{ post.permalink }}" class="post_title">
-					{{ post.title }}
-					{% if post.flair.0 != "" %}
-						<small class="post_flair" style="color:{{ post.flair.2 }}; background:{{ post.flair.1 }}">{{ post.flair.0 }}</small>
-					{% endif %}
-				</a>
-				{% if post.post_type == "image" %}
-				<img class="post_media" src="{{ post.media }}"/>
-				{% else if post.post_type == "video" %}
-				<video class="post_media" src="{{ post.media }}" controls autoplay loop>
-				{% else if post.post_type == "link" %}
-				<a id="post_url" href="{{ post.media }}">{{ post.media }}</a>
-				{% endif %}
-				<div class="post_body">{{ post.body }}</div>
-				<div id="post_footer">
-					<ul id="post_links">
-						<li><a href="/{{ post.id }}">permalink</a></li>
-						<li><a href="https://reddit.com/{{ post.id }}">reddit</a></li>
-					</ul>
-					<p>{{ post.upvote_ratio }}% Upvoted</p>
+
+					<!-- POST BODY -->
+					<div class="post_body">{{ post.body }}</div>
+					<div id="post_footer">
+						<ul id="post_links">
+							<li><a href="/{{ post.id }}">permalink</a></li>
+							<li><a href="https://reddit.com/{{ post.id }}">reddit</a></li>
+						</ul>
+						<p>{{ post.upvote_ratio }}% Upvoted</p>
+					</div>
 				</div>
 			</div>
 		</div>

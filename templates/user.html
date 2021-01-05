@@ -24,24 +24,25 @@
 					{% if post.flags.nsfw %}<div class="nsfw">NSFW</div>{% endif %}
 				</div>
 				<div class="post_right">
-					<p class="post_header">
-						<b><a class="post_subreddit" href="/r/{{ post.community }}">r/{{ post.community }}</a></b>
-						&bull; <a class="post_author" href="/u/{{ post.author }}">u/{{ post.author }}</a>
-						{% if post.author_flair.0 != "" %}
-							<small class="author_flair">{{ post.author_flair.0 }}</small>
-						{% endif %}
-						<span class="datetime" style="float: right;">{{ post.time }}</span>
-					</p>
-					<p class="post_title">
-						{% if post.flair.0 == "Comment" %}
-						{% else if post.flair.0 == "" %}
-						{% else %}
-							<small class="post_flair" style="color:{{ post.flair.2 }}; background:{{ post.flair.1 }}">{{ post.flair.0 }}</small>
-						{% endif %}
-						<a href="{{ post.permalink }}">{{ post.title }}</a>
-					</p>
+					<div class="post_text">
+						<p class="post_header">
+							<a class="post_subreddit" href="/r/{{ post.community }}">r/{{ post.community }}</a>
+							{% if post.author_flair.0 != "" %}
+								<small class="author_flair">{{ post.author_flair.0 }}</small>
+							{% endif %}
+							<span class="datetime" style="float: right;">{{ post.time }}</span>
+						</p>
+						<p class="post_title">
+							{% if post.flair.0 == "Comment" %}
+							{% else if post.flair.0 == "" %}
+							{% else %}
+								<small class="post_flair" style="color:{{ post.flair.2 }}; background:{{ post.flair.1 }}">{{ post.flair.0 }}</small>
+							{% endif %}
+							<a href="{{ post.permalink }}">{{ post.title }}</a>
+						</p>
+					</div>
+					<img class="post_thumbnail" src="{{ post.media }}">
 				</div>
-				<img class="post_thumbnail" src="{{ post.media }}">
 			</div>
 			{% else %}
 			<div class="comment">
