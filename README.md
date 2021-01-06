@@ -128,7 +128,7 @@ For transparency, I hope to describe all the ways Libreddit handles user privacy
 
 **DNS:** Both official domains (`libredd.it` and `libreddit.spike.codes`) use Cloudflare as the DNS resolver. Though, the sites are not proxied through Cloudflare meaning Cloudflare doesn't have access to user traffic.
 
-**Cookies:** Libreddit uses no cookies currently but eventually, I plan to add a configuration page where users can store an optional cookie to save their preferred theme, default sorting algorithm, or default layout.
+**Cookies:** Libreddit uses optional cookies to store any configured settings in [the settings menu](https://libredd.it/settings). This is not a cross-site cookie and the cookie holds no personal data, only a value of the possible layout.
 
 **Hosting:** The official instances (`libredd.it` and `libreddit.spike.codes`) are hosted on [Repl.it](https://repl.it/) which monitors usage to prevent abuse. I can understand if this invalidates certain users' threat models and therefore, selfhosting and browsing through Tor are welcomed.
 
