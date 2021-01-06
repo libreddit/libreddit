@@ -33,7 +33,6 @@ pub async fn set(req: HttpRequest, form: Form<Preferences>) -> HttpResponse {
 		Some(value) => response.cookie(
 			Cookie::build("layout", value)
 				.path("/")
-				.secure(true)
 				.http_only(true)
 				.expires(OffsetDateTime::now_utc() + Duration::weeks(52))
 				.finish(),
