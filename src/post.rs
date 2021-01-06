@@ -1,11 +1,11 @@
 // CRATES
-use crate::utils::{Comment, Flags, Flair, Post, cookie, error, format_num, format_url, media, param, request, rewrite_url, val};
+use crate::utils::{cookie, error, format_num, format_url, media, param, request, rewrite_url, val, Comment, Flags, Flair, Post};
 use actix_web::{HttpRequest, HttpResponse, Result};
 
 use async_recursion::async_recursion;
 
 use askama::Template;
-use chrono::{TimeZone, Utc};
+use time::OffsetDateTime;
 
 // STRUCTS
 #[derive(Template)]
@@ -94,7 +94,7 @@ async fn parse_post(json: &serde_json::Value) -> Result<Post, &'static str> {
 			stickied: post["data"]["stickied"].as_bool().unwrap_or(false),
 		},
 		media: media.1,
-		time: Utc.timestamp(unix_time, 0).format("%b %e %Y %H:%M UTC").to_string(),
+		time: OffsetDateTime::from_unix_timestamp(unix_time).format("%b %d %Y %H:%M UTC"),
 	})
 }
 
@@ -127,7 +127,7 @@ async fn parse_comments(json: &serde_json::Value) -> Result<Vec<Comment>, &'stat
 			body,
 			author: val(comment, "author"),
 			score: format_num(score),
-			time: Utc.timestamp(unix_time, 0).format("%b %e %Y %H:%M UTC").to_string(),
+			time: OffsetDateTime::from_unix_timestamp(unix_time).format("%b %d %Y %H:%M UTC"),
 			replies,
 			flair: Flair(
 				val(comment, "author_flair_text"),

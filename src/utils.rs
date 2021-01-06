@@ -8,9 +8,9 @@ use std::collections::HashMap;
 use actix_web::{cookie::Cookie, HttpResponse, Result};
 use askama::Template;
 use base64::encode;
-use chrono::{TimeZone, Utc};
 use regex::Regex;
 use serde_json::from_str;
+use time::OffsetDateTime;
 use url::Url;
 // use surf::{client, get, middleware::Redirect};
 
@@ -235,7 +235,7 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 				stickied: post["data"]["stickied"].as_bool().unwrap_or_default(),
 			},
 			permalink: val(post, "permalink"),
-			time: Utc.timestamp(unix_time, 0).format("%b %e '%y").to_string(),
+			time: OffsetDateTime::from_unix_timestamp(unix_time).format("%b %d '%y"), // %b %e '%y
 		});
 	}
 

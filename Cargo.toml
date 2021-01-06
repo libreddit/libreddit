@@ -9,13 +9,12 @@ edition = "2018"
 
 [dependencies]
 base64 = "0.13.0"
-actix-web = { version = "3.2.0", features = ["rustls"] }
+actix-web = { version = "3.3.2", features = ["rustls"] }
 reqwest = { version = "0.10", default_features = false, features = ["rustls-tls"] }
-askama = "0.8.0"
-serde = "1.0.117"
+askama = "0.10.5"
+serde = "1.0.118"
 serde_json = "1.0"
-chrono = "0.4.19"
 async-recursion = "0.3.1"
 url = "2.2.0"
-regex = "1"
+regex = "1.4.2"
 time = "0.2.23"

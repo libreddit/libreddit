@@ -2,7 +2,7 @@
 use crate::utils::{cookie, error, fetch_posts, format_url, nested_val, param, request, Post, User};
 use actix_web::{HttpRequest, HttpResponse, Result};
 use askama::Template;
-use chrono::{TimeZone, Utc};
+use time::OffsetDateTime;
 
 // STRUCTS
 #[derive(Template)]
@@ -72,7 +72,7 @@ async fn user(name: &str) -> Result<User, &'static str> {
 		title: nested_val(&res, "subreddit", "title"),
 		icon: format_url(nested_val(&res, "subreddit", "icon_img")),
 		karma: res["data"]["total_karma"].as_i64().unwrap_or(0),
-		created: Utc.timestamp(created, 0).format("%b %e, %Y").to_string(),
+		created: OffsetDateTime::from_unix_timestamp(created).format("%b %d '%y"),
 		banner: nested_val(&res, "subreddit", "banner_img"),
 		description: nested_val(&res, "subreddit", "public_description"),
 	})
