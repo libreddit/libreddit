@@ -1,5 +1,5 @@
 // CRATES
-use crate::utils::{error, fetch_posts, format_num, format_url, param, request, rewrite_url, val, Post, Subreddit};
+use crate::utils::{cookie, error, fetch_posts, format_num, format_url, param, request, rewrite_url, val, Post, Subreddit};
 use actix_web::{HttpRequest, HttpResponse, Result};
 use askama::Template;
 
@@ -11,6 +11,7 @@ struct SubredditTemplate {
 	posts: Vec<Post>,
 	sort: (String, String),
 	ends: (String, String),
+	layout: String,
 }
 
 #[derive(Template)]
@@ -19,6 +20,7 @@ struct WikiTemplate {
 	sub: String,
 	wiki: String,
 	page: String,
+	layout: String,
 }
 
 // SERVICES
@@ -40,6 +42,7 @@ pub async fn page(req: HttpRequest) -> HttpResponse {
 				posts: items.0,
 				sort: (sort, param(&path, "t")),
 				ends: (param(&path, "after"), items.1),
+				layout: cookie(req, "layout"),
 			}
 			.render()
 			.unwrap();
@@ -60,6 +63,7 @@ pub async fn wiki(req: HttpRequest) -> HttpResponse {
 				sub: sub.to_string(),
 				wiki: rewrite_url(res["data"]["content_html"].as_str().unwrap_or_default()),
 				page: page.to_string(),
+				layout: String::new(),
 			}
 			.render()
 			.unwrap();

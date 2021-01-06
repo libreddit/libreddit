@@ -1,5 +1,5 @@
 // CRATES
-use crate::utils::{error, format_num, format_url, param, request, rewrite_url, val, Comment, Flags, Flair, Post};
+use crate::utils::{Comment, Flags, Flair, Post, cookie, error, format_num, format_url, media, param, request, rewrite_url, val};
 use actix_web::{HttpRequest, HttpResponse, Result};
 
 use async_recursion::async_recursion;
@@ -14,6 +14,7 @@ struct PostTemplate {
 	comments: Vec<Comment>,
 	post: Post,
 	sort: String,
+	layout: String,
 }
 
 pub async fn item(req: HttpRequest) -> HttpResponse {
@@ -33,32 +34,19 @@ pub async fn item(req: HttpRequest) -> HttpResponse {
 			let comments = parse_comments(&res[1]).await.unwrap();
 
 			// Use the Post and Comment structs to generate a website to show users
-			let s = PostTemplate { comments, post, sort }.render().unwrap();
+			let s = PostTemplate {
+				comments,
+				post,
+				sort,
+				layout: cookie(req, "layout"),
+			}
+			.render()
+			.unwrap();
 			HttpResponse::Ok().content_type("text/html").body(s)
 		}
 		// If the Reddit API returns an error, exit and send error page to user
 		Err(msg) => error(msg.to_string()).await,
 	}
-}
-
-// UTILITIES
-async fn media(data: &serde_json::Value) -> (String, String) {
-	let post_type: &str;
-	let url = if !data["preview"]["reddit_video_preview"]["fallback_url"].is_null() {
-		post_type = "video";
-		format_url(data["preview"]["reddit_video_preview"]["fallback_url"].as_str().unwrap_or_default().to_string())
-	} else if !data["secure_media"]["reddit_video"]["fallback_url"].is_null() {
-		post_type = "video";
-		format_url(data["secure_media"]["reddit_video"]["fallback_url"].as_str().unwrap_or_default().to_string())
-	} else if data["post_hint"].as_str().unwrap_or("") == "image" {
-		post_type = "image";
-		format_url(data["preview"]["images"][0]["source"]["url"].as_str().unwrap_or_default().to_string())
-	} else {
-		post_type = "link";
-		data["url"].as_str().unwrap_or_default().to_string()
-	};
-
-	(post_type.to_string(), url)
 }
 
 // POSTS
@@ -91,6 +79,7 @@ async fn parse_post(json: &serde_json::Value) -> Result<Post, &'static str> {
 		score: format_num(score),
 		upvote_ratio: ratio as i64,
 		post_type: media.0,
+		thumbnail: format_url(val(post, "thumbnail")),
 		flair: Flair(
 			val(post, "link_flair_text"),
 			val(post, "link_flair_background_color"),

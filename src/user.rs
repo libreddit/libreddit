@@ -1,5 +1,5 @@
 // CRATES
-use crate::utils::{error, fetch_posts, format_url, nested_val, param, request, Post, User};
+use crate::utils::{cookie, error, fetch_posts, format_url, nested_val, param, request, Post, User};
 use actix_web::{HttpRequest, HttpResponse, Result};
 use askama::Template;
 use chrono::{TimeZone, Utc};
@@ -12,6 +12,7 @@ struct UserTemplate {
 	posts: Vec<Post>,
 	sort: (String, String),
 	ends: (String, String),
+	layout: String,
 }
 
 // FUNCTIONS
@@ -34,6 +35,7 @@ pub async fn profile(req: HttpRequest) -> HttpResponse {
 				posts: items.0,
 				sort: (sort, param(&path, "t")),
 				ends: (param(&path, "after"), items.1),
+				layout: cookie(req, "layout"),
 			}
 			.render()
 			.unwrap();

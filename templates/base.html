@@ -11,10 +11,15 @@
 		<link rel="stylesheet" href="/style.css">
 		{% endblock %}
 		</head>
-	<body>
+	<body {% if layout != "" %}id="{{ layout }}"{% endif %}>
 		<!-- NAVIGATION BAR -->
 		<nav>
-			<a id="logo" href="/"><span id="lib">lib</span>reddit. <span id="version">v{{ env!("CARGO_PKG_VERSION") }}</span></a>
+			<p id="logo">
+				<a id="libreddit" href="/">
+					<span id="lib">lib</span><span id="reddit">reddit.</span>
+				</a>
+				<span id="version">v{{ env!("CARGO_PKG_VERSION") }}</span>
+			</p>
 			{% block search %}{% endblock %}
 			<a id="github" href="https://github.com/spikecodes/libreddit">GITHUB</a>
 		</nav>

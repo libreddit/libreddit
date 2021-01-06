@@ -1,9 +1,11 @@
 // use std::collections::HashMap;
 
+use std::collections::HashMap;
+
 //
 // CRATES
 //
-use actix_web::{HttpResponse, Result};
+use actix_web::{cookie::Cookie, HttpResponse, Result};
 use askama::Template;
 use base64::encode;
 use chrono::{TimeZone, Utc};
@@ -37,6 +39,7 @@ pub struct Post {
 	pub post_type: String,
 	pub flair: Flair,
 	pub flags: Flags,
+	pub thumbnail: String,
 	pub media: String,
 	pub time: String,
 }
@@ -91,6 +94,7 @@ pub struct Params {
 #[template(path = "error.html", escape = "none")]
 pub struct ErrorTemplate {
 	pub message: String,
+	pub layout: String,
 }
 
 //
@@ -100,27 +104,14 @@ pub struct ErrorTemplate {
 // Grab a query param from a url
 pub fn param(path: &str, value: &str) -> String {
 	let url = Url::parse(format!("https://libredd.it/{}", path).as_str()).unwrap();
-	let pairs: std::collections::HashMap<_, _> = url.query_pairs().into_owned().collect();
+	let pairs: HashMap<_, _> = url.query_pairs().into_owned().collect();
 	pairs.get(value).unwrap_or(&String::new()).to_owned()
 }
 
-// Cookies from request
-// pub fn cookies(req: HttpRequest) -> HashMap<String, String> {
-// 	let mut result: HashMap<String, String> = HashMap::new();
-
-// 	let cookies: Vec<Cookie> = req
-// 		.headers()
-// 		.get_all("Cookie")
-// 		.map(|value| value.to_str().unwrap())
-// 		.map(|unparsed| Cookie::parse(unparsed).unwrap())
-// 		.collect();
-
-// 	for cookie in cookies {
-// 		result.insert(cookie.name().to_string(), cookie.value().to_string());
-// 	}
-
-// 	result
-// }
+// Cookie value from request
+pub fn cookie(req: actix_web::HttpRequest, name: &str) -> String {
+	actix_web::HttpMessage::cookie(&req, name).unwrap_or_else(|| Cookie::new(name, "")).value().to_string()
+}
 
 // Direct urls to proxy if proxy is enabled
 pub fn format_url(url: String) -> String {
@@ -146,6 +137,25 @@ pub fn format_num(num: i64) -> String {
 	} else {
 		num.to_string()
 	}
+}
+
+pub async fn media(data: &serde_json::Value) -> (String, String) {
+	let post_type: &str;
+	let url = if !data["preview"]["reddit_video_preview"]["fallback_url"].is_null() {
+		post_type = "video";
+		format_url(data["preview"]["reddit_video_preview"]["fallback_url"].as_str().unwrap_or_default().to_string())
+	} else if !data["secure_media"]["reddit_video"]["fallback_url"].is_null() {
+		post_type = "video";
+		format_url(data["secure_media"]["reddit_video"]["fallback_url"].as_str().unwrap_or_default().to_string())
+	} else if data["post_hint"].as_str().unwrap_or("") == "image" {
+		post_type = "image";
+		format_url(data["preview"]["images"][0]["source"]["url"].as_str().unwrap_or_default().to_string())
+	} else {
+		post_type = "link";
+		data["url"].as_str().unwrap_or_default().to_string()
+	};
+
+	(post_type.to_string(), url)
 }
 
 //
@@ -187,11 +197,15 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 
 	// For each post from posts list
 	for post in post_list {
-		let img = format_url(val(post, "thumbnail"));
 		let unix_time: i64 = post["data"]["created_utc"].as_f64().unwrap_or_default().round() as i64;
 		let score = post["data"]["score"].as_i64().unwrap_or_default();
 		let ratio: f64 = post["data"]["upvote_ratio"].as_f64().unwrap_or(1.0) * 100.0;
 		let title = val(post, "title");
+
+		// Determine the type of media along with the media URL
+		let media = media(&post["data"]).await;
+
+		dbg!(post["data"]["id"].to_string());
 
 		posts.push(Post {
 			id: val(post, "id"),
@@ -206,8 +220,9 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 			),
 			score: format_num(score),
 			upvote_ratio: ratio as i64,
-			post_type: "link".to_string(),
-			media: img,
+			post_type: media.0,
+			thumbnail: format_url(val(post, "thumbnail")),
+			media: media.1,
 			flair: Flair(
 				val(post, "link_flair_text"),
 				val(post, "link_flair_background_color"),
@@ -234,7 +249,12 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 //
 
 pub async fn error(msg: String) -> HttpResponse {
-	let body = ErrorTemplate { message: msg }.render().unwrap_or_default();
+	let body = ErrorTemplate {
+		message: msg,
+		layout: String::new(),
+	}
+	.render()
+	.unwrap_or_default();
 	HttpResponse::NotFound().content_type("text/html").body(body)
 }
 

@@ -37,7 +37,8 @@ nav {
 	min-height: 40px;
 }
 
-nav #lib, nav #github, nav #version { color: white; }
+nav * { color: white; }
+nav #reddit { color: var(--accent); }
 nav #version { opacity: 25%; }
 
 main {
@@ -93,7 +94,7 @@ aside {
 	max-width: 350px;
 }
 
-.panel {
+.post, .panel {
 	border: 1px solid var(--highlighted);
 }
 
@@ -408,7 +409,6 @@ input[type="submit"]:hover { color: var(--accent); }
 .post_thumbnail {
 	object-fit: cover;
 	width: auto;
-	flex-shrink: 0;
 	border-radius: 5px;
 	border: 1px solid var(--foreground);
 	max-width: 20%;
@@ -552,6 +552,81 @@ input[type="submit"]:hover { color: var(--accent); }
 
 .post.comment > .post_left {
 	background: black;
+}
+
+/* Layouts */
+
+#compact .post:not(.highlighted) {
+	border-radius: 0;
+	margin: 0;
+	padding: 0;
+}
+
+#compact .post:not(:last-of-type):not(.highlighted):not(.stickied) {
+	border-bottom: 0;
+}
+
+#compact .post_left {
+	border-radius: 0;
+}
+
+#compact .post_header {
+	font-size: 14px;
+}
+
+#compact .post_title {
+	margin-top: 5px;
+}
+
+#compact .post_text {
+	padding: 10px;
+}
+
+#compact .post_thumbnail {
+	max-width: 75px;
+	max-height: 75px;
+}
+
+#compact #footer {
+	margin-top: 10px;
+}
+
+#card .post_right {
+	flex-direction: column;
+}
+
+#card .post:not(.highlighted) .post_media {
+	margin-top: 0;
+	margin-bottom: 15px;
+}
+
+/* Settings */
+
+#settings {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+#prefs {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 20px;
+	background: var(--post);
+	border-radius: 5px;
+}
+
+#prefs > select {
+	border-radius: 5px;
+	margin-left: 20px;
+}
+
+#save {
+	background: var(--highlighted);
+	padding: 10px 15px;
+	border-radius: 5px;
+	margin-top: 20px;
 }
 
 /* Markdown */

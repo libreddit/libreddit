@@ -21,7 +21,7 @@
 		</form>
 		{% for post in posts %}
 		{% if post.title != "Comment" %}
-		<div class="post panel">
+		<div class="post">
 			<div class="post_left">
 				<p class="post_score">{{ post.score }}</p>
 				{% if post.flags.nsfw %}<div class="nsfw">NSFW</div>{% endif %}

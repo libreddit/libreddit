@@ -9,10 +9,14 @@
 
 {% block body %}
 	<main>
-		<form action="/settings/save" method="POST">
-			<label for="pref_nsfw">NSFW</label>
-			<input type="checkbox" name="pref_nsfw" id="pref_nsfw" {% if pref_nsfw == "on" %}checked{% endif %}>
-			<input id="sort_submit" type="submit" value="&rarr;">
+		<form id="settings" action="/settings" method="POST">
+			<div id="prefs">
+				<label for="layout">Layout:</label>
+				<select name="layout"> 
+					{% call utils::options(layout, ["card", "clean", "compact"], "clean") %}
+				</select>
+			</div>
+			<input id="save" type="submit" value="Save">
 		</form>
 	</main>
 {% endblock %}
