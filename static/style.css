@@ -41,6 +41,12 @@ nav * { color: white; }
 nav #reddit { color: var(--accent); }
 nav #version { opacity: 25%; }
 
+#settings_link {
+	font-size: 18px;
+	margin-left: 20px;
+	opacity: 0.8;
+}
+
 main {
 	display: flex;
 	justify-content: center;
@@ -562,6 +568,20 @@ input[type="submit"]:hover { color: var(--accent); }
 	padding: 0;
 }
 
+#compact .post:first-of-type {
+	border-radius: 5px 5px 0 0;
+	overflow: hidden;
+}
+
+#compact .post:last-of-type {
+	border-radius: 0 0 5px 5px;
+	overflow: hidden;
+}
+
+#compact .post.highlighted {
+	border-radius: 5px;
+}
+
 #compact .post:not(:last-of-type):not(.highlighted):not(.stickied) {
 	border-bottom: 0;
 }
@@ -587,8 +607,8 @@ input[type="submit"]:hover { color: var(--accent); }
 	max-height: 75px;
 }
 
-#compact #footer {
-	margin-top: 10px;
+#compact footer {
+	margin-top: 20px;
 }
 
 #card .post_right {

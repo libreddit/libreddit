@@ -205,8 +205,6 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 		// Determine the type of media along with the media URL
 		let media = media(&post["data"]).await;
 
-		dbg!(post["data"]["id"].to_string());
-
 		posts.push(Post {
 			id: val(post, "id"),
 			title: if title.is_empty() { fallback_title.to_owned() } else { title },
