@@ -33,14 +33,20 @@ pub async fn handler(web::Path(b64): web::Path<String>) -> Result<HttpResponse> 
 							.send()
 							.await
 							.map_err(Error::from)
-							.map(|res| HttpResponse::build(res.status()).streaming(res))
+							.map(|res|
+								HttpResponse::build(res.status())
+									.header("Cache-Control", "public, max-age=1209600, s-maxage=86400, must-revalidate")
+									.header("Content-Length", res.headers().get("Content-Length").unwrap().to_owned())
+									.header("Content-Type", res.headers().get("Content-Type").unwrap().to_owned())
+									.streaming(res)
+								)
 					} else {
 						Err(error::ErrorForbidden("Resource must be from Reddit"))
 					}
 				}
-				Err(_) => Err(error::ErrorBadRequest("Can't parse encoded base64 URL")),
+				Err(_) => Err(error::ErrorBadRequest("Can't parse base64 into URL")),
 			}
 		}
-		Err(_) => Err(error::ErrorBadRequest("Can't decode base64 URL")),
+		Err(_) => Err(error::ErrorBadRequest("Can't decode base64")),
 	}
 }
