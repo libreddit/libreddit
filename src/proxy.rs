@@ -28,18 +28,13 @@ pub async fn handler(web::Path(b64): web::Path<String>) -> Result<HttpResponse> 
 					let domain = url.domain().unwrap_or_default();
 
 					if domains.contains(&domain) {
-						Client::default()
-							.get(media.replace("&amp;", "&"))
-							.send()
-							.await
-							.map_err(Error::from)
-							.map(|res|
-								HttpResponse::build(res.status())
-									.header("Cache-Control", "public, max-age=1209600, s-maxage=86400, must-revalidate")
-									.header("Content-Length", res.headers().get("Content-Length").unwrap().to_owned())
-									.header("Content-Type", res.headers().get("Content-Type").unwrap().to_owned())
-									.streaming(res)
-								)
+						Client::default().get(media.replace("&amp;", "&")).send().await.map_err(Error::from).map(|res| {
+							HttpResponse::build(res.status())
+								.header("Cache-Control", "public, max-age=1209600, s-maxage=86400")
+								.header("Content-Length", res.headers().get("Content-Length").unwrap().to_owned())
+								.header("Content-Type", res.headers().get("Content-Type").unwrap().to_owned())
+								.streaming(res)
+						})
 					} else {
 						Err(error::ErrorForbidden("Resource must be from Reddit"))
 					}

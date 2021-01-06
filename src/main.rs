@@ -16,7 +16,9 @@ async fn style() -> HttpResponse {
 }
 
 async fn robots() -> HttpResponse {
-	HttpResponse::Ok().body(include_str!("../static/robots.txt"))
+	HttpResponse::Ok()
+		.header("Cache-Control", "public, max-age=1209600, s-maxage=86400")
+		.body(include_str!("../static/robots.txt"))
 }
 
 #[get("/favicon.ico")]
