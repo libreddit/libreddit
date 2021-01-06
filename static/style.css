@@ -2,12 +2,13 @@
 
 :root {
 	--accent: aqua;
-	--background: #0F0F0F;
+	--text: white;
 	--foreground: #222;
+	--background: #0F0F0F;
 	--outside: #1F1F1F;
 	--post: #161616;
 	--highlighted: #333;
-	--black-contrast: 0 1px 3px rgba(0,0,0,0.5);
+	--shadow: 0 1px 3px rgba(0,0,0,0.5);
 }
 
 ::selection {
@@ -17,7 +18,7 @@
 
 * {
 	margin: 0;
-	color: white;
+	color: var(--text);
 	font-family: sans-serif;
 }
 
@@ -37,7 +38,7 @@ nav {
 	min-height: 40px;
 }
 
-nav * { color: white; }
+nav * { color: var(--text); }
 nav #reddit { color: var(--accent); }
 nav #version { opacity: 25%; }
 
@@ -184,7 +185,7 @@ aside {
 }
 
 #top > div {
-	border-bottom: 2px solid white;
+	border-bottom: 2px solid var(--text);
 }
 
 /* Sorting and Search */
@@ -204,7 +205,7 @@ select, #search {
 
 #searchbox {
 	display: flex;
-	box-shadow: var(--black-contrast);
+	box-shadow: var(--shadow);
 }
 
 #searchbox > *, #sort_submit {
@@ -281,7 +282,7 @@ input[type="submit"]:hover { color: var(--accent); }
 
 #sort_options, footer > a {
 	border-radius: 5px;
-	box-shadow: var(--black-contrast);
+	box-shadow: var(--shadow);
 	background: var(--outside);
 	display: flex;
 	overflow: auto;
@@ -297,7 +298,7 @@ input[type="submit"]:hover { color: var(--accent); }
 
 #sort_options > a.selected {
 	background: var(--accent);
-	color: black;
+	color: var(--background);
 }
 
 #sort_options > a:not(.selected):hover {
@@ -309,7 +310,7 @@ input[type="submit"]:hover { color: var(--accent); }
 .post {
 	border-radius: 5px;
 	background: var(--post);
-	box-shadow: var(--black-contrast);
+	box-shadow: var(--shadow);
 	display: flex;
 	transition: 0.2s all;
 }
@@ -422,7 +423,7 @@ input[type="submit"]:hover { color: var(--accent); }
 
 .post_flair {
 	background: var(--accent);
-	color: black;
+	color: var(--background);
 	padding: 5px;
 	border-radius: 5px;
 	font-size: 12px;
@@ -475,7 +476,7 @@ input[type="submit"]:hover { color: var(--accent); }
 
 .author_flair {
 	background: var(--highlighted);
-	color: white;
+	color: var(--text);
 	padding: 5px;
 	margin-right: 5px;
 	border-radius: 5px;
@@ -549,15 +550,6 @@ input[type="submit"]:hover { color: var(--accent); }
 	width: 2px;
 	height: 100%;
 	background: var(--foreground);
-}
-
-.post.comment {
-	background: #000;
-	border: 2px solid var(--foreground);
-}
-
-.post.comment > .post_left {
-	background: black;
 }
 
 /* Layouts */
@@ -680,7 +672,7 @@ input[type="submit"]:hover { color: var(--accent); }
 	padding: 20px;
 	margin-top: 10px;
 	border-radius: 5px;
-	box-shadow: var(--black-contrast);
+	box-shadow: var(--shadow);
 }
 
 .md table {
