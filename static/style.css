@@ -503,7 +503,7 @@ input[type="submit"]:hover { color: var(--accent); }
 
 .comment_right {
 	word-wrap: anywhere;
-	padding: 10px 25px 10px 5px;
+	padding: 10px 0 10px 5px;
 	flex-grow: 1;
 	flex-shrink: 1;
 }
