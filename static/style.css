@@ -36,6 +36,10 @@ nav {
 	padding: 5px 15px;
 	font-size: 20px;
 	min-height: 40px;
+	position: fixed;
+	width: calc(100% - 30px);
+	top: 0;
+	z-index: 1;
 }
 
 nav * { color: var(--text); }
@@ -53,7 +57,7 @@ main {
 	justify-content: center;
 	max-width: 1000px;
 	padding: 10px 20px;
-	margin: 20px auto;
+	margin: 60px auto 20px auto
 }
 
 #column_one {
@@ -751,12 +755,13 @@ td, th {
 	main {
 		flex-direction: column-reverse;
 		padding: 10px;
-		margin: 10px 0;
+		margin: 100px 0 10px 0;
 	}
 	
 	nav {
 		flex-direction: column;
 		padding: 10px;
+		width: calc(100% - 20px);
 	}
 
 	aside, #subreddit, #user {
