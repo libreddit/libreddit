@@ -33,16 +33,16 @@ pub async fn find(req: HttpRequest) -> HttpResponse {
 	let sub = req.match_info().get("sub").unwrap_or("").to_string();
 
 	match fetch_posts(&path, String::new()).await {
-		Ok(posts) => HttpResponse::Ok().content_type("text/html").body(
+		Ok((posts, after)) => HttpResponse::Ok().content_type("text/html").body(
 			SearchTemplate {
-				posts: posts.0,
+				posts,
 				sub,
 				params: SearchParams {
 					q: param(&path, "q"),
 					sort,
 					t: param(&path, "t"),
 					before: param(&path, "after"),
-					after: posts.1,
+					after,
 					restrict_sr: param(&path, "restrict_sr"),
 				},
 				layout: cookie(req, "layout"),

@@ -108,7 +108,7 @@ pub fn param(path: &str, value: &str) -> String {
 	pairs.get(value).unwrap_or(&String::new()).to_owned()
 }
 
-// Cookie value from request
+// Parse Cookie value from request
 pub fn cookie(req: actix_web::HttpRequest, name: &str) -> String {
 	actix_web::HttpMessage::cookie(&req, name).unwrap_or_else(|| Cookie::new(name, "")).value().to_string()
 }
@@ -172,7 +172,7 @@ pub fn nested_val(j: &serde_json::Value, n: &str, k: &str) -> String {
 	String::from(j["data"][n][k].as_str().unwrap_or_default())
 }
 
-// Fetch posts of a user or subreddit
+// Fetch posts of a user or subreddit and return a vector of posts and the "after" value
 pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post>, String), &'static str> {
 	let res;
 	let post_list;
@@ -180,9 +180,7 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 	// Send a request to the url
 	match request(&path).await {
 		// If success, receive JSON in response
-		Ok(response) => {
-			res = response;
-		}
+		Ok(response) => { res = response;	}
 		// If the Reddit API returns an error, exit this function
 		Err(msg) => return Err(msg),
 	}
@@ -203,7 +201,7 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 		let title = val(post, "title");
 
 		// Determine the type of media along with the media URL
-		let media = media(&post["data"]).await;
+		let (post_type, media) = media(&post["data"]).await;
 
 		posts.push(Post {
 			id: val(post, "id"),
@@ -218,9 +216,9 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 			),
 			score: format_num(score),
 			upvote_ratio: ratio as i64,
-			post_type: media.0,
+			post_type,
 			thumbnail: format_url(val(post, "thumbnail")),
-			media: media.1,
+			media,
 			flair: Flair(
 				val(post, "link_flair_text"),
 				val(post, "link_flair_background_color"),

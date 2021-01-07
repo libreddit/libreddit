@@ -36,12 +36,12 @@ pub async fn page(req: HttpRequest) -> HttpResponse {
 	};
 
 	match fetch_posts(&path, String::new()).await {
-		Ok(items) => {
+		Ok((posts,after)) => {
 			let s = SubredditTemplate {
 				sub: sub_result,
-				posts: items.0,
+				posts: posts,
 				sort: (sort, param(&path, "t")),
-				ends: (param(&path, "after"), items.1),
+				ends: (param(&path, "after"), after),
 				layout: cookie(req, "layout"),
 			}
 			.render()

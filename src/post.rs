@@ -1,6 +1,6 @@
 // CRATES
 use crate::utils::{cookie, error, format_num, format_url, media, param, request, rewrite_url, val, Comment, Flags, Flair, Post};
-use actix_web::{HttpRequest, HttpResponse, Result};
+use actix_web::{HttpRequest, HttpResponse};
 
 use async_recursion::async_recursion;
 
@@ -30,8 +30,8 @@ pub async fn item(req: HttpRequest) -> HttpResponse {
 		// Otherwise, grab the JSON output from the request
 		Ok(res) => {
 			// Parse the JSON into Post and Comment structs
-			let post = parse_post(&res[0]).await.unwrap();
-			let comments = parse_comments(&res[1]).await.unwrap();
+			let post = parse_post(&res[0]).await;
+			let comments = parse_comments(&res[1]).await;
 
 			// Use the Post and Comment structs to generate a website to show users
 			let s = PostTemplate {
@@ -50,7 +50,7 @@ pub async fn item(req: HttpRequest) -> HttpResponse {
 }
 
 // POSTS
-async fn parse_post(json: &serde_json::Value) -> Result<Post, &'static str> {
+async fn parse_post(json: &serde_json::Value) -> Post {
 	// Retrieve post (as opposed to comments) from JSON
 	let post: &serde_json::Value = &json["data"]["children"][0];
 
@@ -61,10 +61,10 @@ async fn parse_post(json: &serde_json::Value) -> Result<Post, &'static str> {
 	let ratio: f64 = post["data"]["upvote_ratio"].as_f64().unwrap_or(1.0) * 100.0;
 
 	// Determine the type of media along with the media URL
-	let media = media(&post["data"]).await;
+	let (post_type, media) = media(&post["data"]).await;
 
 	// Build a post using data parsed from Reddit post API
-	Ok(Post {
+	Post {
 		id: val(post, "id"),
 		title: val(post, "title"),
 		community: val(post, "subreddit"),
@@ -78,7 +78,7 @@ async fn parse_post(json: &serde_json::Value) -> Result<Post, &'static str> {
 		permalink: val(post, "permalink"),
 		score: format_num(score),
 		upvote_ratio: ratio as i64,
-		post_type: media.0,
+		post_type,
 		thumbnail: format_url(val(post, "thumbnail")),
 		flair: Flair(
 			val(post, "link_flair_text"),
@@ -93,14 +93,14 @@ async fn parse_post(json: &serde_json::Value) -> Result<Post, &'static str> {
 			nsfw: post["data"]["over_18"].as_bool().unwrap_or(false),
 			stickied: post["data"]["stickied"].as_bool().unwrap_or(false),
 		},
-		media: media.1,
+		media,
 		time: OffsetDateTime::from_unix_timestamp(unix_time).format("%b %d %Y %H:%M UTC"),
-	})
+	}
 }
 
 // COMMENTS
 #[async_recursion]
-async fn parse_comments(json: &serde_json::Value) -> Result<Vec<Comment>, &'static str> {
+async fn parse_comments(json: &serde_json::Value) -> Vec<Comment> {
 	// Separate the comment JSON into a Vector of comments
 	let comment_data = json["data"]["children"].as_array().unwrap();
 
@@ -117,7 +117,7 @@ async fn parse_comments(json: &serde_json::Value) -> Result<Vec<Comment>, &'stat
 		let body = rewrite_url(&val(comment, "body_html"));
 
 		let replies: Vec<Comment> = if comment["data"]["replies"].is_object() {
-			parse_comments(&comment["data"]["replies"]).await.unwrap_or_default()
+			parse_comments(&comment["data"]["replies"]).await
 		} else {
 			Vec::new()
 		};
@@ -137,5 +137,5 @@ async fn parse_comments(json: &serde_json::Value) -> Result<Vec<Comment>, &'stat
 		});
 	}
 
-	Ok(comments)
+	comments
 }

@@ -29,12 +29,12 @@ pub async fn profile(req: HttpRequest) -> HttpResponse {
 	let posts = fetch_posts(&path, "Comment".to_string()).await;
 
 	match posts {
-		Ok(items) => {
+		Ok((posts, after)) => {
 			let s = UserTemplate {
 				user: user.unwrap(),
-				posts: items.0,
+				posts,
 				sort: (sort, param(&path, "t")),
-				ends: (param(&path, "after"), items.1),
+				ends: (param(&path, "after"), after),
 				layout: cookie(req, "layout"),
 			}
 			.render()

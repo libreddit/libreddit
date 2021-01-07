@@ -34,8 +34,7 @@ async fn main() -> std::io::Result<()> {
 	if args.len() > 1 {
 		for arg in args {
 			if arg.starts_with("--address=") || arg.starts_with("-a=") {
-				let split: Vec<&str> = arg.split('=').collect();
-				address = split[1].to_string();
+				address = arg.split('=').collect::<Vec<&str>>()[1].to_string();
 			}
 		}
 	}
@@ -81,6 +80,9 @@ async fn main() -> std::io::Result<()> {
 			.route("/r/{sub}/comments/{id}/{title}/{comment_id}/", web::get().to(post::item))
 	})
 	.bind(&address)
+	.map(|x| {
+		x
+	})
 	.unwrap_or_else(|_| panic!("Cannot bind to the address: {}", address))
 	.run()
 	.await
