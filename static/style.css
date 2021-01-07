@@ -38,6 +38,7 @@ nav {
 	min-height: 40px;
 	position: fixed;
 	width: calc(100% - 30px);
+	box-shadow: var(--shadow);
 	top: 0;
 	z-index: 1;
 }
