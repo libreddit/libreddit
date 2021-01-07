@@ -18,14 +18,19 @@ struct PostTemplate {
 
 pub async fn item(req: HttpRequest) -> HttpResponse {
 	// Build Reddit API path
-	let path = format!("{}.json?{}&raw_json=1", req.path(), req.query_string());
+	let mut path: String = format!("{}.json?{}&raw_json=1", req.path(), req.query_string());
 
-	// Set sort to sort query parameter or otherwise default sort
-	let sort = if param(&path, "sort").is_empty() {
-		cookie(req.to_owned(), "comment_sort")
-	} else {
-		param(&path, "sort")
-	};
+	// Set sort to sort query parameter
+	let mut sort: String = param(&path, "sort");
+
+	// Grab default comment sort method from Cookies
+	let default_sort = cookie(req.to_owned(), "comment_sort");
+
+	// If there's no sort query but there's a default sort, set sort to default_sort
+	if sort.is_empty() && !default_sort.is_empty() {
+		sort = default_sort;
+		path = format!("{}.json?{}&sort={}&raw_json=1", req.path(), req.query_string(), sort);
+	}
 
 	// Log the post ID being fetched in debug mode
 	#[cfg(debug_assertions)]
