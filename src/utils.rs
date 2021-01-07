@@ -94,7 +94,6 @@ pub struct Params {
 #[template(path = "error.html", escape = "none")]
 pub struct ErrorTemplate {
 	pub message: String,
-	pub layout: String,
 }
 
 //
@@ -180,7 +179,9 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 	// Send a request to the url
 	match request(&path).await {
 		// If success, receive JSON in response
-		Ok(response) => { res = response;	}
+		Ok(response) => {
+			res = response;
+		}
 		// If the Reddit API returns an error, exit this function
 		Err(msg) => return Err(msg),
 	}
@@ -245,12 +246,7 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 //
 
 pub async fn error(msg: String) -> HttpResponse {
-	let body = ErrorTemplate {
-		message: msg,
-		layout: String::new(),
-	}
-	.render()
-	.unwrap_or_default();
+	let body = ErrorTemplate { message: msg }.render().unwrap_or_default();
 	HttpResponse::NotFound().content_type("text/html").body(body)
 }
 

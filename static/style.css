@@ -622,6 +622,7 @@ input[type="submit"]:hover { color: var(--accent); }
 
 #prefs {
 	display: flex;
+	flex-direction: column;
 	justify-content: space-between;
 	align-items: center;
 	padding: 20px;
@@ -629,8 +630,20 @@ input[type="submit"]:hover { color: var(--accent); }
 	border-radius: 5px;
 }
 
-#prefs > select {
+#prefs > div {
+	display: flex;
+	justify-content: space-between;
+	width: 100%;
+	align-items: center;
+}
+
+#prefs > div:not(:last-of-type) {
+	margin-bottom: 10px;
+}
+
+#prefs select {
 	border-radius: 5px;
+	box-shadow: var(--shadow);
 	margin-left: 20px;
 }
 

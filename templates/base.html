@@ -11,7 +11,7 @@
 		<link rel="stylesheet" href="/style.css">
 		{% endblock %}
 		</head>
-	<body {% if layout != "" %}id="{{ layout }}"{% endif %}>
+	<body id="{% block layout %}{% endblock %}">
 		<!-- NAVIGATION BAR -->
 		<nav>
 			<p id="logo">

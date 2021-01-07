@@ -88,7 +88,7 @@
 		<!-- SORT FORM -->
 		<form id="sort">
 			<select name="sort"> 
-				{% call utils::options(sort, ["confidence", "top", "new", "controversial", "old"], "") %}
+				{% call utils::options(sort, ["confidence", "top", "new", "controversial", "old"], "confidence") %}
 			</select><input id="sort_submit" type="submit" value="&rarr;">
 		</form>
 

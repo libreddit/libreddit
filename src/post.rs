@@ -14,12 +14,18 @@ struct PostTemplate {
 	comments: Vec<Comment>,
 	post: Post,
 	sort: String,
-	layout: String,
 }
 
 pub async fn item(req: HttpRequest) -> HttpResponse {
+	// Build Reddit API path
 	let path = format!("{}.json?{}&raw_json=1", req.path(), req.query_string());
-	let sort = param(&path, "sort");
+
+	// Set sort to sort query parameter or otherwise default sort
+	let sort = if param(&path, "sort").is_empty() {
+		cookie(req.to_owned(), "comment_sort")
+	} else {
+		param(&path, "sort")
+	};
 
 	// Log the post ID being fetched in debug mode
 	#[cfg(debug_assertions)]
@@ -34,14 +40,7 @@ pub async fn item(req: HttpRequest) -> HttpResponse {
 			let comments = parse_comments(&res[1]).await;
 
 			// Use the Post and Comment structs to generate a website to show users
-			let s = PostTemplate {
-				comments,
-				post,
-				sort,
-				layout: cookie(req, "layout"),
-			}
-			.render()
-			.unwrap();
+			let s = PostTemplate { comments, post, sort }.render().unwrap();
 			HttpResponse::Ok().content_type("text/html").body(s)
 		}
 		// If the Reddit API returns an error, exit and send error page to user

@@ -80,9 +80,6 @@ async fn main() -> std::io::Result<()> {
 			.route("/r/{sub}/comments/{id}/{title}/{comment_id}/", web::get().to(post::item))
 	})
 	.bind(&address)
-	.map(|x| {
-		x
-	})
 	.unwrap_or_else(|_| panic!("Cannot bind to the address: {}", address))
 	.run()
 	.await

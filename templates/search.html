@@ -3,6 +3,8 @@
 
 {% block title %}Libreddit: search results - {{ params.q }}{% endblock %}
 
+{% block layout %}{% if layout != "" %}{{ layout }}{% endif %}{% endblock %}
+
 {% block content %}
 	<div id="column_one">
 		<form id="search_sort">

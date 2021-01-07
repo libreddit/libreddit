@@ -11,6 +11,8 @@
 	{% call utils::search(["/r/", sub.name.as_str()].concat(), "") %}
 {% endblock %}
 
+{% block layout %}{% if layout != "" %}{{ layout }}{% endif %}{% endblock %}
+
 {% block body %}
 	<main>
 		<div id="column_one">

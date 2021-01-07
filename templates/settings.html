@@ -11,10 +11,18 @@
 	<main>
 		<form id="settings" action="/settings" method="POST">
 			<div id="prefs">
-				<label for="layout">Layout:</label>
-				<select name="layout"> 
-					{% call utils::options(layout, ["card", "clean", "compact"], "clean") %}
-				</select>
+				<div id="layout">
+					<label for="layout">Layout:</label>
+					<select name="layout"> 
+						{% call utils::options(layout, ["card", "clean", "compact"], "clean") %}
+					</select>
+				</div>
+				<div id="comment_sort">
+					<label for="comment_sort">Default comment sort:</label>
+					<select name="comment_sort"> 
+						{% call utils::options(comment_sort, ["confidence", "top", "new", "controversial", "old"], "confidence") %}
+					</select>
+				</div>
 			</div>
 			<input id="save" type="submit" value="Save">
 		</form>

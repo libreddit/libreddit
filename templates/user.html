@@ -6,6 +6,9 @@
 {% endblock %}
 
 {% block title %}{{ user.name.replace("u/", "") }} (u/{{ user.name }}) - Libreddit{% endblock %}
+
+{% block layout %}{% if layout != "" %}{{ layout }}{% endif %}{% endblock %}
+
 {% block body %}
 	<main style="max-width: 1000px;">
 		<div id="column_one">

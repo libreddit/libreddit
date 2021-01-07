@@ -20,26 +20,25 @@ struct WikiTemplate {
 	sub: String,
 	wiki: String,
 	page: String,
-	layout: String,
 }
 
 // SERVICES
 pub async fn page(req: HttpRequest) -> HttpResponse {
 	let path = format!("{}.json?{}", req.path(), req.query_string());
-	let sub = req.match_info().get("sub").unwrap_or("popular").to_string();
+	let sub_name = req.match_info().get("sub").unwrap_or("popular").to_string();
 	let sort = req.match_info().get("sort").unwrap_or("hot").to_string();
 
-	let sub_result = if !&sub.contains('+') && sub != "popular" {
-		subreddit(&sub).await.unwrap_or_default()
+	let sub = if !&sub_name.contains('+') && sub_name != "popular" {
+		subreddit(&sub_name).await.unwrap_or_default()
 	} else {
 		Subreddit::default()
 	};
 
 	match fetch_posts(&path, String::new()).await {
-		Ok((posts,after)) => {
+		Ok((posts, after)) => {
 			let s = SubredditTemplate {
-				sub: sub_result,
-				posts: posts,
+				sub,
+				posts,
 				sort: (sort, param(&path, "t")),
 				ends: (param(&path, "after"), after),
 				layout: cookie(req, "layout"),
@@ -63,7 +62,6 @@ pub async fn wiki(req: HttpRequest) -> HttpResponse {
 				sub: sub.to_string(),
 				wiki: rewrite_url(res["data"]["content_html"].as_str().unwrap_or_default()),
 				page: page.to_string(),
-				layout: String::new(),
 			}
 			.render()
 			.unwrap();
