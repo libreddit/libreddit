@@ -314,6 +314,10 @@ input[type="submit"]:hover { color: var(--accent); }
 
 /* Post */
 
+.thread {
+	word-break: break-word;
+}
+
 .post {
 	border-radius: 5px;
 	background: var(--post);
