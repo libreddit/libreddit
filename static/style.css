@@ -205,6 +205,8 @@ select, #search {
 	padding: 0 15px;
 	height: 40px;
 	appearance: none;
+	-webkit-appearance: none;
+	-moz-appearance: none;
 	border-radius: 5px 0px 0px 5px;
 }
 
@@ -659,6 +661,11 @@ input[type="submit"]:hover { color: var(--accent); }
 	margin-top: 20px;
 }
 
+input[type="submit"] {
+	appearance: none;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+}
 /* Markdown */
 
 .md > *:not(:first-child) {
