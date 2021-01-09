@@ -42,7 +42,7 @@ pub async fn profile(req: HttpRequest) -> HttpResponse {
 			HttpResponse::Ok().content_type("text/html").body(s)
 		}
 		// If there is an error show error page
-		Err(msg) => {dbg!(msg);error(msg.to_string()).await},
+		Err(msg) => error(msg.to_string()).await,
 	}
 }
 

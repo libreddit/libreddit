@@ -47,7 +47,7 @@ async fn main() -> std::io::Result<()> {
 			// TRAILING SLASH MIDDLEWARE
 			.wrap(NormalizePath::default())
 			// DEFAULT SERVICE
-			.default_service(web::get().to(utils::error))
+			.default_service(web::get().to(|| utils::error("Nothing here".to_string())))
 			// GENERAL SERVICES
 			.route("/style.css/", web::get().to(style))
 			.route("/favicon.ico/", web::get().to(HttpResponse::Ok))
