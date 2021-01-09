@@ -54,7 +54,7 @@ A checkmark in the "Cloudflare" category here refers to the use of the reverse p
 
 ### Elsewhere
 Find Libreddit on...
-- 💬 Matrix: [#libreddit:matrix.org](https://matrix.to/#/#libreddit:matrix.org)
+- 💬 Matrix: [#libreddit:kde.org](https://matrix.to/#/#libreddit:matrix.org)
 - 🐋 Docker: [spikecodes/libreddit](https://hub.docker.com/r/spikecodes/libreddit)
 - :octocat: GitHub: [spikecodes/libreddit](https://github.com/spikecodes/libreddit)
 - 🦊 GitLab: [spikecodes/libreddit](https://gitlab.com/spikecodes/libreddit)
