@@ -31,7 +31,7 @@ pub async fn profile(req: HttpRequest) -> HttpResponse {
 	match posts {
 		Ok((posts, after)) => {
 			let s = UserTemplate {
-				user: user.unwrap(),
+				user: user.unwrap_or_default(),
 				posts,
 				sort: (sort, param(&path, "t")),
 				ends: (param(&path, "after"), after),
@@ -42,7 +42,7 @@ pub async fn profile(req: HttpRequest) -> HttpResponse {
 			HttpResponse::Ok().content_type("text/html").body(s)
 		}
 		// If there is an error show error page
-		Err(msg) => error(msg.to_string()).await,
+		Err(msg) => {dbg!(msg);error(msg.to_string()).await},
 	}
 }
 

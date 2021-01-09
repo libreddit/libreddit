@@ -1,5 +1,5 @@
 // CRATES
-use crate::utils::{error, fetch_posts, format_num, format_url, param, prefs, request, rewrite_url, val, Post, Preferences, Subreddit};
+use crate::utils::{cookie, error, fetch_posts, format_num, format_url, param, prefs, request, rewrite_url, val, Post, Preferences, Subreddit};
 use actix_web::{HttpRequest, HttpResponse, Result};
 use askama::Template;
 
@@ -25,10 +25,15 @@ struct WikiTemplate {
 // SERVICES
 pub async fn page(req: HttpRequest) -> HttpResponse {
 	let path = format!("{}.json?{}", req.path(), req.query_string());
-	let sub_name = req.match_info().get("sub").unwrap_or("popular").to_string();
+	let default = cookie(&req, "front_page");
+	let sub_name = req
+		.match_info()
+		.get("sub")
+		.unwrap_or(if default.is_empty() { "popular" } else { default.as_str() })
+		.to_string();
 	let sort = req.match_info().get("sort").unwrap_or("hot").to_string();
 
-	let sub = if !&sub_name.contains('+') && sub_name != "popular" {
+	let sub = if !&sub_name.contains('+') && sub_name != "popular" && sub_name != "all" {
 		subreddit(&sub_name).await.unwrap_or_default()
 	} else {
 		Subreddit::default()

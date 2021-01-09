@@ -51,6 +51,7 @@ pub struct Comment {
 	pub replies: Vec<Comment>,
 }
 
+#[derive(Default)]
 // User struct containing metadata about user
 pub struct User {
 	pub name: String,
@@ -93,6 +94,7 @@ pub struct ErrorTemplate {
 }
 
 pub struct Preferences {
+	pub front_page: String,
 	pub layout: String,
 	pub hide_nsfw: String,
 	pub comment_sort: String,
@@ -105,6 +107,7 @@ pub struct Preferences {
 // Build preferences from cookies
 pub fn prefs(req: HttpRequest) -> Preferences {
 	Preferences {
+		front_page: cookie(&req, "front_page"),
 		layout: cookie(&req, "layout"),
 		hide_nsfw: cookie(&req, "hide_nsfw"),
 		comment_sort: cookie(&req, "comment_sort"),

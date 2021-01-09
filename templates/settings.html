@@ -11,6 +11,12 @@
 	<main>
 		<form id="settings" action="/settings" method="POST">
 			<div id="prefs">
+				<div id="front_page">
+					<label for="front_page">Front page:</label>
+					<select name="front_page"> 
+						{% call utils::options(prefs.front_page, ["popular", "all"], "popular") %}
+					</select>
+				</div>			
 				<div id="layout">
 					<label for="layout">Layout:</label>
 					<select name="layout"> 
@@ -28,6 +34,7 @@
 					<input type="checkbox" name="hide_nsfw" {% if prefs.hide_nsfw == "on" %}checked{% endif %}>
 				</div>
 			</div>
+			<p id="settings_note"><b>Note:</b> settings are saved in browser cookies. Clearing your cookie data will reset them.</p>
 			<input id="save" type="submit" value="Save">
 		</form>
 	</main>
