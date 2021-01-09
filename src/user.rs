@@ -25,13 +25,13 @@ pub async fn profile(req: HttpRequest) -> HttpResponse {
 	let username = req.match_info().get("username").unwrap_or("").to_string();
 
 	// Request user profile data and user posts/comments from Reddit
-	let user = user(&username).await;
+	let user = user(&username).await.unwrap_or_default();
 	let posts = fetch_posts(&path, "Comment".to_string()).await;
 
 	match posts {
 		Ok((posts, after)) => {
 			let s = UserTemplate {
-				user: user.unwrap_or_default(),
+				user,
 				posts,
 				sort: (sort, param(&path, "t")),
 				ends: (param(&path, "after"), after),

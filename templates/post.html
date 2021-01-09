@@ -67,7 +67,7 @@
 					{% if post.post_type == "image" %}
 					<img class="post_media" src="{{ post.media }}"/>
 					{% else if post.post_type == "video" %}
-					<video class="post_media" src="{{ post.media }}" controls autoplay loop>
+					<video class="post_media" src="{{ post.media }}" controls autoplay loop></video>
 					{% else if post.post_type == "link" %}
 					<a id="post_url" href="{{ post.media }}">{{ post.media }}</a>
 					{% endif %}
@@ -81,6 +81,7 @@
 						</ul>
 						<p>{{ post.upvote_ratio }}% Upvoted</p>
 					</div>
+
 				</div>
 			</div>
 		</div>
