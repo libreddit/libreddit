@@ -1,7 +1,7 @@
 //
 // CRATES
 //
-use actix_web::{cookie::Cookie, HttpResponse, Result};
+use actix_web::{cookie::Cookie, HttpRequest, HttpResponse, Result};
 use askama::Template;
 use base64::encode;
 use regex::Regex;
@@ -95,6 +95,7 @@ pub struct ErrorTemplate {
 pub struct Preferences {
 	pub layout: String,
 	pub hide_nsfw: String,
+	pub comment_sort: String,
 }
 
 //
@@ -102,10 +103,11 @@ pub struct Preferences {
 //
 
 // Build preferences from cookies
-pub fn prefs(req: actix_web::HttpRequest) -> Preferences {
+pub fn prefs(req: HttpRequest) -> Preferences {
 	Preferences {
-		layout: cookie(req.to_owned(), "layout"),
-		hide_nsfw: cookie(req, "hide_nsfw"),
+		layout: cookie(&req, "layout"),
+		hide_nsfw: cookie(&req, "hide_nsfw"),
+		comment_sort: cookie(&req, "comment_sort"),
 	}
 }
 
@@ -117,8 +119,8 @@ pub fn param(path: &str, value: &str) -> String {
 }
 
 // Parse Cookie value from request
-pub fn cookie(req: actix_web::HttpRequest, name: &str) -> String {
-	actix_web::HttpMessage::cookie(&req, name).unwrap_or_else(|| Cookie::new(name, "")).value().to_string()
+pub fn cookie(req: &HttpRequest, name: &str) -> String {
+	actix_web::HttpMessage::cookie(req, name).unwrap_or_else(|| Cookie::new(name, "")).value().to_string()
 }
 
 // Direct urls to proxy if proxy is enabled

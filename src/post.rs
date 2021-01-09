@@ -24,7 +24,7 @@ pub async fn item(req: HttpRequest) -> HttpResponse {
 	let mut sort: String = param(&path, "sort");
 
 	// Grab default comment sort method from Cookies
-	let default_sort = cookie(req.to_owned(), "comment_sort");
+	let default_sort = cookie(&req, "comment_sort");
 
 	// If there's no sort query but there's a default sort, set sort to default_sort
 	if sort.is_empty() && !default_sort.is_empty() {

@@ -1,5 +1,5 @@
 // CRATES
-use crate::utils::cookie;
+use crate::utils::{prefs, Preferences};
 use actix_web::{cookie::Cookie, web::Form, HttpMessage, HttpRequest, HttpResponse};
 use askama::Template;
 use time::{Duration, OffsetDateTime};
@@ -8,9 +8,7 @@ use time::{Duration, OffsetDateTime};
 #[derive(Template)]
 #[template(path = "settings.html")]
 struct SettingsTemplate {
-	layout: String,
-	comment_sort: String,
-	hide_nsfw: String,
+	prefs: Preferences,
 }
 
 #[derive(serde::Deserialize)]
@@ -24,13 +22,7 @@ pub struct SettingsForm {
 
 // Retrieve cookies from request "Cookie" header
 pub async fn get(req: HttpRequest) -> HttpResponse {
-	let s = SettingsTemplate {
-		layout: cookie(req.to_owned(), "layout"),
-		comment_sort: cookie(req.to_owned(), "comment_sort"),
-		hide_nsfw: cookie(req, "hide_nsfw"),
-	}
-	.render()
-	.unwrap();
+	let s = SettingsTemplate { prefs: prefs(req) }.render().unwrap();
 	HttpResponse::Ok().content_type("text/html").body(s)
 }
 
