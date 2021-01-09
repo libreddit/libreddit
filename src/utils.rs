@@ -1,7 +1,3 @@
-// use std::collections::HashMap;
-
-use std::collections::HashMap;
-
 //
 // CRATES
 //
@@ -10,9 +6,9 @@ use askama::Template;
 use base64::encode;
 use regex::Regex;
 use serde_json::from_str;
+use std::collections::HashMap;
 use time::OffsetDateTime;
 use url::Url;
-// use surf::{client, get, middleware::Redirect};
 
 //
 // STRUCTS
@@ -96,9 +92,22 @@ pub struct ErrorTemplate {
 	pub message: String,
 }
 
+pub struct Preferences {
+	pub layout: String,
+	pub hide_nsfw: String,
+}
+
 //
 // FORMATTING
 //
+
+// Build preferences from cookies
+pub fn prefs(req: actix_web::HttpRequest) -> Preferences {
+	Preferences {
+		layout: cookie(req.to_owned(), "layout"),
+		hide_nsfw: cookie(req, "hide_nsfw"),
+	}
+}
 
 // Grab a query param from a url
 pub fn param(path: &str, value: &str) -> String {
@@ -114,7 +123,7 @@ pub fn cookie(req: actix_web::HttpRequest, name: &str) -> String {
 
 // Direct urls to proxy if proxy is enabled
 pub fn format_url(url: String) -> String {
-	if url.is_empty() || url == "self" || url == "default" || url == "nsfw" {
+	if url.is_empty() || url == "self" || url == "default" || url == "nsfw" || url == "spoiler" {
 		String::new()
 	} else {
 		format!("/proxy/{}", encode(url).as_str())
@@ -129,10 +138,10 @@ pub fn rewrite_url(text: &str) -> String {
 
 // Append `m` and `k` for millions and thousands respectively
 pub fn format_num(num: i64) -> String {
-	if num > 1000000 {
-		format!("{}m", num / 1000000)
+	if num > 1_000_000 {
+		format!("{}m", num / 1_000_000)
 	} else if num > 1000 {
-		format!("{}k", num / 1000)
+		format!("{}k", num / 1_000)
 	} else {
 		num.to_string()
 	}
@@ -279,9 +288,9 @@ pub async fn request(path: &str) -> Result<serde_json::Value, &'static str> {
 			}
 		}
 		// If can't send request to Reddit, return this to user
-		Err(e) => {
+		Err(_e) => {
 			#[cfg(debug_assertions)]
-			dbg!(format!("{} - {}", url, e));
+			dbg!(format!("{} - {}", url, _e));
 			Err("Couldn't send request to Reddit")
 		}
 	}

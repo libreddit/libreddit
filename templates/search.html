@@ -3,7 +3,7 @@
 
 {% block title %}Libreddit: search results - {{ params.q }}{% endblock %}
 
-{% block layout %}{% if layout != "" %}{{ layout }}{% endif %}{% endblock %}
+{% block layout %}{% if prefs.layout != "" %}{{ prefs.layout }}{% endif %}{% endblock %}
 
 {% block content %}
 	<div id="column_one">
@@ -22,7 +22,9 @@
 			</select>{% endif %}<input id="sort_submit" type="submit" value="&rarr;">
 		</form>
 		{% for post in posts %}
-		{% if post.title != "Comment" %}
+
+		{% if post.flags.nsfw && prefs.hide_nsfw == "on" %}
+		{% else if post.title != "Comment" %}
 		<div class="post">
 			<div class="post_left">
 				<p class="post_score">{{ post.score }}</p>

@@ -11,7 +11,7 @@
 	{% call utils::search(["/r/", sub.name.as_str()].concat(), "") %}
 {% endblock %}
 
-{% block layout %}{% if layout != "" %}{{ layout }}{% endif %}{% endblock %}
+{% block layout %}{% if prefs.layout != "" %}{{ prefs.layout }}{% endif %}{% endblock %}
 
 {% block body %}
 	<main>
@@ -29,7 +29,10 @@
 					<input id="sort_submit" type="submit" value="&rarr;">
 				</select>{% endif %}
 			</form>
+
+			<div id="posts">
 			{% for post in posts %}
+			{% if !(post.flags.nsfw && prefs.hide_nsfw == "on") %}
 			<div class="post {% if post.flags.stickied %}stickied{% endif %}">
 				<div class="post_left">
 					<p class="post_score">{{ post.score }}</p>
@@ -53,14 +56,16 @@
 					</div>
 
 					<!-- POST MEDIA/THUMBNAIL -->
-					{% if layout == "card" && post.post_type == "image" %}
+					{% if prefs.layout == "card" && post.post_type == "image" %}
 						<img class="post_media" src="{{ post.media }}"/>
-					{% else if layout != "card" %}
+					{% else if prefs.layout != "card" %}
 						<img class="post_thumbnail" src="{{ post.thumbnail }}">
 					{% endif %}
 				</div>
 			</div>
+			{% endif %}
 			{% endfor %}
+			</div>
 
 			<footer>
 				{% if ends.0 != "" %}

@@ -1,6 +1,6 @@
 // CRATES
 use crate::utils::cookie;
-use actix_web::{cookie::Cookie, web::Form, HttpRequest, HttpResponse}; // http::Method,
+use actix_web::{cookie::Cookie, web::Form, HttpMessage, HttpRequest, HttpResponse};
 use askama::Template;
 use time::{Duration, OffsetDateTime};
 
@@ -10,12 +10,14 @@ use time::{Duration, OffsetDateTime};
 struct SettingsTemplate {
 	layout: String,
 	comment_sort: String,
+	hide_nsfw: String,
 }
 
 #[derive(serde::Deserialize)]
 pub struct SettingsForm {
 	layout: Option<String>,
 	comment_sort: Option<String>,
+	hide_nsfw: Option<String>,
 }
 
 // FUNCTIONS
@@ -24,7 +26,8 @@ pub struct SettingsForm {
 pub async fn get(req: HttpRequest) -> HttpResponse {
 	let s = SettingsTemplate {
 		layout: cookie(req.to_owned(), "layout"),
-		comment_sort: cookie(req, "comment_sort"),
+		comment_sort: cookie(req.to_owned(), "comment_sort"),
+		hide_nsfw: cookie(req, "hide_nsfw"),
 	}
 	.render()
 	.unwrap();
@@ -33,31 +36,28 @@ pub async fn get(req: HttpRequest) -> HttpResponse {
 
 // Set cookies using response "Set-Cookie" header
 pub async fn set(req: HttpRequest, form: Form<SettingsForm>) -> HttpResponse {
-	let mut response = HttpResponse::Found();
+	let mut res = HttpResponse::Found();
 
-	match &form.layout {
-		Some(value) => response.cookie(
-			Cookie::build("layout", value)
-				.path("/")
-				.http_only(true)
-				.expires(OffsetDateTime::now_utc() + Duration::weeks(52))
-				.finish(),
-		),
-		None => response.del_cookie(&actix_web::HttpMessage::cookie(&req, "layout").unwrap()),
-	};
+	let names = vec!["layout", "comment_sort", "hide_nsfw"];
+	let values = vec![&form.layout, &form.comment_sort, &form.hide_nsfw];
 
-	match &form.comment_sort {
-		Some(value) => response.cookie(
-			Cookie::build("comment_sort", value)
-				.path("/")
-				.http_only(true)
-				.expires(OffsetDateTime::now_utc() + Duration::weeks(52))
-				.finish(),
-		),
-		None => response.del_cookie(&actix_web::HttpMessage::cookie(&req, "comment_sort").unwrap()),
-	};
+	for (i, name) in names.iter().enumerate() {
+		match values[i] {
+			Some(value) => res.cookie(
+				Cookie::build(name.to_owned(), value)
+					.path("/")
+					.http_only(true)
+					.expires(OffsetDateTime::now_utc() + Duration::weeks(52))
+					.finish(),
+			),
+			None => match HttpMessage::cookie(&req, name.to_owned()) {
+				Some(cookie) => res.del_cookie(&cookie),
+				None => &mut res,
+			},
+		};
+	}
 
-	response
+	res
 		.content_type("text/html")
 		.set_header("Location", "/settings")
 		.body(r#"Redirecting to <a href="/settings">settings</a>..."#)

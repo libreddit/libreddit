@@ -1,5 +1,5 @@
 // CRATES
-use crate::utils::{cookie, error, fetch_posts, format_num, format_url, param, request, rewrite_url, val, Post, Subreddit};
+use crate::utils::{error, fetch_posts, format_num, format_url, param, prefs, request, rewrite_url, val, Post, Preferences, Subreddit};
 use actix_web::{HttpRequest, HttpResponse, Result};
 use askama::Template;
 
@@ -11,7 +11,7 @@ struct SubredditTemplate {
 	posts: Vec<Post>,
 	sort: (String, String),
 	ends: (String, String),
-	layout: String,
+	prefs: Preferences,
 }
 
 #[derive(Template)]
@@ -41,7 +41,7 @@ pub async fn page(req: HttpRequest) -> HttpResponse {
 				posts,
 				sort: (sort, param(&path, "t")),
 				ends: (param(&path, "after"), after),
-				layout: cookie(req, "layout"),
+				prefs: prefs(req),
 			}
 			.render()
 			.unwrap();

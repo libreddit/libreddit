@@ -1,5 +1,5 @@
 // CRATES
-use crate::utils::{cookie, error, fetch_posts, param, Post};
+use crate::utils::{error, fetch_posts, param, prefs, Post, Preferences};
 use actix_web::{HttpRequest, HttpResponse};
 use askama::Template;
 
@@ -19,7 +19,7 @@ struct SearchTemplate {
 	posts: Vec<Post>,
 	sub: String,
 	params: SearchParams,
-	layout: String,
+	prefs: Preferences,
 }
 
 // SERVICES
@@ -45,7 +45,7 @@ pub async fn find(req: HttpRequest) -> HttpResponse {
 					after,
 					restrict_sr: param(&path, "restrict_sr"),
 				},
-				layout: cookie(req, "layout"),
+				prefs: prefs(req),
 			}
 			.render()
 			.unwrap(),

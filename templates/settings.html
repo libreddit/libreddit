@@ -23,6 +23,10 @@
 						{% call utils::options(comment_sort, ["confidence", "top", "new", "controversial", "old"], "confidence") %}
 					</select>
 				</div>
+				<div id="hide_nsfw">
+					<label for="hide_nsfw">Hide NSFW posts:</label>
+					<input type="checkbox" name="hide_nsfw" {% if hide_nsfw == "on" %}checked{% endif %}>
+				</div>
 			</div>
 			<input id="save" type="submit" value="Save">
 		</form>

@@ -7,7 +7,7 @@
 
 {% block title %}{{ user.name.replace("u/", "") }} (u/{{ user.name }}) - Libreddit{% endblock %}
 
-{% block layout %}{% if layout != "" %}{{ layout }}{% endif %}{% endblock %}
+{% block layout %}{% if prefs.layout != "" %}{{ prefs.layout }}{% endif %}{% endblock %}
 
 {% block body %}
 	<main style="max-width: 1000px;">
@@ -19,8 +19,12 @@
 					{% call utils::options(sort.1, ["hour", "day", "week", "month", "year", "all"], "all") %}
 				</select>{% endif %}<input id="sort_submit" type="submit" value="&rarr;">
 			</form>
+
+			<div id="posts">
 			{% for post in posts %}
-			{% if post.title != "Comment" %}
+
+			{% if post.flags.nsfw && prefs.hide_nsfw == "on" %}
+			{% else if post.title != "Comment" %}
 			<div class="post">
 				<div class="post_left">
 					<p class="post_score">{{ post.score }}</p>
@@ -47,9 +51,9 @@
 					</div>
 					
 					<!-- POST MEDIA/THUMBNAIL -->
-					{% if layout == "card" && post.post_type == "image" %}
+					{% if prefs.layout == "card" && post.post_type == "image" %}
 						<img class="post_media" src="{{ post.media }}"/>
-					{% else if layout != "card" %}
+					{% else if prefs.layout != "card" %}
 						<img class="post_thumbnail" src="{{ post.thumbnail }}">
 					{% endif %}
 				</div>
@@ -69,7 +73,10 @@
 				</details>
 			</div>
 			{% endif %}
+
 			{% endfor %}
+			</div>
+
 			<footer>
 				{% if ends.0 != "" %}
 				<a href="?sort={{ sort.0 }}&before={{ ends.0 }}">PREV</a>
