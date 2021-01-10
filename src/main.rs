@@ -1,5 +1,5 @@
 // Import Crates
-use actix_web::{App, HttpResponse, HttpServer, get, middleware, web}; // dev::Service
+use actix_web::{get, middleware, web, App, HttpResponse, HttpServer}; // dev::Service
 
 // Reference local files
 mod post;
@@ -59,7 +59,7 @@ async fn main() -> std::io::Result<()> {
 			// 	}
 			// })
 			// TRAILING SLASH MIDDLEWARE
-			.wrap( middleware::NormalizePath::default())
+			.wrap(middleware::NormalizePath::default())
 			// DEFAULT SERVICE
 			.default_service(web::get().to(|| utils::error("Nothing here".to_string())))
 			// GENERAL SERVICES

@@ -1,5 +1,5 @@
 // CRATES
-use crate::utils::{Comment, Flags, Flair, Post, Preferences, cookie, error, format_num, format_url, media, param, prefs, request, rewrite_url, val};
+use crate::utils::{cookie, error, format_num, format_url, media, param, prefs, request, rewrite_url, val, Comment, Flags, Flair, Post, Preferences};
 use actix_web::{HttpRequest, HttpResponse};
 
 use async_recursion::async_recursion;
@@ -14,7 +14,7 @@ struct PostTemplate {
 	comments: Vec<Comment>,
 	post: Post,
 	sort: String,
-	prefs: Preferences
+	prefs: Preferences,
 }
 
 pub async fn item(req: HttpRequest) -> HttpResponse {
@@ -46,7 +46,14 @@ pub async fn item(req: HttpRequest) -> HttpResponse {
 			let comments = parse_comments(&res[1]).await;
 
 			// Use the Post and Comment structs to generate a website to show users
-			let s = PostTemplate { comments, post, sort, prefs: prefs(req) }.render().unwrap();
+			let s = PostTemplate {
+				comments,
+				post,
+				sort,
+				prefs: prefs(req),
+			}
+			.render()
+			.unwrap();
 			HttpResponse::Ok().content_type("text/html").body(s)
 		}
 		// If the Reddit API returns an error, exit and send error page to user
