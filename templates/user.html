@@ -7,10 +7,10 @@
 
 {% block title %}{{ user.name.replace("u/", "") }} (u/{{ user.name }}) - Libreddit{% endblock %}
 
-{% block layout %}{% if prefs.layout != "" %}{{ prefs.layout }}{% endif %}{% endblock %}
+{% block ui %}{% if prefs.layout != "" %}{{ prefs.layout }}{% endif %}{% if prefs.wide == "on" %} wide{% endif %}{% endblock %}
 
 {% block body %}
-	<main style="max-width: 1000px;">
+	<main>
 		<div id="column_one">
 			<form id="sort">
 				<select name="sort"> 

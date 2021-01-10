@@ -20,6 +20,7 @@ struct WikiTemplate {
 	sub: String,
 	wiki: String,
 	page: String,
+	prefs: Preferences,
 }
 
 // SERVICES
@@ -67,6 +68,7 @@ pub async fn wiki(req: HttpRequest) -> HttpResponse {
 				sub: sub.to_string(),
 				wiki: rewrite_url(res["data"]["content_html"].as_str().unwrap_or_default()),
 				page: page.to_string(),
+				prefs: prefs(req),
 			}
 			.render()
 			.unwrap();

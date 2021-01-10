@@ -7,35 +7,39 @@
 	{% call utils::search("".to_owned(), "", "") %}
 {% endblock %}
 
-{% block body %}
-	<main>
-		<form id="settings" action="/settings" method="POST">
-			<div id="prefs">
-				<div id="front_page">
-					<label for="front_page">Front page:</label>
-					<select name="front_page"> 
-						{% call utils::options(prefs.front_page, ["popular", "all"], "popular") %}
-					</select>
-				</div>			
-				<div id="layout">
-					<label for="layout">Layout:</label>
-					<select name="layout"> 
-						{% call utils::options(prefs.layout, ["card", "clean", "compact"], "clean") %}
-					</select>
-				</div>
-				<div id="comment_sort">
-					<label for="comment_sort">Default comment sort:</label>
-					<select name="comment_sort"> 
-						{% call utils::options(prefs.comment_sort, ["confidence", "top", "new", "controversial", "old"], "confidence") %}
-					</select>
-				</div>
-				<div id="hide_nsfw">
-					<label for="hide_nsfw">Hide NSFW posts:</label>
-					<input type="checkbox" name="hide_nsfw" {% if prefs.hide_nsfw == "on" %}checked{% endif %}>
-				</div>
-			</div>
-			<p id="settings_note"><b>Note:</b> settings are saved in browser cookies. Clearing your cookie data will reset them.</p>
-			<input id="save" type="submit" value="Save">
-		</form>
-	</main>
+{% block content %}
+<form id="settings" action="/settings" method="POST">
+	<div id="prefs">
+		<p>Interface</p>
+		<div id="front_page">
+			<label for="front_page">Front page:</label>
+			<select name="front_page"> 
+				{% call utils::options(prefs.front_page, ["popular", "all"], "popular") %}
+			</select>
+		</div>			
+		<div id="layout">
+			<label for="layout">Layout:</label>
+			<select name="layout"> 
+				{% call utils::options(prefs.layout, ["card", "clean", "compact"], "clean") %}
+			</select>
+		</div>
+		<div id="wide">
+			<label for="wide">Wide UI:</label>
+			<input type="checkbox" name="wide" {% if prefs.wide == "on" %}checked{% endif %}>
+		</div>
+		<p>Sorting / Filtering</p>
+		<div id="comment_sort">
+			<label for="comment_sort">Default comment sort:</label>
+			<select name="comment_sort"> 
+				{% call utils::options(prefs.comment_sort, ["confidence", "top", "new", "controversial", "old"], "confidence") %}
+			</select>
+		</div>
+		<div id="hide_nsfw">
+			<label for="hide_nsfw">Hide NSFW posts:</label>
+			<input type="checkbox" name="hide_nsfw" {% if prefs.hide_nsfw == "on" %}checked{% endif %}>
+		</div>
+	</div>
+	<p id="settings_note"><b>Note:</b> settings are saved in browser cookies. Clearing your cookie data will reset them.</p>
+	<input id="save" type="submit" value="Save">
+</form>
 {% endblock %}

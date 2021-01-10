@@ -15,6 +15,7 @@ struct SettingsTemplate {
 pub struct SettingsForm {
 	front_page: Option<String>,
 	layout: Option<String>,
+	wide: Option<String>,
 	comment_sort: Option<String>,
 	hide_nsfw: Option<String>,
 }
@@ -31,8 +32,8 @@ pub async fn get(req: HttpRequest) -> HttpResponse {
 pub async fn set(req: HttpRequest, form: Form<SettingsForm>) -> HttpResponse {
 	let mut res = HttpResponse::Found();
 
-	let names = vec!["front_page", "layout", "comment_sort", "hide_nsfw"];
-	let values = vec![&form.front_page, &form.layout, &form.comment_sort, &form.hide_nsfw];
+	let names = vec!["front_page", "layout", "wide", "comment_sort", "hide_nsfw"];
+	let values = vec![&form.front_page, &form.layout, &form.wide, &form.comment_sort, &form.hide_nsfw];
 
 	for (i, name) in names.iter().enumerate() {
 		match values[i] {

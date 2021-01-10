@@ -1,5 +1,5 @@
 // Import Crates
-use actix_web::{get, middleware::NormalizePath, web, App, HttpResponse, HttpServer};
+use actix_web::{App, HttpResponse, HttpServer, get, middleware, web}; // dev::Service
 
 // Reference local files
 mod post;
@@ -28,14 +28,14 @@ async fn favicon() -> HttpResponse {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-	let args: Vec<String> = std::env::args().collect();
 	let mut address = "0.0.0.0:8080".to_string();
+	// let mut https = false;
 
-	if args.len() > 1 {
-		for arg in args {
-			if arg.starts_with("--address=") || arg.starts_with("-a=") {
-				address = arg.split('=').collect::<Vec<&str>>()[1].to_string();
-			}
+	for arg in std::env::args().collect::<Vec<String>>() {
+		match arg.split('=').collect::<Vec<&str>>()[0] {
+			"--address" | "-a" => address = arg.split('=').collect::<Vec<&str>>()[1].to_string(),
+			// "--redirect-https" | "-r" => https = true,
+			_ => {}
 		}
 	}
 
@@ -44,8 +44,22 @@ async fn main() -> std::io::Result<()> {
 
 	HttpServer::new(|| {
 		App::new()
+			// REDIRECT TO HTTPS
+			// .wrap(middleware::DefaultHeaders::new().header("Strict-Transport-Security", "max-age=31536000"))
+			// .wrap_fn(|req, srv| {
+			// 	let fut = srv.call(req);
+			// 	async {
+			// 		let mut res = fut.await?;
+			// 		if https {
+			// 			res.headers_mut().insert(
+			// 				actix_web::http::header::STRICT_TRANSPORT_SECURITY, actix_web::http::HeaderValue::from_static("max-age=31536000;"),
+			// 			);
+			// 		}
+			// 		Ok(res)
+			// 	}
+			// })
 			// TRAILING SLASH MIDDLEWARE
-			.wrap(NormalizePath::default())
+			.wrap( middleware::NormalizePath::default())
 			// DEFAULT SERVICE
 			.default_service(web::get().to(|| utils::error("Nothing here".to_string())))
 			// GENERAL SERVICES
@@ -80,7 +94,7 @@ async fn main() -> std::io::Result<()> {
 			.route("/r/{sub}/comments/{id}/{title}/{comment_id}/", web::get().to(post::item))
 	})
 	.bind(&address)
-	.unwrap_or_else(|_| panic!("Cannot bind to the address: {}", address))
+	.unwrap_or_else(|e| panic!("Cannot bind to the address {}: {}", address, e))
 	.run()
 	.await
 }

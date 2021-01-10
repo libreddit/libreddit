@@ -7,6 +7,8 @@
 	{% call utils::search(["/r/", post.community.as_str()].concat(), "") %}
 {% endblock %}
 
+{% block ui %}{% if prefs.wide == "on" %} wide{% endif %}{% endblock %}
+
 {% block root %}/r/{{ post.community }}{% endblock %}{% block location %}r/{{ post.community }}{% endblock %}
 {% block head %}
 	{% call super() %}

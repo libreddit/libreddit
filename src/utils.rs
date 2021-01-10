@@ -96,6 +96,7 @@ pub struct ErrorTemplate {
 pub struct Preferences {
 	pub front_page: String,
 	pub layout: String,
+	pub wide: String,
 	pub hide_nsfw: String,
 	pub comment_sort: String,
 }
@@ -109,6 +110,7 @@ pub fn prefs(req: HttpRequest) -> Preferences {
 	Preferences {
 		front_page: cookie(&req, "front_page"),
 		layout: cookie(&req, "layout"),
+		wide: cookie(&req, "wide"),
 		hide_nsfw: cookie(&req, "hide_nsfw"),
 		comment_sort: cookie(&req, "comment_sort"),
 	}
