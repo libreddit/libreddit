@@ -37,6 +37,7 @@ pub struct Post {
 	pub flags: Flags,
 	pub thumbnail: String,
 	pub media: String,
+	pub domain: String,
 	pub time: String,
 }
 
@@ -169,6 +170,9 @@ pub async fn media(data: &serde_json::Value) -> (String, String) {
 	} else if data["post_hint"].as_str().unwrap_or("") == "image" {
 		post_type = "image";
 		format_url(data["preview"]["images"][0]["source"]["url"].as_str().unwrap_or_default().to_string())
+	} else if data["is_self"].as_bool().unwrap_or_default()  {
+		post_type = "self";
+		data["permalink"].as_str().unwrap_or_default().to_string()
 	} else {
 		post_type = "link";
 		data["url"].as_str().unwrap_or_default().to_string()
@@ -240,6 +244,7 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 			post_type,
 			thumbnail: format_url(val(post, "thumbnail")),
 			media,
+			domain: val(post, "domain"),
 			flair: Flair(
 				val(post, "link_flair_text"),
 				val(post, "link_flair_background_color"),

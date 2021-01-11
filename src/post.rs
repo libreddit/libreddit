@@ -106,6 +106,7 @@ async fn parse_post(json: &serde_json::Value) -> Post {
 			stickied: post["data"]["stickied"].as_bool().unwrap_or(false),
 		},
 		media,
+		domain: val(post, "domain"),
 		time: OffsetDateTime::from_unix_timestamp(unix_time).format("%b %d %Y %H:%M UTC"),
 	}
 }
