@@ -91,9 +91,12 @@ pub struct Params {
 #[template(path = "error.html", escape = "none")]
 pub struct ErrorTemplate {
 	pub message: String,
+	pub prefs: Preferences,
 }
 
+#[derive(Default)]
 pub struct Preferences {
+	pub theme: String,
 	pub front_page: String,
 	pub layout: String,
 	pub wide: String,
@@ -108,6 +111,7 @@ pub struct Preferences {
 // Build preferences from cookies
 pub fn prefs(req: HttpRequest) -> Preferences {
 	Preferences {
+		theme: cookie(&req, "theme"),
 		front_page: cookie(&req, "front_page"),
 		layout: cookie(&req, "layout"),
 		wide: cookie(&req, "wide"),
@@ -262,7 +266,12 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 //
 
 pub async fn error(msg: String) -> HttpResponse {
-	let body = ErrorTemplate { message: msg }.render().unwrap_or_default();
+	let body = ErrorTemplate {
+		message: msg,
+		prefs: Preferences::default(),
+	}
+	.render()
+	.unwrap_or_default();
 	HttpResponse::NotFound().content_type("text/html").body(body)
 }
 

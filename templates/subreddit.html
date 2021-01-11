@@ -11,8 +11,6 @@
 	{% call utils::search(["/r/", sub.name.as_str()].concat(), "") %}
 {% endblock %}
 
-{% block ui %}{% if prefs.layout != "" %}{{ prefs.layout }}{% endif %}{% if prefs.wide == "on" %} wide{% endif %}{% endblock %}
-
 {% block body %}
 	<main>
 		<div id="column_one">

@@ -6,8 +6,6 @@
 	{% else %}Libreddit{% endif %}
 {% endblock %}
 
-{% block ui %}{% if prefs.wide == "on" %} wide{% endif %}{% endblock %}
-
 {% block search %}
 	{% call utils::search(["/r/", sub.as_str()].concat(), "") %}
 {% endblock %}

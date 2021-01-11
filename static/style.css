@@ -3,6 +3,7 @@
 :root {
 	--accent: aqua;
 	--green: #5cff85;
+	--nsfw: #FF5C5D;
 	--text: white;
 	--foreground: #222;
 	--background: #0F0F0F;
@@ -13,7 +14,7 @@
 }
 
 ::selection {
-	color: var(--background);
+	color: var(--foreground);
 	background: var(--accent);
 }
 
@@ -127,6 +128,20 @@ aside {
 	opacity: 0.5;
 }
 
+/* Light Theme */
+
+.light {
+	--accent: #009a9a;
+	--green: #00a229;
+	--text: black;
+	--foreground: #f5f5f5;
+	--background: #DDD;
+	--outside: #ECECEC;
+	--post: #eee;
+	--highlighted: white;
+	--shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
 /* User & Subreddit */
 
 #user, #subreddit, #sidebar {
@@ -225,6 +240,7 @@ select, #search {
 #searchbox {
 	display: flex;
 	box-shadow: var(--shadow);
+	border-radius: 5px;
 }
 
 #searchbox > *, #sort_submit {
@@ -308,7 +324,7 @@ input[type="submit"]:hover { color: var(--accent); }
 }
 
 #sort_options > a, footer > a {
-	color: lightgrey;
+	color: var(--text);
 	padding: 10px 20px;
 	text-align: center;
 	cursor: pointer;
@@ -317,7 +333,7 @@ input[type="submit"]:hover { color: var(--accent); }
 
 #sort_options > a.selected {
 	background: var(--accent);
-	color: var(--background);
+	color: var(--foreground);
 }
 
 #sort_options > a:not(.selected):hover {
@@ -454,9 +470,9 @@ input[type="submit"]:hover { color: var(--accent); }
 }
 
 .nsfw {
-	color: #FF5C5D;
+	color: var(--nsfw);
 	margin-top: 20px;
-	border: 1px solid #FF5C5D;
+	border: 1px solid var(--nsfw);
 	padding: 5px;
 	font-size: 12px;
 	border-radius: 5px;
@@ -676,6 +692,7 @@ input[type="submit"]:hover { color: var(--accent); }
 	border-radius: 5px;
 	box-shadow: var(--shadow);
 	margin-left: 20px;
+	background: var(--foreground);
 }
 
 #save {

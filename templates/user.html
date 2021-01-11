@@ -7,8 +7,6 @@
 
 {% block title %}{{ user.name.replace("u/", "") }} (u/{{ user.name }}) - Libreddit{% endblock %}
 
-{% block ui %}{% if prefs.layout != "" %}{{ prefs.layout }}{% endif %}{% if prefs.wide == "on" %} wide{% endif %}{% endblock %}
-
 {% block body %}
 	<main>
 		<div id="column_one">
