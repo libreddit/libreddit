@@ -49,7 +49,7 @@ pub async fn profile(req: HttpRequest) -> HttpResponse {
 // USER
 async fn user(name: &str) -> Result<User, &'static str> {
 	// Build the Reddit JSON API path
-	let path: String = format!("user/{}/about.json", name);
+	let path: String = format!("/user/{}/about.json", name);
 
 	// Send a request to the url
 	match request(&path).await {

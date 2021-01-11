@@ -277,36 +277,62 @@ pub async fn error(msg: String) -> HttpResponse {
 
 // Make a request to a Reddit API and parse the JSON response
 pub async fn request(path: &str) -> Result<serde_json::Value, &'static str> {
-	let url = format!("https://www.reddit.com/{}", path);
+	let url = format!("https://www.reddit.com{}", path);
 
+	// match reqwest::get(&url).await {
+	// 	Ok(res) => {
+	// 		// Read the status from the response
+	// 		match res.status().is_success() {
+	// 			true => {
+	// 				// Parse the response from Reddit as JSON
+	// 				match from_str(res.text().await.unwrap_or_default().as_str()) {
+	// 					Ok(json) => Ok(json),
+	// 					Err(_) => {
+	// 						#[cfg(debug_assertions)]
+	// 						dbg!(format!("{} - Failed to parse page JSON data", url));
+	// 						Err("Failed to parse page JSON data")
+	// 					}
+	// 				}
+	// 			}
+	// 			// If Reddit returns error, tell user Page Not Found
+	// 			false => {
+	// 				#[cfg(debug_assertions)]
+	// 				dbg!(format!("{} - Page not found", url));
+	// 				Err("Page not found")
+	// 			}
+	// 		}
+	// 	}
+	// 	// If can't send request to Reddit, return this to user
+	// 	Err(_e) => {
+	// 		#[cfg(debug_assertions)]
+	// 		dbg!(format!("{} - {}", url, _e));
+	// 		Err("Couldn't send request to Reddit")
+	// 	}
+	// }
 	// Send request using reqwest
-	match reqwest::get(&url).await {
-		Ok(res) => {
-			// Read the status from the response
-			match res.status().is_success() {
-				true => {
-					// Parse the response from Reddit as JSON
-					match from_str(res.text().await.unwrap_or_default().as_str()) {
-						Ok(json) => Ok(json),
-						Err(_) => {
-							#[cfg(debug_assertions)]
-							dbg!(format!("{} - Failed to parse page JSON data", url));
-							Err("Failed to parse page JSON data")
-						}
-					}
-				}
-				// If Reddit returns error, tell user Page Not Found
-				false => {
+	match ureq::get(&url).call() {
+		// If response is success
+		Ok(response) => {
+			// Parse the response from Reddit as JSON
+			match from_str(&response.into_string().unwrap()) {
+				Ok(json) => Ok(json),
+				Err(_) => {
 					#[cfg(debug_assertions)]
-					dbg!(format!("{} - Page not found", url));
-					Err("Page not found")
+					dbg!(format!("{} - Failed to parse page JSON data", url));
+					Err("Failed to parse page JSON data")
 				}
 			}
 		}
-		// If can't send request to Reddit, return this to user
-		Err(_e) => {
+		// If response is error
+		Err(ureq::Error::Status(_, _)) => {
 			#[cfg(debug_assertions)]
-			dbg!(format!("{} - {}", url, _e));
+			dbg!(format!("{} - Page not found", url));
+			Err("Page not found")
+		}
+		// If failed to send request
+		Err(e) => {
+			#[cfg(debug_assertions)]
+			dbg!(e);
 			Err("Couldn't send request to Reddit")
 		}
 	}
