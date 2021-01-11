@@ -34,8 +34,11 @@ pub async fn page(req: HttpRequest) -> HttpResponse {
 		.to_string();
 	let sort = req.match_info().get("sort").unwrap_or("hot").to_string();
 
-	let sub = if !&sub_name.contains('+') && sub_name != "popular" && sub_name != "all" {
+	let sub = if !sub_name.contains('+') && sub_name != "popular" && sub_name != "all" {
 		subreddit(&sub_name).await.unwrap_or_default()
+	} else if sub_name.contains('+') {
+		let mut default = Subreddit::default();
+		default.name = sub_name; default
 	} else {
 		Subreddit::default()
 	};
@@ -60,7 +63,7 @@ pub async fn page(req: HttpRequest) -> HttpResponse {
 pub async fn wiki(req: HttpRequest) -> HttpResponse {
 	let sub = req.match_info().get("sub").unwrap_or("reddit.com");
 	let page = req.match_info().get("page").unwrap_or("index");
-	let path: String = format!("r/{}/wiki/{}.json?raw_json=1", sub, page);
+	let path: String = format!("/r/{}/wiki/{}.json?raw_json=1", sub, page);
 
 	match request(&path).await {
 		Ok(res) => {
