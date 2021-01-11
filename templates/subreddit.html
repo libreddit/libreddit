@@ -75,7 +75,7 @@
 				{% endif %}
 			</footer>
 		</div>
-		{% if sub.name != "" %}
+		{% if sub.name != "" && !sub.name.contains("+") %}
 		<aside>
 			<div class="panel" id="subreddit">
 				{% if sub.wiki %}
