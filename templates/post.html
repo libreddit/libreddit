@@ -22,9 +22,7 @@
 	</div>
 	<details class="comment_right" open>
 		<summary class="comment_data"><a class="comment_author {% if item.author == post.author %}op{% endif %}" href="/u/{{ item.author }}">u/{{ item.author }}</a>
-			{% if item.flair.0 != "" %}
-				<small class="author_flair">{{ item.flair.0 }}</small>
-			{% endif %}
+			{% call utils::render_flair(item.flair) %}
 			<span class="datetime">{{ item.time }}</span>
 		</summary>
 		<p class="comment_body">{{ item.body }}</p>
@@ -50,17 +48,13 @@
 						<a class="post_subreddit" href="/r/{{ post.community }}">r/{{ post.community }}</a>
 						<span class="dot">&bull;</span>
 						<a class="post_author" href="/u/{{ post.author }}">u/{{ post.author }}</a>
-						{% if post.author_flair.0 != "" %}
-							<small class="author_flair">{{ post.author_flair.0 }}</small>
-						{% endif %}
+						{% call utils::render_flair(post.author_flair) %}
 						<span class="dot">&bull;</span>
 						<span class="datetime">{{ post.time }}</span>
 					</p>
 					<a href="{{ post.permalink }}" class="post_title">
 						{{ post.title }}
-						{% if post.flair.0 != "" %}
-							<small class="post_flair" style="color:{{ post.flair.2 }}; background:{{ post.flair.1 }}">{{ post.flair.0 }}</small>
-						{% endif %}
+						{% call utils::render_flair(post.flair) %}
 					</a>
 
 					<!-- POST MEDIA -->

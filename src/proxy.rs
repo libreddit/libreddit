@@ -8,6 +8,8 @@ pub async fn handler(web::Path(b64): web::Path<String>) -> Result<HttpResponse> 
 		// THUMBNAILS
 		"a.thumbs.redditmedia.com",
 		"b.thumbs.redditmedia.com",
+		// EMOJI
+		"emoji.redditmedia.com",
 		// ICONS
 		"styles.redditmedia.com",
 		"www.redditstatic.com",

@@ -26,3 +26,17 @@
 	<input type="submit" value="&rarr;">
 </form>
 {%- endmacro %}
+
+{% macro render_flair(flair) -%}
+{% if flair.flair_parts.len() > 0 %}
+<small class="post_flair" style="color:{{ flair.foreground_color }}; background:{{ flair.background_color }}">
+{% for flair_part in flair.flair_parts %}
+{% if flair_part.flair_part_type == "emoji" %}
+	<span class="emoji" style="background-image:url('{{ flair_part.value }}')"></span>
+{% else if flair_part.flair_part_type == "text" %}
+	<span>{{ flair_part.value }}</span>
+{% endif %}
+{% endfor %}
+</small>
+{% endif %}
+{%- endmacro %}
