@@ -240,6 +240,7 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 		let score = post["data"]["score"].as_i64().unwrap_or_default();
 		let ratio: f64 = post["data"]["upvote_ratio"].as_f64().unwrap_or(1.0) * 100.0;
 		let title = val(post, "title");
+
 		// Determine the type of media along with the media URL
 		let (post_type, media) = media(&post["data"]).await;
 
