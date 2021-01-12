@@ -465,7 +465,6 @@ input[type="submit"]:hover { color: var(--accent); }
 
 .post_thumbnail img {
 	grid-area: 1 / 1 / 2 / 2;
-	height: 100%;
 	width: 100%;
 	object-fit: cover;
 	align-self: center;
