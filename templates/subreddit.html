@@ -31,7 +31,7 @@
 			<div id="posts">
 			{% for post in posts %}
 			{% if !(post.flags.nsfw && prefs.hide_nsfw == "on") %}
-			<div class="post {% if post.flags.stickied %}stickied{% endif %}">
+			<div class="post {% if post.flags.stickied %}stickied{% endif %} {% if prefs.layout == "card" && post.post_type == "image" %} card_post {% endif %}">
 				<div class="post_left">
 					<p class="post_score">{{ post.score }}</p>
 					{% if post.flags.nsfw %}<div class="nsfw">NSFW</div>{% endif %}
@@ -56,8 +56,10 @@
 					<!-- POST MEDIA/THUMBNAIL -->
 					{% if prefs.layout == "card" && post.post_type == "image" %}
 						<img class="post_media" src="{{ post.media }}"/>
-					{% else if prefs.layout != "card" %}
-						<img class="post_thumbnail" src="{{ post.thumbnail }}">
+					{% else if post.post_type == "link" %}
+						<a class="post_thumbnail" href="{{ post.media }}"><img src="{{ post.thumbnail }}"><span>{{ post.domain }}</span></a>
+					{% else if post.post_type != "self" %}
+						<a class="post_thumbnail" href="{{ post.permalink }}"><img src="{{ post.thumbnail }}"><span>{{ post.post_type }}</span></a>
 					{% endif %}
 				</div>
 			</div>

@@ -453,11 +453,35 @@ input[type="submit"]:hover { color: var(--accent); }
 }
 
 .post_thumbnail {
-	object-fit: cover;
-	width: auto;
 	border-radius: 5px;
 	border: 1px solid var(--foreground);
-	max-width: 20%;
+	width: 20%;
+	max-width: 140px;
+	display: grid;
+	overflow: hidden;
+	flex-shrink: 0;
+	background-color: var(--highlighted);
+}
+
+.post_thumbnail img {
+	grid-area: 1 / 1 / 2 / 2;
+	height: 100%;
+	width: 100%;
+	object-fit: cover;
+	align-self: center;
+	justify-self: center;
+}
+
+.post_thumbnail span {
+	text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
+	text-align: center;
+	background-color: rgba(0,0,0,0.8);
+	color: white;
+	grid-area: 1 / 1 / 2 / 2;
+	padding: 5px;
+	align-self: end;
 }
 
 .post_flair {
@@ -634,19 +658,19 @@ input[type="submit"]:hover { color: var(--accent); }
 }
 
 .compact .post_thumbnail {
-	max-width: 75px;
-	max-height: 75px;
+	width: 75px;
+	height: 75px;
 }
 
 .compact footer {
 	margin-top: 20px;
 }
 
-.card .post_right {
+.card_post .post_right {
 	flex-direction: column;
 }
 
-.card .post:not(.highlighted) .post_media {
+.card_post:not(.highlighted) .post_media {
 	margin-top: 0;
 	margin-bottom: 15px;
 }
