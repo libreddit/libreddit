@@ -91,7 +91,7 @@ async fn parse_post(json: &serde_json::Value) -> Post {
 		score: format_num(score),
 		upvote_ratio: ratio as i64,
 		post_type,
-		thumbnail: format_url(val(post, "thumbnail")),
+		thumbnail: format_url(val(post, "thumbnail").as_str()),
 		flair: Flair(
 			val(post, "link_flair_text"),
 			val(post, "link_flair_background_color"),

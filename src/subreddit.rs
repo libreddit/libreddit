@@ -105,7 +105,7 @@ async fn subreddit(sub: &str) -> Result<Subreddit, &'static str> {
 				title: val(&res, "title"),
 				description: val(&res, "public_description"),
 				info: rewrite_url(&val(&res, "description_html").replace("\\", "")),
-				icon: format_url(icon),
+				icon: format_url(icon.as_str()),
 				members: format_num(members),
 				active: format_num(active),
 				wiki: res["data"]["wiki_enabled"].as_bool().unwrap_or_default(),

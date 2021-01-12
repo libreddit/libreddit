@@ -134,7 +134,7 @@ pub fn cookie(req: &HttpRequest, name: &str) -> String {
 }
 
 // Direct urls to proxy if proxy is enabled
-pub fn format_url(url: String) -> String {
+pub fn format_url(url: &str) -> String {
 	if url.is_empty() || url == "self" || url == "default" || url == "nsfw" || url == "spoiler" {
 		String::new()
 	} else {
@@ -163,13 +163,17 @@ pub async fn media(data: &serde_json::Value) -> (String, String) {
 	let post_type: &str;
 	let url = if !data["preview"]["reddit_video_preview"]["fallback_url"].is_null() {
 		post_type = "video";
-		format_url(data["preview"]["reddit_video_preview"]["fallback_url"].as_str().unwrap_or_default().to_string())
+		format_url(data["preview"]["reddit_video_preview"]["fallback_url"].as_str().unwrap_or_default())
 	} else if !data["secure_media"]["reddit_video"]["fallback_url"].is_null() {
 		post_type = "video";
-		format_url(data["secure_media"]["reddit_video"]["fallback_url"].as_str().unwrap_or_default().to_string())
+		format_url(data["secure_media"]["reddit_video"]["fallback_url"].as_str().unwrap_or_default())
 	} else if data["post_hint"].as_str().unwrap_or("") == "image" {
+		let preview = data["preview"]["images"][0].clone();
 		post_type = "image";
-		format_url(data["preview"]["images"][0]["source"]["url"].as_str().unwrap_or_default().to_string())
+		match preview["variants"]["mp4"].as_object() {
+			Some(gif) => format_url(gif["source"]["url"].as_str().unwrap_or_default()),
+			None => format_url(preview["source"]["url"].as_str().unwrap_or_default())
+		}
 	} else if data["is_self"].as_bool().unwrap_or_default() {
 		post_type = "self";
 		data["permalink"].as_str().unwrap_or_default().to_string()
@@ -178,7 +182,7 @@ pub async fn media(data: &serde_json::Value) -> (String, String) {
 		data["url"].as_str().unwrap_or_default().to_string()
 	};
 
-	(post_type.to_string(), url)
+	(post_type.to_string(), url.to_string())
 }
 
 //
@@ -242,7 +246,7 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 			score: format_num(score),
 			upvote_ratio: ratio as i64,
 			post_type,
-			thumbnail: format_url(val(post, "thumbnail")),
+			thumbnail: format_url(val(post, "thumbnail").as_str()),
 			media,
 			domain: val(post, "domain"),
 			flair: Flair(
@@ -284,37 +288,7 @@ pub async fn error(msg: String) -> HttpResponse {
 pub async fn request(path: &str) -> Result<serde_json::Value, &'static str> {
 	let url = format!("https://www.reddit.com{}", path);
 
-	// match reqwest::get(&url).await {
-	// 	Ok(res) => {
-	// 		// Read the status from the response
-	// 		match res.status().is_success() {
-	// 			true => {
-	// 				// Parse the response from Reddit as JSON
-	// 				match from_str(res.text().await.unwrap_or_default().as_str()) {
-	// 					Ok(json) => Ok(json),
-	// 					Err(_) => {
-	// 						#[cfg(debug_assertions)]
-	// 						dbg!(format!("{} - Failed to parse page JSON data", url));
-	// 						Err("Failed to parse page JSON data")
-	// 					}
-	// 				}
-	// 			}
-	// 			// If Reddit returns error, tell user Page Not Found
-	// 			false => {
-	// 				#[cfg(debug_assertions)]
-	// 				dbg!(format!("{} - Page not found", url));
-	// 				Err("Page not found")
-	// 			}
-	// 		}
-	// 	}
-	// 	// If can't send request to Reddit, return this to user
-	// 	Err(_e) => {
-	// 		#[cfg(debug_assertions)]
-	// 		dbg!(format!("{} - {}", url, _e));
-	// 		Err("Couldn't send request to Reddit")
-	// 	}
-	// }
-	// Send request using reqwest
+	// Send request using ureq
 	match ureq::get(&url).call() {
 		// If response is success
 		Ok(response) => {
