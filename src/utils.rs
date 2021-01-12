@@ -7,7 +7,7 @@ use base64::encode;
 use regex::Regex;
 use serde_json::from_str;
 use std::collections::HashMap;
-use time::OffsetDateTime;
+use time::{OffsetDateTime, Duration};
 use url::Url;
 
 //
@@ -185,6 +185,18 @@ pub async fn media(data: &serde_json::Value) -> (String, String) {
 	(post_type.to_string(), url)
 }
 
+pub fn time(unix_time: i64) -> String {
+	let time = OffsetDateTime::from_unix_timestamp(unix_time);
+	let time_delta = OffsetDateTime::now_utc() - time;
+	if time_delta > Duration::days(1) {
+		time.format("%b %d '%y") // %b %e '%y
+	} else if time_delta.whole_hours() > 0 {
+		format!("{}h ago", time_delta.whole_hours())
+	} else {
+		format!("{}m ago", time_delta.whole_minutes())
+	}
+}
+
 //
 // JSON PARSING
 //
@@ -227,8 +239,8 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 		let unix_time: i64 = post["data"]["created_utc"].as_f64().unwrap_or_default().round() as i64;
 		let score = post["data"]["score"].as_i64().unwrap_or_default();
 		let ratio: f64 = post["data"]["upvote_ratio"].as_f64().unwrap_or(1.0) * 100.0;
-		let title = val(post, "title");
-
+		let title = val(post, "title");	
+		
 		// Determine the type of media along with the media URL
 		let (post_type, media) = media(&post["data"]).await;
 
@@ -263,7 +275,7 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 				stickied: post["data"]["stickied"].as_bool().unwrap_or_default(),
 			},
 			permalink: val(post, "permalink"),
-			time: OffsetDateTime::from_unix_timestamp(unix_time).format("%b %d '%y"), // %b %e '%y
+			time: time(unix_time),
 		});
 	}
 
