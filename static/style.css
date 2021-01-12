@@ -779,6 +779,7 @@ input[type="submit"] {
 	margin-top: 10px;
 	border-radius: 5px;
 	box-shadow: var(--shadow);
+	overflow: auto;
 }
 
 .md table {
