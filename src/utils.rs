@@ -195,22 +195,24 @@ pub async fn media(data: &serde_json::Value) -> (String, String) {
 	(post_type.to_string(), url)
 }
 
-pub fn parse_rich_flair(rich_flair: &Vec<Value>) -> Vec<FlairPart> {
+pub fn parse_rich_flair(rich_flair: Option<&Vec<Value>>) -> Vec<FlairPart> {
 	let mut result: Vec<FlairPart> = Vec::new();
-	for part in rich_flair {
-		let flair_part_type = part["e"].as_str().unwrap_or_default().to_string();
-		let value = if flair_part_type == "text" {
-			part["t"].as_str().unwrap_or_default().to_string()
-			
-		} else if flair_part_type == "emoji" {
-			format_url(part["u"].as_str().unwrap_or_default())
-		} else {
-			"".to_string()
-		};
-		result.push(FlairPart {
-			flair_part_type,
-			value,
-		});
+	if !rich_flair.is_none() {
+		for part in rich_flair.unwrap() {
+			let flair_part_type = part["e"].as_str().unwrap_or_default().to_string();
+			let value = if flair_part_type == "text" {
+				part["t"].as_str().unwrap_or_default().to_string()
+				
+			} else if flair_part_type == "emoji" {
+				format_url(part["u"].as_str().unwrap_or_default())
+			} else {
+				"".to_string()
+			};
+			result.push(FlairPart {
+				flair_part_type,
+				value,
+			});
+		}
 	}
 	result
 }
@@ -269,7 +271,7 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 			body: rewrite_url(&val(post, "body_html")),
 			author: val(post, "author"),
 			author_flair: Flair{
-				flair_parts: parse_rich_flair(post["data"]["author_flair_richtext"].as_array().unwrap()),
+				flair_parts: parse_rich_flair(post["data"]["author_flair_richtext"].as_array()),
 				background_color: val(post, "author_flair_background_color"),
 				foreground_color: val(post, "author_flair_text_color"),
 			},
@@ -280,7 +282,7 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 			media,
 			domain: val(post, "domain"),
 			flair: Flair{
-				flair_parts: parse_rich_flair(post["data"]["link_flair_richtext"].as_array().unwrap()),
+				flair_parts: parse_rich_flair(post["data"]["link_flair_richtext"].as_array()),
 				background_color: val(post, "link_flair_background_color"),
 				foreground_color: if val(post, "link_flair_text_color") == "dark" {
 					"black".to_string()

@@ -83,7 +83,7 @@ async fn parse_post(json: &serde_json::Value) -> Post {
 		body: rewrite_url(&val(post, "selftext_html")),
 		author: val(post, "author"),
 		author_flair: Flair{
-			flair_parts: parse_rich_flair(post["data"]["author_flair_richtext"].as_array().unwrap()),
+			flair_parts: parse_rich_flair(post["data"]["author_flair_richtext"].as_array()),
 			background_color: val(post, "author_flair_background_color"),
 			foreground_color: val(post, "author_flair_text_color"),
 		},
@@ -93,7 +93,7 @@ async fn parse_post(json: &serde_json::Value) -> Post {
 		post_type,
 		thumbnail: format_url(val(post, "thumbnail").as_str()),
 		flair: Flair{
-			flair_parts: parse_rich_flair(post["data"]["link_flair_richtext"].as_array().unwrap()),
+			flair_parts: parse_rich_flair(post["data"]["link_flair_richtext"].as_array()),
 			background_color: val(post, "link_flair_background_color"),
 			foreground_color: if val(post, "link_flair_text_color") == "dark" {
 				"black".to_string()
@@ -146,7 +146,7 @@ async fn parse_comments(json: &serde_json::Value) -> Vec<Comment> {
 			time: OffsetDateTime::from_unix_timestamp(unix_time).format("%b %d %Y %H:%M UTC"),
 			replies,
 			flair: Flair{
-				flair_parts: parse_rich_flair(comment["data"]["author_flair_richtext"].as_array().unwrap()),
+				flair_parts: parse_rich_flair(comment["data"]["author_flair_richtext"].as_array()),
 				background_color: val(&comment, "author_flair_background_color"),
 				foreground_color: val(&comment, "author_flair_text_color"),
 			},
