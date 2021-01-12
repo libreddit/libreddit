@@ -46,7 +46,9 @@
 							<span class="datetime">{{ post.time }}</span>
 						</p>
 						<p class="post_title">
-							{% call utils::render_flair(post.flair) %}
+							{% if post.flair.flair_parts.len() > 0 %}
+							<small class="post_flair" style="color:{{ post.flair.foreground_color }}; background:{{ post.flair.background_color }}">{% call utils::render_flair(post.flair.flair_parts) %}</small>
+							{% endif %}
 							<a href="{{ post.permalink }}">{{ post.title }}</a>
 						</p>
 					</div>

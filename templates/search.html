@@ -34,12 +34,16 @@
 						<a class="post_subreddit" href="/r/{{ post.community }}">r/{{ post.community }}</a>
 						<span class="dot">&bull;</span>
 						<a class="post_author" href="/u/{{ post.author }}">u/{{ post.author }}</a>
-						{% call utils::render_flair(post.author_flair) %}
+						{% if post.author_flair.flair_parts.len() > 0 %}
+							<small class="author_flair">{% call utils::render_flair(post.author_flair.flair_parts) %}</small>
+						{% endif %}
 						<span class="dot">&bull;</span>
 						<span class="datetime">{{ post.time }}</span>
 					</p>
 					<p class="post_title">
-						{% call utils::render_flair(post.flair) %}
+						{% if post.flair.flair_parts.len() > 0 %}
+							<small class="post_flair" style="color:{{ post.flair.foreground_color }}; background:{{ post.flair.background_color }}">{% call utils::render_flair(post.flair.flair_parts) %}</small>
+						{% endif %}
 						<a href="{{ post.permalink }}">{{ post.title }}</a>
 					</p>
 				</div>

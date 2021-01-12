@@ -32,7 +32,9 @@
 					<div class="post_text">
 						<p class="post_header">
 							<a class="post_subreddit" href="/r/{{ post.community }}">r/{{ post.community }}</a>
-							{% call utils::render_flair(post.author_flair) %}
+							{% if post.author_flair.flair_parts.len() > 0 %}
+							<small class="author_flair">{% call utils::render_flair(post.author_flair.flair_parts) %}</small>
+							{% endif %}
 							<span class="dot">&bull;</span>
 							<span class="datetime">{{ post.time }}</span>
 						</p>
@@ -40,7 +42,7 @@
 							{% if post.flair.background_color == "Comment" %}
 							{% else if post.flair.background_color == "" %}
 							{% else %}
-								{% call utils::render_flair(post.flair) %}
+								<small class="post_flair" style="color:{{ post.flair.foreground_color }}; background:{{ post.flair.background_color }}">{% call utils::render_flair(post.flair.flair_parts) %}</small>
 							{% endif %}
 							<a href="{{ post.permalink }}">{{ post.title }}</a>
 						</p>
