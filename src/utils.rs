@@ -172,7 +172,7 @@ pub async fn media(data: &serde_json::Value) -> (String, String) {
 		post_type = "image";
 		match preview["variants"]["mp4"].as_object() {
 			Some(gif) => format_url(gif["source"]["url"].as_str().unwrap_or_default()),
-			None => format_url(preview["source"]["url"].as_str().unwrap_or_default())
+			None => format_url(preview["source"]["url"].as_str().unwrap_or_default()),
 		}
 	} else if data["is_self"].as_bool().unwrap_or_default() {
 		post_type = "self";
@@ -182,7 +182,7 @@ pub async fn media(data: &serde_json::Value) -> (String, String) {
 		data["url"].as_str().unwrap_or_default().to_string()
 	};
 
-	(post_type.to_string(), url.to_string())
+	(post_type.to_string(), url)
 }
 
 //

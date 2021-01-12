@@ -115,7 +115,10 @@ async fn parse_post(json: &serde_json::Value) -> Post {
 #[async_recursion]
 async fn parse_comments(json: &serde_json::Value) -> Vec<Comment> {
 	// Separate the comment JSON into a Vector of comments
-	let comment_data = json["data"]["children"].as_array().unwrap();
+	let comment_data = match json["data"]["children"].as_array() {
+		Some(f) => f.to_owned(),
+		None => { let v = Vec::new(); v }
+	};
 
 	let mut comments: Vec<Comment> = Vec::new();
 
@@ -127,7 +130,7 @@ async fn parse_comments(json: &serde_json::Value) -> Vec<Comment> {
 		}
 
 		let score = comment["data"]["score"].as_i64().unwrap_or(0);
-		let body = rewrite_url(&val(comment, "body_html"));
+		let body = rewrite_url(&val(&comment, "body_html"));
 
 		let replies: Vec<Comment> = if comment["data"]["replies"].is_object() {
 			parse_comments(&comment["data"]["replies"]).await
@@ -136,16 +139,16 @@ async fn parse_comments(json: &serde_json::Value) -> Vec<Comment> {
 		};
 
 		comments.push(Comment {
-			id: val(comment, "id"),
+			id: val(&comment, "id"),
 			body,
-			author: val(comment, "author"),
+			author: val(&comment, "author"),
 			score: format_num(score),
 			time: OffsetDateTime::from_unix_timestamp(unix_time).format("%b %d %Y %H:%M UTC"),
 			replies,
 			flair: Flair(
-				val(comment, "author_flair_text"),
-				val(comment, "author_flair_background_color"),
-				val(comment, "author_flair_text_color"),
+				val(&comment, "author_flair_text"),
+				val(&comment, "author_flair_background_color"),
+				val(&comment, "author_flair_text_color"),
 			),
 		});
 	}
