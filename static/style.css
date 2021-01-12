@@ -506,6 +506,7 @@ input[type="submit"]:hover { color: var(--accent); }
 	background-size: contain;
 	background-position: 50% 50%;
 	background-repeat: no-repeat;
+	vertical-align: middle;
 }
 
 .nsfw {
