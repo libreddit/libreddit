@@ -222,6 +222,13 @@ aside {
 
 /* Sorting and Search */
 
+.search_label {
+	max-width: 100px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
 select {
 	background: var(--outside);
 	transition: 0.2s all;

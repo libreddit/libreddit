@@ -10,7 +10,7 @@
 			{% if sub != "" %}
 			<div id="inside">
 				<input type="checkbox" name="restrict_sr" id="restrict_sr" {% if params.restrict_sr != "" %}checked{% endif %}>
-				<label for="restrict_sr">in r/{{ sub }}</label>
+				<label for="restrict_sr" class="search_label">in r/{{ sub }}</label>
 			</div>
 			{% endif %}
 			<select id="sort_options" name="sort">
