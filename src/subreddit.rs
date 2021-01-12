@@ -37,8 +37,10 @@ pub async fn page(req: HttpRequest) -> HttpResponse {
 	let sub = if !sub_name.contains('+') && sub_name != "popular" && sub_name != "all" {
 		subreddit(&sub_name).await.unwrap_or_default()
 	} else if sub_name.contains('+') {
-		let mut default = Subreddit::default();
-		default.name = sub_name; default
+		Subreddit {
+			name: sub_name,
+			..Subreddit::default()
+		}
 	} else {
 		Subreddit::default()
 	};

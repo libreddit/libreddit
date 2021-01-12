@@ -170,7 +170,7 @@ pub async fn media(data: &serde_json::Value) -> (String, String) {
 	} else if data["post_hint"].as_str().unwrap_or("") == "image" {
 		post_type = "image";
 		format_url(data["preview"]["images"][0]["source"]["url"].as_str().unwrap_or_default().to_string())
-	} else if data["is_self"].as_bool().unwrap_or_default()  {
+	} else if data["is_self"].as_bool().unwrap_or_default() {
 		post_type = "self";
 		data["permalink"].as_str().unwrap_or_default().to_string()
 	} else {
