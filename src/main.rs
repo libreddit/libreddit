@@ -1,5 +1,5 @@
 // Import Crates
-use actix_web::{get, middleware, web, App, HttpResponse, HttpServer}; // dev::Service
+use actix_web::{middleware, web, App, HttpResponse, HttpServer}; // dev::Service
 
 // Reference local files
 mod post;
@@ -21,9 +21,10 @@ async fn robots() -> HttpResponse {
 		.body(include_str!("../static/robots.txt"))
 }
 
-#[get("/favicon.ico")]
 async fn favicon() -> HttpResponse {
-	HttpResponse::Ok().body("")
+	HttpResponse::Ok()
+		.header("Cache-Control", "public, max-age=1209600, s-maxage=86400")
+		.body(include_bytes!("../static/favicon.ico").as_ref())
 }
 
 #[actix_web::main]
@@ -64,7 +65,7 @@ async fn main() -> std::io::Result<()> {
 			.default_service(web::get().to(|| utils::error("Nothing here".to_string())))
 			// GENERAL SERVICES
 			.route("/style.css/", web::get().to(style))
-			.route("/favicon.ico/", web::get().to(HttpResponse::Ok))
+			.route("/favicon.ico/", web::get().to(favicon))
 			.route("/robots.txt/", web::get().to(robots))
 			// SETTINGS SERVICE
 			.route("/settings/", web::get().to(settings::get))
