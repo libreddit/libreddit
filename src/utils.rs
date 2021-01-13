@@ -195,9 +195,9 @@ pub async fn media(data: &serde_json::Value) -> (String, String) {
 	(post_type.to_string(), url)
 }
 
-pub fn parse_rich_flair(rich_flair: Option<&Vec<Value>>) -> Vec<FlairPart> {
+pub fn parse_rich_flair(flair_type: String, rich_flair: Option<&Vec<Value>>, text_flair: Option<&str>) -> Vec<FlairPart> {
 	let mut result: Vec<FlairPart> = Vec::new();
-	if !rich_flair.is_none() {
+	if flair_type == "richtext" && !rich_flair.is_none() {
 		for part in rich_flair.unwrap() {
 			let flair_part_type = part["e"].as_str().unwrap_or_default().to_string();
 			let value = if flair_part_type == "text" {
@@ -213,6 +213,11 @@ pub fn parse_rich_flair(rich_flair: Option<&Vec<Value>>) -> Vec<FlairPart> {
 				value,
 			});
 		}
+	} else if flair_type == "text" && !text_flair.is_none() {
+		result.push(FlairPart {
+			flair_part_type: "text".to_string(),
+			value: text_flair.unwrap().to_string(),
+		});
 	}
 	result
 }
@@ -271,7 +276,7 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 			body: rewrite_url(&val(post, "body_html")),
 			author: val(post, "author"),
 			author_flair: Flair{
-				flair_parts: parse_rich_flair(post["data"]["author_flair_richtext"].as_array()),
+				flair_parts: parse_rich_flair(val(post, "author_flair_type"), post["data"]["author_flair_richtext"].as_array(), post["data"]["author_flair_text"].as_str()),
 				background_color: val(post, "author_flair_background_color"),
 				foreground_color: val(post, "author_flair_text_color"),
 			},
@@ -282,7 +287,7 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 			media,
 			domain: val(post, "domain"),
 			flair: Flair{
-				flair_parts: parse_rich_flair(post["data"]["link_flair_richtext"].as_array()),
+				flair_parts: parse_rich_flair(val(post, "link_flair_type"), post["data"]["link_flair_richtext"].as_array(), post["data"]["link_flair_text"].as_str()),
 				background_color: val(post, "link_flair_background_color"),
 				foreground_color: if val(post, "link_flair_text_color") == "dark" {
 					"black".to_string()
