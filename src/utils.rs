@@ -7,21 +7,21 @@ use base64::encode;
 use regex::Regex;
 use serde_json::{from_str, Value};
 use std::collections::HashMap;
-use time::{OffsetDateTime, Duration};
+use time::{Duration, OffsetDateTime};
 use url::Url;
 
 //
 // STRUCTS
 //
 // Post flair with content, background color and foreground color
-pub struct Flair{
-	pub flair_parts: Vec<FlairPart>, 
+pub struct Flair {
+	pub flair_parts: Vec<FlairPart>,
 	pub background_color: String,
 	pub foreground_color: String,
 }
 
-pub struct FlairPart{
-	pub flair_part_type: String, 
+pub struct FlairPart {
+	pub flair_part_type: String,
 	pub value: String,
 }
 
@@ -183,11 +183,11 @@ pub async fn media(data: &serde_json::Value) -> (String, String) {
 			Some(gif) => {
 				post_type = "gif";
 				format_url(gif["source"]["url"].as_str().unwrap_or_default())
-			},
+			}
 			None => {
 				post_type = "image";
 				format_url(preview["source"]["url"].as_str().unwrap_or_default())
-			},
+			}
 		}
 	} else if data["is_self"].as_bool().unwrap_or_default() {
 		post_type = "self";
@@ -207,16 +207,12 @@ pub fn parse_rich_flair(flair_type: String, rich_flair: Option<&Vec<Value>>, tex
 			let flair_part_type = part["e"].as_str().unwrap_or_default().to_string();
 			let value = if flair_part_type == "text" {
 				part["t"].as_str().unwrap_or_default().to_string()
-				
 			} else if flair_part_type == "emoji" {
 				format_url(part["u"].as_str().unwrap_or_default())
 			} else {
 				"".to_string()
 			};
-			result.push(FlairPart {
-				flair_part_type,
-				value,
-			});
+			result.push(FlairPart { flair_part_type, value });
 		}
 	} else if flair_type == "text" && !text_flair.is_none() {
 		result.push(FlairPart {
@@ -292,8 +288,12 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 			community: val(post, "subreddit"),
 			body: rewrite_url(&val(post, "body_html")),
 			author: val(post, "author"),
-			author_flair: Flair{
-				flair_parts: parse_rich_flair(val(post, "author_flair_type"), post["data"]["author_flair_richtext"].as_array(), post["data"]["author_flair_text"].as_str()),
+			author_flair: Flair {
+				flair_parts: parse_rich_flair(
+					val(post, "author_flair_type"),
+					post["data"]["author_flair_richtext"].as_array(),
+					post["data"]["author_flair_text"].as_str(),
+				),
 				background_color: val(post, "author_flair_background_color"),
 				foreground_color: val(post, "author_flair_text_color"),
 			},
@@ -303,8 +303,12 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 			thumbnail: format_url(val(post, "thumbnail").as_str()),
 			media,
 			domain: val(post, "domain"),
-			flair: Flair{
-				flair_parts: parse_rich_flair(val(post, "link_flair_type"), post["data"]["link_flair_richtext"].as_array(), post["data"]["link_flair_text"].as_str()),
+			flair: Flair {
+				flair_parts: parse_rich_flair(
+					val(post, "link_flair_type"),
+					post["data"]["link_flair_richtext"].as_array(),
+					post["data"]["link_flair_text"].as_str(),
+				),
 				background_color: val(post, "link_flair_background_color"),
 				foreground_color: if val(post, "link_flair_text_color") == "dark" {
 					"black".to_string()
