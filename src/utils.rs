@@ -5,7 +5,7 @@ use actix_web::{cookie::Cookie, HttpRequest, HttpResponse, Result};
 use askama::Template;
 use base64::encode;
 use regex::Regex;
-use serde_json::from_str;
+use serde_json::{from_str, Value};
 use std::collections::HashMap;
 use time::{OffsetDateTime, Duration};
 use url::Url;
@@ -13,8 +13,18 @@ use url::Url;
 //
 // STRUCTS
 //
-// Post flair with text, background color and foreground color
-pub struct Flair(pub String, pub String, pub String);
+// Post flair with content, background color and foreground color
+pub struct Flair{
+	pub flair_parts: Vec<FlairPart>, 
+	pub background_color: String,
+	pub foreground_color: String,
+}
+
+pub struct FlairPart{
+	pub flair_part_type: String, 
+	pub value: String,
+}
+
 // Post flags with nsfw and stickied
 pub struct Flags {
 	pub nsfw: bool,
@@ -190,6 +200,33 @@ pub async fn media(data: &serde_json::Value) -> (String, String) {
 	(post_type.to_string(), url)
 }
 
+pub fn parse_rich_flair(flair_type: String, rich_flair: Option<&Vec<Value>>, text_flair: Option<&str>) -> Vec<FlairPart> {
+	let mut result: Vec<FlairPart> = Vec::new();
+	if flair_type == "richtext" && !rich_flair.is_none() {
+		for part in rich_flair.unwrap() {
+			let flair_part_type = part["e"].as_str().unwrap_or_default().to_string();
+			let value = if flair_part_type == "text" {
+				part["t"].as_str().unwrap_or_default().to_string()
+				
+			} else if flair_part_type == "emoji" {
+				format_url(part["u"].as_str().unwrap_or_default())
+			} else {
+				"".to_string()
+			};
+			result.push(FlairPart {
+				flair_part_type,
+				value,
+			});
+		}
+	} else if flair_type == "text" && !text_flair.is_none() {
+		result.push(FlairPart {
+			flair_part_type: "text".to_string(),
+			value: text_flair.unwrap().to_string(),
+		});
+	}
+	result
+}
+
 pub fn time(unix_time: i64) -> String {
 	let time = OffsetDateTime::from_unix_timestamp(unix_time);
 	let time_delta = OffsetDateTime::now_utc() - time;
@@ -255,26 +292,26 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 			community: val(post, "subreddit"),
 			body: rewrite_url(&val(post, "body_html")),
 			author: val(post, "author"),
-			author_flair: Flair(
-				val(post, "author_flair_text"),
-				val(post, "author_flair_background_color"),
-				val(post, "author_flair_text_color"),
-			),
+			author_flair: Flair{
+				flair_parts: parse_rich_flair(val(post, "author_flair_type"), post["data"]["author_flair_richtext"].as_array(), post["data"]["author_flair_text"].as_str()),
+				background_color: val(post, "author_flair_background_color"),
+				foreground_color: val(post, "author_flair_text_color"),
+			},
 			score: format_num(score),
 			upvote_ratio: ratio as i64,
 			post_type,
 			thumbnail: format_url(val(post, "thumbnail").as_str()),
 			media,
 			domain: val(post, "domain"),
-			flair: Flair(
-				val(post, "link_flair_text"),
-				val(post, "link_flair_background_color"),
-				if val(post, "link_flair_text_color") == "dark" {
+			flair: Flair{
+				flair_parts: parse_rich_flair(val(post, "link_flair_type"), post["data"]["link_flair_richtext"].as_array(), post["data"]["link_flair_text"].as_str()),
+				background_color: val(post, "link_flair_background_color"),
+				foreground_color: if val(post, "link_flair_text_color") == "dark" {
 					"black".to_string()
 				} else {
 					"white".to_string()
 				},
-			),
+			},
 			flags: Flags {
 				nsfw: post["data"]["over_18"].as_bool().unwrap_or_default(),
 				stickied: post["data"]["stickied"].as_bool().unwrap_or_default(),

@@ -1,5 +1,5 @@
 // CRATES
-use crate::utils::{cookie, error, format_num, format_url, media, param, prefs, request, rewrite_url, val, Comment, Flags, Flair, Post, Preferences};
+use crate::utils::{cookie, error, format_num, format_url, media, parse_rich_flair, param, prefs, request, rewrite_url, val, Comment, Flags, Flair, Post, Preferences};
 use actix_web::{HttpRequest, HttpResponse};
 
 use async_recursion::async_recursion;
@@ -82,25 +82,25 @@ async fn parse_post(json: &serde_json::Value) -> Post {
 		community: val(post, "subreddit"),
 		body: rewrite_url(&val(post, "selftext_html")),
 		author: val(post, "author"),
-		author_flair: Flair(
-			val(post, "author_flair_text"),
-			val(post, "author_flair_background_color"),
-			val(post, "author_flair_text_color"),
-		),
+		author_flair: Flair{
+			flair_parts: parse_rich_flair(val(post, "author_flair_type"), post["data"]["author_flair_richtext"].as_array(), post["data"]["author_flair_text"].as_str()),
+			background_color: val(post, "author_flair_background_color"),
+			foreground_color: val(post, "author_flair_text_color"),
+		},
 		permalink: val(post, "permalink"),
 		score: format_num(score),
 		upvote_ratio: ratio as i64,
 		post_type,
 		thumbnail: format_url(val(post, "thumbnail").as_str()),
-		flair: Flair(
-			val(post, "link_flair_text"),
-			val(post, "link_flair_background_color"),
-			if val(post, "link_flair_text_color") == "dark" {
+		flair: Flair{
+			flair_parts: parse_rich_flair(val(post, "link_flair_type"), post["data"]["link_flair_richtext"].as_array(), post["data"]["link_flair_text"].as_str()),
+			background_color: val(post, "link_flair_background_color"),
+			foreground_color: if val(post, "link_flair_text_color") == "dark" {
 				"black".to_string()
 			} else {
 				"white".to_string()
 			},
-		),
+		},
 		flags: Flags {
 			nsfw: post["data"]["over_18"].as_bool().unwrap_or(false),
 			stickied: post["data"]["stickied"].as_bool().unwrap_or(false),
@@ -145,11 +145,11 @@ async fn parse_comments(json: &serde_json::Value) -> Vec<Comment> {
 			score: format_num(score),
 			time: OffsetDateTime::from_unix_timestamp(unix_time).format("%b %d %Y %H:%M UTC"),
 			replies,
-			flair: Flair(
-				val(&comment, "author_flair_text"),
-				val(&comment, "author_flair_background_color"),
-				val(&comment, "author_flair_text_color"),
-			),
+			flair: Flair{
+				flair_parts: parse_rich_flair(val(&comment, "author_flair_type"), comment["data"]["author_flair_richtext"].as_array(), comment["data"]["author_flair_text"].as_str()),
+				background_color: val(&comment, "author_flair_background_color"),
+				foreground_color: val(&comment, "author_flair_text_color"),
+			},
 		});
 	}
 

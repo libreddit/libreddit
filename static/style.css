@@ -499,6 +499,16 @@ input[type="submit"]:hover { color: var(--accent); }
 	font-weight: bold;
 }
 
+.emoji {
+	width: 1em;
+	height: 1em;
+	display: inline-block;
+	background-size: contain;
+	background-position: 50% 50%;
+	background-repeat: no-repeat;
+	vertical-align: middle;
+}
+
 .nsfw {
 	color: var(--nsfw);
 	margin-top: 20px;
