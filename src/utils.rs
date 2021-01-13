@@ -244,11 +244,6 @@ pub fn val(j: &serde_json::Value, k: &str) -> String {
 	String::from(j["data"][k].as_str().unwrap_or_default())
 }
 
-// nested_val() function used to parse JSON from Reddit APIs
-pub fn nested_val(j: &serde_json::Value, n: &str, k: &str) -> String {
-	String::from(j["data"][n][k].as_str().unwrap_or_default())
-}
-
 // Fetch posts of a user or subreddit and return a vector of posts and the "after" value
 pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post>, String), &'static str> {
 	let res;
