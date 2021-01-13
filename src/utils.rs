@@ -7,7 +7,7 @@ use base64::encode;
 use regex::Regex;
 use serde_json::{from_str, Value};
 use std::collections::HashMap;
-use time::OffsetDateTime;
+use time::{OffsetDateTime, Duration};
 use url::Url;
 
 //
@@ -179,10 +179,15 @@ pub async fn media(data: &serde_json::Value) -> (String, String) {
 		format_url(data["secure_media"]["reddit_video"]["fallback_url"].as_str().unwrap_or_default())
 	} else if data["post_hint"].as_str().unwrap_or("") == "image" {
 		let preview = data["preview"]["images"][0].clone();
-		post_type = "image";
 		match preview["variants"]["mp4"].as_object() {
-			Some(gif) => format_url(gif["source"]["url"].as_str().unwrap_or_default()),
-			None => format_url(preview["source"]["url"].as_str().unwrap_or_default()),
+			Some(gif) => {
+				post_type = "gif";
+				format_url(gif["source"]["url"].as_str().unwrap_or_default())
+			},
+			None => {
+				post_type = "image";
+				format_url(preview["source"]["url"].as_str().unwrap_or_default())
+			},
 		}
 	} else if data["is_self"].as_bool().unwrap_or_default() {
 		post_type = "self";
@@ -220,6 +225,18 @@ pub fn parse_rich_flair(flair_type: String, rich_flair: Option<&Vec<Value>>, tex
 		});
 	}
 	result
+}
+
+pub fn time(unix_time: i64) -> String {
+	let time = OffsetDateTime::from_unix_timestamp(unix_time);
+	let time_delta = OffsetDateTime::now_utc() - time;
+	if time_delta > Duration::days(1) {
+		time.format("%b %d '%y") // %b %e '%y
+	} else if time_delta.whole_hours() > 0 {
+		format!("{}h ago", time_delta.whole_hours())
+	} else {
+		format!("{}m ago", time_delta.whole_minutes())
+	}
 }
 
 //
@@ -300,7 +317,7 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 				stickied: post["data"]["stickied"].as_bool().unwrap_or_default(),
 			},
 			permalink: val(post, "permalink"),
-			time: OffsetDateTime::from_unix_timestamp(unix_time).format("%b %d '%y"), // %b %e '%y
+			time: time(unix_time),
 		});
 	}
 
