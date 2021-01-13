@@ -169,10 +169,15 @@ pub async fn media(data: &serde_json::Value) -> (String, String) {
 		format_url(data["secure_media"]["reddit_video"]["fallback_url"].as_str().unwrap_or_default())
 	} else if data["post_hint"].as_str().unwrap_or("") == "image" {
 		let preview = data["preview"]["images"][0].clone();
-		post_type = "image";
 		match preview["variants"]["mp4"].as_object() {
-			Some(gif) => format_url(gif["source"]["url"].as_str().unwrap_or_default()),
-			None => format_url(preview["source"]["url"].as_str().unwrap_or_default()),
+			Some(gif) => {
+				post_type = "gif";
+				format_url(gif["source"]["url"].as_str().unwrap_or_default())
+			},
+			None => {
+				post_type = "image";
+				format_url(preview["source"]["url"].as_str().unwrap_or_default())
+			},
 		}
 	} else if data["is_self"].as_bool().unwrap_or_default() {
 		post_type = "self";

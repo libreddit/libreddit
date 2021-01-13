@@ -117,7 +117,7 @@ async fn parse_comments(json: &serde_json::Value) -> Vec<Comment> {
 	// Separate the comment JSON into a Vector of comments
 	let comment_data = match json["data"]["children"].as_array() {
 		Some(f) => f.to_owned(),
-		None => { let v = Vec::new(); v }
+		None => Vec::new(),
 	};
 
 	let mut comments: Vec<Comment> = Vec::new();

@@ -66,7 +66,7 @@
 					<!-- POST MEDIA -->
 					{% if post.post_type == "image" %}
 					<img class="post_media" src="{{ post.media }}"/>
-					{% else if post.post_type == "video" %}
+					{% else if post.post_type == "video" || post.post_type == "gif" %}
 					<video class="post_media" src="{{ post.media }}" controls autoplay loop></video>
 					{% else if post.post_type == "link" %}
 					<a id="post_url" href="{{ post.media }}">{{ post.media }}</a>
