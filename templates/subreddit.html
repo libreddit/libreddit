@@ -56,10 +56,17 @@
 					<!-- POST MEDIA/THUMBNAIL -->
 					{% if prefs.layout == "card" && post.post_type == "image" %}
 						<img class="post_media" src="{{ post.media }}"/>
-					{% else if post.post_type == "link" %}
-						<a class="post_thumbnail" href="{{ post.media }}"><img src="{{ post.thumbnail }}"><span>{{ post.domain }}</span></a>
 					{% else if post.post_type != "self" %}
-						<a class="post_thumbnail" href="{{ post.permalink }}"><img src="{{ post.thumbnail }}"><span>{{ post.post_type }}</span></a>
+						<a class="post_thumbnail {% if post.thumbnail == "" %}no_thumbnail{% endif %}" href="{% if post.post_type == "link" %}{{ post.media }}{% else %}{{ post.permalink }}{% endif %}">
+							{% if post.thumbnail == "" %}
+								<svg viewBox="0 0 100 106" width="50" height="53" xmlns="http://www.w3.org/2000/svg">
+									<path d="M35,15h-15a10,10 0,0,0 0,20h25a10,10 0,0,0 10,-10m-12.5,0a10, 10 0,0,1 10, -10h25a10,10 0,0,1 0,20h-15" fill="none" stroke-width="5" stroke-linecap="round"/>
+								</svg>
+							{% else %}
+								<img src="{{ post.thumbnail }}">
+							{% endif %}
+							<span>{% if post.post_type == "link" %}{{ post.domain }}{% else %}{{ post.post_type }}{% endif %}</span>
+						</a>
 					{% endif %}
 				</div>
 			</div>
