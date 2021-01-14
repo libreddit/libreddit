@@ -47,7 +47,7 @@ pub async fn profile(req: HttpRequest) -> HttpResponse {
 }
 
 // USER
-async fn user(name: &str) -> Result<User, &'static str> {
+async fn user(name: &str) -> Result<User, String> {
 	// Build the Reddit JSON API path
 	let path: String = format!("/user/{}/about.json", name);
 

@@ -50,7 +50,7 @@ async fn main() -> std::io::Result<()> {
 			// Append trailing slash and remove double slashes
 			.wrap(middleware::NormalizePath::default())
 			// Default service in case no routes match
-			.default_service(web::get().to(|| utils::error("Nothing here")))
+			.default_service(web::get().to(|| utils::error("Nothing here".to_string())))
 			// Read static files
 			.route("/style.css/", web::get().to(style))
 			.route("/favicon.ico/", web::get().to(favicon))
@@ -95,10 +95,10 @@ async fn main() -> std::io::Result<()> {
 							.route("/{page}/", web::get().to(subreddit::wiki)),
 					)
 					// Search all of Reddit
-					.route("/search/", web::get().to(search::find)),
+					.route("/search/", web::get().to(search::find))
+					// Short link for post
+					.route("/{id:.{5,6}}/", web::get().to(post::item)),
 			)
-			// Short link for post
-			.route("/{id:.{5,6}}/", web::get().to(post::item))
 	})
 	.bind(&address)
 	.unwrap_or_else(|e| panic!("Cannot bind to the address {}: {}", address, e))

@@ -84,7 +84,7 @@ pub async fn wiki(req: HttpRequest) -> HttpResponse {
 }
 
 // SUBREDDIT
-async fn subreddit(sub: &str) -> Result<Subreddit, &'static str> {
+async fn subreddit(sub: &str) -> Result<Subreddit, String> {
 	// Build the Reddit JSON API url
 	let path: String = format!("/r/{}/about.json?raw_json=1", sub);
 

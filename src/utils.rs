@@ -101,7 +101,7 @@ pub struct Params {
 #[derive(Template)]
 #[template(path = "error.html", escape = "none")]
 pub struct ErrorTemplate {
-	pub message: String,
+	pub msg: String,
 	pub prefs: Preferences,
 }
 
@@ -169,7 +169,7 @@ pub fn format_num(num: i64) -> String {
 	}
 }
 
-pub async fn media(data: &serde_json::Value) -> (String, String) {
+pub async fn media(data: &Value) -> (String, String) {
 	let post_type: &str;
 	let url = if !data["preview"]["reddit_video_preview"]["fallback_url"].is_null() {
 		post_type = "video";
@@ -249,12 +249,12 @@ pub fn time(unix_time: i64) -> String {
 //
 
 // val() function used to parse JSON from Reddit APIs
-pub fn val(j: &serde_json::Value, k: &str) -> String {
+pub fn val(j: &Value, k: &str) -> String {
 	String::from(j["data"][k].as_str().unwrap_or_default())
 }
 
 // Fetch posts of a user or subreddit and return a vector of posts and the "after" value
-pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post>, String), &'static str> {
+pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post>, String), String> {
 	let res;
 	let post_list;
 
@@ -271,7 +271,7 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 	// Fetch the list of posts from the JSON response
 	match res["data"]["children"].as_array() {
 		Some(list) => post_list = list,
-		None => return Err("No posts found"),
+		None => return Err("No posts found".to_string()),
 	}
 
 	let mut posts: Vec<Post> = Vec::new();
@@ -336,9 +336,9 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 // NETWORKING
 //
 
-pub async fn error(msg: &str) -> HttpResponse {
+pub async fn error(msg: String) -> HttpResponse {
 	let body = ErrorTemplate {
-		message: msg.to_string(),
+		msg,
 		prefs: Preferences::default(),
 	}
 	.render()
@@ -347,34 +347,50 @@ pub async fn error(msg: &str) -> HttpResponse {
 }
 
 // Make a request to a Reddit API and parse the JSON response
-pub async fn request(path: &str) -> Result<serde_json::Value, &'static str> {
+pub async fn request(path: &str) -> Result<Value, String> {
 	let url = format!("https://www.reddit.com{}", path);
 
-	// Send request using ureq
-	match ureq::get(&url).call() {
-		// If response is success
-		Ok(response) => {
-			// Parse the response from Reddit as JSON
-			match from_str(&response.into_string().unwrap()) {
-				Ok(json) => Ok(json),
-				Err(_) => {
-					#[cfg(debug_assertions)]
-					dbg!(format!("{} - Failed to parse page JSON data", url));
-					Err("Failed to parse page JSON data")
+	// Send request using awc
+	async fn send(url: &str) -> Result<String, (bool, String)> {
+		let client = actix_web::client::Client::default();
+		let response = client.get(url).send().await;
+
+		match response {
+			Ok(mut payload) => {
+				// Get first number of response HTTP status code
+				match payload.status().to_string().chars().next() {
+					// If success
+					Some('2') => Ok(String::from_utf8(payload.body().limit(20_000_000).await.unwrap().to_vec()).unwrap()),
+					// If redirection
+					Some('3') => Err((true, payload.headers().get("location").unwrap().to_str().unwrap().to_string())),
+					// Otherwise
+					_ => Err((false, "Page not found".to_string())),
 				}
 			}
+			Err(_) => Err((false, "Couldn't send request to Reddit".to_string())),
 		}
-		// If response is error
-		Err(ureq::Error::Status(_, _)) => {
-			#[cfg(debug_assertions)]
-			dbg!(format!("{} - Page not found", url));
-			Err("Page not found")
+	}
+
+	fn err(u: String, m: String) -> Result<Value, String> {
+		#[cfg(debug_assertions)]
+		dbg!(format!("{} - {}", u, m));
+		Err(m)
+	};
+
+	fn json(url: String, body: String) -> Result<Value, String> {
+		match from_str(body.as_str()) {
+			Ok(json) => Ok(json),
+			Err(_) => err(url, "Failed to parse page JSON data".to_string()),
 		}
-		// If failed to send request
-		Err(e) => {
-			#[cfg(debug_assertions)]
-			dbg!(e);
-			Err("Couldn't send request to Reddit")
-		}
+	}
+
+	match send(&url).await {
+		Ok(body) => json(url, body),
+		Err((true, location)) => match send(location.as_str()).await {
+			Ok(body) => json(url, body),
+			Err((true, location)) => err(url, location),
+			Err((_, msg)) => err(url, msg),
+		},
+		Err((_, msg)) => err(url, msg),
 	}
 }
