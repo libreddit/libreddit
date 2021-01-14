@@ -506,7 +506,7 @@ a.search_subreddit:hover {
 	display: grid;
 	overflow: hidden;
 	flex-shrink: 0;
-	background-color: var(--highlighted);
+	background-color: black;
 }
 
 .post_thumbnail img {
@@ -517,12 +517,23 @@ a.search_subreddit:hover {
 	justify-self: center;
 }
 
+.post_thumbnail.no_thumbnail {
+	background-color: var(--highlighted)
+}
+
+.post_thumbnail svg {
+	grid-area: 1 / 1 / 2 / 2;
+	align-self: center;
+	justify-self: center;
+	stroke: var(--text);
+}
+
 .post_thumbnail span {
 	text-overflow: ellipsis;
 	overflow: hidden;
 	white-space: nowrap;
 	text-align: center;
-	background-color: rgba(0,0,0,0.6);
+	background-color: rgba(0,0,0,0.8);
 	color: white;
 	grid-area: 1 / 1 / 2 / 2;
 	padding: 5px;
