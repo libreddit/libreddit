@@ -133,9 +133,10 @@ pub fn prefs(req: HttpRequest) -> Preferences {
 
 // Grab a query param from a url
 pub fn param(path: &str, value: &str) -> String {
-	let url = Url::parse(format!("https://libredd.it/{}", path).as_str()).unwrap();
-	let pairs: HashMap<_, _> = url.query_pairs().into_owned().collect();
-	pairs.get(value).unwrap_or(&String::new()).to_owned()
+	match Url::parse(format!("https://libredd.it/{}", path).as_str()) {
+		Ok(url) => url.query_pairs().into_owned().collect::<HashMap<_, _>>().get(value).unwrap_or(&String::new()).to_owned(),
+		_ => String::new(),
+	}
 }
 
 // Parse Cookie value from request
@@ -360,9 +361,12 @@ pub async fn request(path: &str) -> Result<Value, String> {
 				// Get first number of response HTTP status code
 				match payload.status().to_string().chars().next() {
 					// If success
-					Some('2') => Ok(String::from_utf8(payload.body().limit(20_000_000).await.unwrap().to_vec()).unwrap()),
+					Some('2') => Ok(String::from_utf8(payload.body().limit(20_000_000).await.unwrap_or_default().to_vec()).unwrap_or_default()),
 					// If redirection
-					Some('3') => Err((true, payload.headers().get("location").unwrap().to_str().unwrap().to_string())),
+					Some('3') => match payload.headers().get("location") {
+						Some(location) => Err((true, location.to_str().unwrap_or_default().to_string())),
+						None => Err((false, "Page not found".to_string()))
+					}
 					// Otherwise
 					_ => Err((false, "Page not found".to_string())),
 				}
