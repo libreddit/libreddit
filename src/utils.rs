@@ -202,28 +202,31 @@ pub async fn media(data: &serde_json::Value) -> (String, String) {
 
 pub fn parse_rich_flair(flair_type: String, rich_flair: Option<&Vec<Value>>, text_flair: Option<&str>) -> Vec<FlairPart> {
 	match flair_type.as_str() {
-		"richtext" =>	match rich_flair {
-			Some(rich) => rich.iter().map(|part| {
-				let value = |name: &str| part[name].as_str().unwrap_or_default();
-				FlairPart {
-					flair_part_type: value("e").to_string(),
-					value: match value("e") {
-						"text" => value("t").to_string(),
-						"emoji" => format_url(value("u")),
-						_ => String::new()
+		"richtext" => match rich_flair {
+			Some(rich) => rich
+				.iter()
+				.map(|part| {
+					let value = |name: &str| part[name].as_str().unwrap_or_default();
+					FlairPart {
+						flair_part_type: value("e").to_string(),
+						value: match value("e") {
+							"text" => value("t").to_string(),
+							"emoji" => format_url(value("u")),
+							_ => String::new(),
+						},
 					}
-				}
-			}).collect::<Vec<FlairPart>>(),
-			None => Vec::new()
+				})
+				.collect::<Vec<FlairPart>>(),
+			None => Vec::new(),
 		},
-		"text" =>	match text_flair {
+		"text" => match text_flair {
 			Some(text) => vec![FlairPart {
 				flair_part_type: "text".to_string(),
 				value: text.to_string(),
 			}],
-			None => Vec::new()
+			None => Vec::new(),
 		},
-		_ => Vec::new()
+		_ => Vec::new(),
 	}
 }
 
@@ -333,9 +336,9 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 // NETWORKING
 //
 
-pub async fn error(msg: String) -> HttpResponse {
+pub async fn error(msg: &str) -> HttpResponse {
 	let body = ErrorTemplate {
-		message: msg,
+		message: msg.to_string(),
 		prefs: Preferences::default(),
 	}
 	.render()

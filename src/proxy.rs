@@ -41,9 +41,9 @@ pub async fn handler(web::Path(b64): web::Path<String>) -> Result<HttpResponse> 
 						Err(error::ErrorForbidden("Resource must be from Reddit"))
 					}
 				}
-				Err(_) => Err(error::ErrorBadRequest("Can't parse base64 into URL")),
+				_ => Err(error::ErrorBadRequest("Can't parse base64 into URL")),
 			}
 		}
-		Err(_) => Err(error::ErrorBadRequest("Can't decode base64")),
+		_ => Err(error::ErrorBadRequest("Can't decode base64")),
 	}
 }

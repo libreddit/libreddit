@@ -57,7 +57,7 @@ pub async fn item(req: HttpRequest) -> HttpResponse {
 			HttpResponse::Ok().content_type("text/html").body(s)
 		}
 		// If the Reddit API returns an error, exit and send error page to user
-		Err(msg) => error(msg.to_string()).await,
+		Err(msg) => error(msg).await,
 	}
 }
 

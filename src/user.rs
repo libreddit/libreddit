@@ -42,7 +42,7 @@ pub async fn profile(req: HttpRequest) -> HttpResponse {
 			HttpResponse::Ok().content_type("text/html").body(s)
 		}
 		// If there is an error show error page
-		Err(msg) => error(msg.to_string()).await,
+		Err(msg) => error(msg).await,
 	}
 }
 
@@ -57,7 +57,7 @@ async fn user(name: &str) -> Result<User, &'static str> {
 		Ok(res) => {
 			// Grab creation date as unix timestamp
 			let created: i64 = res["data"]["created"].as_f64().unwrap_or(0.0).round() as i64;
-			
+
 			// nested_val function used to parse JSON from Reddit APIs
 			let about = |item| res["data"]["subreddit"][item].as_str().unwrap_or_default().to_string();
 
