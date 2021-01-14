@@ -90,6 +90,6 @@ pub async fn find(req: HttpRequest) -> HttpResponse {
 			.render()
 			.unwrap(),
 		),
-		Err(msg) => error(msg.to_string()).await,
+		Err(msg) => error(msg).await,
 	}
 }

@@ -58,33 +58,33 @@ pub async fn page(req: HttpRequest) -> HttpResponse {
 			.unwrap();
 			HttpResponse::Ok().content_type("text/html").body(s)
 		}
-		Err(msg) => error(msg.to_string()).await,
+		Err(msg) => error(msg).await,
 	}
 }
 
 pub async fn wiki(req: HttpRequest) -> HttpResponse {
-	let sub = req.match_info().get("sub").unwrap_or("reddit.com");
-	let page = req.match_info().get("page").unwrap_or("index");
+	let sub = req.match_info().get("sub").unwrap_or("reddit.com").to_string();
+	let page = req.match_info().get("page").unwrap_or("index").to_string();
 	let path: String = format!("/r/{}/wiki/{}.json?raw_json=1", sub, page);
 
 	match request(&path).await {
 		Ok(res) => {
 			let s = WikiTemplate {
-				sub: sub.to_string(),
+				sub,
 				wiki: rewrite_url(res["data"]["content_html"].as_str().unwrap_or_default()),
-				page: page.to_string(),
+				page,
 				prefs: prefs(req),
 			}
 			.render()
 			.unwrap();
 			HttpResponse::Ok().content_type("text/html").body(s)
 		}
-		Err(msg) => error(msg.to_string()).await,
+		Err(msg) => error(msg).await,
 	}
 }
 
 // SUBREDDIT
-async fn subreddit(sub: &str) -> Result<Subreddit, &'static str> {
+async fn subreddit(sub: &str) -> Result<Subreddit, String> {
 	// Build the Reddit JSON API url
 	let path: String = format!("/r/{}/about.json?raw_json=1", sub);
 

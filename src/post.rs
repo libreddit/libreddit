@@ -1,5 +1,5 @@
 // CRATES
-use crate::utils::{cookie, error, format_num, format_url, media, parse_rich_flair, param, prefs, request, rewrite_url, val, Comment, Flags, Flair, Post, Preferences};
+use crate::utils::{cookie, error, format_num, format_url, media, param, parse_rich_flair, prefs, request, rewrite_url, val, Comment, Flags, Flair, Post, Preferences};
 use actix_web::{HttpRequest, HttpResponse};
 
 use async_recursion::async_recursion;
@@ -57,7 +57,7 @@ pub async fn item(req: HttpRequest) -> HttpResponse {
 			HttpResponse::Ok().content_type("text/html").body(s)
 		}
 		// If the Reddit API returns an error, exit and send error page to user
-		Err(msg) => error(msg.to_string()).await,
+		Err(msg) => error(msg).await,
 	}
 }
 
@@ -82,8 +82,12 @@ async fn parse_post(json: &serde_json::Value) -> Post {
 		community: val(post, "subreddit"),
 		body: rewrite_url(&val(post, "selftext_html")),
 		author: val(post, "author"),
-		author_flair: Flair{
-			flair_parts: parse_rich_flair(val(post, "author_flair_type"), post["data"]["author_flair_richtext"].as_array(), post["data"]["author_flair_text"].as_str()),
+		author_flair: Flair {
+			flair_parts: parse_rich_flair(
+				val(post, "author_flair_type"),
+				post["data"]["author_flair_richtext"].as_array(),
+				post["data"]["author_flair_text"].as_str(),
+			),
 			background_color: val(post, "author_flair_background_color"),
 			foreground_color: val(post, "author_flair_text_color"),
 		},
@@ -92,8 +96,12 @@ async fn parse_post(json: &serde_json::Value) -> Post {
 		upvote_ratio: ratio as i64,
 		post_type,
 		thumbnail: format_url(val(post, "thumbnail").as_str()),
-		flair: Flair{
-			flair_parts: parse_rich_flair(val(post, "link_flair_type"), post["data"]["link_flair_richtext"].as_array(), post["data"]["link_flair_text"].as_str()),
+		flair: Flair {
+			flair_parts: parse_rich_flair(
+				val(post, "link_flair_type"),
+				post["data"]["link_flair_richtext"].as_array(),
+				post["data"]["link_flair_text"].as_str(),
+			),
 			background_color: val(post, "link_flair_background_color"),
 			foreground_color: if val(post, "link_flair_text_color") == "dark" {
 				"black".to_string()
@@ -145,8 +153,12 @@ async fn parse_comments(json: &serde_json::Value) -> Vec<Comment> {
 			score: format_num(score),
 			time: OffsetDateTime::from_unix_timestamp(unix_time).format("%b %d %Y %H:%M UTC"),
 			replies,
-			flair: Flair{
-				flair_parts: parse_rich_flair(val(&comment, "author_flair_type"), comment["data"]["author_flair_richtext"].as_array(), comment["data"]["author_flair_text"].as_str()),
+			flair: Flair {
+				flair_parts: parse_rich_flair(
+					val(&comment, "author_flair_type"),
+					comment["data"]["author_flair_richtext"].as_array(),
+					comment["data"]["author_flair_text"].as_str(),
+				),
 				background_color: val(&comment, "author_flair_background_color"),
 				foreground_color: val(&comment, "author_flair_text_color"),
 			},

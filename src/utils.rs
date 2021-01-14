@@ -7,21 +7,21 @@ use base64::encode;
 use regex::Regex;
 use serde_json::{from_str, Value};
 use std::collections::HashMap;
-use time::{OffsetDateTime, Duration};
+use time::{Duration, OffsetDateTime};
 use url::Url;
 
 //
 // STRUCTS
 //
 // Post flair with content, background color and foreground color
-pub struct Flair{
-	pub flair_parts: Vec<FlairPart>, 
+pub struct Flair {
+	pub flair_parts: Vec<FlairPart>,
 	pub background_color: String,
 	pub foreground_color: String,
 }
 
-pub struct FlairPart{
-	pub flair_part_type: String, 
+pub struct FlairPart {
+	pub flair_part_type: String,
 	pub value: String,
 }
 
@@ -101,7 +101,7 @@ pub struct Params {
 #[derive(Template)]
 #[template(path = "error.html", escape = "none")]
 pub struct ErrorTemplate {
-	pub message: String,
+	pub msg: String,
 	pub prefs: Preferences,
 }
 
@@ -169,7 +169,7 @@ pub fn format_num(num: i64) -> String {
 	}
 }
 
-pub async fn media(data: &serde_json::Value) -> (String, String) {
+pub async fn media(data: &Value) -> (String, String) {
 	let post_type: &str;
 	let url = if !data["preview"]["reddit_video_preview"]["fallback_url"].is_null() {
 		post_type = "video";
@@ -183,11 +183,11 @@ pub async fn media(data: &serde_json::Value) -> (String, String) {
 			Some(gif) => {
 				post_type = "gif";
 				format_url(gif["source"]["url"].as_str().unwrap_or_default())
-			},
+			}
 			None => {
 				post_type = "image";
 				format_url(preview["source"]["url"].as_str().unwrap_or_default())
-			},
+			}
 		}
 	} else if data["is_self"].as_bool().unwrap_or_default() {
 		post_type = "self";
@@ -201,37 +201,42 @@ pub async fn media(data: &serde_json::Value) -> (String, String) {
 }
 
 pub fn parse_rich_flair(flair_type: String, rich_flair: Option<&Vec<Value>>, text_flair: Option<&str>) -> Vec<FlairPart> {
-	let mut result: Vec<FlairPart> = Vec::new();
-	if flair_type == "richtext" && !rich_flair.is_none() {
-		for part in rich_flair.unwrap() {
-			let flair_part_type = part["e"].as_str().unwrap_or_default().to_string();
-			let value = if flair_part_type == "text" {
-				part["t"].as_str().unwrap_or_default().to_string()
-				
-			} else if flair_part_type == "emoji" {
-				format_url(part["u"].as_str().unwrap_or_default())
-			} else {
-				"".to_string()
-			};
-			result.push(FlairPart {
-				flair_part_type,
-				value,
-			});
-		}
-	} else if flair_type == "text" && !text_flair.is_none() {
-		result.push(FlairPart {
-			flair_part_type: "text".to_string(),
-			value: text_flair.unwrap().to_string(),
-		});
+	match flair_type.as_str() {
+		"richtext" => match rich_flair {
+			Some(rich) => rich
+				.iter()
+				.map(|part| {
+					let value = |name: &str| part[name].as_str().unwrap_or_default();
+					FlairPart {
+						flair_part_type: value("e").to_string(),
+						value: match value("e") {
+							"text" => value("t").to_string(),
+							"emoji" => format_url(value("u")),
+							_ => String::new(),
+						},
+					}
+				})
+				.collect::<Vec<FlairPart>>(),
+			None => Vec::new(),
+		},
+		"text" => match text_flair {
+			Some(text) => vec![FlairPart {
+				flair_part_type: "text".to_string(),
+				value: text.to_string(),
+			}],
+			None => Vec::new(),
+		},
+		_ => Vec::new(),
 	}
-	result
 }
 
 pub fn time(unix_time: i64) -> String {
 	let time = OffsetDateTime::from_unix_timestamp(unix_time);
 	let time_delta = OffsetDateTime::now_utc() - time;
-	if time_delta > Duration::days(1) {
+	if time_delta > Duration::days(30) {
 		time.format("%b %d '%y") // %b %e '%y
+	} else if time_delta.whole_days() > 0 {
+		format!("{}d ago", time_delta.whole_days())
 	} else if time_delta.whole_hours() > 0 {
 		format!("{}h ago", time_delta.whole_hours())
 	} else {
@@ -244,17 +249,12 @@ pub fn time(unix_time: i64) -> String {
 //
 
 // val() function used to parse JSON from Reddit APIs
-pub fn val(j: &serde_json::Value, k: &str) -> String {
+pub fn val(j: &Value, k: &str) -> String {
 	String::from(j["data"][k].as_str().unwrap_or_default())
 }
 
-// nested_val() function used to parse JSON from Reddit APIs
-pub fn nested_val(j: &serde_json::Value, n: &str, k: &str) -> String {
-	String::from(j["data"][n][k].as_str().unwrap_or_default())
-}
-
 // Fetch posts of a user or subreddit and return a vector of posts and the "after" value
-pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post>, String), &'static str> {
+pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post>, String), String> {
 	let res;
 	let post_list;
 
@@ -271,7 +271,7 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 	// Fetch the list of posts from the JSON response
 	match res["data"]["children"].as_array() {
 		Some(list) => post_list = list,
-		None => return Err("No posts found"),
+		None => return Err("No posts found".to_string()),
 	}
 
 	let mut posts: Vec<Post> = Vec::new();
@@ -292,8 +292,12 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 			community: val(post, "subreddit"),
 			body: rewrite_url(&val(post, "body_html")),
 			author: val(post, "author"),
-			author_flair: Flair{
-				flair_parts: parse_rich_flair(val(post, "author_flair_type"), post["data"]["author_flair_richtext"].as_array(), post["data"]["author_flair_text"].as_str()),
+			author_flair: Flair {
+				flair_parts: parse_rich_flair(
+					val(post, "author_flair_type"),
+					post["data"]["author_flair_richtext"].as_array(),
+					post["data"]["author_flair_text"].as_str(),
+				),
 				background_color: val(post, "author_flair_background_color"),
 				foreground_color: val(post, "author_flair_text_color"),
 			},
@@ -303,8 +307,12 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 			thumbnail: format_url(val(post, "thumbnail").as_str()),
 			media,
 			domain: val(post, "domain"),
-			flair: Flair{
-				flair_parts: parse_rich_flair(val(post, "link_flair_type"), post["data"]["link_flair_richtext"].as_array(), post["data"]["link_flair_text"].as_str()),
+			flair: Flair {
+				flair_parts: parse_rich_flair(
+					val(post, "link_flair_type"),
+					post["data"]["link_flair_richtext"].as_array(),
+					post["data"]["link_flair_text"].as_str(),
+				),
 				background_color: val(post, "link_flair_background_color"),
 				foreground_color: if val(post, "link_flair_text_color") == "dark" {
 					"black".to_string()
@@ -330,7 +338,7 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 
 pub async fn error(msg: String) -> HttpResponse {
 	let body = ErrorTemplate {
-		message: msg,
+		msg,
 		prefs: Preferences::default(),
 	}
 	.render()
@@ -339,34 +347,50 @@ pub async fn error(msg: String) -> HttpResponse {
 }
 
 // Make a request to a Reddit API and parse the JSON response
-pub async fn request(path: &str) -> Result<serde_json::Value, &'static str> {
+pub async fn request(path: &str) -> Result<Value, String> {
 	let url = format!("https://www.reddit.com{}", path);
 
-	// Send request using ureq
-	match ureq::get(&url).call() {
-		// If response is success
-		Ok(response) => {
-			// Parse the response from Reddit as JSON
-			match from_str(&response.into_string().unwrap()) {
-				Ok(json) => Ok(json),
-				Err(_) => {
-					#[cfg(debug_assertions)]
-					dbg!(format!("{} - Failed to parse page JSON data", url));
-					Err("Failed to parse page JSON data")
+	// Send request using awc
+	async fn send(url: &str) -> Result<String, (bool, String)> {
+		let client = actix_web::client::Client::default();
+		let response = client.get(url).send().await;
+
+		match response {
+			Ok(mut payload) => {
+				// Get first number of response HTTP status code
+				match payload.status().to_string().chars().next() {
+					// If success
+					Some('2') => Ok(String::from_utf8(payload.body().limit(20_000_000).await.unwrap().to_vec()).unwrap()),
+					// If redirection
+					Some('3') => Err((true, payload.headers().get("location").unwrap().to_str().unwrap().to_string())),
+					// Otherwise
+					_ => Err((false, "Page not found".to_string())),
 				}
 			}
+			Err(_) => Err((false, "Couldn't send request to Reddit".to_string())),
 		}
-		// If response is error
-		Err(ureq::Error::Status(_, _)) => {
-			#[cfg(debug_assertions)]
-			dbg!(format!("{} - Page not found", url));
-			Err("Page not found")
+	}
+
+	fn err(u: String, m: String) -> Result<Value, String> {
+		#[cfg(debug_assertions)]
+		dbg!(format!("{} - {}", u, m));
+		Err(m)
+	};
+
+	fn json(url: String, body: String) -> Result<Value, String> {
+		match from_str(body.as_str()) {
+			Ok(json) => Ok(json),
+			Err(_) => err(url, "Failed to parse page JSON data".to_string()),
 		}
-		// If failed to send request
-		Err(e) => {
-			#[cfg(debug_assertions)]
-			dbg!(e);
-			Err("Couldn't send request to Reddit")
-		}
+	}
+
+	match send(&url).await {
+		Ok(body) => json(url, body),
+		Err((true, location)) => match send(location.as_str()).await {
+			Ok(body) => json(url, body),
+			Err((true, location)) => err(url, location),
+			Err((_, msg)) => err(url, msg),
+		},
+		Err((_, msg)) => err(url, msg),
 	}
 }
