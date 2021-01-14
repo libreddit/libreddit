@@ -59,8 +59,6 @@ async fn main() -> std::io::Result<()> {
 			.route("/proxy/{url:.*}/", web::get().to(proxy::handler))
 			// Browse user profile
 			.route("/{scope:u|user}/{username}/", web::get().to(user::profile))
-			// Short link for post
-			.route("/{id:.{5,6}}/", web::get().to(post::item))
 			// Configure settings
 			.service(web::resource("/settings/").route(web::get().to(settings::get)).route(web::post().to(settings::set)))
 			// Subreddit services
@@ -99,6 +97,8 @@ async fn main() -> std::io::Result<()> {
 					// Search all of Reddit
 					.route("/search/", web::get().to(search::find)),
 			)
+			// Short link for post
+			.route("/{id:.{5,6}}/", web::get().to(post::item))
 	})
 	.bind(&address)
 	.unwrap_or_else(|e| panic!("Cannot bind to the address {}: {}", address, e))
