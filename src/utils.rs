@@ -226,8 +226,10 @@ pub fn parse_rich_flair(flair_type: String, rich_flair: Option<&Vec<Value>>, tex
 pub fn time(unix_time: i64) -> String {
 	let time = OffsetDateTime::from_unix_timestamp(unix_time);
 	let time_delta = OffsetDateTime::now_utc() - time;
-	if time_delta > Duration::days(1) {
+	if time_delta > Duration::days(30) {
 		time.format("%b %d '%y") // %b %e '%y
+	} else if time_delta.whole_days() > 0 {
+		format!("{}d ago", time_delta.whole_days())
 	} else if time_delta.whole_hours() > 0 {
 		format!("{}h ago", time_delta.whole_hours())
 	} else {
