@@ -347,6 +347,45 @@ input[type="submit"]:hover { color: var(--accent); }
 	background: var(--foreground);
 }
 
+#search_subreddits {
+	border-radius: 5px;
+	background: var(--post);
+	box-shadow: var(--shadow);
+	transition: 0.2s all;
+	border: 1px solid var(--highlighted);
+	margin-bottom: 20px;
+}
+
+.search_subreddit { 
+	padding: 16px 20px;
+	display: block;
+}
+
+a.search_subreddit:hover {
+	text-decoration: none;
+	background: var(--foreground);
+}
+
+.search_subreddit:not(:last-child) { 
+	border-bottom: 1px solid var(--highlighted);
+}
+
+.search_subreddit_header {
+	margin-bottom: 8px;
+}
+
+.search_subreddit_name {
+	font-weight: bold;
+	font-size: 16px;
+}
+
+.search_subreddit_description {
+	text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
+	opacity: 0.5;
+}
+
 /* Post */
 
 .thread {
