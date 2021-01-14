@@ -1,5 +1,5 @@
 // CRATES
-use crate::utils::{error, fetch_posts, param, prefs, Post, Preferences, request, val};
+use crate::utils::{error, fetch_posts, param, prefs, request, val, Post, Preferences};
 use actix_web::{HttpRequest, HttpResponse};
 use askama::Template;
 
@@ -34,42 +34,19 @@ struct SearchTemplate {
 // SERVICES
 pub async fn find(req: HttpRequest) -> HttpResponse {
 	let path = format!("{}.json?{}", req.path(), req.query_string());
+	let sub = req.match_info().get("sub").unwrap_or("").to_string();
+
 	let sort = if param(&path, "sort").is_empty() {
 		"relevance".to_string()
 	} else {
 		param(&path, "sort")
 	};
-	let sub = req.match_info().get("sub").unwrap_or("").to_string();
-	let mut subreddits: Vec<Subreddit> = Vec::new();
-	
-	if param(&path, "restrict_sr") == "" {
-		let subreddit_search_path = format!("/subreddits/search.json?q={}&limit=3", param(&path, "q"));
-		let res;
-		let subreddit_list;
 
-		// Send a request to the url
-		match request(&subreddit_search_path).await {
-			// If success, receive JSON in response
-			Ok(response) => {
-				res = response;
-				subreddit_list = res["data"]["children"].as_array();
-			}
-			// If the Reddit API returns an error, exit this function
-			Err(_msg) => {subreddit_list = None;}
-		}
-				
-		// For each subreddit from subreddit list
-		if !subreddit_list.is_none() {
-			for subreddit in subreddit_list.unwrap() {
-				subreddits.push(Subreddit {
-					name: val(subreddit, "display_name_prefixed"),
-					url: val(subreddit, "url"),
-					description: val(subreddit, "public_description"),
-					subscribers: subreddit["data"]["subscribers"].as_u64().unwrap_or_default() as i64,
-				});
-			}
-		}
-	}
+	let subreddits = if param(&path, "restrict_sr").is_empty() {
+		search_subreddits(param(&path, "q")).await
+	} else {
+		Vec::new()
+	};
 
 	match fetch_posts(&path, String::new()).await {
 		Ok((posts, after)) => HttpResponse::Ok().content_type("text/html").body(
@@ -91,5 +68,31 @@ pub async fn find(req: HttpRequest) -> HttpResponse {
 			.unwrap(),
 		),
 		Err(msg) => error(msg).await,
+	}
+}
+
+async fn search_subreddits(q: String) -> Vec<Subreddit> {
+	let subreddit_search_path = format!("/subreddits/search.json?q={}&limit=3", q.replace(' ', "+"));
+
+	// Send a request to the url
+	match request(&subreddit_search_path).await {
+		// If success, receive JSON in response
+		Ok(response) => {
+			match response["data"]["children"].as_array() {
+				// For each subreddit from subreddit list
+				Some(list) => list
+					.iter()
+					.map(|subreddit| Subreddit {
+						name: val(subreddit, "display_name_prefixed"),
+						url: val(subreddit, "url"),
+						description: val(subreddit, "public_description"),
+						subscribers: subreddit["data"]["subscribers"].as_u64().unwrap_or_default() as i64,
+					})
+					.collect::<Vec<Subreddit>>(),
+				_ => Vec::new(),
+			}
+		}
+		// If the Reddit API returns an error, exit this function
+		_ => Vec::new(),
 	}
 }
