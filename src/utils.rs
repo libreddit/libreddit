@@ -201,26 +201,30 @@ pub async fn media(data: &serde_json::Value) -> (String, String) {
 }
 
 pub fn parse_rich_flair(flair_type: String, rich_flair: Option<&Vec<Value>>, text_flair: Option<&str>) -> Vec<FlairPart> {
-	let mut result: Vec<FlairPart> = Vec::new();
-	if flair_type == "richtext" && !rich_flair.is_none() {
-		for part in rich_flair.unwrap() {
-			let flair_part_type = part["e"].as_str().unwrap_or_default().to_string();
-			let value = if flair_part_type == "text" {
-				part["t"].as_str().unwrap_or_default().to_string()
-			} else if flair_part_type == "emoji" {
-				format_url(part["u"].as_str().unwrap_or_default())
-			} else {
-				"".to_string()
-			};
-			result.push(FlairPart { flair_part_type, value });
-		}
-	} else if flair_type == "text" && !text_flair.is_none() {
-		result.push(FlairPart {
-			flair_part_type: "text".to_string(),
-			value: text_flair.unwrap().to_string(),
-		});
+	match flair_type.as_str() {
+		"richtext" =>	match rich_flair {
+			Some(rich) => rich.iter().map(|part| {
+				let value = |name: &str| part[name].as_str().unwrap_or_default();
+				FlairPart {
+					flair_part_type: value("e").to_string(),
+					value: match value("e") {
+						"text" => value("t").to_string(),
+						"emoji" => format_url(value("u")),
+						_ => String::new()
+					}
+				}
+			}).collect::<Vec<FlairPart>>(),
+			None => Vec::new()
+		},
+		"text" =>	match text_flair {
+			Some(text) => vec![FlairPart {
+				flair_part_type: "text".to_string(),
+				value: text.to_string(),
+			}],
+			None => Vec::new()
+		},
+		_ => Vec::new()
 	}
-	result
 }
 
 pub fn time(unix_time: i64) -> String {
