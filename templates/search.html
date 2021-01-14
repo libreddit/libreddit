@@ -38,7 +38,7 @@
 
 		{% if post.flags.nsfw && prefs.hide_nsfw == "on" %}
 		{% else if post.title != "Comment" %}
-		<div class="post">
+		<div class="post {% if prefs.layout == "card" && post.post_type == "image" %}card_post{% endif %}">
 			<div class="post_left">
 				<p class="post_score">{{ post.score }}</p>
 				{% if post.flags.nsfw %}<div class="nsfw">NSFW</div>{% endif %}
@@ -63,7 +63,6 @@
 					</p>
 				</div>
 				
-				<!-- POST THUMBNAIL -->
 				<!-- POST MEDIA/THUMBNAIL -->
 				{% if prefs.layout == "card" && post.post_type == "image" %}
 					<img class="post_media" src="{{ post.media }}"/>
