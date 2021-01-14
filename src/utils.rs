@@ -20,6 +20,7 @@ pub struct Flair {
 	pub foreground_color: String,
 }
 
+// Part of flair, either emoji or text
 pub struct FlairPart {
 	pub flair_part_type: String,
 	pub value: String,
@@ -172,19 +173,23 @@ pub fn format_num(num: i64) -> String {
 
 pub async fn media(data: &Value) -> (String, String) {
 	let post_type: &str;
-	let url = if !data["preview"]["reddit_video_preview"]["fallback_url"].is_null() {
+	// If post is a video, return the video
+	let url = if data["preview"]["reddit_video_preview"]["fallback_url"].is_string() {
 		post_type = "video";
 		format_url(data["preview"]["reddit_video_preview"]["fallback_url"].as_str().unwrap_or_default())
-	} else if !data["secure_media"]["reddit_video"]["fallback_url"].is_null() {
+	} else if data["secure_media"]["reddit_video"]["fallback_url"].is_string() {
 		post_type = "video";
 		format_url(data["secure_media"]["reddit_video"]["fallback_url"].as_str().unwrap_or_default())
+	// Handle images, whether GIFs or pics
 	} else if data["post_hint"].as_str().unwrap_or("") == "image" {
 		let preview = data["preview"]["images"][0].clone();
 		match preview["variants"]["mp4"].as_object() {
+			// Return the mp4 if the media is a gif
 			Some(gif) => {
 				post_type = "gif";
 				format_url(gif["source"]["url"].as_str().unwrap_or_default())
 			}
+			// Return the picture if the media is an image
 			None => {
 				post_type = "image";
 				format_url(preview["source"]["url"].as_str().unwrap_or_default())
@@ -202,10 +207,13 @@ pub async fn media(data: &Value) -> (String, String) {
 }
 
 pub fn parse_rich_flair(flair_type: String, rich_flair: Option<&Vec<Value>>, text_flair: Option<&str>) -> Vec<FlairPart> {
+	// Parse type of flair
 	match flair_type.as_str() {
+		// If flair contains emojis and text
 		"richtext" => match rich_flair {
 			Some(rich) => rich
 				.iter()
+				// For each part of the flair, extract text and emojis
 				.map(|part| {
 					let value = |name: &str| part[name].as_str().unwrap_or_default();
 					FlairPart {
@@ -220,6 +228,7 @@ pub fn parse_rich_flair(flair_type: String, rich_flair: Option<&Vec<Value>>, tex
 				.collect::<Vec<FlairPart>>(),
 			None => Vec::new(),
 		},
+		// If flair contains only text
 		"text" => match text_flair {
 			Some(text) => vec![FlairPart {
 				flair_part_type: "text".to_string(),
@@ -234,8 +243,10 @@ pub fn parse_rich_flair(flair_type: String, rich_flair: Option<&Vec<Value>>, tex
 pub fn time(unix_time: i64) -> String {
 	let time = OffsetDateTime::from_unix_timestamp(unix_time);
 	let time_delta = OffsetDateTime::now_utc() - time;
+	// If the time difference is more than a month, show full date
 	if time_delta > Duration::days(30) {
-		time.format("%b %d '%y") // %b %e '%y
+		time.format("%b %d '%y")
+	// Otherwise, show relative date/time
 	} else if time_delta.whole_days() > 0 {
 		format!("{}d ago", time_delta.whole_days())
 	} else if time_delta.whole_hours() > 0 {
@@ -365,8 +376,8 @@ pub async fn request(path: &str) -> Result<Value, String> {
 					// If redirection
 					Some('3') => match payload.headers().get("location") {
 						Some(location) => Err((true, location.to_str().unwrap_or_default().to_string())),
-						None => Err((false, "Page not found".to_string()))
-					}
+						None => Err((false, "Page not found".to_string())),
+					},
 					// Otherwise
 					_ => Err((false, "Page not found".to_string())),
 				}
@@ -375,12 +386,14 @@ pub async fn request(path: &str) -> Result<Value, String> {
 		}
 	}
 
-	fn err(u: String, m: String) -> Result<Value, String> {
+	// Print error if debugging then return error based on error message
+	fn err(url: String, msg: String) -> Result<Value, String> {
 		#[cfg(debug_assertions)]
-		dbg!(format!("{} - {}", u, m));
-		Err(m)
+		dbg!(format!("{} - {}", url, msg));
+		Err(msg)
 	};
 
+	// Parse JSON from body. If parsing fails, return error
 	fn json(url: String, body: String) -> Result<Value, String> {
 		match from_str(body.as_str()) {
 			Ok(json) => Ok(json),
@@ -388,13 +401,20 @@ pub async fn request(path: &str) -> Result<Value, String> {
 		}
 	}
 
+	// Make request to Reddit using send function
 	match send(&url).await {
+		// If success, parse and return body
 		Ok(body) => json(url, body),
+		// Follow any redirects
 		Err((true, location)) => match send(location.as_str()).await {
+			// If success, parse and return body
 			Ok(body) => json(url, body),
+			// Follow any redirects again
 			Err((true, location)) => err(url, location),
+			// Return errors if request fails
 			Err((_, msg)) => err(url, msg),
 		},
+		// Return errors if request fails
 		Err((_, msg)) => err(url, msg),
 	}
 }
