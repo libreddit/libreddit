@@ -27,6 +27,12 @@ async fn favicon() -> HttpResponse {
 		.body(include_bytes!("../static/favicon.ico").as_ref())
 }
 
+async fn thumbnail() -> HttpResponse {
+	HttpResponse::Ok()
+		.header("Cache-Control", "public, max-age=1209600, s-maxage=86400")
+		.body(include_bytes!("../static/thumbnail.svg").as_ref())
+}
+
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
 	let mut address = "0.0.0.0:8080".to_string();
@@ -66,6 +72,7 @@ async fn main() -> std::io::Result<()> {
 			// GENERAL SERVICES
 			.route("/style.css/", web::get().to(style))
 			.route("/favicon.ico/", web::get().to(favicon))
+			.route("/thumbnail.svg/", web::get().to(thumbnail))
 			.route("/robots.txt/", web::get().to(robots))
 			// SETTINGS SERVICE
 			.route("/settings/", web::get().to(settings::get))
