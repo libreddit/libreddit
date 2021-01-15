@@ -440,7 +440,6 @@ pub async fn request(path: &str) -> Result<Value, String> {
 		}
 		// If failed to send request
 		Err(e) => {
-			#[cfg(debug_assertions)]
 			dbg!(format!("{} - {}", url, e));
 			Err("Couldn't send request to Reddit, this instance may be being rate-limited. Try another.".to_string())
 		}
