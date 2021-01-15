@@ -382,7 +382,7 @@ pub async fn request(path: &str) -> Result<Value, String> {
 					_ => Err((false, "Page not found".to_string())),
 				}
 			}
-			Err(_) => Err((false, "Couldn't send request to Reddit".to_string())),
+			Err(_) => Err((false, "Couldn't send request to Reddit, this instance may be being rate-limited. Try another.".to_string())),
 		}
 	}
 
