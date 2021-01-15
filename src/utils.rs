@@ -363,58 +363,86 @@ pub async fn request(path: &str) -> Result<Value, String> {
 	let url = format!("https://www.reddit.com{}", path);
 
 	// Send request using awc
-	async fn send(url: &str) -> Result<String, (bool, String)> {
-		let client = actix_web::client::Client::default();
-		let response = client.get(url).send().await;
+	// async fn send(url: &str) -> Result<String, (bool, String)> {
+	// 	let client = actix_web::client::Client::default();
+	// 	let response = client.get(url).send().await;
 
-		match response {
-			Ok(mut payload) => {
-				// Get first number of response HTTP status code
-				match payload.status().to_string().chars().next() {
-					// If success
-					Some('2') => Ok(String::from_utf8(payload.body().limit(20_000_000).await.unwrap_or_default().to_vec()).unwrap_or_default()),
-					// If redirection
-					Some('3') => match payload.headers().get("location") {
-						Some(location) => Err((true, location.to_str().unwrap_or_default().to_string())),
-						None => Err((false, "Page not found".to_string())),
-					},
-					// Otherwise
-					_ => Err((false, "Page not found".to_string())),
+	// 	match response {
+	// 		Ok(mut payload) => {
+	// 			// Get first number of response HTTP status code
+	// 			match payload.status().to_string().chars().next() {
+	// 				// If success
+	// 				Some('2') => Ok(String::from_utf8(payload.body().limit(20_000_000).await.unwrap_or_default().to_vec()).unwrap_or_default()),
+	// 				// If redirection
+	// 				Some('3') => match payload.headers().get("location") {
+	// 					Some(location) => Err((true, location.to_str().unwrap_or_default().to_string())),
+	// 					None => Err((false, "Page not found".to_string())),
+	// 				},
+	// 				// Otherwise
+	// 				_ => Err((false, "Page not found".to_string())),
+	// 			}
+	// 		}
+	// 		Err(_) => Err((false, "Couldn't send request to Reddit, this instance may be being rate-limited. Try another.".to_string())),
+	// 	}
+	// }
+
+	// // Print error if debugging then return error based on error message
+	// fn err(url: String, msg: String) -> Result<Value, String> {
+	// 	// #[cfg(debug_assertions)]
+	// 	dbg!(format!("{} - {}", url, msg));
+	// 	Err(msg)
+	// };
+
+	// // Parse JSON from body. If parsing fails, return error
+	// fn json(url: String, body: String) -> Result<Value, String> {
+	// 	match from_str(body.as_str()) {
+	// 		Ok(json) => Ok(json),
+	// 		Err(_) => err(url, "Failed to parse page JSON data".to_string()),
+	// 	}
+	// }
+
+	// // Make request to Reddit using send function
+	// match send(&url).await {
+	// 	// If success, parse and return body
+	// 	Ok(body) => json(url, body),
+	// 	// Follow any redirects
+	// 	Err((true, location)) => match send(location.as_str()).await {
+	// 		// If success, parse and return body
+	// 		Ok(body) => json(url, body),
+	// 		// Follow any redirects again
+	// 		Err((true, location)) => err(url, location),
+	// 		// Return errors if request fails
+	// 		Err((_, msg)) => err(url, msg),
+	// 	},
+	// 	// Return errors if request fails
+	// 	Err((_, msg)) => err(url, msg),
+	// }
+
+	// Send request using ureq
+	match ureq::get(&url).call() {
+		// If response is success
+		Ok(response) => {
+			// Parse the response from Reddit as JSON
+			match from_str(&response.into_string().unwrap()) {
+				Ok(json) => Ok(json),
+				Err(_) => {
+					#[cfg(debug_assertions)]
+					dbg!(format!("{} - Failed to parse page JSON data", url));
+					Err("Failed to parse page JSON data".to_string())
 				}
 			}
-			Err(_) => Err((false, "Couldn't send request to Reddit, this instance may be being rate-limited. Try another.".to_string())),
 		}
-	}
-
-	// Print error if debugging then return error based on error message
-	fn err(url: String, msg: String) -> Result<Value, String> {
-		// #[cfg(debug_assertions)]
-		dbg!(format!("{} - {}", url, msg));
-		Err(msg)
-	};
-
-	// Parse JSON from body. If parsing fails, return error
-	fn json(url: String, body: String) -> Result<Value, String> {
-		match from_str(body.as_str()) {
-			Ok(json) => Ok(json),
-			Err(_) => err(url, "Failed to parse page JSON data".to_string()),
+		// If response is error
+		Err(ureq::Error::Status(_, _)) => {
+			#[cfg(debug_assertions)]
+			dbg!(format!("{} - Page not found", url));
+			Err("Page not found".to_string())
 		}
-	}
-
-	// Make request to Reddit using send function
-	match send(&url).await {
-		// If success, parse and return body
-		Ok(body) => json(url, body),
-		// Follow any redirects
-		Err((true, location)) => match send(location.as_str()).await {
-			// If success, parse and return body
-			Ok(body) => json(url, body),
-			// Follow any redirects again
-			Err((true, location)) => err(url, location),
-			// Return errors if request fails
-			Err((_, msg)) => err(url, msg),
-		},
-		// Return errors if request fails
-		Err((_, msg)) => err(url, msg),
+		// If failed to send request
+		Err(e) => {
+			#[cfg(debug_assertions)]
+			dbg!(format!("{} - {}", url, e));
+			Err("Couldn't send request to Reddit, this instance may be being rate-limited. Try another.".to_string())
+		}
 	}
 }
