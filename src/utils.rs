@@ -388,7 +388,7 @@ pub async fn request(path: &str) -> Result<Value, String> {
 
 	// Print error if debugging then return error based on error message
 	fn err(url: String, msg: String) -> Result<Value, String> {
-		#[cfg(debug_assertions)]
+		// #[cfg(debug_assertions)]
 		dbg!(format!("{} - {}", url, msg));
 		Err(msg)
 	};
