@@ -34,19 +34,20 @@ pub async fn page(req: HttpRequest) -> HttpResponse {
 		.to_string();
 	let sort = req.match_info().get("sort").unwrap_or("hot").to_string();
 
-	let sub = if !sub_name.contains('+') && sub_name != "popular" && sub_name != "all" {
-		subreddit(&sub_name).await.unwrap_or_default()
-	} else if sub_name.contains('+') {
-		Subreddit {
-			name: sub_name,
-			..Subreddit::default()
-		}
-	} else {
-		Subreddit::default()
-	};
-
 	match fetch_posts(&path, String::new()).await {
 		Ok((posts, after)) => {
+			// If you can get subreddit posts, also request subreddit metadata
+			let sub = if !sub_name.contains('+') && sub_name != "popular" && sub_name != "all" {
+				subreddit(&sub_name).await.unwrap_or_default()
+			} else if sub_name.contains('+') {
+				Subreddit {
+					name: sub_name,
+					..Subreddit::default()
+				}
+			} else {
+				Subreddit::default()
+			};
+
 			let s = SubredditTemplate {
 				sub,
 				posts,
