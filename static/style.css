@@ -543,7 +543,8 @@ a.search_subreddit:hover {
 .post_flair {
 	background: var(--accent);
 	color: var(--background);
-	padding: 5px;
+	padding: 4px;
+	margin-right: 5px;
 	border-radius: 5px;
 	font-size: 12px;
 	font-weight: bold;
