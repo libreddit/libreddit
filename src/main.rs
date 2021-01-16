@@ -58,7 +58,15 @@ async fn main() -> std::io::Result<()> {
 			// Proxy media through Libreddit
 			.route("/proxy/{url:.*}/", web::get().to(proxy::handler))
 			// Browse user profile
-			.route("/{scope:u|user}/{username}/", web::get().to(user::profile))
+			.service(
+				web::scope("/{scope:user|u}").service(
+					web::scope("/{username}").route("/", web::get().to(user::profile)).service(
+						web::scope("/comments/{id}/{title}")
+							.route("/", web::get().to(post::item))
+							.route("/{comment_id}/", web::get().to(post::item)),
+					),
+				),
+			)
 			// Configure settings
 			.service(web::resource("/settings/").route(web::get().to(settings::get)).route(web::post().to(settings::set)))
 			// Subreddit services

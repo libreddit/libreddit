@@ -20,6 +20,7 @@ pub struct Flair {
 	pub foreground_color: String,
 }
 
+// Part of flair, either emoji or text
 pub struct FlairPart {
 	pub flair_part_type: String,
 	pub value: String,
@@ -133,9 +134,10 @@ pub fn prefs(req: HttpRequest) -> Preferences {
 
 // Grab a query param from a url
 pub fn param(path: &str, value: &str) -> String {
-	let url = Url::parse(format!("https://libredd.it/{}", path).as_str()).unwrap();
-	let pairs: HashMap<_, _> = url.query_pairs().into_owned().collect();
-	pairs.get(value).unwrap_or(&String::new()).to_owned()
+	match Url::parse(format!("https://libredd.it/{}", path).as_str()) {
+		Ok(url) => url.query_pairs().into_owned().collect::<HashMap<_, _>>().get(value).unwrap_or(&String::new()).to_owned(),
+		_ => String::new(),
+	}
 }
 
 // Parse Cookie value from request
@@ -171,19 +173,23 @@ pub fn format_num(num: i64) -> String {
 
 pub async fn media(data: &Value) -> (String, String) {
 	let post_type: &str;
-	let url = if !data["preview"]["reddit_video_preview"]["fallback_url"].is_null() {
+	// If post is a video, return the video
+	let url = if data["preview"]["reddit_video_preview"]["fallback_url"].is_string() {
 		post_type = "video";
 		format_url(data["preview"]["reddit_video_preview"]["fallback_url"].as_str().unwrap_or_default())
-	} else if !data["secure_media"]["reddit_video"]["fallback_url"].is_null() {
+	} else if data["secure_media"]["reddit_video"]["fallback_url"].is_string() {
 		post_type = "video";
 		format_url(data["secure_media"]["reddit_video"]["fallback_url"].as_str().unwrap_or_default())
+	// Handle images, whether GIFs or pics
 	} else if data["post_hint"].as_str().unwrap_or("") == "image" {
 		let preview = data["preview"]["images"][0].clone();
 		match preview["variants"]["mp4"].as_object() {
+			// Return the mp4 if the media is a gif
 			Some(gif) => {
 				post_type = "gif";
 				format_url(gif["source"]["url"].as_str().unwrap_or_default())
 			}
+			// Return the picture if the media is an image
 			None => {
 				post_type = "image";
 				format_url(preview["source"]["url"].as_str().unwrap_or_default())
@@ -201,10 +207,13 @@ pub async fn media(data: &Value) -> (String, String) {
 }
 
 pub fn parse_rich_flair(flair_type: String, rich_flair: Option<&Vec<Value>>, text_flair: Option<&str>) -> Vec<FlairPart> {
+	// Parse type of flair
 	match flair_type.as_str() {
+		// If flair contains emojis and text
 		"richtext" => match rich_flair {
 			Some(rich) => rich
 				.iter()
+				// For each part of the flair, extract text and emojis
 				.map(|part| {
 					let value = |name: &str| part[name].as_str().unwrap_or_default();
 					FlairPart {
@@ -219,6 +228,7 @@ pub fn parse_rich_flair(flair_type: String, rich_flair: Option<&Vec<Value>>, tex
 				.collect::<Vec<FlairPart>>(),
 			None => Vec::new(),
 		},
+		// If flair contains only text
 		"text" => match text_flair {
 			Some(text) => vec![FlairPart {
 				flair_part_type: "text".to_string(),
@@ -233,8 +243,10 @@ pub fn parse_rich_flair(flair_type: String, rich_flair: Option<&Vec<Value>>, tex
 pub fn time(unix_time: i64) -> String {
 	let time = OffsetDateTime::from_unix_timestamp(unix_time);
 	let time_delta = OffsetDateTime::now_utc() - time;
+	// If the time difference is more than a month, show full date
 	if time_delta > Duration::days(30) {
-		time.format("%b %d '%y") // %b %e '%y
+		time.format("%b %d '%y")
+	// Otherwise, show relative date/time
 	} else if time_delta.whole_days() > 0 {
 		format!("{}d ago", time_delta.whole_days())
 	} else if time_delta.whole_hours() > 0 {
@@ -351,46 +363,85 @@ pub async fn request(path: &str) -> Result<Value, String> {
 	let url = format!("https://www.reddit.com{}", path);
 
 	// Send request using awc
-	async fn send(url: &str) -> Result<String, (bool, String)> {
-		let client = actix_web::client::Client::default();
-		let response = client.get(url).send().await;
+	// async fn send(url: &str) -> Result<String, (bool, String)> {
+	// 	let client = actix_web::client::Client::default();
+	// 	let response = client.get(url).header("User-Agent", format!("web:libreddit:{}", env!("CARGO_PKG_VERSION"))).send().await;
 
-		match response {
-			Ok(mut payload) => {
-				// Get first number of response HTTP status code
-				match payload.status().to_string().chars().next() {
-					// If success
-					Some('2') => Ok(String::from_utf8(payload.body().limit(20_000_000).await.unwrap().to_vec()).unwrap()),
-					// If redirection
-					Some('3') => Err((true, payload.headers().get("location").unwrap().to_str().unwrap().to_string())),
-					// Otherwise
-					_ => Err((false, "Page not found".to_string())),
+	// 	match response {
+	// 		Ok(mut payload) => {
+	// 			// Get first number of response HTTP status code
+	// 			match payload.status().to_string().chars().next() {
+	// 				// If success
+	// 				Some('2') => Ok(String::from_utf8(payload.body().limit(20_000_000).await.unwrap_or_default().to_vec()).unwrap_or_default()),
+	// 				// If redirection
+	// 				Some('3') => match payload.headers().get("location") {
+	// 					Some(location) => Err((true, location.to_str().unwrap_or_default().to_string())),
+	// 					None => Err((false, "Page not found".to_string())),
+	// 				},
+	// 				// Otherwise
+	// 				_ => Err((false, "Page not found".to_string())),
+	// 			}
+	// 		}
+	// 		Err(e) => { dbg!(e); Err((false, "Couldn't send request to Reddit, this instance may be being rate-limited. Try another.".to_string())) },
+	// 	}
+	// }
+
+	// // Print error if debugging then return error based on error message
+	// fn err(url: String, msg: String) -> Result<Value, String> {
+	// 	// #[cfg(debug_assertions)]
+	// 	dbg!(format!("{} - {}", url, msg));
+	// 	Err(msg)
+	// };
+
+	// // Parse JSON from body. If parsing fails, return error
+	// fn json(url: String, body: String) -> Result<Value, String> {
+	// 	match from_str(body.as_str()) {
+	// 		Ok(json) => Ok(json),
+	// 		Err(_) => err(url, "Failed to parse page JSON data".to_string()),
+	// 	}
+	// }
+
+	// // Make request to Reddit using send function
+	// match send(&url).await {
+	// 	// If success, parse and return body
+	// 	Ok(body) => json(url, body),
+	// 	// Follow any redirects
+	// 	Err((true, location)) => match send(location.as_str()).await {
+	// 		// If success, parse and return body
+	// 		Ok(body) => json(url, body),
+	// 		// Follow any redirects again
+	// 		Err((true, location)) => err(url, location),
+	// 		// Return errors if request fails
+	// 		Err((_, msg)) => err(url, msg),
+	// 	},
+	// 	// Return errors if request fails
+	// 	Err((_, msg)) => err(url, msg),
+	// }
+
+	// Send request using ureq
+	match ureq::get(&url).call() {
+		// If response is success
+		Ok(response) => {
+			// Parse the response from Reddit as JSON
+			match from_str(&response.into_string().unwrap()) {
+				Ok(json) => Ok(json),
+				Err(_) => {
+					#[cfg(debug_assertions)]
+					dbg!(format!("{} - Failed to parse page JSON data", url));
+					Err("Failed to parse page JSON data".to_string())
 				}
 			}
-			Err(_) => Err((false, "Couldn't send request to Reddit".to_string())),
 		}
-	}
-
-	fn err(u: String, m: String) -> Result<Value, String> {
-		#[cfg(debug_assertions)]
-		dbg!(format!("{} - {}", u, m));
-		Err(m)
-	};
-
-	fn json(url: String, body: String) -> Result<Value, String> {
-		match from_str(body.as_str()) {
-			Ok(json) => Ok(json),
-			Err(_) => err(url, "Failed to parse page JSON data".to_string()),
+		// If response is error
+		Err(ureq::Error::Status(_, _)) => {
+			#[cfg(debug_assertions)]
+			dbg!(format!("{} - Page not found", url));
+			Err("Page not found".to_string())
 		}
-	}
-
-	match send(&url).await {
-		Ok(body) => json(url, body),
-		Err((true, location)) => match send(location.as_str()).await {
-			Ok(body) => json(url, body),
-			Err((true, location)) => err(url, location),
-			Err((_, msg)) => err(url, msg),
-		},
-		Err((_, msg)) => err(url, msg),
+		// If failed to send request
+		Err(e) => {
+			dbg!(format!("{} - {}", url, e));
+			Err("Couldn't send request to Reddit, this instance may be being rate-limited. Try another.".to_string())
+		}
 	}
 }
