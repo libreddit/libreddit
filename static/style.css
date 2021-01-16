@@ -676,7 +676,7 @@ a.search_subreddit:hover {
 	padding: 5px;
 }
 
-.datetime {
+.created {
 	opacity: 0.5;
 }
 
@@ -901,7 +901,11 @@ td, th {
 		padding: 5px 0;
 	}
 
-	.datetime {
+	/* .comment_data::marker {
+		font-size: 18px;
+	} */
+
+	.created {
 		width: 100%;
 	}
 }

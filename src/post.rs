@@ -1,11 +1,10 @@
 // CRATES
-use crate::utils::{cookie, error, format_num, format_url, media, param, parse_rich_flair, prefs, request, rewrite_url, val, Comment, Flags, Flair, Post, Preferences};
+use crate::utils::{Comment, Flags, Flair, Post, Preferences, cookie, error, format_num, format_url, media, param, parse_rich_flair, prefs, request, rewrite_url, time, val};
 use actix_web::{HttpRequest, HttpResponse};
 
 use async_recursion::async_recursion;
 
 use askama::Template;
-use time::OffsetDateTime;
 
 // STRUCTS
 #[derive(Template)]
@@ -67,7 +66,7 @@ async fn parse_post(json: &serde_json::Value) -> Post {
 	let post: &serde_json::Value = &json["data"]["children"][0];
 
 	// Grab UTC time as unix timestamp
-	let unix_time: i64 = post["data"]["created_utc"].as_f64().unwrap_or_default().round() as i64;
+	let (rel_time, created) = time(post["data"]["created_utc"].as_f64().unwrap_or_default());
 	// Parse post score and upvote ratio
 	let score = post["data"]["score"].as_i64().unwrap_or_default();
 	let ratio: f64 = post["data"]["upvote_ratio"].as_f64().unwrap_or(1.0) * 100.0;
@@ -115,7 +114,8 @@ async fn parse_post(json: &serde_json::Value) -> Post {
 		},
 		media,
 		domain: val(post, "domain"),
-		time: OffsetDateTime::from_unix_timestamp(unix_time).format("%b %d %Y %H:%M UTC"),
+		rel_time,
+		created
 	}
 }
 
@@ -132,10 +132,9 @@ async fn parse_comments(json: &serde_json::Value) -> Vec<Comment> {
 
 	// For each comment, retrieve the values to build a Comment object
 	for comment in comment_data {
-		let unix_time: i64 = comment["data"]["created_utc"].as_f64().unwrap_or(0.0).round() as i64;
-		if unix_time == 0 {
-			continue;
-		}
+		let unix_time = comment["data"]["created_utc"].as_f64().unwrap_or_default();
+		if unix_time == 0.0 {	continue }
+		let (rel_time, created) = time(unix_time);
 
 		let score = comment["data"]["score"].as_i64().unwrap_or(0);
 		let body = rewrite_url(&val(&comment, "body_html"));
@@ -151,7 +150,8 @@ async fn parse_comments(json: &serde_json::Value) -> Vec<Comment> {
 			body,
 			author: val(&comment, "author"),
 			score: format_num(score),
-			time: OffsetDateTime::from_unix_timestamp(unix_time).format("%b %d %Y %H:%M UTC"),
+			rel_time,
+			created,
 			replies,
 			flair: Flair {
 				flair_parts: parse_rich_flair(

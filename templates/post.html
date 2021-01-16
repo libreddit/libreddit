@@ -25,7 +25,7 @@
 			{% if item.flair.flair_parts.len() > 0 %}
 				<small class="author_flair">{% call utils::render_flair(item.flair.flair_parts) %}</small>
 			{% endif %}
-			<span class="datetime">{{ item.time }}</span>
+			<span class="created" title="{{ post.created }}">{{ item.rel_time }}</span>
 		</summary>
 		<div class="comment_body">{{ item.body }}</div>
 {%- endmacro %}
@@ -54,7 +54,7 @@
 							<small class="author_flair">{% call utils::render_flair(post.author_flair.flair_parts) %}</small>
 						{% endif %}
 						<span class="dot">&bull;</span>
-						<span class="datetime">{{ post.time }}</span>
+						<span class="created" title="{{ post.created }}">{{ post.rel_time }}</span>
 					</p>
 					<a href="{{ post.permalink }}" class="post_title">
 						{{ post.title }}

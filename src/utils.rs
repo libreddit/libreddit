@@ -49,7 +49,8 @@ pub struct Post {
 	pub thumbnail: String,
 	pub media: String,
 	pub domain: String,
-	pub time: String,
+	pub rel_time: String,
+	pub created: String,
 }
 
 // Comment with content, post, score and data/time that it was posted
@@ -59,7 +60,8 @@ pub struct Comment {
 	pub author: String,
 	pub flair: Flair,
 	pub score: String,
-	pub time: String,
+	pub rel_time: String,
+	pub created: String,
 	pub replies: Vec<Comment>,
 }
 
@@ -240,11 +242,12 @@ pub fn parse_rich_flair(flair_type: String, rich_flair: Option<&Vec<Value>>, tex
 	}
 }
 
-pub fn time(unix_time: i64) -> String {
-	let time = OffsetDateTime::from_unix_timestamp(unix_time);
+pub fn time(created: f64) -> (String, String) {
+	let time = OffsetDateTime::from_unix_timestamp(created.round() as i64);
 	let time_delta = OffsetDateTime::now_utc() - time;
+
 	// If the time difference is more than a month, show full date
-	if time_delta > Duration::days(30) {
+	let rel_time = if time_delta > Duration::days(30) {
 		time.format("%b %d '%y")
 	// Otherwise, show relative date/time
 	} else if time_delta.whole_days() > 0 {
@@ -253,7 +256,9 @@ pub fn time(unix_time: i64) -> String {
 		format!("{}h ago", time_delta.whole_hours())
 	} else {
 		format!("{}m ago", time_delta.whole_minutes())
-	}
+	};
+
+	(rel_time, time.format("%b %d %Y %H:%M UTC"))
 }
 
 //
@@ -290,7 +295,7 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 
 	// For each post from posts list
 	for post in post_list {
-		let unix_time: i64 = post["data"]["created_utc"].as_f64().unwrap_or_default().round() as i64;
+		let (rel_time, created) = time(post["data"]["created_utc"].as_f64().unwrap_or_default());
 		let score = post["data"]["score"].as_i64().unwrap_or_default();
 		let ratio: f64 = post["data"]["upvote_ratio"].as_f64().unwrap_or(1.0) * 100.0;
 		let title = val(post, "title");
@@ -337,7 +342,8 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 				stickied: post["data"]["stickied"].as_bool().unwrap_or_default(),
 			},
 			permalink: val(post, "permalink"),
-			time: time(unix_time),
+			rel_time,
+			created
 		});
 	}
 
