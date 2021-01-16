@@ -258,7 +258,7 @@ pub fn time(created: f64) -> (String, String) {
 		format!("{}m ago", time_delta.whole_minutes())
 	};
 
-	(rel_time, time.format("%b %d %Y %H:%M UTC"))
+	(rel_time, time.format("%b %d %Y, %H:%M UTC"))
 }
 
 //

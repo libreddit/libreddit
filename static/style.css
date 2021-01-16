@@ -901,13 +901,15 @@ td, th {
 		padding: 5px 0;
 	}
 
-	/* .comment_data::marker {
-		font-size: 18px;
-	} */
-
-	.created {
-		width: 100%;
+	.comment_left {
+		min-width: 45px;
+		padding: 5px 0px;
 	}
+
+	.comment_author { margin-left: 10px; }
+	.comment_score { min-width: 35px;	}
+	.comment_data::marker { font-size: 18px; }
+	.created { width: 100%; }
 }
 
 @media screen and (max-width: 800px) {
