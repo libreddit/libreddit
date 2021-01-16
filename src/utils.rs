@@ -375,6 +375,7 @@ pub async fn error(msg: String) -> HttpResponse {
 // Make a request to a Reddit API and parse the JSON response
 pub async fn request(path: &str) -> Result<Value, String> {
 	let url = format!("https://www.reddit.com{}", path);
+	let user_agent = format!("web:libreddit:{}", env!("CARGO_PKG_VERSION"));
 
 	// Send request using awc
 	// async fn send(url: &str) -> Result<String, (bool, String)> {
@@ -433,7 +434,7 @@ pub async fn request(path: &str) -> Result<Value, String> {
 	// }
 
 	// Send request using ureq
-	match ureq::get(&url).call() {
+	match ureq::get(&url).set("User-Agent", user_agent.as_str()).call() {
 		// If response is success
 		Ok(response) => {
 			// Parse the response from Reddit as JSON
