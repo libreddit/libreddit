@@ -13,6 +13,7 @@ use url::Url;
 //
 // STRUCTS
 //
+
 // Post flair with content, background color and foreground color
 pub struct Flair {
 	pub flair_parts: Vec<FlairPart>,
@@ -24,6 +25,12 @@ pub struct Flair {
 pub struct FlairPart {
 	pub flair_part_type: String,
 	pub value: String,
+}
+
+pub struct Author {
+	pub name: String,
+	pub flair: Flair,
+	pub distinguished: String,
 }
 
 // Post flags with nsfw and stickied
@@ -38,8 +45,7 @@ pub struct Post {
 	pub title: String,
 	pub community: String,
 	pub body: String,
-	pub author: String,
-	pub author_flair: Flair,
+	pub author: Author,
 	pub permalink: String,
 	pub score: String,
 	pub upvote_ratio: i64,
@@ -57,8 +63,7 @@ pub struct Post {
 pub struct Comment {
 	pub id: String,
 	pub body: String,
-	pub author: String,
-	pub flair: Flair,
+	pub author: Author,
 	pub score: String,
 	pub rel_time: String,
 	pub created: String,
@@ -308,15 +313,18 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 			title: if title.is_empty() { fallback_title.to_owned() } else { title },
 			community: val(post, "subreddit"),
 			body: rewrite_url(&val(post, "body_html")),
-			author: val(post, "author"),
-			author_flair: Flair {
-				flair_parts: parse_rich_flair(
-					val(post, "author_flair_type"),
-					post["data"]["author_flair_richtext"].as_array(),
-					post["data"]["author_flair_text"].as_str(),
-				),
-				background_color: val(post, "author_flair_background_color"),
-				foreground_color: val(post, "author_flair_text_color"),
+			author: Author {
+				name: val(post, "author"),
+				flair: Flair {
+					flair_parts: parse_rich_flair(
+						val(post, "author_flair_type"),
+						post["data"]["author_flair_richtext"].as_array(),
+						post["data"]["author_flair_text"].as_str(),
+					),
+					background_color: val(post, "author_flair_background_color"),
+					foreground_color: val(post, "author_flair_text_color"),
+				},
+				distinguished: val(post, "distinguished"),
 			},
 			score: format_num(score),
 			upvote_ratio: ratio as i64,

@@ -4,6 +4,7 @@
 	--accent: aqua;
 	--green: #5cff85;
 	--nsfw: #FF5C5D;
+	--admin: #ea0027;
 	--text: white;
 	--foreground: #222;
 	--background: #0F0F0F;
@@ -603,11 +604,6 @@ a.search_subreddit:hover {
 .comment_link { text-decoration: underline; }
 .comment_author { opacity: 0.9; }
 
-.comment_author.op {
-	color: var(--accent);
-	font-weight: bold;
-}
-
 .author_flair {
 	background: var(--highlighted);
 	color: var(--text);
@@ -685,6 +681,13 @@ a.search_subreddit:hover {
 	height: 100%;
 	background: var(--foreground);
 }
+
+.moderator, .admin { opacity: 1; }
+.op, .moderator, .admin { font-weight: bold; }
+
+.op { color: var(--accent); }
+.moderator { color: var(--green); }
+.admin { color: var(--admin); }
 
 /* Layouts */
 

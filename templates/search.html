@@ -48,9 +48,9 @@
 					<p class="post_header">
 						<a class="post_subreddit" href="/r/{{ post.community }}">r/{{ post.community }}</a>
 						<span class="dot">&bull;</span>
-						<a class="post_author" href="/u/{{ post.author }}">u/{{ post.author }}</a>
-						{% if post.author_flair.flair_parts.len() > 0 %}
-							<small class="author_flair">{% call utils::render_flair(post.author_flair.flair_parts) %}</small>
+						<a class="post_author" href="/u/{{ post.author.name }}">u/{{ post.author.name }}</a>
+						{% if post.author.flair.flair_parts.len() > 0 %}
+							<small class="author_flair">{% call utils::render_flair(post.author.flair.flair_parts) %}</small>
 						{% endif %}
 						<span class="dot">&bull;</span>
 						<span class="created" title="{{ post.created }}">{{ post.rel_time }}</span>

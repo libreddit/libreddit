@@ -1,5 +1,5 @@
 // CRATES
-use crate::utils::{cookie, error, format_num, format_url, media, param, parse_rich_flair, prefs, request, rewrite_url, time, val, Comment, Flags, Flair, Post, Preferences};
+use crate::utils::*;
 use actix_web::{HttpRequest, HttpResponse};
 
 use async_recursion::async_recursion;
@@ -80,15 +80,18 @@ async fn parse_post(json: &serde_json::Value) -> Post {
 		title: val(post, "title"),
 		community: val(post, "subreddit"),
 		body: rewrite_url(&val(post, "selftext_html")),
-		author: val(post, "author"),
-		author_flair: Flair {
-			flair_parts: parse_rich_flair(
-				val(post, "author_flair_type"),
-				post["data"]["author_flair_richtext"].as_array(),
-				post["data"]["author_flair_text"].as_str(),
-			),
-			background_color: val(post, "author_flair_background_color"),
-			foreground_color: val(post, "author_flair_text_color"),
+		author: Author {
+			name: val(post, "author"),
+			flair: Flair {
+				flair_parts: parse_rich_flair(
+					val(post, "author_flair_type"),
+					post["data"]["author_flair_richtext"].as_array(),
+					post["data"]["author_flair_text"].as_str(),
+				),
+				background_color: val(post, "author_flair_background_color"),
+				foreground_color: val(post, "author_flair_text_color"),
+			},
+			distinguished: val(post, "distinguished"),
 		},
 		permalink: val(post, "permalink"),
 		score: format_num(score),
@@ -150,20 +153,23 @@ async fn parse_comments(json: &serde_json::Value) -> Vec<Comment> {
 		comments.push(Comment {
 			id: val(&comment, "id"),
 			body,
-			author: val(&comment, "author"),
+			author: Author {
+				name: val(&comment, "author"),
+				flair: Flair {
+					flair_parts: parse_rich_flair(
+						val(&comment, "author_flair_type"),
+						comment["data"]["author_flair_richtext"].as_array(),
+						comment["data"]["author_flair_text"].as_str(),
+					),
+					background_color: val(&comment, "author_flair_background_color"),
+					foreground_color: val(&comment, "author_flair_text_color"),
+				},
+				distinguished: val(&comment, "distinguished"),
+			},
 			score: format_num(score),
 			rel_time,
 			created,
 			replies,
-			flair: Flair {
-				flair_parts: parse_rich_flair(
-					val(&comment, "author_flair_type"),
-					comment["data"]["author_flair_richtext"].as_array(),
-					comment["data"]["author_flair_text"].as_str(),
-				),
-				background_color: val(&comment, "author_flair_background_color"),
-				foreground_color: val(&comment, "author_flair_text_color"),
-			},
 		});
 	}
 

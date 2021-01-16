@@ -10,7 +10,7 @@
 {% block root %}/r/{{ post.community }}{% endblock %}{% block location %}r/{{ post.community }}{% endblock %}
 {% block head %}
 	{% call super() %}
-	<meta name="author" content="u/{{ post.author }}">
+	<meta name="author" content="u/{{ post.author.name }}">
 {% endblock %}
 
 <!-- OPEN COMMENT MACRO -->
@@ -21,9 +21,10 @@
 		<div class="line"></div>
 	</div>
 	<details class="comment_right" open>
-		<summary class="comment_data"><a class="comment_author {% if item.author == post.author %}op{% endif %}" href="/u/{{ item.author }}">u/{{ item.author }}</a>
-			{% if item.flair.flair_parts.len() > 0 %}
-				<small class="author_flair">{% call utils::render_flair(item.flair.flair_parts) %}</small>
+		<summary class="comment_data">
+			<a class="comment_author {{ item.author.distinguished }} {% if item.author.name == post.author.name %}op{% endif %}" href="/u/{{ item.author.name }}">u/{{ item.author.name }}</a>
+			{% if item.author.flair.flair_parts.len() > 0 %}
+				<small class="author_flair">{% call utils::render_flair(item.author.flair.flair_parts) %}</small>
 			{% endif %}
 			<span class="created" title="{{ post.created }}">{{ item.rel_time }}</span>
 		</summary>
@@ -49,9 +50,9 @@
 					<p class="post_header">
 						<a class="post_subreddit" href="/r/{{ post.community }}">r/{{ post.community }}</a>
 						<span class="dot">&bull;</span>
-						<a class="post_author" href="/u/{{ post.author }}">u/{{ post.author }}</a>
-						{% if post.author_flair.flair_parts.len() > 0 %}
-							<small class="author_flair">{% call utils::render_flair(post.author_flair.flair_parts) %}</small>
+						<a class="post_author" href="/u/{{ post.author.name }}">u/{{ post.author.name }}</a>
+						{% if post.author.flair.flair_parts.len() > 0 %}
+							<small class="author_flair">{% call utils::render_flair(post.author.flair.flair_parts) %}</small>
 						{% endif %}
 						<span class="dot">&bull;</span>
 						<span class="created" title="{{ post.created }}">{{ post.rel_time }}</span>
