@@ -1,5 +1,5 @@
 // CRATES
-use crate::utils::{Comment, Flags, Flair, Post, Preferences, cookie, error, format_num, format_url, media, param, parse_rich_flair, prefs, request, rewrite_url, time, val};
+use crate::utils::{cookie, error, format_num, format_url, media, param, parse_rich_flair, prefs, request, rewrite_url, time, val, Comment, Flags, Flair, Post, Preferences};
 use actix_web::{HttpRequest, HttpResponse};
 
 use async_recursion::async_recursion;
@@ -115,7 +115,7 @@ async fn parse_post(json: &serde_json::Value) -> Post {
 		media,
 		domain: val(post, "domain"),
 		rel_time,
-		created
+		created,
 	}
 }
 
@@ -133,7 +133,9 @@ async fn parse_comments(json: &serde_json::Value) -> Vec<Comment> {
 	// For each comment, retrieve the values to build a Comment object
 	for comment in comment_data {
 		let unix_time = comment["data"]["created_utc"].as_f64().unwrap_or_default();
-		if unix_time == 0.0 {	continue }
+		if unix_time == 0.0 {
+			continue;
+		}
 		let (rel_time, created) = time(unix_time);
 
 		let score = comment["data"]["score"].as_i64().unwrap_or(0);

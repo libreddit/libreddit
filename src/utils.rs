@@ -343,7 +343,7 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 			},
 			permalink: val(post, "permalink"),
 			rel_time,
-			created
+			created,
 		});
 	}
 
