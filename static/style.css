@@ -388,6 +388,10 @@ a.search_subreddit:hover {
 
 /* Post */
 
+.sep {
+	display: none;
+}
+
 .thread {
 	word-break: break-word;
 }
