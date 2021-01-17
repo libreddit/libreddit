@@ -1,5 +1,8 @@
 // Import Crates
-use actix_web::{App, HttpResponse, HttpServer, dev::{Service, ServiceResponse}, middleware, web};
+use actix_web::{
+	dev::{Service, ServiceResponse},
+	middleware, web, App, HttpResponse, HttpServer,
+};
 use futures::future::FutureExt;
 
 // Reference local files
@@ -50,12 +53,10 @@ async fn main() -> std::io::Result<()> {
 			.wrap_fn(move |req, srv| {
 				let secure = req.connection_info().scheme() == "https";
 				let https_url = format!("https://{}{}", req.connection_info().host(), req.uri().to_string());
-				srv.call(req).map(move |res: Result<ServiceResponse, _> | {
+				srv.call(req).map(move |res: Result<ServiceResponse, _>| {
 					if force_https && !secure {
-						let redirect: ServiceResponse<actix_web::dev::Body> = ServiceResponse::new(
-							res.unwrap().request().clone(),
-							HttpResponse::Found().header("Location", https_url).finish()
-						);
+						let redirect: ServiceResponse<actix_web::dev::Body> =
+							ServiceResponse::new(res.unwrap().request().clone(), HttpResponse::Found().header("Location", https_url).finish());
 						Ok(redirect)
 					} else {
 						res

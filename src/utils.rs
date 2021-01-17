@@ -39,6 +39,12 @@ pub struct Flags {
 	pub stickied: bool,
 }
 
+pub struct Media {
+	pub url: String,
+	pub width: i64,
+	pub height: i64,
+}
+
 // Post containing content, metadata and media
 pub struct Post {
 	pub id: String,
@@ -52,16 +58,12 @@ pub struct Post {
 	pub post_type: String,
 	pub flair: Flair,
 	pub flags: Flags,
-	pub thumbnail: String,
-	pub media: String,
+	pub thumbnail: Media,
+	pub media: Media,
 	pub domain: String,
 	pub rel_time: String,
 	pub created: String,
 	pub comments: String,
-	pub media_width: i64,
-	pub media_height: i64,
-	pub thumbnail_width: i64,
-	pub thumbnail_height: i64,
 }
 
 // Comment with content, post, score and data/time that it was posted
@@ -183,7 +185,7 @@ pub fn format_num(num: i64) -> String {
 	}
 }
 
-pub async fn media(data: &Value) -> (String, String, i64, i64) {
+pub async fn media(data: &Value) -> (String, Media) {
 	let post_type: &str;
 	// If post is a video, return the video
 	let url = if data["preview"]["reddit_video_preview"]["fallback_url"].is_string() {
@@ -214,14 +216,15 @@ pub async fn media(data: &Value) -> (String, String, i64, i64) {
 		post_type = "link";
 		data["url"].as_str().unwrap_or_default().to_string()
 	};
-	
-	let (width, height) = if post_type == "image" {
-		(data["preview"]["images"][0]["source"]["width"].as_i64().unwrap_or_default(), data["preview"]["images"][0]["source"]["height"].as_i64().unwrap_or_default())
-	} else {
-		(0, 0)
-	};
 
-	(post_type.to_string(), url, width, height)
+	(
+		post_type.to_string(),
+		Media {
+			url,
+			width: data["preview"]["images"][0]["source"]["width"].as_i64().unwrap_or_default(),
+			height: data["preview"]["images"][0]["source"]["height"].as_i64().unwrap_or_default(),
+		},
+	)
 }
 
 pub fn parse_rich_flair(flair_type: String, rich_flair: Option<&Vec<Value>>, text_flair: Option<&str>) -> Vec<FlairPart> {
@@ -317,7 +320,7 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 		let title = val(post, "title");
 
 		// Determine the type of media along with the media URL
-		let (post_type, media, width, height) = media(&post["data"]).await;
+		let (post_type, media) = media(&post["data"]).await;
 
 		posts.push(Post {
 			id: val(post, "id"),
@@ -340,7 +343,11 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 			score: format_num(score),
 			upvote_ratio: ratio as i64,
 			post_type,
-			thumbnail: format_url(val(post, "thumbnail").as_str()),
+			thumbnail: Media {
+				url: format_url(val(post, "thumbnail").as_str()),
+				width: post["data"]["thumbnail_width"].as_i64().unwrap_or_default(),
+				height: post["data"]["thumbnail_height"].as_i64().unwrap_or_default(),
+			},
 			media,
 			domain: val(post, "domain"),
 			flair: Flair {
@@ -364,10 +371,6 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 			rel_time,
 			created,
 			comments: format_num(post["data"]["num_comments"].as_i64().unwrap_or_default()),
-			media_width: width,
-			media_height: height,
-			thumbnail_width: post["data"]["thumbnail_width"].as_i64().unwrap_or_default(),
-			thumbnail_height: post["data"]["thumbnail_height"].as_i64().unwrap_or_default(),
 		});
 	}
 
