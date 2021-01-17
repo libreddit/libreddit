@@ -56,7 +56,7 @@ nav * { color: var(--text); }
 nav #reddit, #code { color: var(--accent); }
 nav #logo { grid-area: logo; }
 nav #code { grid-area: code; }
-nav #version { opacity: 25%; }
+nav #version { opacity: 50%; }
 
 #settings_link {
 	font-size: 18px;

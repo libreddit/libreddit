@@ -6,16 +6,16 @@
 {% block content %}
 	<div id="column_one">
 		<form id="search_sort">
-			<input id="search" type="text" name="q" placeholder="Search" value="{{ params.q }}">
+			<input id="search" type="text" name="q" placeholder="Search" value="{{ params.q }}" title="Search libreddit">
 			{% if sub != "" %}
 			<div id="inside">
 				<input type="checkbox" name="restrict_sr" id="restrict_sr" {% if params.restrict_sr != "" %}checked{% endif %}>
 				<label for="restrict_sr" class="search_label">in r/{{ sub }}</label>
 			</div>
 			{% endif %}
-			<select id="sort_options" name="sort">
+			<select id="sort_options" name="sort" title="Sort results by">
 				{% call utils::options(params.sort, ["relevance", "hot", "top", "new", "comments"], "") %}
-			</select>{% if params.sort != "new" %}<select id="timeframe" name="t"> 
+			</select>{% if params.sort != "new" %}<select id="timeframe" name="t" title="Timeframe"> 
 				{% call utils::options(params.t, ["hour", "day", "week", "month", "year", "all"], "all") %}
 			</select>{% endif %}<input id="sort_submit" type="submit" value="&rarr;">
 		</form>
@@ -54,15 +54,16 @@
 			</p>
 			<!-- POST MEDIA/THUMBNAIL -->
 			{% if (prefs.layout.is_empty() || prefs.layout == "card") && post.post_type == "image" %}
-			<img class="post_media" width="{{ post.media.width }}px" height="{{ post.media.height}}px" src="{{ post.media.url }}"/>
+			<img class="post_media" alt="Post image" width="{{ post.media.width }}px" height="{{ post.media.height}}px" src="{{ post.media.url }}"/>
 			{% else if post.post_type != "self" %}
 			<a class="post_thumbnail {% if post.thumbnail.url.is_empty() %}no_thumbnail{% endif %}" href="{% if post.post_type == "link" %}{{ post.media.url }}{% else %}{{ post.permalink }}{% endif %}">
 				{% if post.thumbnail.url.is_empty() %}
 					<svg viewBox="0 0 100 106" width="140" height="53" xmlns="http://www.w3.org/2000/svg">
+						<title>Thumbnail</title>
 						<path d="M35,15h-15a10,10 0,0,0 0,20h25a10,10 0,0,0 10,-10m-12.5,0a10, 10 0,0,1 10, -10h25a10,10 0,0,1 0,20h-15" fill="none" stroke-width="5" stroke-linecap="round"/>
 					</svg>
 				{% else %}
-					<img src="{{ post.thumbnail.url }}" width="{{ post.thumbnail.width }}px" height="{{ post.thumbnail.height }}px">
+					<img src="{{ post.thumbnail.url }}" alt="Thumbnail" width="{{ post.thumbnail.width }}px" height="{{ post.thumbnail.height }}px">
 				{% endif %}
 				<span>{% if post.post_type == "link" %}{{ post.domain }}{% else %}{{ post.post_type }}{% endif %}</span>
 			</a>
