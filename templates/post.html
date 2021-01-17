@@ -62,11 +62,11 @@
 
 			<!-- POST MEDIA -->
 			{% if post.post_type == "image" %}
-			<img class="post_media" alt="Post image" width="{{ post.media_width }}px" height="{{ post.media_height}}px" src="{{ post.media }}"/>
+			<img class="post_media" alt="Post image" width="{{ post.media.width }}px" height="{{ post.media.height}}px" src="{{ post.media.url }}"/>
 			{% else if post.post_type == "video" || post.post_type == "gif" %}
-			<video class="post_media" src="{{ post.media }}" controls autoplay loop></video>
+			<video class="post_media" src="{{ post.media.url }}" controls autoplay loop></video>
 			{% else if post.post_type == "link" %}
-			<a id="post_url" href="{{ post.media }}">{{ post.media }}</a>
+			<a id="post_url" href="{{ post.media.url }}">{{ post.media.url }}</a>
 			{% endif %}
 
 			<!-- POST BODY -->

@@ -32,23 +32,30 @@ body {
 }
 
 nav {
-	display: flex;
+	display: grid;
+	grid-template-areas: "logo searchbox code";
+
 	justify-content: space-between;
 	align-items: center;
+	
 	color: var(--accent);
 	background: var(--outside);
-	padding: 5px 15px;
-	font-size: 20px;
-	min-height: 40px;
-	position: fixed;
-	width: calc(100% - 30px);
 	box-shadow: var(--shadow);
-	top: 0;
+	
+	font-size: 20px;
+	
 	z-index: 1;
+	top: 0;
+	padding: 5px 15px;
+	min-height: 40px;
+	width: calc(100% - 30px);
+	position: fixed;
 }
 
 nav * { color: var(--text); }
-nav #reddit { color: var(--accent); }
+nav #reddit, #code { color: var(--accent); }
+nav #logo { grid-area: logo; }
+nav #code { grid-area: code; }
 nav #version { opacity: 50%; }
 
 #settings_link {
@@ -246,6 +253,7 @@ select, #search {
 }
 
 #searchbox {
+	grid-area: searchbox;
 	display: flex;
 	box-shadow: var(--shadow);
 	border-radius: 5px;
@@ -939,7 +947,7 @@ td, th {
 	}
 	
 	nav {
-		flex-direction: column;
+		grid-template-areas: 'logo code' 'searchbox searchbox';
 		padding: 10px;
 		width: calc(100% - 20px);
 	}
@@ -952,5 +960,4 @@ td, th {
 	#user, #sidebar { margin: 20px 0;	}
 	#logo { margin: 5px auto; }
 	#searchbox { width: 100%; }
-	#github {	display: none; }
 }

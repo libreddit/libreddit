@@ -47,17 +47,17 @@
 					<a href="{{ post.permalink }}">{{ post.title }}</a>{% if post.flags.nsfw %} <small class="nsfw">NSFW</small>{% endif %}
 				</p>
 				<!-- POST MEDIA/THUMBNAIL -->
-				{% if (prefs.layout == "" || prefs.layout == "card") && post.post_type == "image" %}
-				<img class="post_media" alt="Post image" width="{{ post.media_width }}px" height="{{ post.media_height}}px" src="{{ post.media }}"/>
+				{% if (prefs.layout.is_empty() || prefs.layout == "card") && post.post_type == "image" %}
+				<img class="post_media" alt="Post image" width="{{ post.media.width }}px" height="{{ post.media.height }}px" src="{{ post.media.url }}"/>
 				{% else if post.post_type != "self" %}
-				<a class="post_thumbnail {% if post.thumbnail == "" %}no_thumbnail{% endif %}" href="{% if post.post_type == "link" %}{{ post.media }}{% else %}{{ post.permalink }}{% endif %}">
-					{% if post.thumbnail == "" %}
+				<a class="post_thumbnail {% if post.thumbnail.url.is_empty() %}no_thumbnail{% endif %}" href="{% if post.post_type == "link" %}{{ post.media.url }}{% else %}{{ post.permalink }}{% endif %}">
+					{% if post.thumbnail.url.is_empty() %}
 						<svg viewBox="0 0 100 106" width="140" height="53" xmlns="http://www.w3.org/2000/svg">
 							<title>Thumbnail</title>
 							<path d="M35,15h-15a10,10 0,0,0 0,20h25a10,10 0,0,0 10,-10m-12.5,0a10, 10 0,0,1 10, -10h25a10,10 0,0,1 0,20h-15" fill="none" stroke-width="5" stroke-linecap="round"/>
 						</svg>
 					{% else %}
-						<img src="{{ post.thumbnail }}" alt="Thumbnail" width="{{ post.thumbnail_width }}px" height="{{ post.thumbnail_height }}px">
+						<img src="{{ post.thumbnail.url }}" alt="Thumbnail" width="{{ post.thumbnail.width }}px" height="{{ post.thumbnail.height }}px">
 					{% endif %}
 					<span>{% if post.post_type == "link" %}{{ post.domain }}{% else %}{{ post.post_type }}{% endif %}</span>
 				</a>
