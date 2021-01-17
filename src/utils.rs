@@ -176,9 +176,9 @@ pub fn rewrite_url(text: &str) -> String {
 
 // Append `m` and `k` for millions and thousands respectively
 pub fn format_num(num: i64) -> String {
-	if num > 1_000_000 {
+	if num >= 1_000_000 {
 		format!("{}m", num / 1_000_000)
-	} else if num > 1000 {
+	} else if num >= 1000 {
 		format!("{}k", num / 1_000)
 	} else {
 		num.to_string()
