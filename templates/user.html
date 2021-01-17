@@ -42,7 +42,7 @@
 							{% if post.flair.background_color == "Comment" %}
 							{% else if post.flair.background_color == "" %}
 							{% else %}
-								<small class="post_flair" style="color:{{ post.flair.foreground_color }}; background:{{ post.flair.background_color }}">{% call utils::render_flair(post.flair.flair_parts) %}</small>
+								<small class="post_flair" style="color:{{ post.flair.foreground_color }}; background:{{ post.flair.background_color }};">{% call utils::render_flair(post.flair.flair_parts) %}</small>
 							{% endif %}
 							<a href="{{ post.permalink }}">{{ post.title }}</a>
 						</p>

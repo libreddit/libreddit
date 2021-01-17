@@ -29,7 +29,7 @@
 
 {% macro render_flair(flair) -%}
 {% for flair_part in flair %}
-	{% if flair_part.flair_part_type == "emoji" %}<span class="emoji" style="background-image:url('{{ flair_part.value }}')"></span>
+	{% if flair_part.flair_part_type == "emoji" %}<span class="emoji" style="background-image:url('{{ flair_part.value }}');"></span>
 	{% else if flair_part.flair_part_type == "text" %}<span>{{ flair_part.value }}</span>{% endif %}
 {% endfor %}
 {%- endmacro %}

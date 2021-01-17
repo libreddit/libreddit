@@ -60,7 +60,7 @@
 					<a href="{{ post.permalink }}" class="post_title">
 						{{ post.title }}
 						{% if post.flair.flair_parts.len() > 0 %}
-							<small class="post_flair" style="color:{{ post.flair.foreground_color }}; background:{{ post.flair.background_color }}">{% call utils::render_flair(post.flair.flair_parts) %}</small>
+							<small class="post_flair" style="color:{{ post.flair.foreground_color }}; background:{{ post.flair.background_color }};">{% call utils::render_flair(post.flair.flair_parts) %}</small>
 						{% endif %}
 					</a>
 
