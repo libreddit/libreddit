@@ -15,7 +15,13 @@
 					{% call utils::options(sort.0, ["hot", "new", "top"], "") %}
 				</select>{% if sort.0 == "top" %}<select id="timeframe" name="t"> 
 					{% call utils::options(sort.1, ["hour", "day", "week", "month", "year", "all"], "all") %}
-				</select>{% endif %}<input id="sort_submit" type="submit" value="&rarr;">
+				</select>{% endif %}<button id="sort_submit" class="submit">
+					<svg width="15" viewBox="0 0 110 100" fill="none" stroke-width="10" stroke-linecap="round">
+						<path d="M20 50 H100" />
+						<path d="M75 15 L100 50 L75 85" />
+						&rarr;
+					</svg>
+				</button>
 			</form>
 
 			<div id="posts">

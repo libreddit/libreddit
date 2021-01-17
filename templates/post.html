@@ -87,7 +87,13 @@
 		<form id="sort">
 			<select name="sort" title="Sort comments by"> 
 				{% call utils::options(sort, ["confidence", "top", "new", "controversial", "old"], "confidence") %}
-			</select><input id="sort_submit" type="submit" value="&rarr;">
+			</select><button id="sort_submit" class="submit">
+				<svg width="15" viewBox="0 0 110 100" fill="none" stroke-width="10" stroke-linecap="round">
+					<path d="M20 50 H100" />
+					<path d="M75 15 L100 50 L75 85" />
+					&rarr;
+				</svg>
+			</button>
 		</form>
 
 		<!-- COMMENTS -->

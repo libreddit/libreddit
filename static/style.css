@@ -117,6 +117,10 @@ a:hover {
 	text-decoration: underline;
 }
 
+svg {
+	stroke: var(--text);
+}
+
 img[src=""] {
 	display: none;
 }
@@ -280,14 +284,18 @@ select, #search {
 
 #restrict_sr { margin-right: 5px; }
 
-input[type="submit"] {
+input[type="submit"], button.submit {
 	border: 0;
 	border-radius: 0px 5px 5px 0px;
-	transition: 0.2s all;
 }
 
+button.submit { display: flex; }
 select:hover { background: var(--foreground); }
-input[type="submit"]:hover { color: var(--accent); }
+
+input[type="submit"]:hover, button.submit:hover {
+	transition: 0.2s all;
+	color: var(--accent);
+}
 
 #timeframe {
 	margin: 0 2px;
@@ -568,7 +576,6 @@ a.search_subreddit:hover {
 	grid-area: 1 / 1 / 2 / 2;
 	align-self: center;
 	justify-self: center;
-	stroke: var(--text);
 	max-width: 100%;
 }
 
