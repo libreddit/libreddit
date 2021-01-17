@@ -72,7 +72,7 @@ async fn parse_post(json: &serde_json::Value) -> Post {
 	let ratio: f64 = post["data"]["upvote_ratio"].as_f64().unwrap_or(1.0) * 100.0;
 
 	// Determine the type of media along with the media URL
-	let (post_type, media, width, height) = media(&post["data"]).await;
+	let (post_type, media) = media(&post["data"]).await;
 
 	// Build a post using data parsed from Reddit post API
 	Post {
@@ -97,7 +97,12 @@ async fn parse_post(json: &serde_json::Value) -> Post {
 		score: format_num(score),
 		upvote_ratio: ratio as i64,
 		post_type,
-		thumbnail: format_url(val(post, "thumbnail").as_str()),
+		media,
+		thumbnail: Media {
+			url: format_url(val(post, "thumbnail").as_str()),
+			width: post["data"]["thumbnail_width"].as_i64().unwrap_or_default(),
+			height: post["data"]["thumbnail_height"].as_i64().unwrap_or_default(),
+		},
 		flair: Flair {
 			flair_parts: parse_rich_flair(
 				val(post, "link_flair_type"),
@@ -115,15 +120,10 @@ async fn parse_post(json: &serde_json::Value) -> Post {
 			nsfw: post["data"]["over_18"].as_bool().unwrap_or(false),
 			stickied: post["data"]["stickied"].as_bool().unwrap_or(false),
 		},
-		media,
 		domain: val(post, "domain"),
 		rel_time,
 		created,
 		comments: format_num(post["data"]["num_comments"].as_i64().unwrap_or_default()),
-		media_width: width,
-		media_height: height,
-		thumbnail_width: post["data"]["thumbnail_width"].as_i64().unwrap_or_default(),
-		thumbnail_height: post["data"]["thumbnail_height"].as_i64().unwrap_or_default(),
 	}
 }
 
