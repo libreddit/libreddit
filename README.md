@@ -190,6 +190,8 @@ Specify a custom address for the server by passing the `-a` or `--address` argum
 libreddit --address=0.0.0.0:8111
 ```
 
+Given you have a TLS certificate, you can pass the `-r` or `--redirect-https` arguments to force HTTPS.
+
 ## Building
 
 ```

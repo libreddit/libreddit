@@ -1,5 +1,6 @@
 // Import Crates
-use actix_web::{middleware, web, App, HttpResponse, HttpServer}; // dev::Service
+use actix_web::{App, HttpResponse, HttpServer, dev::{Service, ServiceResponse}, middleware, web};
+use futures::future::FutureExt;
 
 // Reference local files
 mod post;
@@ -30,12 +31,12 @@ async fn favicon() -> HttpResponse {
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
 	let mut address = "0.0.0.0:8080".to_string();
-	// let mut https = false;
+	let mut force_https = false;
 
 	for arg in std::env::args().collect::<Vec<String>>() {
 		match arg.split('=').collect::<Vec<&str>>()[0] {
 			"--address" | "-a" => address = arg.split('=').collect::<Vec<&str>>()[1].to_string(),
-			// "--redirect-https" | "-r" => https = true,
+			"--redirect-https" | "-r" => force_https = true,
 			_ => (),
 		}
 	}
@@ -43,10 +44,24 @@ async fn main() -> std::io::Result<()> {
 	// start http server
 	println!("Running Libreddit v{} on {}!", env!("CARGO_PKG_VERSION"), &address);
 
-	HttpServer::new(|| {
+	HttpServer::new(move || {
 		App::new()
-			// Redirect to HTTPS
-			// .wrap_fn(|req, srv| { let fut = srv.call(req); async { let mut res = fut.await?; if https {}	Ok(res) } })
+			// Redirect to HTTPS if "--redirect-https" enabled
+			.wrap_fn(move |req, srv| {
+				let secure = req.connection_info().scheme() == "https";
+				let https_url = format!("https://{}{}", req.connection_info().host(), req.uri().to_string());
+				srv.call(req).map(move |res: Result<ServiceResponse, _> | {
+					if force_https && !secure {
+						let redirect: ServiceResponse<actix_web::dev::Body> = ServiceResponse::new(
+							res.unwrap().request().clone(),
+							HttpResponse::Found().header("Location", https_url).finish()
+						);
+						Ok(redirect)
+					} else {
+						res
+					}
+				})
+			})
 			// Append trailing slash and remove double slashes
 			.wrap(middleware::NormalizePath::default())
 			// Default service in case no routes match
