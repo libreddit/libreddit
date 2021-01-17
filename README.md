@@ -33,7 +33,7 @@ Like [Invidious](https://github.com/iv-org/invidious) but for Reddit. Browse the
 
 ## Screenshot
 
-![](https://i.ibb.co/6mXqb4G/libreddit-rust.png)
+![](https://i.ibb.co/FxxbKM6/libreddit-rust.png)
 
 ## Instances
 
