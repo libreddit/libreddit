@@ -41,50 +41,46 @@
 
 		<!-- POST CONTENT -->
 		<div class="post highlighted">
-			<div class="post_left">
-				<p class="post_score">{{ post.score }}</p>
-				{% if post.flags.nsfw %}<div class="nsfw">NSFW</div>{% endif %}
+			
+			<p class="post_header">
+				<a class="post_subreddit" href="/r/{{ post.community }}">r/{{ post.community }}</a>
+				<span class="dot">&bull;</span>
+				<a class="post_author" href="/u/{{ post.author.name }}">u/{{ post.author.name }}</a>
+				{% if post.author.flair.flair_parts.len() > 0 %}
+					<small class="author_flair">{% call utils::render_flair(post.author.flair.flair_parts) %}</small>
+				{% endif %}
+				<span class="dot">&bull;</span>
+				<span class="created" title="{{ post.created }}">{{ post.rel_time }}</span>
+			</p>
+			<p class="post_title">
+				<a href="{{ post.permalink }}">{{ post.title }}</a>
+				{% if post.flair.flair_parts.len() > 0 %}
+					<small class="post_flair" style="color:{{ post.flair.foreground_color }}; background:{{ post.flair.background_color }};">{% call utils::render_flair(post.flair.flair_parts) %}</small>
+				{% endif %}
+				{% if post.flags.nsfw %} <small class="nsfw">NSFW</small>{% endif %}
+			</p>
+
+			<!-- POST MEDIA -->
+			{% if post.post_type == "image" %}
+			<img class="post_media" width="{{ post.media_width }}px" height="{{ post.media_height}}px" src="{{ post.media }}"/>
+			{% else if post.post_type == "video" || post.post_type == "gif" %}
+			<video class="post_media" src="{{ post.media }}" controls autoplay loop></video>
+			{% else if post.post_type == "link" %}
+			<a id="post_url" href="{{ post.media }}">{{ post.media }}</a>
+			{% endif %}
+
+			<!-- POST BODY -->
+			<div class="post_body">{{ post.body }}</div>
+			<div class="post_score">{{ post.score }}<span class="label"> Upvotes</span></div>
+			<div class="post_footer">
+				
+				<ul id="post_links">
+					<li><a href="/{{ post.id }}">permalink</a></li>
+					<li><a href="https://reddit.com/{{ post.id }}">reddit</a></li>
+				</ul>
+				<p>{{ post.upvote_ratio }}% Upvoted</p>
 			</div>
-			<div class="post_right">
-				<div class="post_text">
-					<p class="post_header">
-						<a class="post_subreddit" href="/r/{{ post.community }}">r/{{ post.community }}</a>
-						<span class="dot">&bull;</span>
-						<a class="post_author" href="/u/{{ post.author.name }}">u/{{ post.author.name }}</a>
-						{% if post.author.flair.flair_parts.len() > 0 %}
-							<small class="author_flair">{% call utils::render_flair(post.author.flair.flair_parts) %}</small>
-						{% endif %}
-						<span class="dot">&bull;</span>
-						<span class="created" title="{{ post.created }}">{{ post.rel_time }}</span>
-					</p>
-					<a href="{{ post.permalink }}" class="post_title">
-						{{ post.title }}
-						{% if post.flair.flair_parts.len() > 0 %}
-							<small class="post_flair" style="color:{{ post.flair.foreground_color }}; background:{{ post.flair.background_color }};">{% call utils::render_flair(post.flair.flair_parts) %}</small>
-						{% endif %}
-					</a>
 
-					<!-- POST MEDIA -->
-					{% if post.post_type == "image" %}
-					<img class="post_media" src="{{ post.media }}"/>
-					{% else if post.post_type == "video" || post.post_type == "gif" %}
-					<video class="post_media" src="{{ post.media }}" controls autoplay loop></video>
-					{% else if post.post_type == "link" %}
-					<a id="post_url" href="{{ post.media }}">{{ post.media }}</a>
-					{% endif %}
-
-					<!-- POST BODY -->
-					<div class="post_body">{{ post.body }}</div>
-					<div id="post_footer">
-						<ul id="post_links">
-							<li><a href="/{{ post.id }}">permalink</a></li>
-							<li><a href="https://reddit.com/{{ post.id }}">reddit</a></li>
-						</ul>
-						<p>{{ post.upvote_ratio }}% Upvoted</p>
-					</div>
-
-				</div>
-			</div>
 		</div>
 
 		<!-- SORT FORM -->

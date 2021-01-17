@@ -57,6 +57,11 @@ pub struct Post {
 	pub domain: String,
 	pub rel_time: String,
 	pub created: String,
+	pub comments: String,
+	pub media_width: i64,
+	pub media_height: i64,
+	pub thumbnail_width: i64,
+	pub thumbnail_height: i64,
 }
 
 // Comment with content, post, score and data/time that it was posted
@@ -178,7 +183,7 @@ pub fn format_num(num: i64) -> String {
 	}
 }
 
-pub async fn media(data: &Value) -> (String, String) {
+pub async fn media(data: &Value) -> (String, String, i64, i64) {
 	let post_type: &str;
 	// If post is a video, return the video
 	let url = if data["preview"]["reddit_video_preview"]["fallback_url"].is_string() {
@@ -209,8 +214,14 @@ pub async fn media(data: &Value) -> (String, String) {
 		post_type = "link";
 		data["url"].as_str().unwrap_or_default().to_string()
 	};
+	
+	let (width, height) = if post_type == "image" {
+		(data["preview"]["images"][0]["source"]["width"].as_i64().unwrap_or_default(), data["preview"]["images"][0]["source"]["height"].as_i64().unwrap_or_default())
+	} else {
+		(0, 0)
+	};
 
-	(post_type.to_string(), url)
+	(post_type.to_string(), url, width, height)
 }
 
 pub fn parse_rich_flair(flair_type: String, rich_flair: Option<&Vec<Value>>, text_flair: Option<&str>) -> Vec<FlairPart> {
@@ -306,7 +317,7 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 		let title = val(post, "title");
 
 		// Determine the type of media along with the media URL
-		let (post_type, media) = media(&post["data"]).await;
+		let (post_type, media, width, height) = media(&post["data"]).await;
 
 		posts.push(Post {
 			id: val(post, "id"),
@@ -352,6 +363,11 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 			permalink: val(post, "permalink"),
 			rel_time,
 			created,
+			comments: format_num(post["data"]["num_comments"].as_i64().unwrap_or_default()),
+			media_width: width,
+			media_height: height,
+			thumbnail_width: post["data"]["thumbnail_width"].as_i64().unwrap_or_default(),
+			thumbnail_height: post["data"]["thumbnail_height"].as_i64().unwrap_or_default(),
 		});
 	}
 
