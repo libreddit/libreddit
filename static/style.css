@@ -49,7 +49,7 @@ nav {
 
 nav * { color: var(--text); }
 nav #reddit { color: var(--accent); }
-nav #version { opacity: 25%; }
+nav #version { opacity: 50%; }
 
 #settings_link {
 	font-size: 18px;

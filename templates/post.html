@@ -62,7 +62,7 @@
 
 			<!-- POST MEDIA -->
 			{% if post.post_type == "image" %}
-			<img class="post_media" width="{{ post.media_width }}px" height="{{ post.media_height}}px" src="{{ post.media }}"/>
+			<img class="post_media" alt="Post image" width="{{ post.media_width }}px" height="{{ post.media_height}}px" src="{{ post.media }}"/>
 			{% else if post.post_type == "video" || post.post_type == "gif" %}
 			<video class="post_media" src="{{ post.media }}" controls autoplay loop></video>
 			{% else if post.post_type == "link" %}
@@ -85,7 +85,7 @@
 
 		<!-- SORT FORM -->
 		<form id="sort">
-			<select name="sort"> 
+			<select name="sort" title="Sort comments by"> 
 				{% call utils::options(sort, ["confidence", "top", "new", "controversial", "old"], "confidence") %}
 			</select><input id="sort_submit" type="submit" value="&rarr;">
 		</form>
