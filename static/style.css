@@ -127,7 +127,7 @@ aside {
 	opacity: 0.5;
 }
 
-/* Color themes */
+/* Define themes */
 
 :root {
 	/* Light theme */
@@ -151,8 +151,12 @@ aside {
 	--post-dark: #161616;
 	--highlighted-dark: #333;
 	--shadow-dark: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
 
-	/* Fallback to dark (default) */
+/* Automatic theme selection */
+
+:root{
+	/* Default & fallback theme (dark) */
 	--accent: var(--accent-dark);
 	--green: var(--green-dark);
 	--text: var(--text-dark);
@@ -178,7 +182,7 @@ aside {
 	}
 }
 
-/* Override themes */
+/* User-set theme overrides */
 
 .light {
 	--accent: var(--accent-light);
