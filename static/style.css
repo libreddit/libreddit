@@ -289,7 +289,11 @@ input[type="submit"], button.submit {
 	border-radius: 0px 5px 5px 0px;
 }
 
-button.submit { display: flex; }
+button.submit {
+	display: flex;
+	align-items: center;
+}
+
 select:hover { background: var(--foreground); }
 
 input[type="submit"]:hover, button.submit:hover {
