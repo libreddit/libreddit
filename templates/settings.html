@@ -14,7 +14,7 @@
 		<div id="theme">
 			<label for="theme">Theme:</label>
 			<select name="theme"> 
-				{% call utils::options(prefs.theme, ["dark", "light"], "dark") %}
+				{% call utils::options(prefs.theme, ["system", "dark", "light"], "system") %}
 			</select>
 		</div>
 		<p>Interface</p>

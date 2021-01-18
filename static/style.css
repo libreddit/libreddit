@@ -1,17 +1,8 @@
 /* General */
 
 :root {
-	--accent: aqua;
-	--green: #5cff85;
-	--nsfw: #FF5C5D;
+	--nsfw: #ff5c5d;
 	--admin: #ea0027;
-	--text: white;
-	--foreground: #222;
-	--background: #0F0F0F;
-	--outside: #1F1F1F;
-	--post: #161616;
-	--highlighted: #333;
-	--shadow: 0 1px 3px rgba(0,0,0,0.5);
 }
 
 ::selection {
@@ -140,18 +131,85 @@ aside {
 	opacity: 0.5;
 }
 
-/* Light Theme */
+/* Define themes */
+
+:root {
+	/* Light theme */
+	--accent-light: #009a9a;
+	--green-light: #00a229;
+	--text-light: black;
+	--foreground-light: #f5f5f5;
+	--background-light: #ddd;
+	--outside-light: #ececec;
+	--post-light: #eee;
+	--highlighted-light: white;
+	--shadow-light: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+	/* Dark theme */
+	--accent-dark: aqua;
+	--green-dark: #5cff85;
+	--text-dark: white;
+	--foreground-dark: #222;
+	--background-dark: #0f0f0f;
+	--outside-dark: #1f1f1f;
+	--post-dark: #161616;
+	--highlighted-dark: #333;
+	--shadow-dark: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+/* Automatic theme selection */
+
+:root{
+	/* Default & fallback theme (dark) */
+	--accent: var(--accent-dark);
+	--green: var(--green-dark);
+	--text: var(--text-dark);
+	--foreground: var(--foreground-dark);
+	--background: var(--background-dark);
+	--outside: var(--outside-dark);
+	--post: var(--post-dark);
+	--highlighted: var(--highlighted-dark);
+	--shadow: var(--shadow-dark);
+}
+
+@media (prefers-color-scheme: light) {
+	:root {
+		--accent: var(--accent-light);
+		--green: var(--green-light);
+		--text: var(--text-light);
+		--foreground: var(--foreground-light);
+		--background: var(--background-light);
+		--outside: var(--outside-light);
+		--post: var(--post-light);
+		--highlighted: var(--highlighted-light);
+		--shadow: var(--shadow-light);
+	}
+}
+
+/* User-set theme overrides */
 
 .light {
-	--accent: #009a9a;
-	--green: #00a229;
-	--text: black;
-	--foreground: #f5f5f5;
-	--background: #DDD;
-	--outside: #ECECEC;
-	--post: #eee;
-	--highlighted: white;
-	--shadow: 0 1px 3px rgba(0,0,0,0.1);
+	--accent: var(--accent-light);
+	--green: var(--green-light);
+	--text: var(--text-light);
+	--foreground: var(--foreground-light);
+	--background: var(--background-light);
+	--outside: var(--outside-light);
+	--post: var(--post-light);
+	--highlighted: var(--highlighted-light);
+	--shadow: var(--shadow-light);
+}
+
+.dark {
+	--accent: var(--accent-dark);
+	--green: var(--green-dark);
+	--text: var(--text-dark);
+	--foreground: var(--foreground-dark);
+	--background: var(--background-dark);
+	--outside: var(--outside-dark);
+	--post: var(--post-dark);
+	--highlighted: var(--highlighted-dark);
+	--shadow: var(--shadow-dark);
 }
 
 /* User & Subreddit */
