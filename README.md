@@ -79,11 +79,11 @@ Lasted tested Jan 17, 2021.
 
 Results from Google Lighthouse ([Libreddit Report](https://lighthouse-dot-webdotdevsite.appspot.com/lh/html?url=https%3A%2F%2Flibredd.it), [Reddit Report](https://lighthouse-dot-webdotdevsite.appspot.com/lh/html?url=https%3A%2F%2Fwww.reddit.com%2F)).
 
-|                        | Libreddit     | Reddit    |
-|------------------------|---------------|-----------|
-| Requests               | 20            | 70        |
-| Resource Size (card ui)| 1,224 KiB     | 1,690 KiB |
-| Time to Interactive    | **1.5 s**     | **11.2 s**|
+|                        | Libreddit     | Reddit     |
+|------------------------|---------------|------------|
+| Requests               | 20            | 70         |
+| Resource Size (card ui)| 1,224 KiB     | 1,690 KiB  |
+| Time to Interactive    | **1.5 s**     | **11.2 s** |
 
 ## Privacy
 
@@ -156,7 +156,6 @@ docker run -d --name libreddit -p 80:8080 spikecodes/libreddit
 
 For ArchLinux users, Libreddit is available from the AUR as [`libreddit-git`](https://aur.archlinux.org/packages/libreddit-git).
 
-Install:
 ```
 yay -S libreddit-git
 ```
@@ -167,7 +166,7 @@ If you're on Linux and none of these methods work for you, you can grab a Linux 
 
 ## E) Repl.it
 
-**Note:** Repl.it is a free option but they are *not* private and are monitor server usage to prevent abuse. If you really need a free and easy setup, this method may work best for you.
+**Note:** Repl.it is a free option but they are *not* private and monitor server usage to prevent abuse. If you need a free and easy setup, this method may work best for you.
 
 1. Create a Repl.it account (see note above)
 2. Visit [the official Repl](https://repl.it/@spikethecoder/libreddit) and fork it
@@ -179,18 +178,18 @@ In the web preview (defaults to top right), you should see your instance hosted 
 
 # Deployment
 
-Once installed, deploy Libreddit (unless you're using Docker) by running:
+Once installed, deploy Libreddit to `0.0.0.0:8080` by running:
 
 ```
 libreddit
 ```
 
-Specify a custom address for the server by passing the `-a` or `--address` argument:
-```
-libreddit --address=0.0.0.0:8111
-```
+## Options
 
-Given you have a TLS certificate, you can pass the `-r` or `--redirect-https` arguments to force HTTPS.
+| Short | Long               | Example                           |
+|-------|--------------------|-----------------------------------|
+| `-a`  | `--address`        | `libreddit --adress=0.0.0.0:8111` |
+| `-r`  | `--redirect-https` | `libreddit --redirect-https`      |
 
 ## Building
 
