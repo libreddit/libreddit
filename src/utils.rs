@@ -473,9 +473,9 @@ pub async fn request(path: &str) -> Result<Value, String> {
 			Err("Page not found".to_string())
 		}
 		// If failed to send request
-		Err(e) => {
+		Err(_e) => {
 			#[cfg(debug_assertions)]
-			dbg!(format!("{} - {}", url, e));
+			dbg!(format!("{} - {}", url, _e));
 			Err("Couldn't send request to Reddit, this instance may be being rate-limited. Try another.".to_string())
 		}
 	}

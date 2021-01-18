@@ -849,7 +849,7 @@ input[type="submit"] {
 	padding: 10px;
 	margin: 4px 0 4px 5px;
 	border-left: 4px solid var(--highlighted);
-	background: var(--post);
+	background: var(--outside);
 }
 
 .md a, .md a * {
