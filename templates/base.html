@@ -15,7 +15,7 @@
 	<body class="
 		{% if prefs.layout != "" %}{{ prefs.layout }}{% endif %}
 		{% if prefs.wide == "on" %} wide{% endif %}
-		{% if prefs.theme != "" %} {{ prefs.theme }}{% endif %}">
+		{% if (prefs.theme == "dark" || prefs.theme =="light") %} {{ prefs.theme }}{% endif %}">
 		<!-- NAVIGATION BAR -->
 		<nav>
 			<p id="logo">
