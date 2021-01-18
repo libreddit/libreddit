@@ -17,7 +17,13 @@
 				{% call utils::options(params.sort, ["relevance", "hot", "top", "new", "comments"], "") %}
 			</select>{% if params.sort != "new" %}<select id="timeframe" name="t" title="Timeframe"> 
 				{% call utils::options(params.t, ["hour", "day", "week", "month", "year", "all"], "all") %}
-			</select>{% endif %}<input id="sort_submit" type="submit" value="&rarr;">
+			</select>{% endif %}<button id="sort_submit" class="submit">
+					<svg width="15" viewBox="0 0 110 100" fill="none" stroke-width="10" stroke-linecap="round">
+						<path d="M20 50 H100" />
+						<path d="M75 15 L100 50 L75 85" />
+						&rarr;
+					</svg>
+				</button>
 		</form>
 		
 		{% if subreddits.len() > 0 %}

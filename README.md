@@ -2,40 +2,34 @@
 
 > An alternative private front-end to Reddit 
 
-Libre + Reddit = [Libreddit](https://libredd.it)
+![screenshot](https://i.ibb.co/FxxbKM6/libreddit-rust.png)
 
-- 🚀 Fast: written in Rust for blazing fast speeds and safety
-- ☁️ Light: no JavaScript, no ads, no tracking
+---
+
+- 🚀 Fast: written in Rust for blazing fast speeds and memory safety
+- ☁️ Light: no JavaScript, no ads, no tracking, no bloat
 - 🕵 Private: all requests are proxied through the server, including media
 - 🔒 Secure: strong [Content Security Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP) prevents browser requests to Reddit
 
-Like [Invidious](https://github.com/iv-org/invidious) but for Reddit. Browse the coldest takes of [r/unpopularopinion](https://libredd.it/r/unpopularopinion) without being [tracked](#reddit).
+---
 
-## Contents
-- [Screenshot](#screenshot)
-- [Instances](#instances)
+**10 second pitch:** Libreddit is a portmanteau of "libre" (meaning freedom) and "Reddit". It is a private front-end like [Invidious](https://github.com/iv-org/invidious) but for Reddit. Browse the coldest takes of [r/unpopularopinion](https://libredd.it/r/unpopularopinion) without being [tracked](#reddit).
+
+## Jump to...
 - [About](#about)
-  - [Elsewhere](#elsewhere)
-  - [Info](#info)
   - [Teddit Comparison](#how-does-it-compare-to-teddit)
 - [Comparison](#comparison)
-  - [Speed](#speed)
-  - [Privacy](#privacy)
 - [Installation](#installation)
   - [Cargo](#a-cargo)
   - [Docker](#b-docker)
   - [AUR](#c-aur)
   - [GitHub Releases](#d-github-releases)
   - [Repl.it](#e-replit)
-- Developing
-  - [Deployment](#deployment)
-  - [Building](#building)
+- [Deployment](#deployment)
 
-## Screenshot
+---
 
-![](https://i.ibb.co/FxxbKM6/libreddit-rust.png)
-
-## Instances
+# Instances
 
 Feel free to [open an issue](https://github.com/spikecodes/libreddit/issues/new) to have your [selfhosted instance](#deployment) listed here!
 
@@ -50,21 +44,22 @@ Feel free to [open an issue](https://github.com/spikecodes/libreddit/issues/new)
 
 A checkmark in the "Cloudflare" category here refers to the use of the reverse proxy, [Cloudflare](https://cloudflare). The checkmark will not be listed for a site which uses Cloudflare DNS but rather the proxying service which grants Cloudflare the ability to monitor traffic to the website.
 
-## About
+---
 
-### Elsewhere
+# About
+
 Find Libreddit on...
 - 💬 Matrix: [#libreddit:kde.org](https://matrix.to/#/#libreddit:matrix.org)
 - 🐋 Docker: [spikecodes/libreddit](https://hub.docker.com/r/spikecodes/libreddit)
 - :octocat: GitHub: [spikecodes/libreddit](https://github.com/spikecodes/libreddit)
 - 🦊 GitLab: [spikecodes/libreddit](https://gitlab.com/spikecodes/libreddit)
 
-### Info
+## Info
 Libreddit hopes to provide an easier way to browse Reddit, without the ads, trackers, and bloat. Libreddit was inspired by other alternative front-ends to popular services such as [Invidious](https://github.com/iv-org/invidious) for YouTube, [Nitter](https://github.com/zedeus/nitter) for Twitter, and [Bibliogram](https://sr.ht/~cadence/bibliogram/) for Instagram.
 
 Libreddit currently implements most of Reddit's (signed-out) functionalities but still lacks [a few features](https://github.com/spikecodes/libreddit/issues).
 
-### How does it compare to Teddit?
+## How does it compare to Teddit?
 
 Teddit is another awesome open source project designed to provide an alternative frontend to Reddit. There is no connection between the two and you're welcome to use whichever one you favor. Competition fosters innovation and Teddit's release has motivated me to build Libreddit into an even more polished product.
 
@@ -72,25 +67,27 @@ If you are looking to compare, the biggest differences I have noticed are:
 - Libreddit is themed around Reddit's redesign whereas Teddit appears to stick much closer to Reddit's old design. This may suit some users better as design is always subjective.
 - Libreddit is written in [Rust](https://www.rust-lang.org) for speed and memory safety. It uses [Actix Web](https://actix.rs), which was [benchmarked as the fastest web server for single queries](https://www.techempower.com/benchmarks/#hw=ph&test=db).
 
-## Comparison
+---
+
+# Comparison
 
 This section outlines how Libreddit compares to Reddit.
 
-### Speed
+## Speed
 
-Lasted tested December 21, 2020.
+Lasted tested Jan 17, 2021.
 
 Results from Google Lighthouse ([Libreddit Report](https://lighthouse-dot-webdotdevsite.appspot.com/lh/html?url=https%3A%2F%2Flibredd.it), [Reddit Report](https://lighthouse-dot-webdotdevsite.appspot.com/lh/html?url=https%3A%2F%2Fwww.reddit.com%2F)).
 
-|                     | Libreddit     | Reddit    |
-|---------------------|---------------|-----------|
-| Requests            | 22            | 70        |
-| Resource Size       | 135 KiB       | 2,222 KiB |
-| Time to Interactive | **1.7 s**     | **11.5 s**|
+|                        | Libreddit     | Reddit    |
+|------------------------|---------------|-----------|
+| Requests               | 20            | 70        |
+| Resource Size (card ui)| 1,224 KiB     | 1,690 KiB |
+| Time to Interactive    | **1.5 s**     | **11.2 s**|
 
-### Privacy
+## Privacy
 
-#### Reddit
+### Reddit
 
 **Logging:** According to Reddit's [privacy policy](https://www.redditinc.com/policies/privacy-policy), they "may [automatically] log information" including:
 - IP address
@@ -119,7 +116,7 @@ Results from Google Lighthouse ([Libreddit Report](https://lighthouse-dot-webdot
 - Third-Party Cookies
 - Third-Party Site
 
-#### Libreddit
+### Libreddit
 
 For transparency, I hope to describe all the ways Libreddit handles user privacy.
 
@@ -131,9 +128,11 @@ For transparency, I hope to describe all the ways Libreddit handles user privacy
 
 **Hosting:** The official instances (`libredd.it` and `libreddit.spike.codes`) are hosted on [Repl.it](https://repl.it/) which monitors usage to prevent abuse. I can understand if this invalidates certain users' threat models and therefore, selfhosting and browsing through Tor are welcomed.
 
-## Installation
+---
 
-### A) Cargo
+# Installation
+
+## A) Cargo
 
 Make sure Rust stable is installed along with `cargo`, Rust's package manager.
 
@@ -141,7 +140,7 @@ Make sure Rust stable is installed along with `cargo`, Rust's package manager.
 cargo install libreddit
 ```
 
-### B) Docker
+## B) Docker
 
 Deploy the Docker image of Libreddit:
 ```
@@ -153,7 +152,7 @@ Deploy using a different port (in this case, port 80):
 docker run -d --name libreddit -p 80:8080 spikecodes/libreddit
 ```
 
-### C) AUR
+## C) AUR
 
 For ArchLinux users, Libreddit is available from the AUR as [`libreddit-git`](https://aur.archlinux.org/packages/libreddit-git).
 
@@ -162,12 +161,11 @@ Install:
 yay -S libreddit-git
 ```
 
-### D) GitHub Releases
+## D) GitHub Releases
 
 If you're on Linux and none of these methods work for you, you can grab a Linux binary from [the newest release](https://github.com/spikecodes/libreddit/releases/latest).
-Currently, Libreddit does not have Windows or macOS binaries but those will be available soon.
 
-### E) Repl.it
+## E) Repl.it
 
 **Note:** Repl.it is a free option but they are *not* private and are monitor server usage to prevent abuse. If you really need a free and easy setup, this method may work best for you.
 
@@ -177,7 +175,9 @@ Currently, Libreddit does not have Windows or macOS binaries but those will be a
 
 In the web preview (defaults to top right), you should see your instance hosted where you can assign a [custom domain](https://docs.repl.it/repls/web-hosting#custom-domains).
 
-## Deployment
+---
+
+# Deployment
 
 Once installed, deploy Libreddit (unless you're using Docker) by running:
 
