@@ -146,7 +146,6 @@ hr {
 a {
 	color: inherit;
 	text-decoration: none;
-	transition: 0.2s all;
 }
 
 a:hover {
@@ -269,7 +268,7 @@ select, #search, #sort_options, #inside, #searchbox > *, #sort_submit {
 
 select {
 	background: var(--outside);
-	transition: 0.2s all;
+	transition: 0.2s background;
 }
 
 select, #search {
@@ -318,10 +317,8 @@ button.submit {
 
 select:hover { background: var(--foreground); }
 
-input[type="submit"]:hover, button.submit:hover {
-	transition: 0.2s all;
-	color: var(--accent);
-}
+input[type="submit"]:hover { color: var(--accent); }
+button.submit:hover > svg { stroke: var(--accent); }
 
 #timeframe {
 	margin: 0 2px;
@@ -374,7 +371,7 @@ input[type="submit"]:hover, button.submit:hover {
 	padding: 10px 20px;
 	text-align: center;
 	cursor: pointer;
-	transition: 0.2s all;
+	transition: 0.2s background;
 }
 
 #sort_options > a.selected {
@@ -390,7 +387,7 @@ input[type="submit"]:hover, button.submit:hover {
 	border-radius: 5px;
 	background: var(--post);
 	box-shadow: var(--shadow);
-	transition: 0.2s all;
+	transition: 0.2s background;
 	border: 1px solid var(--highlighted);
 	margin-bottom: 20px;
 }
@@ -440,7 +437,7 @@ a.search_subreddit:hover {
 	background: var(--post);
 	box-shadow: var(--shadow);
 	display: grid;
-	transition: 0.2s background-color;
+	transition: 0.2s background;
 	grid-template: 	"post_score post_header post_thumbnail" auto
 			"post_score post_title  post_thumbnail" 1fr
 			"post_score post_media  post_thumbnail" auto
@@ -467,11 +464,11 @@ a.search_subreddit:hover {
 	text-align: center;
 	background: var(--foreground);
 	border-radius: 5px 0 0 5px;
-	transition: 0.2s background-color;
+	background: var(--highlighted);
 }
 
 .post:hover > .post_score {
-	background: var(--highlighted);
+	transition: 0.2s background;
 }
 
 .post_score .label {
