@@ -456,7 +456,6 @@ a.search_subreddit:hover {
 	background: var(--foreground);
 }
 
-
 .post_score {
 	padding-top: 20px;
 	color: var(--accent);
@@ -464,11 +463,11 @@ a.search_subreddit:hover {
 	text-align: center;
 	background: var(--foreground);
 	border-radius: 5px 0 0 5px;
-	background: var(--highlighted);
+	transition: 0.2s background;
 }
 
 .post:hover > .post_score {
-	transition: 0.2s background;
+	background: var(--highlighted);
 }
 
 .post_score .label {
@@ -573,7 +572,7 @@ a.search_subreddit:hover {
 	border: 1px solid var(--foreground);
 	display: grid;
 	overflow: hidden;
-	background-color: black;
+	background-color: var(--background);
 	grid-area: post_thumbnail;
 	margin: 5px;
 }
