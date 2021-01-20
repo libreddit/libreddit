@@ -522,14 +522,30 @@ a.search_subreddit:hover {
 }
 
 .post_media {
+	grid-area: post_media;
+	text-align: center;
+}
+
+.post_media img {
 	max-width: calc(100% - 40px);
-	align-self: center;
 	margin-top: 15px;
 	margin: 5px auto;
 	height: auto;
-	grid-area: post_media;
 	background-color: var(--highlighted);
-	display: table;
+	display: block;
+	width: auto;
+	color: transparent;
+	/* TODO, add background image placeholder? */
+	/*
+	<svg viewBox="0 0 100 100" width="100" height="100" xmlns="http://www.w3.org/2000/svg">
+	  <path d="M15,20 h70 a10,10 0 0 1 10,10 v40 a10,10 0 0 1 -10,10 h-70 a10,10 0 0 1 -10,-10 v-40 a10,10 0 0 1 10,-10 z" fill="none" stroke="RGBA(128,128,128,0.5)" stroke-width="5" />
+	  <path d="M15,70 l25,-35 l15,20 l10,-10 l20, 25 z" stroke="none" fill="RGBA(128,128,128,0.5)" />
+	</svg>
+	*/
+}
+
+.post_media img.short {
+	max-height: 512px;
 }
 
 #post_url {
