@@ -446,7 +446,7 @@ a.search_subreddit:hover {
 			"post_score post_media  post_thumbnail" auto
 			"post_score post_body   post_thumbnail" auto
 			"post_score post_footer post_thumbnail" auto
-			/ minmax(40px, auto) 1fr fit-content(min(20%, 152px));
+			/ minmax(40px, auto) minmax(0, 1fr) fit-content(min(20%, 152px));
 }
 
 .post:not(:last-child) { margin-bottom: 10px; }
@@ -529,6 +529,7 @@ a.search_subreddit:hover {
 	height: auto;
 	grid-area: post_media;
 	background-color: var(--highlighted);
+	display: table;
 }
 
 #post_url {
