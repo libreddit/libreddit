@@ -6,14 +6,14 @@
 
 ---
 
+**10 second pitch:** Libreddit is a portmanteau of "libre" (meaning freedom) and "Reddit". It is a private front-end like [Invidious](https://github.com/iv-org/invidious) but for Reddit. Browse the coldest takes of [r/unpopularopinion](https://libredd.it/r/unpopularopinion) without being [tracked](#reddit).
+
 - 🚀 Fast: written in Rust for blazing fast speeds and memory safety
 - ☁️ Light: no JavaScript, no ads, no tracking, no bloat
 - 🕵 Private: all requests are proxied through the server, including media
 - 🔒 Secure: strong [Content Security Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP) prevents browser requests to Reddit
 
 ---
-
-**10 second pitch:** Libreddit is a portmanteau of "libre" (meaning freedom) and "Reddit". It is a private front-end like [Invidious](https://github.com/iv-org/invidious) but for Reddit. Browse the coldest takes of [r/unpopularopinion](https://libredd.it/r/unpopularopinion) without being [tracked](#reddit).
 
 ## Jump to...
 - [About](#about)
@@ -48,11 +48,14 @@ A checkmark in the "Cloudflare" category here refers to the use of the reverse p
 
 # About
 
-Find Libreddit on...
-- 💬 Matrix: [#libreddit:kde.org](https://matrix.to/#/#libreddit:matrix.org)
-- 🐋 Docker: [spikecodes/libreddit](https://hub.docker.com/r/spikecodes/libreddit)
-- :octocat: GitHub: [spikecodes/libreddit](https://github.com/spikecodes/libreddit)
-- 🦊 GitLab: [spikecodes/libreddit](https://gitlab.com/spikecodes/libreddit)
+Find Libreddit on 💬 [Matrix](https://matrix.to/#/#libreddit:kde.org), 🐋 [Docker](https://hub.docker.com/r/spikecodes/libreddit), :octocat: [GitHub](https://github.com/spikecodes/libreddit), and 🦊 [GitLab](https://gitlab.com/spikecodes/libreddit).
+
+## Built with
+
+- [Rust](https://www.rust-lang.org/) - Programming language
+- [Actix Web](https://github.com/actix/actix-web) - Web server
+- [Askama](https://github.com/djc/askama) - Templating engine
+- [ureq](https://github.com/algesten/ureq) - HTTP client
 
 ## Info
 Libreddit hopes to provide an easier way to browse Reddit, without the ads, trackers, and bloat. Libreddit was inspired by other alternative front-ends to popular services such as [Invidious](https://github.com/iv-org/invidious) for YouTube, [Nitter](https://github.com/zedeus/nitter) for Twitter, and [Bibliogram](https://sr.ht/~cadence/bibliogram/) for Instagram.
@@ -126,13 +129,13 @@ For transparency, I hope to describe all the ways Libreddit handles user privacy
 
 **Cookies:** Libreddit uses optional cookies to store any configured settings in [the settings menu](https://libredd.it/settings). This is not a cross-site cookie and the cookie holds no personal data, only a value of the possible layout.
 
-**Hosting:** The official instances (`libredd.it` and `libreddit.spike.codes`) are hosted on [Repl.it](https://repl.it/) which monitors usage to prevent abuse. I can understand if this invalidates certain users' threat models and therefore, selfhosting and browsing through Tor are welcomed.
+**Hosting:** The official instances are hosted on [Repl.it](https://repl.it/) which monitors usage to prevent abuse. I can understand if this invalidates certain users' threat models and therefore, selfhosting and browsing through Tor are welcomed.
 
 ---
 
 # Installation
 
-## A) Cargo
+## 1) Cargo
 
 Make sure Rust stable is installed along with `cargo`, Rust's package manager.
 
@@ -140,9 +143,9 @@ Make sure Rust stable is installed along with `cargo`, Rust's package manager.
 cargo install libreddit
 ```
 
-## B) Docker
+## 2) Docker
 
-Deploy the Docker image of Libreddit:
+Deploy the [Docker image](https://hub.docker.com/r/spikecodes/libreddit) of Libreddit:
 ```
 docker run -d --name libreddit -p 8080:8080 spikecodes/libreddit
 ```
@@ -152,7 +155,7 @@ Deploy using a different port (in this case, port 80):
 docker run -d --name libreddit -p 80:8080 spikecodes/libreddit
 ```
 
-## C) AUR
+## 3) AUR
 
 For ArchLinux users, Libreddit is available from the AUR as [`libreddit-git`](https://aur.archlinux.org/packages/libreddit-git).
 
@@ -160,13 +163,13 @@ For ArchLinux users, Libreddit is available from the AUR as [`libreddit-git`](ht
 yay -S libreddit-git
 ```
 
-## D) GitHub Releases
+## 4) GitHub Releases
 
 If you're on Linux and none of these methods work for you, you can grab a Linux binary from [the newest release](https://github.com/spikecodes/libreddit/releases/latest).
 
-## E) Repl.it
+## 5) Repl.it
 
-**Note:** Repl.it is a free option but they are *not* private and monitor server usage to prevent abuse. If you need a free and easy setup, this method may work best for you.
+**Note:** Repl.it is a free option but they are *not* private and will monitor server usage to prevent abuse. If you need a free and easy setup, this method may work best for you.
 
 1. Create a Repl.it account (see note above)
 2. Visit [the official Repl](https://repl.it/@spikethecoder/libreddit) and fork it
