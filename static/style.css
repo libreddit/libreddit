@@ -16,6 +16,7 @@
 	--background: #0f0f0f;
 	--outside: #1f1f1f;
 	--post: #161616;
+	--panel-border: 1px solid #333;
 	--highlighted: #333;
 	--shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
 }
@@ -30,6 +31,7 @@
 		--background: #ddd;
 		--outside: #ececec;
 		--post: #eee;
+		--panel-border: 1px solid #ccc;
 		--highlighted: white;
 		--shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 	}
@@ -44,6 +46,7 @@
 	--background: #ddd;
 	--outside: #ececec;
 	--post: #eee;
+	--panel-border: 1px solid #ccc;
 	--highlighted: white;
 	--shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
@@ -167,7 +170,7 @@ aside {
 }
 
 .post, .panel {
-	border: 1px solid var(--highlighted);
+	border: var(--panel-border);
 }
 
 .dot {
@@ -388,7 +391,7 @@ button.submit:hover > svg { stroke: var(--accent); }
 	background: var(--post);
 	box-shadow: var(--shadow);
 	transition: 0.2s background;
-	border: 1px solid var(--highlighted);
+	border: var(--panel-border);
 	margin-bottom: 20px;
 }
 
@@ -443,7 +446,7 @@ a.search_subreddit:hover {
 			"post_score post_media  post_thumbnail" auto
 			"post_score post_body   post_thumbnail" auto
 			"post_score post_footer post_thumbnail" auto
-			/ minmax(50px, auto) 1fr fit-content(min(20%, 152px));
+			/ minmax(40px, auto) 1fr fit-content(min(20%, 152px));
 }
 
 .post:not(:last-child) { margin-bottom: 10px; }
@@ -458,16 +461,14 @@ a.search_subreddit:hover {
 
 .post_score {
 	padding-top: 20px;
+	font-size: 13px;
+	font-weight: bold;
+	text-align: end;
 	color: var(--accent);
 	grid-area: post_score;
-	text-align: center;
-	background: var(--foreground);
+	text-align: end;
 	border-radius: 5px 0 0 5px;
 	transition: 0.2s background;
-}
-
-.post:hover > .post_score {
-	background: var(--highlighted);
 }
 
 .post_score .label {
@@ -569,7 +570,7 @@ a.search_subreddit:hover {
 
 .post_thumbnail {
 	border-radius: 5px;
-	border: 1px solid var(--foreground);
+	border: var(--panel-border);
 	display: grid;
 	overflow: hidden;
 	background-color: var(--background);
@@ -891,13 +892,14 @@ input[type="submit"] {
 
 /* Tables */
 
+table, td, th {	border: var(--panel-border); }
+
 table {
-	border: 3px var(--highlighted) solid;
+	border-width: 3px;
 	border-spacing: 0;
 }
 
 td, th {
-	border: 1px var(--highlighted) solid;
 	padding: 10px;
 }
 
@@ -917,7 +919,6 @@ td, th {
 		background-color: unset;
 		margin: 5px 0px 20px 20px;
 		padding: 0;
-		font-size: 14px;
 	}
 	
 	.compact .post_score {
