@@ -522,30 +522,21 @@ a.search_subreddit:hover {
 }
 
 .post_media {
-	grid-area: post_media;
-	text-align: center;
-}
-
-.post_media img {
 	max-width: calc(100% - 40px);
+	height: auto;
+	align-self: center;
 	margin-top: 15px;
 	margin: 5px auto;
-	height: auto;
+	grid-area: post_media;
 	background-color: var(--highlighted);
-	display: block;
-	width: auto;
-	color: transparent;
-	/* TODO, add background image placeholder? */
-	/*
-	<svg viewBox="0 0 100 100" width="100" height="100" xmlns="http://www.w3.org/2000/svg">
-	  <path d="M15,20 h70 a10,10 0 0 1 10,10 v40 a10,10 0 0 1 -10,10 h-70 a10,10 0 0 1 -10,-10 v-40 a10,10 0 0 1 10,-10 z" fill="none" stroke="RGBA(128,128,128,0.5)" stroke-width="5" />
-	  <path d="M15,70 l25,-35 l15,20 l10,-10 l20, 25 z" stroke="none" fill="RGBA(128,128,128,0.5)" />
-	</svg>
-	*/
+	background-image: url("data:image/svg+xml;utf8,<svg viewBox='0 0 100 100' width='100' height='100' xmlns='http://www.w3.org/2000/svg'><path d='M15,20 h70 a10,10 0 0 1 10,10 v45 a10,10 0 0 1 -10,10 h-70 a10,10 0 0 1 -10,-10 v-45 a10,10 0 0 1 10,-10 z' fill='none' stroke='rgba(128,128,128,0.5)' stroke-width='3' /><path d='M15,75 l25,-35 l15,20 l10,-10 l20, 25 z' stroke='none' fill='rgba(128,128,128,0.5)' /><circle cx='75' cy='35' r='7' stroke='none' fill='rgba(128,128,128,0.5)'/></svg>");
+	background-position: 50%;
+	background-repeat: no-repeat;
 }
 
-.post_media img.short {
+.post_media.short {
 	max-height: 512px;
+	width: auto;
 }
 
 #post_url {
@@ -595,7 +586,7 @@ a.search_subreddit:hover {
 	margin: 5px;
 }
 
-.post_thumbnail img {
+.post_thumbnail svg {
 	grid-area: 1 / 1 / 2 / 2;
 	width: 100%;
 	height: auto;
@@ -608,7 +599,7 @@ a.search_subreddit:hover {
 	background-color: var(--highlighted);
 }
 
-.post_thumbnail svg {
+.post_thumbnail.no_thumbnail svg {
 	grid-area: 1 / 1 / 2 / 2;
 	align-self: center;
 	justify-self: center;
