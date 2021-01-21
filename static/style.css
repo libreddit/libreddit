@@ -668,6 +668,7 @@ a.search_subreddit:hover {
 	padding: 10px 0 10px 5px;
 	flex-grow: 1;
 	flex-shrink: 1;
+	min-width: 0;
 }
 
 .comment_data > * {
