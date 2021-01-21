@@ -1,5 +1,5 @@
 // CRATES
-use crate::utils::{error, fetch_posts, param, prefs, request, val, Post, Preferences};
+use crate::utils::{error, fetch_posts, param, prefs, request, val, Post, Preferences, cookie};
 use actix_web::{HttpRequest, HttpResponse};
 use askama::Template;
 
@@ -33,7 +33,8 @@ struct SearchTemplate {
 
 // SERVICES
 pub async fn find(req: HttpRequest) -> HttpResponse {
-	let path = format!("{}.json?{}", req.path(), req.query_string());
+	let nsfw_results = if cookie(&req, "hide_nsfw") != "on" { "&include_over_18=on" } else { "" };
+	let path = format!("{}.json?{}{}", req.path(), req.query_string(), nsfw_results);
 	let sub = req.match_info().get("sub").unwrap_or("").to_string();
 
 	let sort = if param(&path, "sort").is_empty() {
