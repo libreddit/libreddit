@@ -460,7 +460,7 @@ a.search_subreddit:hover {
 }
 
 .post_score {
-	padding-top: 20px;
+	padding-top: 16px;
 	font-size: 13px;
 	font-weight: bold;
 	text-align: end;
@@ -476,7 +476,7 @@ a.search_subreddit:hover {
 } 
 
 .post_header {
-	margin: 20px 20px 5px 20px;
+	margin: 15px 20px 5px 15px;
 	grid-area: post_header;
 }
 
@@ -487,7 +487,7 @@ a.search_subreddit:hover {
 .post_title {
 	font-size: 16px;
 	line-height: 1.5;
-	margin: 5px 20px;
+	margin: 5px 15px;
 	grid-area: post_title;
 }
 
@@ -548,7 +548,7 @@ a.search_subreddit:hover {
 .post_body {
 	opacity: 0.9;
 	font-weight: normal;
-	margin: 5px 20px;
+	margin: 5px 15px;
 	grid-area: post_body;
 }
 
@@ -558,7 +558,7 @@ a.search_subreddit:hover {
 	opacity: 0.5;
 	font-size: 14px;
 	grid-area: post_footer;
-	margin: 5px 20px 20px 20px;
+	margin: 5px 20px 15px 15px;
 }
 
 .post_comments {
@@ -925,20 +925,13 @@ td, th {
 	}
 	
 	.post_score {
-		background-color: unset;
-		margin: 5px 0px 20px 20px;
+		margin: 5px 0px 20px 15px;
 		padding: 0;
 	}
 	
-	.compact .post_score {
-		background-color: unset;
-		margin: 2.5px 0px 15px 15px;
-		padding: 0;
-		font-size: 14px;
-	}
+	.compact .post_score { padding: 0; }
 	
 	.post_score::before {	content: "↑" }
-	.post:hover > .post_score {	background: unset; }
 
 	.post_header { font-size: 14px; }
 	.post_footer { margin-left: 15px;	}

@@ -1,5 +1,5 @@
 // CRATES
-use crate::utils::{error, fetch_posts, param, prefs, request, val, Post, Preferences, cookie};
+use crate::utils::{cookie, error, fetch_posts, param, prefs, request, val, Post, Preferences};
 use actix_web::{HttpRequest, HttpResponse};
 use askama::Template;
 
