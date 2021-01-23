@@ -9,6 +9,7 @@ use serde_json::{from_str, Value};
 use std::collections::HashMap;
 use time::{Duration, OffsetDateTime};
 use url::Url;
+use cached::proc_macro::cached;
 
 //
 // STRUCTS
@@ -295,7 +296,7 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 	let post_list;
 
 	// Send a request to the url
-	match request(&path).await {
+	match request(path.to_string()).await {
 		// If success, receive JSON in response
 		Ok(response) => {
 			res = response;
@@ -392,7 +393,8 @@ pub async fn error(msg: String) -> HttpResponse {
 }
 
 // Make a request to a Reddit API and parse the JSON response
-pub async fn request(path: &str) -> Result<Value, String> {
+#[cached(size=1000,time=60, result = true)]
+pub async fn request(path: String) -> Result<Value, String> {
 	let url = format!("https://www.reddit.com{}", path);
 	let user_agent = format!("web:libreddit:{}", env!("CARGO_PKG_VERSION"));
 
