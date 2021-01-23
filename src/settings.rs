@@ -1,6 +1,6 @@
 // CRATES
 use crate::utils::{prefs, Preferences};
-use actix_web::{cookie::Cookie, web::Form, HttpMessage, HttpRequest, HttpResponse};
+use actix_web::{cookie::Cookie, web::Form, HttpRequest, HttpResponse};
 use askama::Template;
 use time::{Duration, OffsetDateTime};
 
@@ -30,7 +30,7 @@ pub async fn get(req: HttpRequest) -> HttpResponse {
 }
 
 // Set cookies using response "Set-Cookie" header
-pub async fn set(req: HttpRequest, form: Form<SettingsForm>) -> HttpResponse {
+pub async fn set(_req: HttpRequest, form: Form<SettingsForm>) -> HttpResponse {
 	let mut res = HttpResponse::Found();
 
 	let names = vec!["theme", "front_page", "layout", "wide", "comment_sort", "hide_nsfw"];
@@ -45,10 +45,7 @@ pub async fn set(req: HttpRequest, form: Form<SettingsForm>) -> HttpResponse {
 					.expires(OffsetDateTime::now_utc() + Duration::weeks(52))
 					.finish(),
 			),
-			None => match HttpMessage::cookie(&req, name.to_owned()) {
-				Some(cookie) => res.del_cookie(&cookie),
-				None => &mut res,
-			},
+			None => res.del_cookie(&Cookie::named(name.to_owned())),
 		};
 	}
 

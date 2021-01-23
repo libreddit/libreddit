@@ -53,15 +53,16 @@ async fn main() -> std::io::Result<()> {
 			.wrap_fn(move |req, srv| {
 				let secure = req.connection_info().scheme() == "https";
 				let https_url = format!("https://{}{}", req.connection_info().host(), req.uri().to_string());
-				srv.call(req).map(move |res: Result<ServiceResponse, _>| {
+				srv.call(req).map(move |res: Result<ServiceResponse, _>|
 					if force_https && !secure {
-						let redirect: ServiceResponse<actix_web::dev::Body> =
-							ServiceResponse::new(res.unwrap().request().clone(), HttpResponse::Found().header("Location", https_url).finish());
-						Ok(redirect)
+						Ok(ServiceResponse::new(
+							res.unwrap().request().to_owned(),
+							HttpResponse::Found().header("Location", https_url).finish(),
+						))
 					} else {
 						res
 					}
-				})
+				)
 			})
 			// Append trailing slash and remove double slashes
 			.wrap(middleware::NormalizePath::default())
@@ -106,23 +107,19 @@ async fn main() -> std::io::Result<()> {
 							.route("/{page}/", web::get().to(subreddit::wiki)),
 					),
 			)
-			// Universal services
+			// Front page
+			.route("/", web::get().to(subreddit::page))
+			.route("/{sort:best|hot|new|top|rising|controversial}/", web::get().to(subreddit::page))
+			// View Reddit wiki
 			.service(
-				web::scope("")
-					// Front page
-					.route("/", web::get().to(subreddit::page))
-					.route("/{sort:best|hot|new|top|rising|controversial}/", web::get().to(subreddit::page))
-					// View Reddit wiki
-					.service(
-						web::scope("/wiki")
-							.route("/", web::get().to(subreddit::wiki))
-							.route("/{page}/", web::get().to(subreddit::wiki)),
-					)
-					// Search all of Reddit
-					.route("/search/", web::get().to(search::find))
-					// Short link for post
-					.route("/{id:.{5,6}}/", web::get().to(post::item)),
+				web::scope("/wiki")
+					.route("/", web::get().to(subreddit::wiki))
+					.route("/{page}/", web::get().to(subreddit::wiki)),
 			)
+			// Search all of Reddit
+			.route("/search/", web::get().to(search::find))
+			// Short link for post
+			.route("/{id:.{5,6}}/", web::get().to(post::item))
 	})
 	.bind(&address)
 	.unwrap_or_else(|e| panic!("Cannot bind to the address {}: {}", address, e))
