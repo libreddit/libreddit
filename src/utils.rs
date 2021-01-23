@@ -286,7 +286,7 @@ pub fn time(created: f64) -> (String, String) {
 
 // val() function used to parse JSON from Reddit APIs
 pub fn val(j: &Value, k: &str) -> String {
-	String::from(j["data"][k].as_str().unwrap_or_default())
+	j["data"][k].as_str().unwrap_or_default().to_string()
 }
 
 // Fetch posts of a user or subreddit and return a vector of posts and the "after" value

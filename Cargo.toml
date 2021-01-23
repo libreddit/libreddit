@@ -8,14 +8,14 @@ authors = ["spikecodes <19519553+spikecodes@users.noreply.github.com>"]
 edition = "2018"
 
 [dependencies]
-base64 = "0.13.0"
-actix-web = { version = "3.3.2", features = ["rustls"] }
+base64 = "0.13"
+actix-web = { version = "3.3", features = ["rustls"] }
 futures = "0.3"
-askama = "0.10.5"
-ureq = "2.0.1"
-serde = { version = "1.0.118", default_features = false, features = ["derive"] }
+askama = "0.10"
+ureq = "2.0"
+serde = { version = "1.0", default_features = false, features = ["derive"] }
 serde_json = "1.0"
-async-recursion = "0.3.1"
-url = "2.2.0"
-regex = "1.4.2"
-time = "0.2.23"
+async-recursion = "0.3"
+url = "2.2"
+regex = "1.4"
+time = "0.2"
