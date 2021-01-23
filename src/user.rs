@@ -54,7 +54,7 @@ async fn user(name: &str) -> Result<User, String> {
 	let path: String = format!("/user/{}/about.json", name);
 
 	// Send a request to the url
-	match request(&path).await {
+	match request(path).await {
 		// If success, receive JSON in response
 		Ok(res) => {
 			// Grab creation date as unix timestamp

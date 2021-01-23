@@ -37,7 +37,7 @@ pub async fn item(req: HttpRequest) -> HttpResponse {
 	dbg!(req.match_info().get("id").unwrap_or(""));
 
 	// Send a request to the url, receive JSON in response
-	match request(&path).await {
+	match request(path).await {
 		// Otherwise, grab the JSON output from the request
 		Ok(res) => {
 			// Parse the JSON into Post and Comment structs

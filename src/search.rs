@@ -75,7 +75,7 @@ async fn search_subreddits(q: String) -> Vec<Subreddit> {
 	let subreddit_search_path = format!("/subreddits/search.json?q={}&limit=3", q.replace(' ', "+"));
 
 	// Send a request to the url
-	match request(&subreddit_search_path).await {
+	match request(subreddit_search_path).await {
 		// If success, receive JSON in response
 		Ok(response) => {
 			match response["data"]["children"].as_array() {

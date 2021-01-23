@@ -68,7 +68,7 @@ pub async fn wiki(req: HttpRequest) -> HttpResponse {
 	let page = req.match_info().get("page").unwrap_or("index").to_string();
 	let path: String = format!("/r/{}/wiki/{}.json?raw_json=1", sub, page);
 
-	match request(&path).await {
+	match request(path).await {
 		Ok(res) => {
 			let s = WikiTemplate {
 				sub,
@@ -90,7 +90,7 @@ async fn subreddit(sub: &str) -> Result<Subreddit, String> {
 	let path: String = format!("/r/{}/about.json?raw_json=1", sub);
 
 	// Send a request to the url
-	match request(&path).await {
+	match request(path).await {
 		// If success, receive JSON in response
 		Ok(res) => {
 			// Metadata regarding the subreddit
