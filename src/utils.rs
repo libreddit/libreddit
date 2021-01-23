@@ -393,7 +393,7 @@ pub async fn error(msg: String) -> HttpResponse {
 }
 
 // Make a request to a Reddit API and parse the JSON response
-#[cached(size=1000,time=120, result = true)]
+#[cached(size=1000,time=60, result = true)]
 pub async fn request(path: String) -> Result<Value, String> {
 	let url = format!("https://www.reddit.com{}", path);
 	let user_agent = format!("web:libreddit:{}", env!("CARGO_PKG_VERSION"));
