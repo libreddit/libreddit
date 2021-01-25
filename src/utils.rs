@@ -1,7 +1,7 @@
 //
 // CRATES
 //
-use actix_web::{cookie::Cookie, HttpRequest, HttpResponse, Result};
+use tide::{Request, Response};
 use askama::Template;
 use base64::encode;
 use regex::Regex;
@@ -104,7 +104,7 @@ pub struct Subreddit {
 }
 
 // Parser for query params, used in sorting (eg. /r/rust/?sort=hot)
-#[derive(serde::Deserialize)]
+#[derive(serde::Deserialize, Default)]
 pub struct Params {
 	pub t: Option<String>,
 	pub q: Option<String>,
@@ -136,7 +136,7 @@ pub struct Preferences {
 //
 
 // Build preferences from cookies
-pub fn prefs(req: HttpRequest) -> Preferences {
+pub fn prefs(req: Request<()>) -> Preferences {
 	Preferences {
 		theme: cookie(&req, "theme"),
 		front_page: cookie(&req, "front_page"),
@@ -156,8 +156,9 @@ pub fn param(path: &str, value: &str) -> String {
 }
 
 // Parse Cookie value from request
-pub fn cookie(req: &HttpRequest, name: &str) -> String {
-	actix_web::HttpMessage::cookie(req, name).unwrap_or_else(|| Cookie::new(name, "")).value().to_string()
+pub fn cookie(req: &Request<()>, name: &str) -> String {
+	// actix_web::HttpMessage::cookie(req, name).unwrap_or_else(|| Cookie::new(name, "")).value().to_string()
+	String::new()
 }
 
 // Direct urls to proxy if proxy is enabled
@@ -186,7 +187,7 @@ pub fn format_num(num: i64) -> String {
 	}
 }
 
-pub async fn media(data: &Value) -> (String, Media) {
+pub fn media(data: &Value) -> (String, Media) {
 	let post_type: &str;
 	// If post is a video, return the video
 	let url = if data["preview"]["reddit_video_preview"]["fallback_url"].is_string() {
@@ -321,7 +322,7 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 		let title = val(post, "title");
 
 		// Determine the type of media along with the media URL
-		let (post_type, media) = media(&post["data"]).await;
+		let (post_type, media) = media(&post["data"]);
 
 		posts.push(Post {
 			id: val(post, "id"),
@@ -382,14 +383,15 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 // NETWORKING
 //
 
-pub async fn error(msg: String) -> HttpResponse {
+pub async fn error(msg: String) -> tide::Result {
 	let body = ErrorTemplate {
 		msg,
 		prefs: Preferences::default(),
 	}
 	.render()
 	.unwrap_or_default();
-	HttpResponse::NotFound().content_type("text/html").body(body)
+
+	Ok(Response::builder(404).content_type("text/html").body(body).build())
 }
 
 // Make a request to a Reddit API and parse the JSON response
@@ -454,31 +456,44 @@ pub async fn request(path: String) -> Result<Value, String> {
 	// 	Err((_, msg)) => err(url, msg),
 	// }
 
-	// Send request using ureq
-	match ureq::get(&url).set("User-Agent", user_agent.as_str()).call() {
-		// If response is success
-		Ok(response) => {
-			// Parse the response from Reddit as JSON
-			match from_str(&response.into_string().unwrap()) {
-				Ok(json) => Ok(json),
-				Err(_) => {
-					#[cfg(debug_assertions)]
-					dbg!(format!("{} - Failed to parse page JSON data", url));
-					Err("Failed to parse page JSON data".to_string())
-				}
-			}
-		}
-		// If response is error
-		Err(ureq::Error::Status(_, _)) => {
-			#[cfg(debug_assertions)]
-			dbg!(format!("{} - Page not found", url));
-			Err("Page not found".to_string())
-		}
-		// If failed to send request
-		Err(_e) => {
-			#[cfg(debug_assertions)]
-			dbg!(format!("{} - {}", url, _e));
-			Err("Couldn't send request to Reddit, this instance may be being rate-limited. Try another.".to_string())
-		}
-	}
+	// Send request using surf
+	let req = surf::get(&url).header("User-Agent", user_agent.as_str());
+	let client = surf::client().with(surf::middleware::Redirect::new(5));
+
+	dbg!("Send request");
+
+	let json: Value = client.recv_json(req).await.unwrap_or_default();
+
+	dbg!("Return response");
+
+	Ok(json)
+
+	// match client.recv_string(req).await {
+	// 	// If response is success
+	// 	Ok(response) => {
+	// 		// Parse the response from Reddit as JSON
+	// 		match from_str(&response) {
+	// 			Ok(json) => Ok(json),
+	// 			Err(_) => {
+	// 				dbg!(response);
+
+	// 				#[cfg(debug_assertions)]
+	// 				dbg!(format!("{} - Failed to parse page JSON data", url));
+	// 				Err("Failed to parse page JSON data".to_string())
+	// 			}
+	// 		}
+	// 	}
+	// 	// If response is error
+	// 	// Err(e) => {
+	// 	// 	#[cfg(debug_assertions)]
+	// 	// 	dbg!(format!("{} - Page not found", url));
+	// 	// 	Err("Page not found".to_string())
+	// 	// }
+	// 	// If failed to send request
+	// 	Err(_e) => {
+	// 		#[cfg(debug_assertions)]
+	// 		dbg!(format!("{} - {}", url, _e));
+	// 		Err("Couldn't send request to Reddit".to_string())
+	// 	}
+	// }
 }

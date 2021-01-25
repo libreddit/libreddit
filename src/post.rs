@@ -1,191 +1,194 @@
 // CRATES
-// use crate::utils::*;
-use tide::{Request};
+use crate::utils::*;
+use tide::{Request, Response, http::Cookie};
 
-// use async_recursion::async_recursion;
+use askama::Template;
 
-// use askama::Template;
-
-// // STRUCTS
-// #[derive(Template)]
-// #[template(path = "post.html", escape = "none")]
-// struct PostTemplate {
-// 	comments: Vec<Comment>,
-// 	post: Post,
-// 	sort: String,
-// 	prefs: Preferences,
-// }
-
-
+// STRUCTS
+#[derive(Template)]
+#[template(path = "post.html", escape = "none")]
+struct PostTemplate {
+	comments: Vec<Comment>,
+	post: Post,
+	sort: String,
+	prefs: Preferences,
+}
 
 pub async fn item(req: Request<()>) -> tide::Result {
 	// Build Reddit API path
-	let query: String = req.query().unwrap_or_default();
-	dbg!(query);
-
-	let cookie = req.cookie("comment_sort").unwrap();
-	dbg!(cookie.value());
-
-	Ok("POST".into())
-	// let mut path: String = format!("{}.json?{}&raw_json=1", req.url().path(), );
-
+	let mut path: String = format!("{}.json?{}&raw_json=1", req.url().path(), req.url().query().unwrap_or_default());
+	
 	// // Set sort to sort query parameter
-	// let mut sort: String = param(&path, "sort");
+	let Params { sort, .. } = req.query().unwrap_or_default();
+	let mut sort: String = sort.unwrap_or_default();
 
 	// // Grab default comment sort method from Cookies
-	// let default_sort = cookie(&req, "comment_sort");
+	let default_sort = req.cookie("comment_sort").unwrap_or(Cookie::named("comment_sort"));
 
 	// // If there's no sort query but there's a default sort, set sort to default_sort
-	// if sort.is_empty() && !default_sort.is_empty() {
-	// 	sort = default_sort;
-	// 	path = format!("{}.json?{}&sort={}&raw_json=1", req.path(), req.query_string(), sort);
-	// }
+	if sort.is_empty() && !default_sort.value().is_empty() {
+		sort = default_sort.value().to_string();
+		path = format!("{}&sort={}", path, sort);
+	}
 
-	// // Log the post ID being fetched in debug mode
-	// #[cfg(debug_assertions)]
-	// dbg!(req.match_info().get("id").unwrap_or(""));
+	// Log the post ID being fetched in debug mode
+	#[cfg(debug_assertions)]
+	dbg!(req.param("id").unwrap_or(""));
 
-	// // Send a request to the url, receive JSON in response
+	let url = format!("https://www.reddit.com{}", path);
+	let user_agent = format!("web:libreddit:{}", env!("CARGO_PKG_VERSION"));
+
+	// Send request using surf
+	let http = surf::get(&url).header("User-Agent", user_agent.as_str());
+	let client = surf::client().with(surf::middleware::Redirect::new(5));
+
+	dbg!("Send request");
+
+	let json: serde_json::Value = client.recv_json(http).await.unwrap_or_default();
+
+	dbg!("Return response");
+
+	// Send a request to the url, receive JSON in response
 	// match request(path).await {
-	// 	// Otherwise, grab the JSON output from the request
-	// 	Ok(res) => {
-	// 		// Parse the JSON into Post and Comment structs
-	// 		let post = parse_post(&res[0]).await;
-	// 		let comments = parse_comments(&res[1]).await;
+		// Otherwise, grab the JSON output from the request
+		// Ok(res) => {
+			// Parse the JSON into Post and Comment structs
+			let post = parse_post(&json[0]);
+			let comments = parse_comments(&json[1]);
 
-	// 		// Use the Post and Comment structs to generate a website to show users
-	// 		let s = PostTemplate {
-	// 			comments,
-	// 			post,
-	// 			sort,
-	// 			prefs: prefs(req),
-	// 		}
-	// 		.render()
-	// 		.unwrap();
-	// 		HttpResponse::Ok().content_type("text/html").body(s)
-	// 	}
-	// 	// If the Reddit API returns an error, exit and send error page to user
-	// 	Err(msg) => error(msg).await,
+			// Use the Post and Comment structs to generate a website to show users
+			let s = PostTemplate {
+				comments,
+				post,
+				sort,
+				prefs: prefs(req),
+			}
+			.render()
+			.unwrap();
+
+			Ok(Response::builder(200).content_type("text/html").body(s).build())
+		// }
+		// If the Reddit API returns an error, exit and send error page to user
+		// Err(msg) => error(msg).await,
 	// }
 }
 
 // POSTS
-// async fn parse_post(json: &serde_json::Value) -> Post {
-// 	// Retrieve post (as opposed to comments) from JSON
-// 	let post: &serde_json::Value = &json["data"]["children"][0];
+fn parse_post(json: &serde_json::Value) -> Post {
+	// Retrieve post (as opposed to comments) from JSON
+	let post: &serde_json::Value = &json["data"]["children"][0];
 
-// 	// Grab UTC time as unix timestamp
-// 	let (rel_time, created) = time(post["data"]["created_utc"].as_f64().unwrap_or_default());
-// 	// Parse post score and upvote ratio
-// 	let score = post["data"]["score"].as_i64().unwrap_or_default();
-// 	let ratio: f64 = post["data"]["upvote_ratio"].as_f64().unwrap_or(1.0) * 100.0;
+	// Grab UTC time as unix timestamp
+	let (rel_time, created) = time(post["data"]["created_utc"].as_f64().unwrap_or_default());
+	// Parse post score and upvote ratio
+	let score = post["data"]["score"].as_i64().unwrap_or_default();
+	let ratio: f64 = post["data"]["upvote_ratio"].as_f64().unwrap_or(1.0) * 100.0;
 
-// 	// Determine the type of media along with the media URL
-// 	let (post_type, media) = media(&post["data"]).await;
+	// Determine the type of media along with the media URL
+	let (post_type, media) = media(&post["data"]);
 
-// 	// Build a post using data parsed from Reddit post API
-// 	Post {
-// 		id: val(post, "id"),
-// 		title: val(post, "title"),
-// 		community: val(post, "subreddit"),
-// 		body: rewrite_url(&val(post, "selftext_html")),
-// 		author: Author {
-// 			name: val(post, "author"),
-// 			flair: Flair {
-// 				flair_parts: parse_rich_flair(
-// 					val(post, "author_flair_type"),
-// 					post["data"]["author_flair_richtext"].as_array(),
-// 					post["data"]["author_flair_text"].as_str(),
-// 				),
-// 				background_color: val(post, "author_flair_background_color"),
-// 				foreground_color: val(post, "author_flair_text_color"),
-// 			},
-// 			distinguished: val(post, "distinguished"),
-// 		},
-// 		permalink: val(post, "permalink"),
-// 		score: format_num(score),
-// 		upvote_ratio: ratio as i64,
-// 		post_type,
-// 		media,
-// 		thumbnail: Media {
-// 			url: format_url(val(post, "thumbnail").as_str()),
-// 			width: post["data"]["thumbnail_width"].as_i64().unwrap_or_default(),
-// 			height: post["data"]["thumbnail_height"].as_i64().unwrap_or_default(),
-// 		},
-// 		flair: Flair {
-// 			flair_parts: parse_rich_flair(
-// 				val(post, "link_flair_type"),
-// 				post["data"]["link_flair_richtext"].as_array(),
-// 				post["data"]["link_flair_text"].as_str(),
-// 			),
-// 			background_color: val(post, "link_flair_background_color"),
-// 			foreground_color: if val(post, "link_flair_text_color") == "dark" {
-// 				"black".to_string()
-// 			} else {
-// 				"white".to_string()
-// 			},
-// 		},
-// 		flags: Flags {
-// 			nsfw: post["data"]["over_18"].as_bool().unwrap_or(false),
-// 			stickied: post["data"]["stickied"].as_bool().unwrap_or(false),
-// 		},
-// 		domain: val(post, "domain"),
-// 		rel_time,
-// 		created,
-// 		comments: format_num(post["data"]["num_comments"].as_i64().unwrap_or_default()),
-// 	}
-// }
+	// Build a post using data parsed from Reddit post API
+	Post {
+		id: val(post, "id"),
+		title: val(post, "title"),
+		community: val(post, "subreddit"),
+		body: rewrite_url(&val(post, "selftext_html")),
+		author: Author {
+			name: val(post, "author"),
+			flair: Flair {
+				flair_parts: parse_rich_flair(
+					val(post, "author_flair_type"),
+					post["data"]["author_flair_richtext"].as_array(),
+					post["data"]["author_flair_text"].as_str(),
+				),
+				background_color: val(post, "author_flair_background_color"),
+				foreground_color: val(post, "author_flair_text_color"),
+			},
+			distinguished: val(post, "distinguished"),
+		},
+		permalink: val(post, "permalink"),
+		score: format_num(score),
+		upvote_ratio: ratio as i64,
+		post_type,
+		media,
+		thumbnail: Media {
+			url: format_url(val(post, "thumbnail").as_str()),
+			width: post["data"]["thumbnail_width"].as_i64().unwrap_or_default(),
+			height: post["data"]["thumbnail_height"].as_i64().unwrap_or_default(),
+		},
+		flair: Flair {
+			flair_parts: parse_rich_flair(
+				val(post, "link_flair_type"),
+				post["data"]["link_flair_richtext"].as_array(),
+				post["data"]["link_flair_text"].as_str(),
+			),
+			background_color: val(post, "link_flair_background_color"),
+			foreground_color: if val(post, "link_flair_text_color") == "dark" {
+				"black".to_string()
+			} else {
+				"white".to_string()
+			},
+		},
+		flags: Flags {
+			nsfw: post["data"]["over_18"].as_bool().unwrap_or(false),
+			stickied: post["data"]["stickied"].as_bool().unwrap_or(false),
+		},
+		domain: val(post, "domain"),
+		rel_time,
+		created,
+		comments: format_num(post["data"]["num_comments"].as_i64().unwrap_or_default()),
+	}
+}
 
-// // COMMENTS
-// #[async_recursion]
-// async fn parse_comments(json: &serde_json::Value) -> Vec<Comment> {
-// 	// Separate the comment JSON into a Vector of comments
-// 	let comment_data = match json["data"]["children"].as_array() {
-// 		Some(f) => f.to_owned(),
-// 		None => Vec::new(),
-// 	};
+// COMMENTS
+fn parse_comments(json: &serde_json::Value) -> Vec<Comment> {
+	// Separate the comment JSON into a Vector of comments
+	let comment_data = match json["data"]["children"].as_array() {
+		Some(f) => f.to_owned(),
+		None => Vec::new(),
+	};
 
-// 	let mut comments: Vec<Comment> = Vec::new();
+	let mut comments: Vec<Comment> = Vec::new();
 
-// 	// For each comment, retrieve the values to build a Comment object
-// 	for comment in comment_data {
-// 		let unix_time = comment["data"]["created_utc"].as_f64().unwrap_or_default();
-// 		if unix_time == 0.0 {
-// 			continue;
-// 		}
-// 		let (rel_time, created) = time(unix_time);
+	// For each comment, retrieve the values to build a Comment object
+	for comment in comment_data {
+		let unix_time = comment["data"]["created_utc"].as_f64().unwrap_or_default();
+		if unix_time == 0.0 {
+			continue;
+		}
+		let (rel_time, created) = time(unix_time);
 
-// 		let score = comment["data"]["score"].as_i64().unwrap_or(0);
-// 		let body = rewrite_url(&val(&comment, "body_html"));
+		let score = comment["data"]["score"].as_i64().unwrap_or(0);
+		let body = rewrite_url(&val(&comment, "body_html"));
 
-// 		let replies: Vec<Comment> = if comment["data"]["replies"].is_object() {
-// 			parse_comments(&comment["data"]["replies"]).await
-// 		} else {
-// 			Vec::new()
-// 		};
+		let replies: Vec<Comment> = if comment["data"]["replies"].is_object() {
+			parse_comments(&comment["data"]["replies"])
+		} else {
+			Vec::new()
+		};
 
-// 		comments.push(Comment {
-// 			id: val(&comment, "id"),
-// 			body,
-// 			author: Author {
-// 				name: val(&comment, "author"),
-// 				flair: Flair {
-// 					flair_parts: parse_rich_flair(
-// 						val(&comment, "author_flair_type"),
-// 						comment["data"]["author_flair_richtext"].as_array(),
-// 						comment["data"]["author_flair_text"].as_str(),
-// 					),
-// 					background_color: val(&comment, "author_flair_background_color"),
-// 					foreground_color: val(&comment, "author_flair_text_color"),
-// 				},
-// 				distinguished: val(&comment, "distinguished"),
-// 			},
-// 			score: format_num(score),
-// 			rel_time,
-// 			created,
-// 			replies,
-// 		});
-// 	}
+		comments.push(Comment {
+			id: val(&comment, "id"),
+			body,
+			author: Author {
+				name: val(&comment, "author"),
+				flair: Flair {
+					flair_parts: parse_rich_flair(
+						val(&comment, "author_flair_type"),
+						comment["data"]["author_flair_richtext"].as_array(),
+						comment["data"]["author_flair_text"].as_str(),
+					),
+					background_color: val(&comment, "author_flair_background_color"),
+					foreground_color: val(&comment, "author_flair_text_color"),
+				},
+				distinguished: val(&comment, "distinguished"),
+			},
+			score: format_num(score),
+			rel_time,
+			created,
+			replies,
+		});
+	}
 
-// 	comments
-// }
+	comments
+}

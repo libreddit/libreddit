@@ -9,7 +9,7 @@ mod proxy;
 // mod settings;
 // mod subreddit;
 // mod user;
-// mod utils;
+mod utils;
 
 // Build middleware
 struct HttpsRedirect<HttpsOnly>(HttpsOnly);
@@ -94,7 +94,7 @@ async fn main() -> tide::Result<()> {
 	
 	// // Proxy media through Libreddit
 	// .route("/proxy/{url:.*}/", web::get().to(proxy::handler))
-	app.at("/proxy/:url").get(proxy::handler);
+	app.at("/proxy/*url").get(proxy::handler);
 	
 	// // Browse user profile
 	// .service(
