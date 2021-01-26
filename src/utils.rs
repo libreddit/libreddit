@@ -459,7 +459,7 @@ pub async fn request(path: String) -> Result<Value, String> {
 		// If response is success
 		Ok(response) => {
 			// Parse the response from Reddit as JSON
-			match from_str(&response.into_string().unwrap()) {
+			match from_str(&response.into_string().unwrap_or_default()) {
 				Ok(json) => Ok(json),
 				Err(_) => {
 					dbg!(format!("{} - Failed to parse page JSON data", url));
