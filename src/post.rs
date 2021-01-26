@@ -1,7 +1,6 @@
 // CRATES
 use crate::utils::*;
-use tide::{Request, Response, http::Cookie};
-
+use tide::{Body, Request, Response, http::Cookie};
 use askama::Template;
 
 // STRUCTS
@@ -15,36 +14,37 @@ struct PostTemplate {
 }
 
 pub async fn item(req: Request<()>) -> tide::Result {
-	// Build Reddit API path
-	let mut path: String = format!("{}.json?{}&raw_json=1", req.url().path(), req.url().query().unwrap_or_default());
+	// // Build Reddit API path
+	// let mut path: String = format!("{}.json?{}&raw_json=1", req.url().path(), req.url().query().unwrap_or_default());
 	
-	// // Set sort to sort query parameter
-	let Params { sort, .. } = req.query().unwrap_or_default();
-	let mut sort: String = sort.unwrap_or_default();
+	// // // Set sort to sort query parameter
+	// let Params { sort, .. } = req.query().unwrap_or_default();
+	// let mut sort: String = sort.unwrap_or_default();
 
-	// // Grab default comment sort method from Cookies
-	let default_sort = req.cookie("comment_sort").unwrap_or(Cookie::named("comment_sort"));
+	// // // Grab default comment sort method from Cookies
+	// let default_sort = req.cookie("comment_sort").unwrap_or(Cookie::named("comment_sort"));
 
-	// // If there's no sort query but there's a default sort, set sort to default_sort
-	if sort.is_empty() && !default_sort.value().is_empty() {
-		sort = default_sort.value().to_string();
-		path = format!("{}&sort={}", path, sort);
-	}
+	// // // If there's no sort query but there's a default sort, set sort to default_sort
+	// if sort.is_empty() && !default_sort.value().is_empty() {
+	// 	sort = default_sort.value().to_string();
+	// 	path = format!("{}&sort={}", path, sort);
+	// }
 
 	// Log the post ID being fetched in debug mode
 	#[cfg(debug_assertions)]
 	dbg!(req.param("id").unwrap_or(""));
 
-	let url = format!("https://www.reddit.com{}", path);
-	let user_agent = format!("web:libreddit:{}", env!("CARGO_PKG_VERSION"));
+	// let url = format!("https://www.reddit.com{}", path);
+	// let user_agent = format!("web:libreddit:{}", env!("CARGO_PKG_VERSION"));
 
 	// Send request using surf
-	let http = surf::get(&url).header("User-Agent", user_agent.as_str());
-	let client = surf::client().with(surf::middleware::Redirect::new(5));
+	// let http = surf::get(&url).header("User-Agent", user_agent.as_str());
+	// let client = surf::client().with(surf::middleware::Redirect::new(5));
 
 	dbg!("Send request");
 
-	let json: serde_json::Value = client.recv_json(http).await.unwrap_or_default();
+	// let json: serde_json::Value = client.recv_json(http).await.unwrap_or_default();
+	async_std::task::sleep(std::time::Duration::from_secs(6)).await;
 
 	dbg!("Return response");
 
@@ -53,20 +53,20 @@ pub async fn item(req: Request<()>) -> tide::Result {
 		// Otherwise, grab the JSON output from the request
 		// Ok(res) => {
 			// Parse the JSON into Post and Comment structs
-			let post = parse_post(&json[0]);
-			let comments = parse_comments(&json[1]);
+			// let post = parse_post(&json[0]);
+			// let comments = parse_comments(&json[1]);
 
 			// Use the Post and Comment structs to generate a website to show users
-			let s = PostTemplate {
-				comments,
-				post,
-				sort,
-				prefs: prefs(req),
-			}
-			.render()
-			.unwrap();
+			// let s = PostTemplate {
+			// 	comments,
+			// 	post,
+			// 	sort,
+			// 	prefs: prefs(req),
+			// }
+			// .render()
+			// .unwrap();
 
-			Ok(Response::builder(200).content_type("text/html").body(s).build())
+			Ok("a".into())
 		// }
 		// If the Reddit API returns an error, exit and send error page to user
 		// Err(msg) => error(msg).await,
