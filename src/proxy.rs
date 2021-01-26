@@ -21,10 +21,10 @@ pub async fn handler(web::Path(b64): web::Path<String>) -> Result<HttpResponse> 
 		"v.redd.it",
 	];
 
-	match decode(b64) {
-		Ok(bytes) => {
-			let media = String::from_utf8(bytes).unwrap_or_default();
+	let decoded = decode(b64).map(|bytes| String::from_utf8(bytes).unwrap_or_default());
 
+	match decoded {
+		Ok(media) => {
 			match Url::parse(media.as_str()) {
 				Ok(url) => {
 					let domain = url.domain().unwrap_or_default();
