@@ -393,7 +393,7 @@ pub async fn error(msg: String) -> HttpResponse {
 }
 
 // Make a request to a Reddit API and parse the JSON response
-#[cached(size=100,time=60, result = true)]
+// #[cached(size=100,time=60, result = true)]
 pub async fn request(path: String) -> Result<Value, String> {
 	let url = format!("https://www.reddit.com{}", path);
 	let user_agent = format!("web:libreddit:{}", env!("CARGO_PKG_VERSION"));
@@ -462,7 +462,6 @@ pub async fn request(path: String) -> Result<Value, String> {
 			match from_str(&response.into_string().unwrap()) {
 				Ok(json) => Ok(json),
 				Err(_) => {
-					#[cfg(debug_assertions)]
 					dbg!(format!("{} - Failed to parse page JSON data", url));
 					Err("Failed to parse page JSON data".to_string())
 				}
@@ -476,7 +475,6 @@ pub async fn request(path: String) -> Result<Value, String> {
 		}
 		// If failed to send request
 		Err(_e) => {
-			#[cfg(debug_assertions)]
 			dbg!(format!("{} - {}", url, _e));
 			Err("Couldn't send request to Reddit, this instance may be being rate-limited. Try another.".to_string())
 		}
