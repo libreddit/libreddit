@@ -459,10 +459,11 @@ pub async fn request(path: String) -> Result<Value, String> {
 		// If response is success
 		Ok(response) => {
 			// Parse the response from Reddit as JSON
-			match from_str(&response.into_string().unwrap_or_default()) {
+			let json_string = &response.into_string().unwrap_or_default();
+			match from_str(json_string) {
 				Ok(json) => Ok(json),
 				Err(e) => {
-					println!("{} - Failed to parse page JSON data: {}", url, e);
+					println!("{} - Failed to parse page JSON data: {} - {}", url, e, json_string);
 					Err("Failed to parse page JSON data".to_string())
 				}
 			}
