@@ -99,7 +99,7 @@ nav #version { opacity: 50%; }
 
 #settings_link {
 	font-size: 18px;
-	margin-left: 20px;
+	margin-left: 10px;
 	opacity: 0.8;
 }
 
@@ -304,6 +304,7 @@ select, #search {
 	align-items: center;
 	border-right: 2px var(--outside) solid;
 	padding: 0 10px;
+	max-width: 50%;
 }
 
 #restrict_sr { margin-right: 5px; }
@@ -973,5 +974,5 @@ td, th {
 
 	#user, #sidebar { margin: 20px 0;	}
 	#logo { margin: 5px auto; }
-	#searchbox { width: 100%; }
+	#searchbox { width: calc(100vw - 35px); }
 }
