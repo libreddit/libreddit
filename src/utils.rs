@@ -9,7 +9,7 @@ use serde_json::{from_str, Value};
 use std::collections::HashMap;
 use time::{Duration, OffsetDateTime};
 use url::Url;
-use cached::proc_macro::cached;
+// use cached::proc_macro::cached;
 
 //
 // STRUCTS
@@ -461,8 +461,8 @@ pub async fn request(path: String) -> Result<Value, String> {
 			// Parse the response from Reddit as JSON
 			match from_str(&response.into_string().unwrap_or_default()) {
 				Ok(json) => Ok(json),
-				Err(_) => {
-					dbg!(format!("{} - Failed to parse page JSON data", url));
+				Err(e) => {
+					println!("{} - Failed to parse page JSON data: {}", url, e);
 					Err("Failed to parse page JSON data".to_string())
 				}
 			}
@@ -474,8 +474,8 @@ pub async fn request(path: String) -> Result<Value, String> {
 			Err("Page not found".to_string())
 		}
 		// If failed to send request
-		Err(_e) => {
-			dbg!(format!("{} - {}", url, _e));
+		Err(e) => {
+			println!("{} - Couldn't send request to Reddit: {}", url, e);
 			Err("Couldn't send request to Reddit, this instance may be being rate-limited. Try another.".to_string())
 		}
 	}
