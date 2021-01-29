@@ -21,7 +21,6 @@ async fn style() -> HttpResponse {
 
 async fn robots() -> HttpResponse {
 	HttpResponse::Ok()
-		.content_type("text/plain")
 		.header("Cache-Control", "public, max-age=1209600, s-maxage=86400")
 		.body("User-agent: *\nAllow: /")
 }
@@ -73,7 +72,7 @@ async fn main() -> std::io::Result<()> {
 				.header("Referrer-Policy", "no-referrer")
 				.header("X-Content-Type-Options", "nosniff")
 				.header("X-Frame-Options", "DENY")
-				.header("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline'; base-uri 'none'; img-src 'self' data:; form-action 'self'; frame-ancestors: 'none';"))
+				.header("Content-Security-Policy", "default-src 'none'; style-src 'self' 'unsafe-inline'; base-uri 'none'; img-src 'self' data:; form-action 'self'; frame-ancestors 'none';"))
 			// Default service in case no routes match
 			.default_service(web::get().to(|| utils::error("Nothing here".to_string())))
 			// Read static files
