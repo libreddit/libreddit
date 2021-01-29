@@ -21,12 +21,14 @@ async fn style() -> HttpResponse {
 
 async fn robots() -> HttpResponse {
 	HttpResponse::Ok()
+		.content_type("text/plain")
 		.header("Cache-Control", "public, max-age=1209600, s-maxage=86400")
 		.body("User-agent: *\nAllow: /")
 }
 
 async fn favicon() -> HttpResponse {
 	HttpResponse::Ok()
+		.content_type("image/x-icon")
 		.header("Cache-Control", "public, max-age=1209600, s-maxage=86400")
 		.body(include_bytes!("../static/favicon.ico").as_ref())
 }
@@ -66,6 +68,12 @@ async fn main() -> std::io::Result<()> {
 			})
 			// Append trailing slash and remove double slashes
 			.wrap(middleware::NormalizePath::default())
+			// Apply default headers for security
+			.wrap(middleware::DefaultHeaders::new()
+				.header("Referrer-Policy", "no-referrer")
+				.header("X-Content-Type-Options", "nosniff")
+				.header("X-Frame-Options", "DENY")
+				.header("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline'; base-uri 'none'; img-src 'self' data:; form-action 'self'; frame-ancestors: 'none';"))
 			// Default service in case no routes match
 			.default_service(web::get().to(|| utils::error("Nothing here".to_string())))
 			// Read static files
