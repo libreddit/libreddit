@@ -73,7 +73,7 @@
 				</svg>
 			</a>
 			{% else if post.post_type == "video" || post.post_type == "gif" %}
-			<video class="post_media" src="{{ post.media.url }}" controls autoplay loop></video>
+			<video class="post_media" src="{{ post.media.url }}" type="video/mp4" controls autoplay loop playsinline></video>
 			{% else if post.post_type == "link" %}
 			<a id="post_url" href="{{ post.media.url }}">{{ post.media.url }}</a>
 			{% endif %}
