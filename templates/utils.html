@@ -40,9 +40,9 @@
 {% endfor %}
 {%- endmacro %}
 
-{% macro sub_list(current, width) -%}
+{% macro sub_list(current) -%}
 {% if prefs.subs.len() > 0 %}
-	<div id="subscriptions_container" class="{{ width }}">
+	<div id="subscriptions_container">
 		<details id="subscriptions">
 			<summary>Subscriptions</summary>
 			<div id="sub_list">

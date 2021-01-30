@@ -73,7 +73,7 @@ body {
 
 nav {
 	display: grid;
-	grid-template-areas: "logo searchbox code";
+	grid-template-areas: "logo searchbox links";
 
 	justify-content: space-between;
 	align-items: center;
@@ -95,11 +95,12 @@ nav {
 nav * { color: var(--text); }
 nav #reddit, #code { color: var(--accent); }
 nav #logo { grid-area: logo; }
-nav #code { grid-area: code; }
-nav #version { opacity: 50%; }
+nav #links { grid-area: links; }
+
+nav #version { opacity: 50%; vertical-align: -2px; }
+nav #libreddit { vertical-align: -2px; }
 
 #settings_link {
-	font-size: 18px;
 	margin-left: 10px;
 	opacity: 0.8;
 }
@@ -257,27 +258,18 @@ aside {
 /* Subscribed subreddit list */
 
 #subscriptions_container {
-	display: flex;
-	max-width: 1000px;
-	margin: 0 auto;
-	padding: 10px 20px;
-}
-
-#subscriptions_container.narrow {
-	max-width: 750px;
-}
-
-.wide #subscriptions_container, .wide #subscriptions_container.narrow {
-	max-width: calc(100% - 40px);
+	display: inline-block;
+	margin-left: 10px;
 }
 
 #subscriptions {
-	display: inline-block;
 	position: relative;
 	border-radius: 5px;
+	border: var(--panel-border);
 	background-color: var(--outside);
 	align-items: center;
 	box-sizing: border-box;
+	font-size: 15px;
 }
 
 #subscriptions > summary {
@@ -1052,7 +1044,7 @@ td, th {
 }
 
 @media screen and (max-width: 800px) {
-	body { padding-top: 100px }
+	body { padding-top: 120px }
 
 	main {
 		flex-direction: column-reverse;
@@ -1062,15 +1054,13 @@ td, th {
 	}
 	
 	nav {
-		grid-template-areas: 'logo code' 'searchbox searchbox';
+		grid-template-areas: 'logo links' 'searchbox searchbox';
 		padding: 10px;
 		width: calc(100% - 20px);
 	}
 
-	#subscriptions_container { 
-		padding: 10px;
-		justify-content: center;
-	}
+	#version { display: none; }
+
 	#subscriptions { position: unset; }
 
 	#sub_list {
