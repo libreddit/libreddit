@@ -65,7 +65,7 @@ pub async fn page(req: HttpRequest) -> HttpResponse {
 }
 
 // Sub or unsub by setting subscription cookie using response "Set-Cookie" header
-pub async fn set(req: HttpRequest) -> HttpResponse {
+pub async fn subscriptions(req: HttpRequest) -> HttpResponse {
 	let mut res = HttpResponse::Found();
 	let default = cookie(&req, "front_page");
 	let sub = req

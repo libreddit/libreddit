@@ -233,7 +233,7 @@ aside {
 	color: var(--accent);
 }
 
-/* Subscriptions/Favorites */
+/* Subscriptions */
 
 #sub_subscription {
 	margin-top: 20px;
@@ -242,20 +242,33 @@ aside {
 #sub_subscription > input {
 	padding: 10px 20px;
 	border-radius: 5px;
-	color: var(--foreground);
 }
 
-#sub_subscription > .add { color: var(--foreground); background-color: var(--accent); }
-#sub_subscription > .remove { color: var(--text); background-color: var(--highlighted); }
+#sub_subscription > .add {
+	color: var(--foreground);
+	background-color: var(--accent);
+}
 
-#sub_list {
+#sub_subscription > .remove { 
+	color: var(--text);
+	background-color: var(--highlighted);
+}
+
+/* Subscribed subreddit list */
+
+#subscriptions {
 	display: flex;
+	max-width: 1000px;
+	margin: 0 auto;
 	align-items: center;
-	justify-content: center;
 	padding: 10px 20px;
 }
 
-#subs {
+.wide #subscriptions {
+	max-width: calc(100% - 40px);
+}
+
+#sub_list {
 	border-radius: 5px;
 	box-shadow: var(--shadow);
 	background: var(--outside);
@@ -263,11 +276,11 @@ aside {
 	overflow: auto;
 }
 
-#subs a {
+#sub_list > a {
 	padding: 10px 20px;
 }
 
-#subs > .selected {
+#sub_list > .selected {
 	background-color: var(--accent);
 	color: var(--foreground);
 }
@@ -1009,7 +1022,10 @@ td, th {
 		width: calc(100% - 20px);
 	}
 
-	#sub_list { padding: 10px; }
+	#sub_list { 
+		padding: 10px;
+		max-width: 100%;
+	}
 
 	aside, #subreddit, #user {
 		margin: 0;
