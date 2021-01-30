@@ -100,7 +100,7 @@ async fn main() -> std::io::Result<()> {
 					.route("/", web::get().to(subreddit::page))
 					.route("/{sort:hot|new|top|rising|controversial}/", web::get().to(subreddit::page))
 					// Handle subscribe/unsubscribe
-					.route("/subscribe/", web::post().to(subreddit::subscribe))
+					.route("/{action:subscribe|unsubscribe}/", web::post().to(subreddit::set))
 					//.route("/unsubscribe/", web::post().to(subreddit::unsubscribe))
 					// View post on subreddit
 					.service(

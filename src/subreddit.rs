@@ -64,8 +64,8 @@ pub async fn page(req: HttpRequest) -> HttpResponse {
 	}
 }
 
-// Subscribe by setting subscription cookie using response "Set-Cookie" header
-pub async fn subscribe(req: HttpRequest) -> HttpResponse {
+// Sub or unsub by setting subscription cookie using response "Set-Cookie" header
+pub async fn set(req: HttpRequest) -> HttpResponse {
 	let mut res = HttpResponse::Found();
 	let default = cookie(&req, "front_page");
 	let sub = req
@@ -74,26 +74,36 @@ pub async fn subscribe(req: HttpRequest) -> HttpResponse {
 		.unwrap_or(if default.is_empty() { "popular" } else { default.as_str() });
 	let sub_name = sub.to_string();
 
+	let action = req.match_info().get("action").unwrap().to_string();
+
 	let mut sub_list = prefs(req.to_owned()).subs;
 
-	println!("sub_list len: {}", sub_list.join(","));
-
-	if sub_list.len() == 0 {
-		sub_list = Vec::new();
-		sub_list.push(sub_name);
-	} else if !sub_list.contains(&sub_name) {
-		sub_list.push(sub_name);
-		sub_list.sort();
+	// Modify sub list based on action
+	if action == "subscribe" {
+		if sub_list.is_empty() {
+			sub_list = Vec::new();
+			sub_list.push(sub_name);
+		} else if !sub_list.contains(&sub_name) {
+			sub_list.push(sub_name);
+			sub_list.sort();
+		}
+	} else {
+		sub_list.retain(|s| s != &sub_name);
 	}
 
-	res.cookie(Cookie::build("subscriptions", sub_list.join(","))
-		.path("/")
-		.http_only(true)
-		.expires(OffsetDateTime::now_utc() + Duration::weeks(52))
-		.finish(),);
+	// Delete cookie if empty, else set
+	if sub_list.is_empty() {
+		res.del_cookie(&Cookie::named("subscriptions"));
+	} else {
+		res.cookie(Cookie::build("subscriptions", sub_list.join(","))
+			.path("/")
+			.http_only(true)
+			.expires(OffsetDateTime::now_utc() + Duration::weeks(52))
+			.finish(),);
+	}
 
+	// Redirect back to subreddit
 	let path = format!("/r/{}", sub);
-	
 	res
 		.content_type("text/html")
 		.set_header("Location", path.to_string())
