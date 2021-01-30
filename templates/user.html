@@ -7,7 +7,7 @@
 
 {% block title %}{{ user.name.replace("u/", "") }} (u/{{ user.name }}) - Libreddit{% endblock %}
 
-{% block sub_list %}
+{% block subscriptions %}
 	{% call utils::sub_list("") %}
 {% endblock %}
 

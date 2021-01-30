@@ -13,7 +13,7 @@
 	<meta name="author" content="u/{{ post.author.name }}">
 {% endblock %}
 
-{% block sub_list %}
+{% block subscriptions %}
 	{% call utils::sub_list(post.community.as_str()) %}
 {% endblock %}
 

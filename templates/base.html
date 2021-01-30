@@ -23,12 +23,10 @@
 				<span id="version">v{{ env!("CARGO_PKG_VERSION") }}</span>
 				<a id="settings_link" href="/settings">settings</a>
 			</p>
+			{% block subscriptions %}{% endblock %}
 			{% block search %}{% endblock %}
 			<a id="code" href="https://github.com/spikecodes/libreddit">code</a>
 		</nav>
-		
-		{% block sub_list %}
-		{% endblock %}
 		
 		<!-- MAIN CONTENT -->
 		{% block body %}

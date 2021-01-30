@@ -11,7 +11,7 @@
 	{% call utils::search(["/r/", sub.name.as_str()].concat(), "") %}
 {% endblock %}
 
-{% block sub_list %}
+{% block subscriptions %}
 	{% call utils::sub_list(sub.name.as_str()) %}
 {% endblock %}
 
