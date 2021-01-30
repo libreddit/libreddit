@@ -239,7 +239,7 @@ aside {
 	margin-top: 20px;
 }
 
-#sub_subscription > input {
+#sub_subscription > a {
 	padding: 10px 20px;
 	border-radius: 5px;
 }
@@ -876,7 +876,7 @@ a.search_subreddit:hover {
 	opacity: 0.75;
 }
 
-#prefs {
+.prefs {
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
@@ -886,7 +886,7 @@ a.search_subreddit:hover {
 	border-radius: 5px;
 }
 
-#prefs > div {
+.prefs > div {
 	display: flex;
 	justify-content: space-between;
 	width: 100%;
@@ -894,11 +894,11 @@ a.search_subreddit:hover {
 	align-items: center;
 }
 
-#prefs > div:not(:last-of-type) {
+.prefs > div:not(:last-of-type) {
 	margin-bottom: 10px;
 }
 
-#prefs select {
+.prefs select {
 	border-radius: 5px;
 	box-shadow: var(--shadow);
 	margin-left: 20px;
@@ -917,6 +917,30 @@ input[type="submit"] {
 	-webkit-appearance: none;
 	-moz-appearance: none;
 }
+
+#settings_subs {
+	list-style: none;
+	padding: 0;
+}
+
+#settings_subs > li {
+	display: flex;
+	margin: 10px 0;
+}
+#settings_subs > li:last-of-type { margin-bottom: 0; }
+
+#settings_subs > li > span {
+	padding: 10px 0;
+	margin-right: auto;
+}
+
+#settings_subs > li > a {
+	margin-left: 30px;
+	padding: 10px 20px;
+	border-radius: 5px;
+	background-color: var(--highlighted);
+}
+
 /* Markdown */
 
 .md > *:not(:first-child) {

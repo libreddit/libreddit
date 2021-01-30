@@ -7,13 +7,9 @@
 	{% call utils::search("".to_owned(), "", "") %}
 {% endblock %}
 
-{% block subscriptions %}
-	{% call utils::sub_list("", "narrow") %}
-{% endblock %}
-
 {% block content %}
 <form id="settings" action="/settings" method="POST">
-	<div id="prefs">
+	<div class="prefs">
 		<p>Appearance</p>
 		<div id="theme">
 			<label for="theme">Theme:</label>
@@ -52,5 +48,19 @@
 	</div>
 	<p id="settings_note"><b>Note:</b> settings are saved in browser cookies. Clearing your cookie data will reset them.</p>
 	<input id="save" type="submit" value="Save">
+	{% if prefs.subs.len() > 0 %}
+		<aside class="prefs">
+			<p>Subscribed Subreddits</p>
+			<ul id="settings_subs">
+				{% for sub in prefs.subs %}
+					<li>
+						<span>{{ sub }}</span>
+						<a href="/r/{{ sub }}/unsubscribe/?redirect=/settings">Unsubscribe</a>
+					</li>
+				{% endfor %}
+			</ul>
+		</aside>
+	{% endif %}
 </form>
+
 {% endblock %}

@@ -125,15 +125,13 @@
 						<div>{{ sub.members }}</div>
 						<div>{{ sub.active }}</div>
 					</div>
-					{% if prefs.subs.contains(sub.name) %}
-					<form id="sub_subscription" action="/r/{{ sub.name }}/unsubscribe" method="POST">
-						<input class="subscribe remove" type="submit" value="Unsubscribe">
-					</form>
-					{% else %}
-					<form id="sub_subscription" action="/r/{{ sub.name }}/subscribe" method="POST">
-						<input class="subscribe add" type="submit" value="Subscribe">
-					</form>
-					{% endif %}
+					<div id="sub_subscription">
+						{% if prefs.subs.contains(sub.name) %}
+							<a href="/r/{{ sub.name }}/unsubscribe" class="subscribe remove">Unsubscribe</a>
+						{% else %}
+							<a href="/r/{{ sub.name }}/subscribe" class="subscribe add">Subscribe</a>
+						{% endif %}
+					</div>
 				</div>
 			</div>
 			<details class="panel" id="sidebar">
