@@ -72,7 +72,7 @@ async fn main() -> std::io::Result<()> {
 				.header("Referrer-Policy", "no-referrer")
 				.header("X-Content-Type-Options", "nosniff")
 				.header("X-Frame-Options", "DENY")
-				.header("Content-Security-Policy", "default-src 'none'; style-src 'self' 'unsafe-inline'; base-uri 'none'; img-src 'self' data:; form-action 'self'; frame-ancestors 'none';"))
+				.header("Content-Security-Policy", "default-src 'none'; media-src 'self'; style-src 'self' 'unsafe-inline'; base-uri 'none'; img-src 'self' data:; form-action 'self'; frame-ancestors 'none';"))
 			// Default service in case no routes match
 			.default_service(web::get().to(|| utils::error("Nothing here".to_string())))
 			// Read static files
