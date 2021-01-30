@@ -11,6 +11,10 @@
 	{% call utils::search(["/r/", sub.name.as_str()].concat(), "") %}
 {% endblock %}
 
+{% block sub_list %}
+	{% call utils::sub_list(sub.name.as_str()) %}
+{% endblock %}
+
 {% block body %}
 	<main>
 		<div id="column_one">
@@ -120,6 +124,13 @@
 						<label>Active</label>
 						<div>{{ sub.members }}</div>
 						<div>{{ sub.active }}</div>
+					</div>
+					<div id="sub_subscription">
+						{% if prefs.subs.contains(sub.name) %}
+						<a class="subscribe remove">Unsubscribe</a>
+						{% else %}
+						<a class="subscribe add">Subscribe</a>
+						{% endif %}
 					</div>
 				</div>
 			</div>

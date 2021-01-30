@@ -39,3 +39,15 @@
 	{% else if flair_part.flair_part_type == "text" %}<span>{{ flair_part.value }}</span>{% endif %}
 {% endfor %}
 {%- endmacro %}
+
+{% macro sub_list(current) -%}
+{% if prefs.subs.len() > 0 %}
+	<div id="sub_list">
+		<div id="subs">
+			{% for sub in prefs.subs %}
+				<a href="/r/{{ sub }}" {% if sub == current %}class="selected"{% endif %}>{{ sub }}</a>
+			{% endfor %}
+		</div>
+	</div>
+{% endif %}
+{%- endmacro %}

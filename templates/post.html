@@ -13,6 +13,10 @@
 	<meta name="author" content="u/{{ post.author.name }}">
 {% endblock %}
 
+{% block sub_list %}
+	{% call utils::sub_list(post.community.as_str()) %}
+{% endblock %}
+
 <!-- OPEN COMMENT MACRO -->
 {% macro comment(item) -%}
 <div id="{{ item.id }}" class="comment">

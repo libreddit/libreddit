@@ -68,6 +68,7 @@ pre, form, fieldset, table, th, td, select, input {
 body {
 	background: var(--background);
 	font-size: 15px;
+	padding-top: 60px;
 }
 
 nav {
@@ -108,7 +109,7 @@ main {
 	justify-content: center;
 	max-width: 1000px;
 	padding: 10px 20px;
-	margin: 60px auto 20px auto
+	margin: 0 auto;
 }
 
 .wide main {
@@ -230,6 +231,45 @@ aside {
 
 #user_details > label, #sub_details > label {
 	color: var(--accent);
+}
+
+/* Subscriptions/Favorites */
+
+#sub_subscription {
+	margin-top: 30px;
+}
+
+#sub_subscription > a {
+	padding: 10px 20px;
+	border-radius: 5px;
+	color: var(--foreground);
+}
+
+#sub_subscription > .add { color: var(--foreground); background-color: var(--accent); }
+#sub_subscription > .remove { color: var(--text); background-color: var(--highlighted); }
+
+#sub_list {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 10px 20px;
+}
+
+#subs {
+	border-radius: 5px;
+	box-shadow: var(--shadow);
+	background: var(--outside);
+	display: flex;
+	overflow: auto;
+}
+
+#subs a {
+	padding: 10px 20px;
+}
+
+#subs > .selected {
+	background-color: var(--accent);
+	color: var(--foreground);
 }
 
 /* Wiki Pages */
@@ -954,10 +994,12 @@ td, th {
 }
 
 @media screen and (max-width: 800px) {
+	body { padding-top: 100px }
+
 	main {
 		flex-direction: column-reverse;
 		padding: 10px;
-		margin: 100px 0 10px 0;
+		margin: 0 0 10px 0;
 		max-width: 100%;
 	}
 	
@@ -966,6 +1008,8 @@ td, th {
 		padding: 10px;
 		width: calc(100% - 20px);
 	}
+
+	#sub_list { padding: 10px; }
 
 	aside, #subreddit, #user {
 		margin: 0;

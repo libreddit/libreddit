@@ -7,6 +7,10 @@
 	{% call utils::search("".to_owned(), "", "") %}
 {% endblock %}
 
+{% block sub_list %}
+	{% call utils::sub_list("") %}
+{% endblock %}
+
 {% block content %}
 <form id="settings" action="/settings" method="POST">
 	<div id="prefs">

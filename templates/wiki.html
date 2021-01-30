@@ -10,6 +10,10 @@
 	{% call utils::search(["/r/", sub.as_str()].concat(), "") %}
 {% endblock %}
 
+{% block sub_list %}
+	{% call utils::sub_list(sub.as_str()) %}
+{% endblock %}
+
 {% block body %}
 	<main>
 		<div class="panel" id="column_one">

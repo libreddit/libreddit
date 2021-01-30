@@ -3,6 +3,10 @@
 
 {% block title %}Libreddit: search results - {{ params.q }}{% endblock %}
 
+{% block sub_list %}
+	{% call utils::sub_list("") %}
+{% endblock %}
+
 {% block content %}
 	<div id="column_one">
 		<form id="search_sort">
