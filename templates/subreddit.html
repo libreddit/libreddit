@@ -12,7 +12,7 @@
 {% endblock %}
 
 {% block subscriptions %}
-	{% call utils::sub_list(sub.name.as_str()) %}
+	{% call utils::sub_list(sub.name.as_str(), "wide") %}
 {% endblock %}
 
 {% block body %}

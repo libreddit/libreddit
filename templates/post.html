@@ -14,7 +14,7 @@
 {% endblock %}
 
 {% block subscriptions %}
-	{% call utils::sub_list(post.community.as_str()) %}
+	{% call utils::sub_list(post.community.as_str(), "narrow") %}
 {% endblock %}
 
 <!-- OPEN COMMENT MACRO -->

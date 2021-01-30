@@ -4,7 +4,7 @@
 {% block title %}Libreddit: search results - {{ params.q }}{% endblock %}
 
 {% block subscriptions %}
-	{% call utils::sub_list("") %}
+	{% call utils::sub_list("", "narrow") %}
 {% endblock %}
 
 {% block content %}

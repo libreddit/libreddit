@@ -40,15 +40,17 @@
 {% endfor %}
 {%- endmacro %}
 
-{% macro sub_list(current) -%}
+{% macro sub_list(current, width) -%}
 {% if prefs.subs.len() > 0 %}
-	<details id="subscriptions">
-		<summary>subscribed</summary>
-		<div id="sub_list">
-			{% for sub in prefs.subs %}
-				<a href="/r/{{ sub }}" {% if sub == current %}class="selected"{% endif %}>{{ sub }}</a>
-			{% endfor %}
-		</div>
-	</details>
+	<div id="subscriptions_container" class="{{ width }}">
+		<details id="subscriptions">
+			<summary>Subscriptions</summary>
+			<div id="sub_list">
+				{% for sub in prefs.subs %}
+					<a href="/r/{{ sub }}" {% if sub == current %}class="selected"{% endif %}>{{ sub }}</a>
+				{% endfor %}
+			</div>
+		</details>
+	</div>
 {% endif %}
 {%- endmacro %}

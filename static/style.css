@@ -84,7 +84,7 @@ nav {
 	
 	font-size: 20px;
 	
-	z-index: 1;
+	z-index: 2;
 	top: 0;
 	padding: 5px 15px;
 	min-height: 40px;
@@ -256,33 +256,58 @@ aside {
 
 /* Subscribed subreddit list */
 
-#subscriptions {
+#subscriptions_container {
 	display: flex;
 	max-width: 1000px;
 	margin: 0 auto;
-	align-items: center;
 	padding: 10px 20px;
 }
 
-.wide #subscriptions {
+#subscriptions_container.narrow {
+	max-width: 750px;
+}
+
+.wide #subscriptions_container, .wide #subscriptions_container.narrow {
 	max-width: calc(100% - 40px);
 }
 
+#subscriptions {
+	display: inline-block;
+	position: relative;
+	border-radius: 5px;
+	background-color: var(--outside);
+	align-items: center;
+	box-sizing: border-box;
+}
+
+#subscriptions > summary {
+	padding: 10px 20px 10px 15px;
+}
+
 #sub_list {
+	position: absolute;
+	display: flex;
+	min-width: 100%;
 	border-radius: 5px;
 	box-shadow: var(--shadow);
 	background: var(--outside);
-	display: flex;
+	flex-direction: column;
 	overflow: auto;
+	z-index: 1;
 }
 
 #sub_list > a {
 	padding: 10px 20px;
+	transition: 0.2s background;
 }
 
 #sub_list > .selected {
 	background-color: var(--accent);
 	color: var(--foreground);
+}
+
+#sub_list > a:not(.selected):hover {
+	background-color: var(--foreground);
 }
 
 /* Wiki Pages */
@@ -504,10 +529,6 @@ a.search_subreddit:hover {
 }
 
 .post:not(:last-child) { margin-bottom: 10px; }
-
-.post.highlighted {
-	margin: 20px 0;
-}
 
 .post:hover {
 	background: var(--foreground);
@@ -1022,9 +1043,16 @@ td, th {
 		width: calc(100% - 20px);
 	}
 
-	#sub_list { 
+	#subscriptions_container { 
 		padding: 10px;
-		max-width: 100%;
+		justify-content: center;
+	}
+	#subscriptions { position: unset; }
+
+	#sub_list {
+		left: 10px;
+		right: 10px;
+		min-width: auto;
 	}
 
 	aside, #subreddit, #user {

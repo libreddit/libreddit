@@ -11,7 +11,7 @@
 {% endblock %}
 
 {% block subscriptions %}
-	{% call utils::sub_list(sub.as_str()) %}
+	{% call utils::sub_list(sub.as_str(), "narrow") %}
 {% endblock %}
 
 {% block body %}
