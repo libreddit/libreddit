@@ -236,10 +236,10 @@ aside {
 /* Subscriptions/Favorites */
 
 #sub_subscription {
-	margin-top: 30px;
+	margin-top: 20px;
 }
 
-#sub_subscription > a {
+#sub_subscription > input {
 	padding: 10px 20px;
 	border-radius: 5px;
 	color: var(--foreground);

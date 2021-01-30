@@ -1,7 +1,8 @@
 // CRATES
 use crate::utils::*;
-use actix_web::{HttpRequest, HttpResponse, Result};
+use actix_web::{cookie::Cookie, HttpRequest, HttpResponse, Result};
 use askama::Template;
+use time::{Duration, OffsetDateTime};
 
 // STRUCTS
 #[derive(Template)]
@@ -61,6 +62,42 @@ pub async fn page(req: HttpRequest) -> HttpResponse {
 		}
 		Err(msg) => error(msg).await,
 	}
+}
+
+// Subscribe by setting subscription cookie using response "Set-Cookie" header
+pub async fn subscribe(req: HttpRequest) -> HttpResponse {
+	let mut res = HttpResponse::Found();
+	let default = cookie(&req, "front_page");
+	let sub = req
+		.match_info()
+		.get("sub")
+		.unwrap_or(if default.is_empty() { "popular" } else { default.as_str() });
+	let sub_name = sub.to_string();
+
+	let mut sub_list = prefs(req.to_owned()).subs;
+
+	println!("sub_list len: {}", sub_list.join(","));
+
+	if sub_list.len() == 0 {
+		sub_list = Vec::new();
+		sub_list.push(sub_name);
+	} else if !sub_list.contains(&sub_name) {
+		sub_list.push(sub_name);
+		sub_list.sort();
+	}
+
+	res.cookie(Cookie::build("subscriptions", sub_list.join(","))
+		.path("/")
+		.http_only(true)
+		.expires(OffsetDateTime::now_utc() + Duration::weeks(52))
+		.finish(),);
+
+	let path = format!("/r/{}", sub);
+	
+	res
+		.content_type("text/html")
+		.set_header("Location", path.to_string())
+		.body(format!("Redirecting to <a href=\"{0}\">{0}</a>...", path.to_string()))
 }
 
 pub async fn wiki(req: HttpRequest) -> HttpResponse {
