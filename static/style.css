@@ -904,6 +904,10 @@ a.search_subreddit:hover {
 	background: var(--foreground);
 }
 
+aside.prefs {
+	margin-top: 20px;
+}
+
 #save {
 	background: var(--highlighted);
 	padding: 10px 15px;
@@ -1013,6 +1017,8 @@ td, th {
 /* Mobile */
 
 @media screen and (max-width: 480px) {
+	#version { display: none; }
+	
 	.post {
 		grid-template: 	"post_header post_header post_thumbnail" auto
 				"post_title  post_title  post_thumbnail" 1fr
@@ -1066,7 +1072,7 @@ td, th {
 		width: calc(100% - 20px);
 	}
 
-	#version { display: none; }
+	nav #links { margin-left: auto; }
 
 	#subscriptions { position: unset; }
 
@@ -1082,6 +1088,6 @@ td, th {
 	}
 
 	#user, #sidebar { margin: 20px 0;	}
-	#logo { margin: 5px auto; }
+	#logo, #links { margin-bottom: 5px; }
 	#searchbox { width: calc(100vw - 35px); }
 }
