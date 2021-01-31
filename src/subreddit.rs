@@ -52,17 +52,18 @@ pub async fn page(req: HttpRequest) -> HttpResponse {
 			let sub = if !sub.contains('+') && sub != subscribed && sub != "popular" && sub != "all" {
 				// Regular subreddit
 				subreddit(&sub).await.unwrap_or_default()
+			} else if sub == subscribed {
+				// Subscription feed
+				if req.path().starts_with("/r/") {
+					subreddit(&sub).await.unwrap_or_default()
+				} else {
+					Subreddit::default()
+				}
 			} else if sub.contains('+') {
 				// Multireddit
 				Subreddit {
 					name: sub,
 					..Subreddit::default()
-				}
-			} else if sub == subscribed {
-				if req.path().starts_with("/r/") {
-					subreddit(&sub).await.unwrap_or_default()
-				} else {
-					Subreddit::default()
 				}
 			} else {
 				Subreddit::default()
