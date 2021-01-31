@@ -44,7 +44,7 @@ pub async fn page(req: HttpRequest) -> HttpResponse {
 			front_page.to_owned()
 		});
 
-	let path = format!("/r/{}.json?{}", sub, req.query_string());
+	let path = format!("/r/{}/{}.json?{}", sub, sort, req.query_string());
 
 	match fetch_posts(&path, String::new()).await {
 		Ok((posts, after)) => {

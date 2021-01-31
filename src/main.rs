@@ -75,7 +75,7 @@ async fn main() -> std::io::Result<()> {
 					.header("X-Frame-Options", "DENY")
 					.header(
 						"Content-Security-Policy",
-						"default-src 'none'; style-src 'self' 'unsafe-inline'; base-uri 'none'; img-src 'self' data:; form-action 'self'; frame-ancestors 'none';",
+						"default-src 'none'; media-src 'self'; style-src 'self' 'unsafe-inline'; base-uri 'none'; img-src 'self' data:; form-action 'self'; frame-ancestors 'none';",
 					),
 			)
 			// Default service in case no routes match
