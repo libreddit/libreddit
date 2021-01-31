@@ -99,7 +99,7 @@ pub async fn subscriptions(req: HttpRequest) -> HttpResponse {
 
 	// Redirect back to subreddit
 	// check for redirect parameter if unsubscribing from outside sidebar
-	let redirect_path = param(&format!("{}?{}", req.path(), req.query_string()), "redirect");
+	let redirect_path = param(&req.uri().to_string(), "redirect");
 	let path;
 
 	if redirect_path.len() > 1 && redirect_path.chars().nth(0).unwrap() == '/' {
