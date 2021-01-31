@@ -42,9 +42,9 @@
 					{% call utils::options(prefs.comment_sort, ["confidence", "top", "new", "controversial", "old"], "confidence") %}
 				</select>
 			</div>
-			<div id="hide_nsfw">
-				<label for="hide_nsfw">Hide NSFW posts:</label>
-				<input type="checkbox" name="hide_nsfw" {% if prefs.hide_nsfw == "on" %}checked{% endif %}>
+			<div id="show_nsfw">
+				<label for="show_nsfw">Show NSFW posts:</label>
+				<input type="checkbox" name="show_nsfw" {% if prefs.show_nsfw == "on" %}checked{% endif %}>
 			</div>
 		</div>
 		<p id="settings_note"><b>Note:</b> settings are saved in browser cookies. Clearing your cookie data will reset them.</p>

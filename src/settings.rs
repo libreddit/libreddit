@@ -18,7 +18,7 @@ pub struct SettingsForm {
 	layout: Option<String>,
 	wide: Option<String>,
 	comment_sort: Option<String>,
-	hide_nsfw: Option<String>,
+	show_nsfw: Option<String>,
 }
 
 // FUNCTIONS
@@ -33,8 +33,8 @@ pub async fn get(req: HttpRequest) -> HttpResponse {
 pub async fn set(_req: HttpRequest, form: Form<SettingsForm>) -> HttpResponse {
 	let mut res = HttpResponse::Found();
 
-	let names = vec!["theme", "front_page", "layout", "wide", "comment_sort", "hide_nsfw"];
-	let values = vec![&form.theme, &form.front_page, &form.layout, &form.wide, &form.comment_sort, &form.hide_nsfw];
+	let names = vec!["theme", "front_page", "layout", "wide", "comment_sort", "show_nsfw"];
+	let values = vec![&form.theme, &form.front_page, &form.layout, &form.wide, &form.comment_sort, &form.show_nsfw];
 
 	for (i, name) in names.iter().enumerate() {
 		match values[i] {

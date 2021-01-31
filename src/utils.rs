@@ -127,7 +127,7 @@ pub struct Preferences {
 	pub front_page: String,
 	pub layout: String,
 	pub wide: String,
-	pub hide_nsfw: String,
+	pub show_nsfw: String,
 	pub comment_sort: String,
 	pub subs: Vec<String>,
 }
@@ -143,7 +143,7 @@ pub fn prefs(req: HttpRequest) -> Preferences {
 		front_page: cookie(&req, "front_page"),
 		layout: cookie(&req, "layout"),
 		wide: cookie(&req, "wide"),
-		hide_nsfw: cookie(&req, "hide_nsfw"),
+		show_nsfw: cookie(&req, "show_nsfw"),
 		comment_sort: cookie(&req, "comment_sort"),
 		subs: cookie(&req, "subscriptions").split('+').map(String::from).filter(|s| s != "").collect(),
 	}

@@ -33,7 +33,7 @@ struct SearchTemplate {
 
 // SERVICES
 pub async fn find(req: HttpRequest) -> HttpResponse {
-	let nsfw_results = if cookie(&req, "hide_nsfw") != "on" { "&include_over_18=on" } else { "" };
+	let nsfw_results = if cookie(&req, "show_nsfw") == "on" { "&include_over_18=on" } else { "" };
 	let path = format!("{}.json?{}{}", req.path(), req.query_string(), nsfw_results);
 	let sub = req.match_info().get("sub").unwrap_or("").to_string();
 

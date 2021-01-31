@@ -41,7 +41,7 @@
 
 			<div id="posts">
 			{% for post in posts %}
-			{% if !(post.flags.nsfw && prefs.hide_nsfw == "on") %}
+			{% if !(post.flags.nsfw && prefs.show_nsfw != "on") %}
 			<hr class="sep" />
 			<div class="post {% if post.flags.stickied %}stickied{% endif %}">	
 				<p class="post_header">
