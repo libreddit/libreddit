@@ -79,10 +79,10 @@ pub async fn subscriptions(req: HttpRequest) -> HttpResponse {
 	let mut sub_list = prefs(req.to_owned()).subs;
 
 	// Modify sub list based on action
-	if action == "subscribe" {
+	if action == "subscribe" && !sub_list.contains(&sub_name) {
 		sub_list.push(sub_name);
 		sub_list.sort();
-	} else {
+	} else if action == "unsubscribe" {
 		sub_list.retain(|s| s != &sub_name);
 	}
 
