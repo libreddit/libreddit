@@ -145,7 +145,7 @@ pub fn prefs(req: HttpRequest) -> Preferences {
 		wide: cookie(&req, "wide"),
 		hide_nsfw: cookie(&req, "hide_nsfw"),
 		comment_sort: cookie(&req, "comment_sort"),
-		subs: cookie(&req, "subscriptions").split(",").map(String::from).filter(|s| s != "").collect(),
+		subs: cookie(&req, "subscriptions").split('+').map(String::from).filter(|s| s != "").collect(),
 	}
 }
 

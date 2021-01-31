@@ -24,26 +24,24 @@ pub async fn handler(web::Path(b64): web::Path<String>) -> Result<HttpResponse> 
 	let decoded = decode(b64).map(|bytes| String::from_utf8(bytes).unwrap_or_default());
 
 	match decoded {
-		Ok(media) => {
-			match Url::parse(media.as_str()) {
-				Ok(url) => {
-					let domain = url.domain().unwrap_or_default();
+		Ok(media) => match Url::parse(media.as_str()) {
+			Ok(url) => {
+				let domain = url.domain().unwrap_or_default();
 
-					if domains.contains(&domain) {
-						Client::default().get(media.replace("&amp;", "&")).send().await.map_err(Error::from).map(|res| {
-							HttpResponse::build(res.status())
-								.header("Cache-Control", "public, max-age=1209600, s-maxage=86400")
-								.header("Content-Length", res.headers().get("Content-Length").unwrap().to_owned())
-								.header("Content-Type", res.headers().get("Content-Type").unwrap().to_owned())
-								.streaming(res)
-						})
-					} else {
-						Err(error::ErrorForbidden("Resource must be from Reddit"))
-					}
+				if domains.contains(&domain) {
+					Client::default().get(media.replace("&amp;", "&")).send().await.map_err(Error::from).map(|res| {
+						HttpResponse::build(res.status())
+							.header("Cache-Control", "public, max-age=1209600, s-maxage=86400")
+							.header("Content-Length", res.headers().get("Content-Length").unwrap().to_owned())
+							.header("Content-Type", res.headers().get("Content-Type").unwrap().to_owned())
+							.streaming(res)
+					})
+				} else {
+					Err(error::ErrorForbidden("Resource must be from Reddit"))
 				}
-				_ => Err(error::ErrorBadRequest("Can't parse base64 into URL")),
 			}
-		}
+			_ => Err(error::ErrorBadRequest("Can't parse base64 into URL")),
+		},
 		_ => Err(error::ErrorBadRequest("Can't decode base64")),
 	}
 }

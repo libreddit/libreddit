@@ -127,9 +127,13 @@
 					</div>
 					<div id="sub_subscription">
 						{% if prefs.subs.contains(sub.name) %}
-							<a href="/r/{{ sub.name }}/unsubscribe" class="subscribe remove">Unsubscribe</a>
+							<form action="/r/{{ sub.name }}/unsubscribe">
+								<button id="unsubscribe">Unsubscribe</button>
+							</form>
 						{% else %}
-							<a href="/r/{{ sub.name }}/subscribe" class="subscribe add">Subscribe</a>
+							<form action="/r/{{ sub.name }}/subscribe">
+								<button id="subscribe">Subscribe</button>
+							</form>
 						{% endif %}
 					</div>
 				</div>

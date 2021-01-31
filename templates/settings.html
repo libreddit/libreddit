@@ -21,7 +21,7 @@
 		<div id="front_page">
 			<label for="front_page">Front page:</label>
 			<select name="front_page"> 
-				{% call utils::options(prefs.front_page, ["popular", "all"], "popular") %}
+				{% call utils::options(prefs.front_page, ["default", "popular", "all"], "default") %}
 			</select>
 		</div>
 		<div id="layout">

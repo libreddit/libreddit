@@ -95,13 +95,23 @@ nav {
 nav * { color: var(--text); }
 nav #reddit, #code { color: var(--accent); }
 nav #logo { grid-area: logo; }
-nav #links { grid-area: links; }
 
-nav #version { opacity: 50%; vertical-align: -2px; }
-nav #libreddit { vertical-align: -2px; }
+nav #links {
+	grid-area: links;
+	margin-left: 10px;
+}
+
+nav #version {
+	opacity: 50%;
+	vertical-align: -2px;
+	margin-right: 10px;
+}
+
+nav #libreddit {
+	vertical-align: -2px;
+}
 
 #settings_link {
-	margin-left: 10px;
 	opacity: 0.8;
 }
 
@@ -240,17 +250,18 @@ aside {
 	margin-top: 20px;
 }
 
-#sub_subscription > a {
+#sub_subscription button {
 	padding: 10px 20px;
 	border-radius: 5px;
+	cursor: pointer;
 }
 
-#sub_subscription > .add {
+#subscribe {
 	color: var(--foreground);
 	background-color: var(--accent);
 }
 
-#sub_subscription > .remove { 
+#unsubscribe { 
 	color: var(--text);
 	background-color: var(--highlighted);
 }
@@ -266,11 +277,10 @@ aside {
 	box-sizing: border-box;
 	font-size: 15px;
 	display: inline-block;
-	margin-left: 10px;
 }
 
 #subscriptions > summary {
-	padding: 10px 20px 10px 15px;
+	padding: 8px 15px;
 }
 
 #sub_list {

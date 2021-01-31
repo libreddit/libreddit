@@ -26,24 +26,43 @@ struct WikiTemplate {
 
 // SERVICES
 pub async fn page(req: HttpRequest) -> HttpResponse {
-	let path = format!("{}.json?{}", req.path(), req.query_string());
-	let default = cookie(&req, "front_page");
+	let subscribed = cookie(&req, "subscriptions");
+	let front_page = cookie(&req, "front_page");
+	let sort = req.match_info().get("sort").unwrap_or("hot").to_string();
+
 	let sub = req
 		.match_info()
 		.get("sub")
-		.unwrap_or(if default.is_empty() { "popular" } else { default.as_str() })
-		.to_string();
-	let sort = req.match_info().get("sort").unwrap_or("hot").to_string();
+		.map(String::from)
+		.unwrap_or(if front_page == "default" || front_page.is_empty() {
+			if subscribed.is_empty() {
+				"popular".to_string()
+			} else {
+				subscribed.to_owned()
+			}
+		} else {
+			front_page.to_owned()
+		});
+
+	let path = format!("/r/{}.json?{}", sub, req.query_string());
 
 	match fetch_posts(&path, String::new()).await {
 		Ok((posts, after)) => {
 			// If you can get subreddit posts, also request subreddit metadata
-			let sub = if !sub.contains('+') && sub != "popular" && sub != "all" {
+			let sub = if !sub.contains('+') && sub != subscribed && sub != "popular" && sub != "all" {
+				// Regular subreddit
 				subreddit(&sub).await.unwrap_or_default()
 			} else if sub.contains('+') {
+				// Multireddit
 				Subreddit {
 					name: sub,
 					..Subreddit::default()
+				}
+			} else if sub == subscribed {
+				if req.path().starts_with("/r/") {
+					subreddit(&sub).await.unwrap_or_default()
+				} else {
+					Subreddit::default()
 				}
 			} else {
 				Subreddit::default()
@@ -84,11 +103,13 @@ pub async fn subscriptions(req: HttpRequest) -> HttpResponse {
 	if sub_list.is_empty() {
 		res.del_cookie(&Cookie::build("subscriptions", "").path("/").finish());
 	} else {
-		res.cookie(Cookie::build("subscriptions", sub_list.join(","))
-			.path("/")
-			.http_only(true)
-			.expires(OffsetDateTime::now_utc() + Duration::weeks(52))
-			.finish(),);
+		res.cookie(
+			Cookie::build("subscriptions", sub_list.join("+"))
+				.path("/")
+				.http_only(true)
+				.expires(OffsetDateTime::now_utc() + Duration::weeks(52))
+				.finish(),
+		);
 	}
 
 	// Redirect back to subreddit
