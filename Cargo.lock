@@ -1915,9 +1915,9 @@ dependencies = [
 
 [[package]]
 name = "tide"
-version = "0.15.0"
+version = "0.16.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c832ca099a0645f6446b6c8900b09e3b76978dedc0d7383438698b32ff07f734"
+checksum = "c459573f0dd2cc734b539047f57489ea875af8ee950860ded20cf93a79a1dee0"
 dependencies = [
  "async-h1",
  "async-session",
@@ -1930,7 +1930,7 @@ dependencies = [
  "http-types",
  "kv-log-macro",
  "log",
- "pin-project-lite 0.1.11",
+ "pin-project-lite 0.2.4",
  "route-recognizer",
  "serde",
  "serde_json",

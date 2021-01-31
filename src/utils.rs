@@ -457,43 +457,48 @@ pub async fn request(path: String) -> Result<Value, String> {
 	// }
 
 	// Send request using surf
-	let req = surf::get(&url).header("User-Agent", user_agent.as_str());
+	dbg!(&url);
+	let req = surf::get(&url);
+	// let req = surf::get(&url).header("User-Agent", user_agent.as_str());
+	dbg!(2);
+	// let client = surf::client();
 	let client = surf::client().with(surf::middleware::Redirect::new(5));
 
-	dbg!("Send request");
+	// let json: Value = client.recv_json(req).await.unwrap_or_default();
 
-	let json: Value = client.recv_json(req).await.unwrap_or_default();
+	dbg!(3);
+	let res = client.send(req).await;
 
-	dbg!("Return response");
+	dbg!(4);
+	let body = res.unwrap().take_body().into_string().await;
 
-	Ok(json)
+	dbg!(5);
+	match body {
+		// If response is success
+		Ok(response) => {
+			// Parse the response from Reddit as JSON
+			match from_str(&response) {
+				Ok(json) => { dbg!(&json); Ok(json) },
+				Err(_) => {
+					dbg!(response);
 
-	// match client.recv_string(req).await {
-	// 	// If response is success
-	// 	Ok(response) => {
-	// 		// Parse the response from Reddit as JSON
-	// 		match from_str(&response) {
-	// 			Ok(json) => Ok(json),
-	// 			Err(_) => {
-	// 				dbg!(response);
-
-	// 				#[cfg(debug_assertions)]
-	// 				dbg!(format!("{} - Failed to parse page JSON data", url));
-	// 				Err("Failed to parse page JSON data".to_string())
-	// 			}
-	// 		}
-	// 	}
-	// 	// If response is error
-	// 	// Err(e) => {
-	// 	// 	#[cfg(debug_assertions)]
-	// 	// 	dbg!(format!("{} - Page not found", url));
-	// 	// 	Err("Page not found".to_string())
-	// 	// }
-	// 	// If failed to send request
-	// 	Err(_e) => {
-	// 		#[cfg(debug_assertions)]
-	// 		dbg!(format!("{} - {}", url, _e));
-	// 		Err("Couldn't send request to Reddit".to_string())
-	// 	}
-	// }
+					#[cfg(debug_assertions)]
+					dbg!(format!("{} - Failed to parse page JSON data", url));
+					Err("Failed to parse page JSON data".to_string())
+				}
+			}
+		}
+		// If response is error
+		// Err(e) => {
+		// 	#[cfg(debug_assertions)]
+		// 	dbg!(format!("{} - Page not found", url));
+		// 	Err("Page not found".to_string())
+		// }
+		// If failed to send request
+		Err(_e) => {
+			#[cfg(debug_assertions)]
+			dbg!(format!("{} - {}", url, _e));
+			Err("Couldn't send request to Reddit".to_string())
+		}
+	}
 }

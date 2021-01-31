@@ -8,9 +8,9 @@ authors = ["spikecodes <19519553+spikecodes@users.noreply.github.com>"]
 edition = "2018"
 
 [dependencies]
-tide = "0.15.0"
+tide = "0.16"
 async-std = { version = "1.8.0", features = ["attributes"] }
-surf = "2.1"
+surf = "2"
 base64 = "0.13"
 cached = "0.23"
 futures = "0.3"
