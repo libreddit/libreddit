@@ -54,7 +54,7 @@ async fn main() -> std::io::Result<()> {
 			.wrap_fn(move |req, srv| {
 				let secure = req.connection_info().scheme() == "https";
 				let https_url = format!("https://{}{}", req.connection_info().host(), req.uri().to_string());
-				srv.call(req).map(move |res: Result<ServiceResponse, _>|
+				srv.call(req).map(move |res: Result<ServiceResponse, _>| {
 					if force_https && !secure {
 						Ok(ServiceResponse::new(
 							res.unwrap().request().to_owned(),
@@ -63,16 +63,21 @@ async fn main() -> std::io::Result<()> {
 					} else {
 						res
 					}
-				)
+				})
 			})
 			// Append trailing slash and remove double slashes
 			.wrap(middleware::NormalizePath::default())
 			// Apply default headers for security
-			.wrap(middleware::DefaultHeaders::new()
-				.header("Referrer-Policy", "no-referrer")
-				.header("X-Content-Type-Options", "nosniff")
-				.header("X-Frame-Options", "DENY")
-				.header("Content-Security-Policy", "default-src 'none'; media-src 'self'; style-src 'self' 'unsafe-inline'; base-uri 'none'; img-src 'self' data:; form-action 'self'; frame-ancestors 'none';"))
+			.wrap(
+				middleware::DefaultHeaders::new()
+					.header("Referrer-Policy", "no-referrer")
+					.header("X-Content-Type-Options", "nosniff")
+					.header("X-Frame-Options", "DENY")
+					.header(
+						"Content-Security-Policy",
+						"default-src 'none'; style-src 'self' 'unsafe-inline'; base-uri 'none'; img-src 'self' data:; form-action 'self'; frame-ancestors 'none';",
+					),
+			)
 			// Default service in case no routes match
 			.default_service(web::get().to(|| utils::error("Nothing here".to_string())))
 			// Read static files
@@ -99,6 +104,8 @@ async fn main() -> std::io::Result<()> {
 					// See posts and info about subreddit
 					.route("/", web::get().to(subreddit::page))
 					.route("/{sort:hot|new|top|rising|controversial}/", web::get().to(subreddit::page))
+					// Handle subscribe/unsubscribe
+					.route("/{action:subscribe|unsubscribe}/", web::post().to(subreddit::subscriptions))
 					// View post on subreddit
 					.service(
 						web::scope("/comments/{id}/{title}")

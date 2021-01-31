@@ -16,15 +16,18 @@
 		{% if prefs.theme != "system" %} {{ prefs.theme }}{% endif %}">
 		<!-- NAVIGATION BAR -->
 		<nav>
-			<p id="logo">
+			<div id="logo">
 				<a id="libreddit" href="/">
 					<span id="lib">lib</span><span id="reddit">reddit.</span>
 				</a>
 				<span id="version">v{{ env!("CARGO_PKG_VERSION") }}</span>
-				<a id="settings_link" href="/settings">settings</a>
-			</p>
+				{% block subscriptions %}{% endblock %}
+			</div>
 			{% block search %}{% endblock %}
-			<a id="code" href="https://github.com/spikecodes/libreddit">code</a>
+			<div id="links">
+				<a id="settings_link" href="/settings">settings</a>
+				<a id="code" href="https://github.com/spikecodes/libreddit">code</a>
+			</div>
 		</nav>
 		
 		<!-- MAIN CONTENT -->

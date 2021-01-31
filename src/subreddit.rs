@@ -1,7 +1,8 @@
 // CRATES
 use crate::utils::*;
-use actix_web::{HttpRequest, HttpResponse, Result};
+use actix_web::{cookie::Cookie, HttpRequest, HttpResponse, Result};
 use askama::Template;
+use time::{Duration, OffsetDateTime};
 
 // STRUCTS
 #[derive(Template)]
@@ -25,23 +26,43 @@ struct WikiTemplate {
 
 // SERVICES
 pub async fn page(req: HttpRequest) -> HttpResponse {
-	let path = format!("{}.json?{}", req.path(), req.query_string());
-	let default = cookie(&req, "front_page");
-	let sub_name = req
+	let subscribed = cookie(&req, "subscriptions");
+	let front_page = cookie(&req, "front_page");
+	let sort = req.match_info().get("sort").unwrap_or("hot").to_string();
+
+	let sub = req
 		.match_info()
 		.get("sub")
-		.unwrap_or(if default.is_empty() { "popular" } else { default.as_str() })
-		.to_string();
-	let sort = req.match_info().get("sort").unwrap_or("hot").to_string();
+		.map(String::from)
+		.unwrap_or(if front_page == "default" || front_page.is_empty() {
+			if subscribed.is_empty() {
+				"popular".to_string()
+			} else {
+				subscribed.to_owned()
+			}
+		} else {
+			front_page.to_owned()
+		});
+
+	let path = format!("/r/{}.json?{}", sub, req.query_string());
 
 	match fetch_posts(&path, String::new()).await {
 		Ok((posts, after)) => {
 			// If you can get subreddit posts, also request subreddit metadata
-			let sub = if !sub_name.contains('+') && sub_name != "popular" && sub_name != "all" {
-				subreddit(&sub_name).await.unwrap_or_default()
-			} else if sub_name.contains('+') {
+			let sub = if !sub.contains('+') && sub != subscribed && sub != "popular" && sub != "all" {
+				// Regular subreddit
+				subreddit(&sub).await.unwrap_or_default()
+			} else if sub == subscribed {
+				// Subscription feed
+				if req.path().starts_with("/r/") {
+					subreddit(&sub).await.unwrap_or_default()
+				} else {
+					Subreddit::default()
+				}
+			} else if sub.contains('+') {
+				// Multireddit
 				Subreddit {
-					name: sub_name,
+					name: sub,
 					..Subreddit::default()
 				}
 			} else {
@@ -61,6 +82,50 @@ pub async fn page(req: HttpRequest) -> HttpResponse {
 		}
 		Err(msg) => error(msg).await,
 	}
+}
+
+// Sub or unsub by setting subscription cookie using response "Set-Cookie" header
+pub async fn subscriptions(req: HttpRequest) -> HttpResponse {
+	let mut res = HttpResponse::Found();
+
+	let sub = req.match_info().get("sub").unwrap_or_default().to_string();
+	let action = req.match_info().get("action").unwrap_or_default().to_string();
+	let mut sub_list = prefs(req.to_owned()).subs;
+
+	// Modify sub list based on action
+	if action == "subscribe" && !sub_list.contains(&sub) {
+		sub_list.push(sub.to_owned());
+		sub_list.sort();
+	} else if action == "unsubscribe" {
+		sub_list.retain(|s| s != &sub);
+	}
+
+	// Delete cookie if empty, else set
+	if sub_list.is_empty() {
+		res.del_cookie(&Cookie::build("subscriptions", "").path("/").finish());
+	} else {
+		res.cookie(
+			Cookie::build("subscriptions", sub_list.join("+"))
+				.path("/")
+				.http_only(true)
+				.expires(OffsetDateTime::now_utc() + Duration::weeks(52))
+				.finish(),
+		);
+	}
+
+	// Redirect back to subreddit
+	// check for redirect parameter if unsubscribing from outside sidebar
+	let redirect_path = param(&req.uri().to_string(), "redirect");
+	let path = if !redirect_path.is_empty() && redirect_path.starts_with('/') {
+		redirect_path
+	} else {
+		format!("/r/{}", sub)
+	};
+
+	res
+		.content_type("text/html")
+		.set_header("Location", path.to_owned())
+		.body(format!("Redirecting to <a href=\"{0}\">{0}</a>...", path))
 }
 
 pub async fn wiki(req: HttpRequest) -> HttpResponse {

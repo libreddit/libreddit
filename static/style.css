@@ -68,11 +68,12 @@ pre, form, fieldset, table, th, td, select, input {
 body {
 	background: var(--background);
 	font-size: 15px;
+	padding-top: 60px;
 }
 
 nav {
 	display: grid;
-	grid-template-areas: "logo searchbox code";
+	grid-template-areas: "logo searchbox links";
 
 	justify-content: space-between;
 	align-items: center;
@@ -83,7 +84,7 @@ nav {
 	
 	font-size: 20px;
 	
-	z-index: 1;
+	z-index: 2;
 	top: 0;
 	padding: 5px 15px;
 	min-height: 40px;
@@ -94,12 +95,23 @@ nav {
 nav * { color: var(--text); }
 nav #reddit, #code { color: var(--accent); }
 nav #logo { grid-area: logo; }
-nav #code { grid-area: code; }
-nav #version { opacity: 50%; }
+
+nav #links {
+	grid-area: links;
+	margin-left: 10px;
+}
+
+nav #version {
+	opacity: 50%;
+	vertical-align: -2px;
+	margin-right: 10px;
+}
+
+nav #libreddit {
+	vertical-align: -2px;
+}
 
 #settings_link {
-	font-size: 18px;
-	margin-left: 10px;
 	opacity: 0.8;
 }
 
@@ -108,7 +120,7 @@ main {
 	justify-content: center;
 	max-width: 1000px;
 	padding: 10px 20px;
-	margin: 60px auto 20px auto
+	margin: 0 auto;
 }
 
 .wide main {
@@ -230,6 +242,71 @@ aside {
 
 #user_details > label, #sub_details > label {
 	color: var(--accent);
+}
+
+/* Subscriptions */
+
+#sub_subscription {
+	margin-top: 20px;
+}
+
+.subscribe, .unsubscribe {
+	padding: 10px 20px;
+	border-radius: 5px;
+	cursor: pointer;
+}
+
+.subscribe {
+	color: var(--foreground);
+	background-color: var(--accent);
+}
+
+.unsubscribe { 
+	color: var(--text);
+	background-color: var(--highlighted);
+}
+
+/* Subscribed subreddit list */
+
+#subscriptions {
+	position: relative;
+	border-radius: 5px;
+	border: var(--panel-border);
+	background-color: var(--outside);
+	align-items: center;
+	box-sizing: border-box;
+	font-size: 15px;
+	display: inline-block;
+}
+
+#subscriptions > summary {
+	padding: 8px 15px;
+}
+
+#sub_list {
+	position: absolute;
+	display: flex;
+	min-width: 100%;
+	border-radius: 5px;
+	box-shadow: var(--shadow);
+	background: var(--outside);
+	flex-direction: column;
+	overflow: auto;
+	z-index: 1;
+}
+
+#sub_list > a {
+	padding: 10px 20px;
+	transition: 0.2s background;
+}
+
+#sub_list > .selected {
+	background-color: var(--accent);
+	color: var(--foreground);
+}
+
+#sub_list > a:not(.selected):hover {
+	background-color: var(--foreground);
 }
 
 /* Wiki Pages */
@@ -451,10 +528,6 @@ a.search_subreddit:hover {
 }
 
 .post:not(:last-child) { margin-bottom: 10px; }
-
-.post.highlighted {
-	margin: 20px 0;
-}
 
 .post:hover {
 	background: var(--foreground);
@@ -789,7 +862,7 @@ a.search_subreddit:hover {
 
 /* Settings */
 
-#settings {
+#settings, #settings > form {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
@@ -802,7 +875,7 @@ a.search_subreddit:hover {
 	opacity: 0.75;
 }
 
-#prefs {
+.prefs {
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
@@ -812,7 +885,7 @@ a.search_subreddit:hover {
 	border-radius: 5px;
 }
 
-#prefs > div {
+.prefs > div {
 	display: flex;
 	justify-content: space-between;
 	width: 100%;
@@ -820,15 +893,19 @@ a.search_subreddit:hover {
 	align-items: center;
 }
 
-#prefs > div:not(:last-of-type) {
+.prefs > div:not(:last-of-type) {
 	margin-bottom: 10px;
 }
 
-#prefs select {
+.prefs select {
 	border-radius: 5px;
 	box-shadow: var(--shadow);
 	margin-left: 20px;
 	background: var(--foreground);
+}
+
+aside.prefs {
+	margin-top: 20px;
 }
 
 #save {
@@ -843,6 +920,27 @@ input[type="submit"] {
 	-webkit-appearance: none;
 	-moz-appearance: none;
 }
+
+#settings_subs {
+	list-style: none;
+	padding: 0;
+}
+
+#settings_subs > li {
+	display: flex;
+	margin: 10px 0;
+}
+#settings_subs > li:last-of-type { margin-bottom: 0; }
+
+#settings_subs > li > span {
+	padding: 10px 0;
+	margin-right: auto;
+}
+
+#settings_subs .unsubscribe {
+	margin-left: 30px;
+}
+
 /* Markdown */
 
 .md > *:not(:first-child) {
@@ -916,6 +1014,8 @@ td, th {
 /* Mobile */
 
 @media screen and (max-width: 480px) {
+	#version { display: none; }
+
 	.post {
 		grid-template: 	"post_header post_header post_thumbnail" auto
 				"post_title  post_title  post_thumbnail" 1fr
@@ -954,17 +1054,29 @@ td, th {
 }
 
 @media screen and (max-width: 800px) {
+	body { padding-top: 120px }
+
 	main {
 		flex-direction: column-reverse;
 		padding: 10px;
-		margin: 100px 0 10px 0;
+		margin: 0 0 10px 0;
 		max-width: 100%;
 	}
 	
 	nav {
-		grid-template-areas: 'logo code' 'searchbox searchbox';
+		grid-template-areas: 'logo links' 'searchbox searchbox';
 		padding: 10px;
 		width: calc(100% - 20px);
+	}
+
+	nav #links { margin-left: auto; }
+
+	#subscriptions { position: unset; }
+
+	#sub_list {
+		left: 10px;
+		right: 10px;
+		min-width: auto;
 	}
 
 	aside, #subreddit, #user {
@@ -973,6 +1085,6 @@ td, th {
 	}
 
 	#user, #sidebar { margin: 20px 0;	}
-	#logo { margin: 5px auto; }
+	#logo, #links { margin-bottom: 5px; }
 	#searchbox { width: calc(100vw - 35px); }
 }
