@@ -93,7 +93,8 @@ nav {
 }
 
 nav * { color: var(--text); }
-nav #reddit, #code { color: var(--accent); }
+nav #reddit, #code > span { color: var(--accent); }
+nav #code > svg { stroke: var(--accent); }
 
 nav #logo {
 	grid-area: logo;
@@ -104,6 +105,11 @@ nav #logo {
 nav #links {
 	grid-area: links;
 	margin-left: 10px;
+	display: flex;
+}
+
+nav #links svg {
+	display: none;
 }
 
 nav #version {
@@ -118,6 +124,10 @@ nav #libreddit {
 
 #settings_link {
 	opacity: 0.8;
+}
+
+#code {
+	margin-left: 5px;
 }
 
 main {
@@ -1075,6 +1085,8 @@ td, th {
 	}
 
 	nav #links { margin-left: auto; }
+	nav #links span { display: none; }
+	nav #links svg { display: block; }
 
 	#subscriptions { position: unset; }
 
