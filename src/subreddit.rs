@@ -80,13 +80,8 @@ pub async fn subscriptions(req: HttpRequest) -> HttpResponse {
 
 	// Modify sub list based on action
 	if action == "subscribe" {
-		if sub_list.is_empty() {
-			sub_list = Vec::new();
-			sub_list.push(sub_name);
-		} else if !sub_list.contains(&sub_name) {
-			sub_list.push(sub_name);
-			sub_list.sort();
-		}
+		sub_list.push(sub_name);
+		sub_list.sort();
 	} else {
 		sub_list.retain(|s| s != &sub_name);
 	}
