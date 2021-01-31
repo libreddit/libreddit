@@ -100,18 +100,16 @@ pub async fn subscriptions(req: HttpRequest) -> HttpResponse {
 	// Redirect back to subreddit
 	// check for redirect parameter if unsubscribing from outside sidebar
 	let redirect_path = param(&req.uri().to_string(), "redirect");
-	let path;
-
-	if redirect_path.len() > 1 && redirect_path.chars().nth(0).unwrap() == '/' {
-		path = redirect_path;
+	let path = if !redirect_path.is_empty() && redirect_path.starts_with('/') {
+		redirect_path
 	} else {
-		path = format!("/r/{}", sub);
-	}
+		format!("/r/{}", sub)
+	};
 
 	res
 		.content_type("text/html")
-		.set_header("Location", path.to_string())
-		.body(format!("Redirecting to <a href=\"{0}\">{0}</a>...", path.to_string()))
+		.set_header("Location", path.to_owned())
+		.body(format!("Redirecting to <a href=\"{0}\">{0}</a>...", path))
 }
 
 pub async fn wiki(req: HttpRequest) -> HttpResponse {
