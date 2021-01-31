@@ -93,7 +93,7 @@ pub async fn subscriptions(req: HttpRequest) -> HttpResponse {
 
 	// Delete cookie if empty, else set
 	if sub_list.is_empty() {
-		res.del_cookie(&Cookie::named("subscriptions"));
+		res.del_cookie(&Cookie::build("subscriptions", "").path("/").finish());
 	} else {
 		res.cookie(Cookie::build("subscriptions", sub_list.join(","))
 			.path("/")
