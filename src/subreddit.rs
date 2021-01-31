@@ -28,7 +28,7 @@ struct WikiTemplate {
 pub async fn page(req: HttpRequest) -> HttpResponse {
 	let path = format!("{}.json?{}", req.path(), req.query_string());
 	let default = cookie(&req, "front_page");
-	let sub_name = req
+	let sub = req
 		.match_info()
 		.get("sub")
 		.unwrap_or(if default.is_empty() { "popular" } else { default.as_str() })
@@ -38,11 +38,11 @@ pub async fn page(req: HttpRequest) -> HttpResponse {
 	match fetch_posts(&path, String::new()).await {
 		Ok((posts, after)) => {
 			// If you can get subreddit posts, also request subreddit metadata
-			let sub = if !sub_name.contains('+') && sub_name != "popular" && sub_name != "all" {
-				subreddit(&sub_name).await.unwrap_or_default()
-			} else if sub_name.contains('+') {
+			let sub = if !sub.contains('+') && sub != "popular" && sub != "all" {
+				subreddit(&sub).await.unwrap_or_default()
+			} else if sub.contains('+') {
 				Subreddit {
-					name: sub_name,
+					name: sub,
 					..Subreddit::default()
 				}
 			} else {
@@ -67,23 +67,17 @@ pub async fn page(req: HttpRequest) -> HttpResponse {
 // Sub or unsub by setting subscription cookie using response "Set-Cookie" header
 pub async fn subscriptions(req: HttpRequest) -> HttpResponse {
 	let mut res = HttpResponse::Found();
-	let default = cookie(&req, "front_page");
-	let sub = req
-		.match_info()
-		.get("sub")
-		.unwrap_or(if default.is_empty() { "popular" } else { default.as_str() });
-	let sub_name = sub.to_string();
 
-	let action = req.match_info().get("action").unwrap().to_string();
-
+	let sub = req.match_info().get("sub").unwrap_or_default().to_string();
+	let action = req.match_info().get("action").unwrap_or_default().to_string();
 	let mut sub_list = prefs(req.to_owned()).subs;
 
 	// Modify sub list based on action
-	if action == "subscribe" && !sub_list.contains(&sub_name) {
-		sub_list.push(sub_name);
+	if action == "subscribe" && !sub_list.contains(&sub) {
+		sub_list.push(sub.to_owned());
 		sub_list.sort();
 	} else if action == "unsubscribe" {
-		sub_list.retain(|s| s != &sub_name);
+		sub_list.retain(|s| s != &sub);
 	}
 
 	// Delete cookie if empty, else set
