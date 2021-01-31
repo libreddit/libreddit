@@ -94,7 +94,12 @@ nav {
 
 nav * { color: var(--text); }
 nav #reddit, #code { color: var(--accent); }
-nav #logo { grid-area: logo; }
+
+nav #logo {
+	grid-area: logo;
+	white-space: nowrap;
+	margin-right: 5px;
+}
 
 nav #links {
 	grid-area: links;
