@@ -72,8 +72,8 @@
 					xmlns="http://www.w3.org/2000/svg">
 						<image width="100%" height="100%" href="{{ post.media.url }}"/>
 						<desc>
-							<img alt="Post image" src="{{ post.media.url }}"/>
-						</dev>
+							<img class="post_media" alt="Post image" src="{{ post.media.url }}"/>
+						</desc>
 				</svg>
 			</a>
 			{% else if post.post_type == "video" || post.post_type == "gif" %}
