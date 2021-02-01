@@ -2,7 +2,7 @@
 
 > An alternative private front-end to Reddit 
 
-![screenshot](https://i.ibb.co/FxxbKM6/libreddit-rust.png)
+![screenshot](https://i.ibb.co/F0JsY5K/image.png)
 
 ---
 
@@ -40,7 +40,9 @@ Feel free to [open an issue](https://github.com/spikecodes/libreddit/issues/new)
 | [libreddit.dothq.co](https://libreddit.dothq.co) | 🇺🇸 US  | ✅ |
 | [libreddit.insanity.wtf](https://libreddit.insanity.wtf) | 🇺🇸 US  | ✅ |
 | [libreddit.kavin.rocks](https://libreddit.kavin.rocks) | 🇮🇳 IN  | ✅ |
+| [libreddit.himiko.cloud](https://libreddit.himiko.cloud) | 🇧🇬 BG |  |
 | [spjmllawtheisznfs7uryhxumin26ssv2draj7oope3ok3wuhy43eoyd.onion](http://spjmllawtheisznfs7uryhxumin26ssv2draj7oope3ok3wuhy43eoyd.onion) | 🇮🇳 IN  |  |
+| [fwhhsbrbltmrct5hshrnqlqygqvcgmnek3cnka55zj4y7nuus5muwyyd.onion](http://fwhhsbrbltmrct5hshrnqlqygqvcgmnek3cnka55zj4y7nuus5muwyyd.onion) | 🇩🇪 DE  |  |
 
 A checkmark in the "Cloudflare" category here refers to the use of the reverse proxy, [Cloudflare](https://cloudflare). The checkmark will not be listed for a site which uses Cloudflare DNS but rather the proxying service which grants Cloudflare the ability to monitor traffic to the website.
 
@@ -123,7 +125,7 @@ Results from Google Lighthouse ([Libreddit Report](https://lighthouse-dot-webdot
 
 For transparency, I hope to describe all the ways Libreddit handles user privacy.
 
-**Logging:** In production (when running the binary, hosting with docker, or using the official instances), Libreddit logs nothing. When debugging (running from source without `--release`), Libreddit logs post IDs and URL paths fetched to aid with troubleshooting.
+**Logging:** In production (when running the binary, hosting with docker, or using the official instances), Libreddit logs when Reddit is ratelimiting Libreddit and when Reddit's JSON responses can't be parsed. When debugging (running from source without `--release`), Libreddit logs post IDs and URL paths fetched to aid with troubleshooting.
 
 **DNS:** Both official domains (`libredd.it` and `libreddit.spike.codes`) use Cloudflare as the DNS resolver. Though, the sites are not proxied through Cloudflare meaning Cloudflare doesn't have access to user traffic.
 

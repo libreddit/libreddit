@@ -171,7 +171,11 @@ async fn parse_comments(json: &serde_json::Value) -> Vec<Comment> {
 				},
 				distinguished: val(&comment, "distinguished"),
 			},
-			score: format_num(score),
+			score: if comment["data"]["score_hidden"].as_bool().unwrap_or_default() {
+				"•".to_string()
+			} else {
+				format_num(score)
+			},
 			rel_time,
 			created,
 			replies,

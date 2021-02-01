@@ -7,6 +7,10 @@
 
 {% block title %}{{ user.name.replace("u/", "") }} (u/{{ user.name }}) - Libreddit{% endblock %}
 
+{% block subscriptions %}
+	{% call utils::sub_list("") %}
+{% endblock %}
+
 {% block body %}
 	<main>
 		<div id="column_one">
@@ -27,7 +31,7 @@
 			<div id="posts">
 			{% for post in posts %}
 
-			{% if post.flags.nsfw && prefs.hide_nsfw == "on" %}
+			{% if post.flags.nsfw && prefs.show_nsfw != "on" %}
 			{% else if post.title != "Comment" %}
 			<div class="post {% if post.flags.stickied %}stickied{% endif %}">	
 				<p class="post_header">

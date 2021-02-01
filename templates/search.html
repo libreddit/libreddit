@@ -3,6 +3,10 @@
 
 {% block title %}Libreddit: search results - {{ params.q }}{% endblock %}
 
+{% block subscriptions %}
+	{% call utils::sub_list("") %}
+{% endblock %}
+
 {% block content %}
 	<div id="column_one">
 		<form id="search_sort">
@@ -42,7 +46,7 @@
 		{%  endif %}
 		{% for post in posts %}
 
-		{% if post.flags.nsfw && prefs.hide_nsfw == "on" %}
+		{% if post.flags.nsfw && prefs.show_nsfw != "on" %}
 		{% else if post.title != "Comment" %}
 		<div class="post {% if post.flags.stickied %}stickied{% endif %}">	
 			<p class="post_header">

@@ -9,7 +9,7 @@ use serde_json::{from_str, Value};
 use std::collections::HashMap;
 use time::{Duration, OffsetDateTime};
 use url::Url;
-use cached::proc_macro::cached;
+// use cached::proc_macro::cached;
 
 //
 // STRUCTS
@@ -127,8 +127,9 @@ pub struct Preferences {
 	pub front_page: String,
 	pub layout: String,
 	pub wide: String,
-	pub hide_nsfw: String,
+	pub show_nsfw: String,
 	pub comment_sort: String,
+	pub subs: Vec<String>,
 }
 
 //
@@ -142,8 +143,9 @@ pub fn prefs(req: HttpRequest) -> Preferences {
 		front_page: cookie(&req, "front_page"),
 		layout: cookie(&req, "layout"),
 		wide: cookie(&req, "wide"),
-		hide_nsfw: cookie(&req, "hide_nsfw"),
+		show_nsfw: cookie(&req, "show_nsfw"),
 		comment_sort: cookie(&req, "comment_sort"),
+		subs: cookie(&req, "subscriptions").split('+').map(String::from).filter(|s| !s.is_empty()).collect(),
 	}
 }
 
@@ -341,7 +343,11 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 				},
 				distinguished: val(post, "distinguished"),
 			},
-			score: format_num(score),
+			score: if post["data"]["hide_score"].as_bool().unwrap_or_default() {
+				"•".to_string()
+			} else {
+				format_num(score)
+			},
 			upvote_ratio: ratio as i64,
 			post_type,
 			thumbnail: Media {
@@ -393,7 +399,7 @@ pub async fn error(msg: String) -> HttpResponse {
 }
 
 // Make a request to a Reddit API and parse the JSON response
-#[cached(size=1000,time=60, result = true)]
+// #[cached(size=100,time=60, result = true)]
 pub async fn request(path: String) -> Result<Value, String> {
 	let url = format!("https://www.reddit.com{}", path);
 	let user_agent = format!("web:libreddit:{}", env!("CARGO_PKG_VERSION"));
@@ -459,11 +465,11 @@ pub async fn request(path: String) -> Result<Value, String> {
 		// If response is success
 		Ok(response) => {
 			// Parse the response from Reddit as JSON
-			match from_str(&response.into_string().unwrap()) {
+			let json_string = &response.into_string().unwrap_or_default();
+			match from_str(json_string) {
 				Ok(json) => Ok(json),
-				Err(_) => {
-					#[cfg(debug_assertions)]
-					dbg!(format!("{} - Failed to parse page JSON data", url));
+				Err(e) => {
+					println!("{} - Failed to parse page JSON data: {} - {}", url, e, json_string);
 					Err("Failed to parse page JSON data".to_string())
 				}
 			}
@@ -475,9 +481,8 @@ pub async fn request(path: String) -> Result<Value, String> {
 			Err("Page not found".to_string())
 		}
 		// If failed to send request
-		Err(_e) => {
-			#[cfg(debug_assertions)]
-			dbg!(format!("{} - {}", url, _e));
+		Err(e) => {
+			println!("{} - Couldn't send request to Reddit: {}", url, e);
 			Err("Couldn't send request to Reddit, this instance may be being rate-limited. Try another.".to_string())
 		}
 	}

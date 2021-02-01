@@ -19,6 +19,21 @@ async fn style() -> HttpResponse {
 	HttpResponse::Ok().content_type("text/css").body(include_str!("../static/style.css"))
 }
 
+// Required for creating a PWA
+async fn manifest() -> HttpResponse {
+	HttpResponse::Ok().content_type("application/json").body(include_str!("../static/manifest.json"))
+}
+
+// Required for the manifest to be valid
+async fn pwa_logo() -> HttpResponse {
+	HttpResponse::Ok().content_type("image/png").body(include_bytes!("../static/logo.png").as_ref())
+}
+
+// Required for iOS App Icons
+async fn iphone_logo() -> HttpResponse {
+	HttpResponse::Ok().content_type("image/png").body(include_bytes!("../static/touch-icon-iphone.png").as_ref())
+}
+
 async fn robots() -> HttpResponse {
 	HttpResponse::Ok()
 		.header("Cache-Control", "public, max-age=1209600, s-maxage=86400")
@@ -27,6 +42,7 @@ async fn robots() -> HttpResponse {
 
 async fn favicon() -> HttpResponse {
 	HttpResponse::Ok()
+		.content_type("image/x-icon")
 		.header("Cache-Control", "public, max-age=1209600, s-maxage=86400")
 		.body(include_bytes!("../static/favicon.ico").as_ref())
 }
@@ -53,7 +69,7 @@ async fn main() -> std::io::Result<()> {
 			.wrap_fn(move |req, srv| {
 				let secure = req.connection_info().scheme() == "https";
 				let https_url = format!("https://{}{}", req.connection_info().host(), req.uri().to_string());
-				srv.call(req).map(move |res: Result<ServiceResponse, _>|
+				srv.call(req).map(move |res: Result<ServiceResponse, _>| {
 					if force_https && !secure {
 						Ok(ServiceResponse::new(
 							res.unwrap().request().to_owned(),
@@ -62,16 +78,30 @@ async fn main() -> std::io::Result<()> {
 					} else {
 						res
 					}
-				)
+				})
 			})
 			// Append trailing slash and remove double slashes
 			.wrap(middleware::NormalizePath::default())
+			// Apply default headers for security
+			.wrap(
+				middleware::DefaultHeaders::new()
+					.header("Referrer-Policy", "no-referrer")
+					.header("X-Content-Type-Options", "nosniff")
+					.header("X-Frame-Options", "DENY")
+					.header(
+						"Content-Security-Policy",
+						"default-src 'none'; manifest-src 'self'; media-src 'self'; style-src 'self' 'unsafe-inline'; base-uri 'none'; img-src 'self' data:; form-action 'self'; frame-ancestors 'none';",
+					),
+			)
 			// Default service in case no routes match
 			.default_service(web::get().to(|| utils::error("Nothing here".to_string())))
 			// Read static files
 			.route("/style.css/", web::get().to(style))
 			.route("/favicon.ico/", web::get().to(favicon))
 			.route("/robots.txt/", web::get().to(robots))
+			.route("/manifest.json/", web::get().to(manifest))
+			.route("/logo.png/", web::get().to(pwa_logo))
+			.route("/touch-icon-iphone.png/", web::get().to(iphone_logo))
 			// Proxy media through Libreddit
 			.route("/proxy/{url:.*}/", web::get().to(proxy::handler))
 			// Browse user profile
@@ -92,6 +122,8 @@ async fn main() -> std::io::Result<()> {
 					// See posts and info about subreddit
 					.route("/", web::get().to(subreddit::page))
 					.route("/{sort:hot|new|top|rising|controversial}/", web::get().to(subreddit::page))
+					// Handle subscribe/unsubscribe
+					.route("/{action:subscribe|unsubscribe}/", web::post().to(subreddit::subscriptions))
 					// View post on subreddit
 					.service(
 						web::scope("/comments/{id}/{title}")
