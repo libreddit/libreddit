@@ -644,6 +644,11 @@ img.post_media {
 	grid-area: post_media;
 }
 
+.post .__NoScript_PlaceHolder__ {
+		max-width: calc(100% - 40px);
+		grid-area: post_media;
+}
+
 .post_body {
 	opacity: 0.9;
 	font-weight: normal;
