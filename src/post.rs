@@ -155,8 +155,6 @@ async fn parse_comments(json: &serde_json::Value) -> Vec<Comment> {
 			Vec::new()
 		};
 
-		dbg!();
-
 		comments.push(Comment {
 			id: val(&comment, "id"),
 			body,
