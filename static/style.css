@@ -722,6 +722,10 @@ img.post_media {
 	align-self: end;
 }
 
+.post_thumbnail img {
+	max-width: 100%;	
+}
+
 .stickied {
 	--accent: var(--green);
 	border: 1px solid var(--green);
