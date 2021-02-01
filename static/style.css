@@ -633,6 +633,11 @@ a.search_subreddit:hover {
 	width: auto;
 }
 
+img.post_media {
+	max-width: 100%;
+	width: auto;
+}
+
 #post_url {
 	color: var(--accent);
 	margin: 5px 20px;
