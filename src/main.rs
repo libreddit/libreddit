@@ -19,6 +19,21 @@ async fn style() -> HttpResponse {
 	HttpResponse::Ok().content_type("text/css").body(include_str!("../static/style.css"))
 }
 
+// Required for creating a PWA
+async fn manifest() -> HttpResponse {
+	HttpResponse::Ok().content_type("application/json").body(include_str!("../static/manifest.json"))
+}
+
+// Required for the manifest to be valid
+async fn pwa_logo() -> HttpResponse {
+	HttpResponse::Ok().content_type("image/png").body(include_bytes!("../static/logo.png").as_ref())
+}
+
+// Required for iOS App Icons
+async fn iphone_logo() -> HttpResponse {
+	HttpResponse::Ok().content_type("image/png").body(include_bytes!("../static/touch-icon-iphone.png").as_ref())
+}
+
 async fn robots() -> HttpResponse {
 	HttpResponse::Ok()
 		.header("Cache-Control", "public, max-age=1209600, s-maxage=86400")
@@ -75,7 +90,7 @@ async fn main() -> std::io::Result<()> {
 					.header("X-Frame-Options", "DENY")
 					.header(
 						"Content-Security-Policy",
-						"default-src 'none'; media-src 'self'; style-src 'self' 'unsafe-inline'; base-uri 'none'; img-src 'self' data:; form-action 'self'; frame-ancestors 'none';",
+						"default-src 'none'; manifest-src 'self'; media-src 'self'; style-src 'self' 'unsafe-inline'; base-uri 'none'; img-src 'self' data:; form-action 'self'; frame-ancestors 'none';",
 					),
 			)
 			// Default service in case no routes match
@@ -84,6 +99,9 @@ async fn main() -> std::io::Result<()> {
 			.route("/style.css/", web::get().to(style))
 			.route("/favicon.ico/", web::get().to(favicon))
 			.route("/robots.txt/", web::get().to(robots))
+			.route("/manifest.json/", web::get().to(manifest))
+			.route("/logo.png/", web::get().to(pwa_logo))
+			.route("/touch-icon-iphone.png/", web::get().to(iphone_logo))
 			// Proxy media through Libreddit
 			.route("/proxy/{url:.*}/", web::get().to(proxy::handler))
 			// Browse user profile
