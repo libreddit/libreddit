@@ -80,6 +80,9 @@
 					{% else %}
 					<svg width="{{ post.thumbnail.width }}px" height="{{ post.thumbnail.height }}px" xmlns="http://www.w3.org/2000/svg">
 						<image width="100%" height="100%" href="{{ post.thumbnail.url }}"/>
+						<desc>
+							<img alt="Thumbnail" src="{{ post.thumbnail.url }}"/>
+						</desc>
 					</svg>
 					{% endif %}
 					<span>{% if post.post_type == "link" %}{{ post.domain }}{% else %}{{ post.post_type }}{% endif %}</span>
