@@ -145,7 +145,7 @@ pub fn prefs(req: HttpRequest) -> Preferences {
 		wide: cookie(&req, "wide"),
 		show_nsfw: cookie(&req, "show_nsfw"),
 		comment_sort: cookie(&req, "comment_sort"),
-		subs: cookie(&req, "subscriptions").split('+').map(String::from).filter(|s| s != "").collect(),
+		subs: cookie(&req, "subscriptions").split('+').map(String::from).filter(|s| !s.is_empty()).collect(),
 	}
 }
 
@@ -343,7 +343,11 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 				},
 				distinguished: val(post, "distinguished"),
 			},
-			score: format_num(score),
+			score: if post["data"]["hide_score"].as_bool().unwrap_or_default() {
+				"•".to_string()
+			} else {
+				format_num(score)
+			},
 			upvote_ratio: ratio as i64,
 			post_type,
 			thumbnail: Media {
