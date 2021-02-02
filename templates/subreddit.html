@@ -59,7 +59,7 @@
 				</p>
 				<!-- POST MEDIA/THUMBNAIL -->
 				{% if (prefs.layout.is_empty() || prefs.layout == "card") && post.post_type == "image" %}
-				<a href="{{ post.media.url }}" style="display:contents" >
+				<a href="{{ post.media.url }}" class="post_media_wrapper" >
 					<svg class="post_media {% if post.media.height /  post.media.width < 2 %}short{% endif %}" 
 						width="{{ post.media.width }}px" 
 						height="{{ post.media.height }}px" 
