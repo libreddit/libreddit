@@ -635,6 +635,13 @@ a.search_subreddit:hover {
 	background-repeat: no-repeat;
 }
 
+.post_media_wrapper {
+	display: contents;
+	/* Fallback for browsers insufficiently supporting "display: contents"*/
+	grid-area: post_media;
+	text-align: center;
+}
+
 .post_media.short {
 	max-height: 512px;
 	width: auto;
