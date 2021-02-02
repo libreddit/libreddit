@@ -637,7 +637,7 @@ a.search_subreddit:hover {
 
 .post_media_wrapper {
 	display: contents;
-	/* Fallback for browsers insufficiently supporting "display: contents"*/
+	/* Fallback for browsers with faulty "display: contents" support */
 	grid-area: post_media;
 	text-align: center;
 }
