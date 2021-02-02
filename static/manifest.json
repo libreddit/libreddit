@@ -2,9 +2,9 @@
     "name": "Libreddit",
     "short_name": "Libreddit",
     "display": "standalone",
-    "background_color": "#2A3443",
+    "background_color": "#1F1F1F",
     "description": "An alternative private front-end to Reddit",
-    "theme_color": "#2A3443",
+    "theme_color": "#1F1F1F",
     "icons": [
       {
         "src": "./logo.png",
