@@ -286,9 +286,9 @@ aside {
 	background-color: var(--highlighted);
 }
 
-/* Subscribed subreddit list */
+/* Feeds */
 
-#subscriptions {
+#feeds {
 	position: relative;
 	border-radius: 5px;
 	border: var(--panel-border);
@@ -299,11 +299,11 @@ aside {
 	display: inline-block;
 }
 
-#subscriptions > summary {
+#feeds > summary {
 	padding: 8px 15px;
 }
 
-#sub_list {
+#feed_list {
 	position: absolute;
 	display: flex;
 	min-width: 100%;
@@ -315,17 +315,24 @@ aside {
 	z-index: 1;
 }
 
-#sub_list > a {
+#feed_list > p {
+	font-size: 13px;
+	opacity: 0.5;
+	padding: 5px 20px;
+	margin-top: 10px;
+}
+
+#feed_list > a {
 	padding: 10px 20px;
 	transition: 0.2s background;
 }
 
-#sub_list > .selected {
+#feed_list > .selected {
 	background-color: var(--accent);
 	color: var(--foreground);
 }
 
-#sub_list > a:not(.selected):hover {
+#feed_list > a:not(.selected):hover {
 	background-color: var(--foreground);
 }
 

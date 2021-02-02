@@ -134,7 +134,7 @@ async fn main() -> std::io::Result<()> {
 					.route("/search/", web::get().to(search::find))
 					// View wiki of subreddit
 					.service(
-						web::scope("/wiki")
+						web::scope("/{scope:wiki|w}")
 							.route("/", web::get().to(subreddit::wiki))
 							.route("/{page}/", web::get().to(subreddit::wiki)),
 					),
