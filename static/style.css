@@ -622,45 +622,35 @@ a.search_subreddit:hover {
 	font-weight: bold;
 }
 
-.post_media {
+.post_media_image, .post .__NoScript_PlaceHolder__, .post_media_video  {
 	max-width: calc(100% - 40px);
+	grid-area: post_media;
+	margin: 15px auto 5px auto;
+}
+
+.post_media_image.short svg, .post_media_image.short img{
+	max-height: 512px;
+	width: auto;
+}
+
+.post_media_image svg{
+	max-width: 100%;
 	height: auto;
 	align-self: center;
-	margin-top: 15px;
-	margin: 5px auto;
-	grid-area: post_media;
 	background-color: var(--highlighted);
 	background-image: url("data:image/svg+xml;utf8,<svg viewBox='0 0 100 100' width='100' height='100' xmlns='http://www.w3.org/2000/svg'><path d='M15,20 h70 a10,10 0 0 1 10,10 v45 a10,10 0 0 1 -10,10 h-70 a10,10 0 0 1 -10,-10 v-45 a10,10 0 0 1 10,-10 z' fill='none' stroke='rgba(128,128,128,0.5)' stroke-width='3' /><path d='M15,75 l25,-35 l15,20 l10,-10 l20, 25 z' stroke='none' fill='rgba(128,128,128,0.5)' /><circle cx='75' cy='35' r='7' stroke='none' fill='rgba(128,128,128,0.5)'/></svg>");
 	background-position: 50%;
 	background-repeat: no-repeat;
 }
 
-.post_media_wrapper {
-	display: contents;
-	/* Fallback for browsers insufficiently supporting "display: contents"*/
-	grid-area: post_media;
-	text-align: center;
-}
-
-.post_media.short {
-	max-height: 512px;
-	width: auto;
-}
-
-img.post_media {
+.post_media_image img {
 	max-width: 100%;
-	width: auto;
 }
 
 #post_url {
 	color: var(--accent);
 	margin: 5px 20px;
 	grid-area: post_media;
-}
-
-.post .__NoScript_PlaceHolder__ {
-		max-width: calc(100% - 40px);
-		grid-area: post_media;
 }
 
 .post_body {

@@ -65,19 +65,19 @@
 
 			<!-- POST MEDIA -->
 			{% if post.post_type == "image" %}
-			<a href="{{ post.media.url }}" class="post_media_wrapper" >
-				<svg class="post_media" 
+			<a href="{{ post.media.url }}" class="post_media_image" >
+				<svg
 					width="{{ post.media.width }}px" 
 					height="{{ post.media.height }}px" 
 					xmlns="http://www.w3.org/2000/svg">
 						<image width="100%" height="100%" href="{{ post.media.url }}"/>
 						<desc>
-							<img class="post_media" alt="Post image" src="{{ post.media.url }}"/>
+							<img alt="Post image" src="{{ post.media.url }}"/>
 						</desc>
 				</svg>
 			</a>
 			{% else if post.post_type == "video" || post.post_type == "gif" %}
-			<video class="post_media" src="{{ post.media.url }}" controls autoplay loop></video>
+			<video class="post_media_video" src="{{ post.media.url }}" controls autoplay loop></video>
 			{% else if post.post_type == "link" %}
 			<a id="post_url" href="{{ post.media.url }}">{{ post.media.url }}</a>
 			{% endif %}
