@@ -1,24 +1,26 @@
 // Import Crates
-use tide::{Middleware, Next, Request, Response};
+// use askama::filters::format;
 use surf::utils::async_trait;
+use tide::{utils::After, Middleware, Next, Request, Response};
 
 // Reference local files
 mod post;
 mod proxy;
 // mod search;
 // mod settings;
-// mod subreddit;
+mod subreddit;
 // mod user;
 mod utils;
 
 // Build middleware
 struct HttpsRedirect<HttpsOnly>(HttpsOnly);
+struct NormalizePath;
 
 #[async_trait]
 impl<State, HttpsOnly> Middleware<State> for HttpsRedirect<HttpsOnly>
 where
-	State: Clone + Send + Sync + 'static, 
-	HttpsOnly: Into<bool> + Copy + Send + Sync + 'static
+	State: Clone + Send + Sync + 'static,
+	HttpsOnly: Into<bool> + Copy + Send + Sync + 'static,
 {
 	async fn handle(&self, request: Request<State>, next: Next<'_, State>) -> tide::Result {
 		let secure = request.url().scheme() == "https";
@@ -27,9 +29,18 @@ where
 			let mut secured = request.url().to_owned();
 			secured.set_scheme("https").unwrap_or_default();
 
-			Ok(Response::builder(302)
-				.header("Location", secured.to_string())
-				.build())
+			Ok(Response::builder(302).header("Location", secured.to_string()).build())
+		} else {
+			Ok(next.run(request).await)
+		}
+	}
+}
+
+#[async_trait]
+impl<State: Clone + Send + Sync + 'static> Middleware<State> for NormalizePath {
+	async fn handle(&self, request: Request<State>, next: Next<'_, State>) -> tide::Result {
+		if !request.url().path().ends_with("/") {
+			Ok(Response::builder(301).header("Location", format!("{}/", request.url().path())).build())
 		} else {
 			Ok(next.run(request).await)
 		}
@@ -42,19 +53,23 @@ async fn style(_req: Request<()>) -> tide::Result {
 }
 
 async fn robots(_req: Request<()>) -> tide::Result {
-	Ok(Response::builder(200)
-		.content_type("text/plain")
-		.header("Cache-Control", "public, max-age=1209600, s-maxage=86400")
-		.body("User-agent: *\nAllow: /")
-		.build())
+	Ok(
+		Response::builder(200)
+			.content_type("text/plain")
+			.header("Cache-Control", "public, max-age=1209600, s-maxage=86400")
+			.body("User-agent: *\nAllow: /")
+			.build(),
+	)
 }
 
 async fn favicon(_req: Request<()>) -> tide::Result {
-	Ok(Response::builder(200)
-		.content_type("image/vnd.microsoft.icon")
-		.header("Cache-Control", "public, max-age=1209600, s-maxage=86400")
-		.body(include_bytes!("../static/favicon.ico").as_ref())
-		.build())
+	Ok(
+		Response::builder(200)
+			.content_type("image/vnd.microsoft.icon")
+			.header("Cache-Control", "public, max-age=1209600, s-maxage=86400")
+			.body(include_bytes!("../static/favicon.ico").as_ref())
+			.build(),
+	)
 }
 
 #[async_std::main]
@@ -79,23 +94,35 @@ async fn main() -> tide::Result<()> {
 
 	// Append trailing slash and remove double slashes
 	// .wrap(middleware::NormalizePath::default())
+	app.with(NormalizePath);
+
+	// Apply default headers for security
+	app.with(After(|mut res: Response| async move {
+		res.insert_header("Referrer-Policy", "no-referrer");
+		res.insert_header("X-Content-Type-Options", "nosniff");
+		res.insert_header("X-Frame-Options", "DENY");
+		res.insert_header(
+			"Content-Security-Policy",
+			"default-src 'none'; manifest-src 'self'; media-src 'self'; style-src 'self' 'unsafe-inline'; base-uri 'none'; img-src 'self' data:; form-action 'self'; frame-ancestors 'none';",
+		);
+		Ok(res)
+	}));
 
 	// Default service in case no routes match
 	// .default_service(web::get().to(|| utils::error("Nothing here".to_string())))
-	
-	
+
 	// Read static files
 	// .route("/style.css/", web::get().to(style))
 	// .route("/favicon.ico/", web::get().to(favicon))
 	// .route("/robots.txt/", web::get().to(robots))
-	app.at("/style.css").get(style);
-	app.at("/favicon.ico").get(favicon);
-	app.at("/robots.txt").get(robots);
-	
+	app.at("/style.css/").get(style);
+	app.at("/favicon.ico/").get(favicon);
+	app.at("/robots.txt/").get(robots);
+
 	// Proxy media through Libreddit
 	// .route("/proxy/{url:.*}/", web::get().to(proxy::handler))
-	app.at("/proxy/*url").get(proxy::handler);
-	
+	app.at("/proxy/*url/").get(proxy::handler);
+
 	// Browse user profile
 	// .service(
 	// 	web::scope("/{scope:user|u}").service(
@@ -107,13 +134,13 @@ async fn main() -> tide::Result<()> {
 	// 	),
 	// )
 	// app.at("/user/:name").get(user::profile);
-	app.at("/user/:name/comments/:id/:title").get(post::item);
-	app.at("/user/:name/comments/:id/:title/:comment").get(post::item);
-	
+	app.at("/user/:name/comments/:id/:title/").get(post::item);
+	app.at("/user/:name/comments/:id/:title/:comment/").get(post::item);
+
 	// Configure settings
 	// .service(web::resource("/settings/").route(web::get().to(settings::get)).route(web::post().to(settings::set)))
 	// app.at("/settings").get(settings::get).post(settings::set);
-	
+
 	// Subreddit services
 	// .service(
 	// 	web::scope("/r/{sub}")
@@ -135,24 +162,42 @@ async fn main() -> tide::Result<()> {
 	// 				.route("/{page}/", web::get().to(subreddit::wiki)),
 	// 		),
 	// )
-	
+	app.at("/r/:sub/").nest({
+		let mut sub = tide::new();
+		sub.at("").get(subreddit::item);
+
+		sub.at("comments/:id/:title/").get(post::item);
+		sub.at("comments/:id/:title/:comment_id/").get(post::item);
+
+		sub.at("wiki/").get(subreddit::wiki);
+		sub.at("wiki/:page/").get(subreddit::wiki);
+		sub
+	});
+
 	// Front page
 	// .route("/", web::get().to(subreddit::page))
 	// .route("/{sort:best|hot|new|top|rising|controversial}/", web::get().to(subreddit::page))
-	
+
 	// View Reddit wiki
 	// .service(
 	// 	web::scope("/wiki")
 	// 		.route("/", web::get().to(subreddit::wiki))
 	// 		.route("/{page}/", web::get().to(subreddit::wiki)),
 	// )
-	
+	app.at("/r/:sub/").nest({
+		let mut wiki = tide::new();
+		wiki.at("wiki/").get(subreddit::wiki);
+		wiki.at("wiki/:page/").get(subreddit::wiki);
+		wiki
+	});	
+
 	// Search all of Reddit
 	// .route("/search/", web::get().to(search::find))
-	
+
 	// Short link for post
 	// .route("/{id:.{5,6}}/", web::get().to(post::item))
-	app.at("/:id").get(post::item);
+	app.at("/:id/").get(post::item);
+
 	app.listen("127.0.0.1:8080").await?;
 	Ok(())
 }

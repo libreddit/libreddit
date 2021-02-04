@@ -1,7 +1,7 @@
 // CRATES
 use crate::utils::*;
-use actix_web::{HttpRequest, HttpResponse, Result};
 use askama::Template;
+use tide::{Request, Response};
 
 // STRUCTS
 #[derive(Template)]
@@ -24,15 +24,16 @@ struct WikiTemplate {
 }
 
 // SERVICES
-pub async fn page(req: HttpRequest) -> HttpResponse {
-	let path = format!("{}.json?{}", req.path(), req.query_string());
+pub async fn item(req: Request<()>) -> tide::Result {
+	// Build Reddit API path
+	let path: String = format!("{}.json?{}&raw_json=1", req.url().path(), req.url().query().unwrap_or_default());
+
+	// Set sort to sort query parameter
+	let Params { sort, .. } = req.query().unwrap_or_default();
+	let sort: String = sort.unwrap_or_default();
+
 	let default = cookie(&req, "front_page");
-	let sub_name = req
-		.match_info()
-		.get("sub")
-		.unwrap_or(if default.is_empty() { "popular" } else { default.as_str() })
-		.to_string();
-	let sort = req.match_info().get("sort").unwrap_or("hot").to_string();
+	let sub_name = req.param("sub").unwrap_or(if default.is_empty() { "popular" } else { default.as_str() }).to_string();
 
 	match fetch_posts(&path, String::new()).await {
 		Ok((posts, after)) => {
@@ -57,15 +58,16 @@ pub async fn page(req: HttpRequest) -> HttpResponse {
 			}
 			.render()
 			.unwrap();
-			HttpResponse::Ok().content_type("text/html").body(s)
+
+			Ok(Response::builder(200).content_type("text/html").body(s).build())
 		}
 		Err(msg) => error(msg).await,
 	}
 }
 
-pub async fn wiki(req: HttpRequest) -> HttpResponse {
-	let sub = req.match_info().get("sub").unwrap_or("reddit.com").to_string();
-	let page = req.match_info().get("page").unwrap_or("index").to_string();
+pub async fn wiki(req: Request<()>) -> tide::Result {
+	let sub = req.param("sub").unwrap_or("reddit.com").to_string();
+	let page = req.param("page").unwrap_or("index").to_string();
 	let path: String = format!("/r/{}/wiki/{}.json?raw_json=1", sub, page);
 
 	match request(path).await {
@@ -78,7 +80,8 @@ pub async fn wiki(req: HttpRequest) -> HttpResponse {
 			}
 			.render()
 			.unwrap();
-			HttpResponse::Ok().content_type("text/html").body(s)
+
+			Ok(Response::builder(200).content_type("text/html").body(s).build())
 		}
 		Err(msg) => error(msg).await,
 	}

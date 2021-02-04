@@ -1,15 +1,15 @@
 //
 // CRATES
 //
-use tide::{Request, Response};
 use askama::Template;
 use base64::encode;
+use cached::proc_macro::cached;
 use regex::Regex;
 use serde_json::{from_str, Value};
 use std::collections::HashMap;
+use tide::{http::Cookie, Request, Response};
 use time::{Duration, OffsetDateTime};
 use url::Url;
-use cached::proc_macro::cached;
 
 //
 // STRUCTS
@@ -158,7 +158,8 @@ pub fn param(path: &str, value: &str) -> String {
 // Parse Cookie value from request
 pub fn cookie(req: &Request<()>, name: &str) -> String {
 	// actix_web::HttpMessage::cookie(req, name).unwrap_or_else(|| Cookie::new(name, "")).value().to_string()
-	String::new()
+	let cookie = req.cookie(name).unwrap_or(Cookie::named(name));
+	cookie.value().to_string()
 }
 
 // Direct urls to proxy if proxy is enabled
@@ -395,7 +396,7 @@ pub async fn error(msg: String) -> tide::Result {
 }
 
 // Make a request to a Reddit API and parse the JSON response
-#[cached(size=100,time=60, result = true)]
+#[cached(size = 100, time = 60, result = true)]
 pub async fn request(path: String) -> Result<Value, String> {
 	let url = format!("https://www.reddit.com{}", path);
 	let user_agent = format!("web:libreddit:{}", env!("CARGO_PKG_VERSION"));
@@ -457,43 +458,26 @@ pub async fn request(path: String) -> Result<Value, String> {
 	// }
 
 	// Send request using surf
-	dbg!(&url);
-	let req = surf::get(&url);
-	// let req = surf::get(&url).header("User-Agent", user_agent.as_str());
-	dbg!(2);
-	// let client = surf::client();
+	let req = surf::get(&url).header("User-Agent", user_agent.as_str());
 	let client = surf::client().with(surf::middleware::Redirect::new(5));
 
-	// let json: Value = client.recv_json(req).await.unwrap_or_default();
-
-	dbg!(3);
 	let res = client.send(req).await;
 
-	dbg!(4);
 	let body = res.unwrap().take_body().into_string().await;
 
-	dbg!(5);
 	match body {
 		// If response is success
 		Ok(response) => {
 			// Parse the response from Reddit as JSON
 			match from_str(&response) {
-				Ok(json) => { dbg!(&json); Ok(json) },
+				Ok(json) => Ok(json),
 				Err(_) => {
-					dbg!(response);
-
 					#[cfg(debug_assertions)]
 					dbg!(format!("{} - Failed to parse page JSON data", url));
 					Err("Failed to parse page JSON data".to_string())
 				}
 			}
 		}
-		// If response is error
-		// Err(e) => {
-		// 	#[cfg(debug_assertions)]
-		// 	dbg!(format!("{} - Page not found", url));
-		// 	Err("Page not found".to_string())
-		// }
 		// If failed to send request
 		Err(_e) => {
 			#[cfg(debug_assertions)]

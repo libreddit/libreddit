@@ -1,7 +1,7 @@
 // CRATES
 use crate::utils::*;
-use tide::{Body, Request, Response, http::Cookie};
 use askama::Template;
+use tide::{Request, Response};
 
 // STRUCTS
 #[derive(Template)]
@@ -16,17 +16,17 @@ struct PostTemplate {
 pub async fn item(req: Request<()>) -> tide::Result {
 	// Build Reddit API path
 	let mut path: String = format!("{}.json?{}&raw_json=1", req.url().path(), req.url().query().unwrap_or_default());
-	
-	// // Set sort to sort query parameter
+
+	// Set sort to sort query parameter
 	let Params { sort, .. } = req.query().unwrap_or_default();
 	let mut sort: String = sort.unwrap_or_default();
 
 	// // Grab default comment sort method from Cookies
-	let default_sort = req.cookie("comment_sort").unwrap_or(Cookie::named("comment_sort"));
+	let default_sort = cookie(&req, "comment_sort");
 
 	// // If there's no sort query but there's a default sort, set sort to default_sort
-	if sort.is_empty() && !default_sort.value().is_empty() {
-		sort = default_sort.value().to_string();
+	if sort.is_empty() && !default_sort.is_empty() {
+		sort = default_sort;
 		path = format!("{}&sort={}", path, sort);
 	}
 
