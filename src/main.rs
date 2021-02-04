@@ -162,13 +162,17 @@ async fn main() -> tide::Result<()> {
 	app.at("/r/:sub/").get(subreddit::item);
 	app.at("/r/:sub/comments/:id/:title/").get(post::item);
 	app.at("/r/:sub/comments/:id/:title/:comment_id/").get(post::item);
-
+	
 	app.at("/r/:sub/wiki/").get(subreddit::wiki);
 	app.at("/r/:sub/wiki/:page/").get(subreddit::wiki);
+
+	app.at("/r/:sub/:sort/").get(subreddit::item);
 
 	// Front page
 	// .route("/", web::get().to(subreddit::page))
 	// .route("/{sort:best|hot|new|top|rising|controversial}/", web::get().to(subreddit::page))
+	app.at("/").get(subreddit::item);
+	// app.at("/:sort").get(subreddit::item);
 
 	// View Reddit wiki
 	// .service(

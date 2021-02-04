@@ -26,23 +26,42 @@ struct WikiTemplate {
 // SERVICES
 pub async fn item(req: Request<()>) -> tide::Result {
 	// Build Reddit API path
-	let path: String = format!("{}.json?{}&raw_json=1", req.url().path(), req.url().query().unwrap_or_default());
+	let subscribed = cookie(&req, "subscriptions");
+	let front_page = cookie(&req, "front_page");
+	let sort = req.param("sort").unwrap_or("hot").to_string();
 
-	// Set sort to sort query parameter
-	let Params { sort, .. } = req.query().unwrap_or_default();
-	let sort: String = sort.unwrap_or_default();
+	let sub = req
+		.param("sub")
+		.map(String::from)
+		.unwrap_or(if front_page == "default" || front_page.is_empty() {
+			if subscribed.is_empty() {
+				"popular".to_string()
+			} else {
+				subscribed.to_owned()
+			}
+		} else {
+			front_page.to_owned()
+		});
 
-	let default = cookie(&req, "front_page");
-	let sub_name = req.param("sub").unwrap_or(if default.is_empty() { "popular" } else { default.as_str() }).to_string();
+	let path = format!("/r/{}/{}.json?{}", sub, sort, req.url().query().unwrap_or_default());
 
 	match fetch_posts(&path, String::new()).await {
 		Ok((posts, after)) => {
 			// If you can get subreddit posts, also request subreddit metadata
-			let sub = if !sub_name.contains('+') && sub_name != "popular" && sub_name != "all" {
-				subreddit(&sub_name).await.unwrap_or_default()
-			} else if sub_name.contains('+') {
+			let sub = if !sub.contains('+') && sub != subscribed && sub != "popular" && sub != "all" {
+				// Regular subreddit
+				subreddit(&sub).await.unwrap_or_default()
+			} else if sub == subscribed {
+				// Subscription feed
+				if req.url().path().starts_with("/r/") {
+					subreddit(&sub).await.unwrap_or_default()
+				} else {
+					Subreddit::default()
+				}
+			} else if sub.contains('+') {
+				// Multireddit
 				Subreddit {
-					name: sub_name,
+					name: sub,
 					..Subreddit::default()
 				}
 			} else {
