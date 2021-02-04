@@ -20,11 +20,11 @@
   - [Teddit Comparison](#how-does-it-compare-to-teddit)
 - [Comparison](#comparison)
 - [Installation](#installation)
-  - [Cargo](#a-cargo)
-  - [Docker](#b-docker)
-  - [AUR](#c-aur)
-  - [GitHub Releases](#d-github-releases)
-  - [Repl.it](#e-replit)
+  - [Cargo](#1-cargo)
+  - [Docker](#2-docker)
+  - [AUR](#3-aur)
+  - [GitHub Releases](#4-github-releases)
+  - [Repl.it](#5-replit)
 - [Deployment](#deployment)
 
 ---
