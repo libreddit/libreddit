@@ -108,9 +108,6 @@ async fn main() -> tide::Result<()> {
 		Ok(res)
 	}));
 
-	// Default service in case no routes match
-	// .default_service(web::get().to(|| utils::error("Nothing here".to_string())))
-
 	// Read static files
 	// .route("/style.css/", web::get().to(style))
 	// .route("/favicon.ico/", web::get().to(favicon))
@@ -162,17 +159,12 @@ async fn main() -> tide::Result<()> {
 	// 				.route("/{page}/", web::get().to(subreddit::wiki)),
 	// 		),
 	// )
-	app.at("/r/:sub/").nest({
-		let mut sub = tide::new();
-		sub.at("").get(subreddit::item);
+	app.at("/r/:sub/").get(subreddit::item);
+	app.at("/r/:sub/comments/:id/:title/").get(post::item);
+	app.at("/r/:sub/comments/:id/:title/:comment_id/").get(post::item);
 
-		sub.at("comments/:id/:title/").get(post::item);
-		sub.at("comments/:id/:title/:comment_id/").get(post::item);
-
-		sub.at("wiki/").get(subreddit::wiki);
-		sub.at("wiki/:page/").get(subreddit::wiki);
-		sub
-	});
+	app.at("/r/:sub/wiki/").get(subreddit::wiki);
+	app.at("/r/:sub/wiki/:page/").get(subreddit::wiki);
 
 	// Front page
 	// .route("/", web::get().to(subreddit::page))
@@ -184,19 +176,19 @@ async fn main() -> tide::Result<()> {
 	// 		.route("/", web::get().to(subreddit::wiki))
 	// 		.route("/{page}/", web::get().to(subreddit::wiki)),
 	// )
-	app.at("/r/:sub/").nest({
-		let mut wiki = tide::new();
-		wiki.at("wiki/").get(subreddit::wiki);
-		wiki.at("wiki/:page/").get(subreddit::wiki);
-		wiki
-	});	
-
+	app.at("/wiki/").get(subreddit::wiki);
+	app.at("/wiki/:page/").get(subreddit::wiki);
+	
 	// Search all of Reddit
 	// .route("/search/", web::get().to(search::find))
 
 	// Short link for post
 	// .route("/{id:.{5,6}}/", web::get().to(post::item))
 	app.at("/:id/").get(post::item);
+
+	// Default service in case no routes match
+	// .default_service(web::get().to(|| utils::error("Nothing here".to_string())))
+	// app.at("*").get(|req| async { Err("boo") });
 
 	app.listen("127.0.0.1:8080").await?;
 	Ok(())
