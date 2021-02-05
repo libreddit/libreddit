@@ -158,8 +158,11 @@ async fn main() -> tide::Result<()> {
 	// Search inside subreddit
 	app.at("/r/:sub/search/").get(search::find);
 	// View wiki of subreddit
+	app.at("/r/:sub/w/").get(subreddit::wiki);
+	app.at("/r/:sub/w/:page/").get(subreddit::wiki);
 	app.at("/r/:sub/wiki/").get(subreddit::wiki);
 	app.at("/r/:sub/wiki/:page/").get(subreddit::wiki);
+	// Sort subreddit posts
 	app.at("/r/:sub/:sort/").get(subreddit::page);
 
 	// Front page
@@ -168,6 +171,8 @@ async fn main() -> tide::Result<()> {
 	// app.at("/:sort").get(subreddit::item);
 
 	// View Reddit wiki
+	app.at("/w/").get(subreddit::wiki);
+	app.at("/w/:page/").get(subreddit::wiki);
 	app.at("/wiki/").get(subreddit::wiki);
 	app.at("/wiki/:page/").get(subreddit::wiki);
 	
