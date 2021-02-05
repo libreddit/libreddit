@@ -402,7 +402,7 @@ pub async fn error(msg: String) -> tide::Result {
 }
 
 // Make a request to a Reddit API and parse the JSON response
-#[cached(size = 100, time = 30, result = true)]
+#[cached(size = 100, time = 45, result = true)]
 pub async fn request(path: String) -> Result<Value, String> {
 	let url = format!("https://www.reddit.com{}", path);
 	// Build reddit-compliant user agent for Libreddit
@@ -422,17 +422,15 @@ pub async fn request(path: String) -> Result<Value, String> {
 			// Parse the response from Reddit as JSON
 			match from_str(&response) {
 				Ok(json) => Ok(json),
-				Err(_) => {
-					#[cfg(debug_assertions)]
-					dbg!(format!("{} - Failed to parse page JSON data", url));
+				Err(e) => {
+					println!("{} - Failed to parse page JSON data: {}", url, e);
 					Err("Failed to parse page JSON data".to_string())
 				}
 			}
 		}
 		// If failed to send request
-		Err(_e) => {
-			#[cfg(debug_assertions)]
-			dbg!(format!("{} - {}", url, _e));
+		Err(e) => {
+			println!("{} - Couldn't send request to Reddit: {}", url, e);
 			Err("Couldn't send request to Reddit".to_string())
 		}
 	}
