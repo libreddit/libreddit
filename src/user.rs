@@ -1,6 +1,6 @@
 // CRATES
 use crate::utils::{error, fetch_posts, format_url, param, prefs, request, Post, Preferences, User};
-use actix_web::{HttpRequest, HttpResponse, Result};
+use tide::{Request, Response};
 use askama::Template;
 use time::OffsetDateTime;
 
@@ -16,13 +16,13 @@ struct UserTemplate {
 }
 
 // FUNCTIONS
-pub async fn profile(req: HttpRequest) -> HttpResponse {
+pub async fn profile(req: Request<()>) -> tide::Result {
 	// Build the Reddit JSON API path
-	let path = format!("{}.json?{}&raw_json=1", req.path(), req.query_string());
+	let path = format!("{}.json?{}&raw_json=1", req.url().path(), req.url().query().unwrap_or_default());
 
 	// Retrieve other variables from Libreddit request
 	let sort = param(&path, "sort");
-	let username = req.match_info().get("username").unwrap_or("").to_string();
+	let username = req.param("name").unwrap_or("").to_string();
 
 	// Request user posts/comments from Reddit
 	let posts = fetch_posts(&path, "Comment".to_string()).await;
@@ -41,7 +41,7 @@ pub async fn profile(req: HttpRequest) -> HttpResponse {
 			}
 			.render()
 			.unwrap();
-			HttpResponse::Ok().content_type("text/html").body(s)
+			Ok(Response::builder(200).content_type("text/html").body(s).build())
 		}
 		// If there is an error show error page
 		Err(msg) => error(msg).await,
@@ -51,7 +51,7 @@ pub async fn profile(req: HttpRequest) -> HttpResponse {
 // USER
 async fn user(name: &str) -> Result<User, String> {
 	// Build the Reddit JSON API path
-	let path: String = format!("/user/{}/about.json", name);
+	let path: String = format!("/user/{}/about.json?raw_json=1", name);
 
 	// Send a request to the url
 	match request(path).await {

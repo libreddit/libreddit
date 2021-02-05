@@ -7,9 +7,8 @@ use cached::proc_macro::cached;
 use regex::Regex;
 use serde_json::{from_str, Value};
 use std::collections::HashMap;
-use tide::{http::Cookie, Request, Response};
+use tide::{http::Cookie, Request, Response, http::url::Url};
 use time::{Duration, OffsetDateTime};
-use url::Url;
 
 //
 // STRUCTS
@@ -104,7 +103,7 @@ pub struct Subreddit {
 }
 
 // Parser for query params, used in sorting (eg. /r/rust/?sort=hot)
-#[derive(serde::Deserialize, Default)]
+#[derive(serde::Deserialize)]
 pub struct Params {
 	pub t: Option<String>,
 	pub q: Option<String>,
@@ -127,8 +126,9 @@ pub struct Preferences {
 	pub front_page: String,
 	pub layout: String,
 	pub wide: String,
-	pub hide_nsfw: String,
+	pub show_nsfw: String,
 	pub comment_sort: String,
+	pub subs: Vec<String>,
 }
 
 //
@@ -142,8 +142,9 @@ pub fn prefs(req: Request<()>) -> Preferences {
 		front_page: cookie(&req, "front_page"),
 		layout: cookie(&req, "layout"),
 		wide: cookie(&req, "wide"),
-		hide_nsfw: cookie(&req, "hide_nsfw"),
+		show_nsfw: cookie(&req, "show_nsfw"),
 		comment_sort: cookie(&req, "comment_sort"),
+		subs: cookie(&req, "subscriptions").split('+').map(String::from).filter(|s| !s.is_empty()).collect(),
 	}
 }
 
@@ -162,18 +163,19 @@ pub fn cookie(req: &Request<()>, name: &str) -> String {
 	cookie.value().to_string()
 }
 
+
 // Direct urls to proxy if proxy is enabled
 pub fn format_url(url: &str) -> String {
 	if url.is_empty() || url == "self" || url == "default" || url == "nsfw" || url == "spoiler" {
 		String::new()
 	} else {
-		format!("/proxy/{}", encode(url).as_str())
+		format!("/proxy/{}/", encode(url).as_str())
 	}
 }
 
 // Rewrite Reddit links to Libreddit in body of text
 pub fn rewrite_url(text: &str) -> String {
-	let re = Regex::new(r#"href="(https://|http://|)(www.|)(reddit).(com)/"#).unwrap();
+	let re = Regex::new(r#"href="(https://|http://|)(www.|old.|np.|)(reddit).(com)/"#).unwrap();
 	re.replace_all(text, r#"href="/"#).to_string()
 }
 
@@ -188,7 +190,7 @@ pub fn format_num(num: i64) -> String {
 	}
 }
 
-pub fn media(data: &Value) -> (String, Media) {
+pub async fn media(data: &Value) -> (String, Media) {
 	let post_type: &str;
 	// If post is a video, return the video
 	let url = if data["preview"]["reddit_video_preview"]["fallback_url"].is_string() {
@@ -323,7 +325,7 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 		let title = val(post, "title");
 
 		// Determine the type of media along with the media URL
-		let (post_type, media) = media(&post["data"]);
+		let (post_type, media) = media(&post["data"]).await;
 
 		posts.push(Post {
 			id: val(post, "id"),
@@ -343,7 +345,11 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 				},
 				distinguished: val(post, "distinguished"),
 			},
-			score: format_num(score),
+			score: if post["data"]["hide_score"].as_bool().unwrap_or_default() {
+				"•".to_string()
+			} else {
+				format_num(score)
+			},
 			upvote_ratio: ratio as i64,
 			post_type,
 			thumbnail: Media {
@@ -396,66 +402,11 @@ pub async fn error(msg: String) -> tide::Result {
 }
 
 // Make a request to a Reddit API and parse the JSON response
-#[cached(size = 100, time = 60, result = true)]
+#[cached(size = 100, time = 30, result = true)]
 pub async fn request(path: String) -> Result<Value, String> {
 	let url = format!("https://www.reddit.com{}", path);
+	// Build reddit-compliant user agent for Libreddit
 	let user_agent = format!("web:libreddit:{}", env!("CARGO_PKG_VERSION"));
-
-	// Send request using awc
-	// async fn send(url: &str) -> Result<String, (bool, String)> {
-	// 	let client = actix_web::client::Client::default();
-	// 	let response = client.get(url).header("User-Agent", format!("web:libreddit:{}", env!("CARGO_PKG_VERSION"))).send().await;
-
-	// 	match response {
-	// 		Ok(mut payload) => {
-	// 			// Get first number of response HTTP status code
-	// 			match payload.status().to_string().chars().next() {
-	// 				// If success
-	// 				Some('2') => Ok(String::from_utf8(payload.body().limit(20_000_000).await.unwrap_or_default().to_vec()).unwrap_or_default()),
-	// 				// If redirection
-	// 				Some('3') => match payload.headers().get("location") {
-	// 					Some(location) => Err((true, location.to_str().unwrap_or_default().to_string())),
-	// 					None => Err((false, "Page not found".to_string())),
-	// 				},
-	// 				// Otherwise
-	// 				_ => Err((false, "Page not found".to_string())),
-	// 			}
-	// 		}
-	// 		Err(e) => { dbg!(e); Err((false, "Couldn't send request to Reddit, this instance may be being rate-limited. Try another.".to_string())) },
-	// 	}
-	// }
-
-	// // Print error if debugging then return error based on error message
-	// fn err(url: String, msg: String) -> Result<Value, String> {
-	// 	// #[cfg(debug_assertions)]
-	// 	dbg!(format!("{} - {}", url, msg));
-	// 	Err(msg)
-	// };
-
-	// // Parse JSON from body. If parsing fails, return error
-	// fn json(url: String, body: String) -> Result<Value, String> {
-	// 	match from_str(body.as_str()) {
-	// 		Ok(json) => Ok(json),
-	// 		Err(_) => err(url, "Failed to parse page JSON data".to_string()),
-	// 	}
-	// }
-
-	// // Make request to Reddit using send function
-	// match send(&url).await {
-	// 	// If success, parse and return body
-	// 	Ok(body) => json(url, body),
-	// 	// Follow any redirects
-	// 	Err((true, location)) => match send(location.as_str()).await {
-	// 		// If success, parse and return body
-	// 		Ok(body) => json(url, body),
-	// 		// Follow any redirects again
-	// 		Err((true, location)) => err(url, location),
-	// 		// Return errors if request fails
-	// 		Err((_, msg)) => err(url, msg),
-	// 	},
-	// 	// Return errors if request fails
-	// 	Err((_, msg)) => err(url, msg),
-	// }
 
 	// Send request using surf
 	let req = surf::get(&url).header("User-Agent", user_agent.as_str());

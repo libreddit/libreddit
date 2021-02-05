@@ -1,7 +1,10 @@
 // CRATES
 use crate::utils::*;
-use askama::Template;
 use tide::{Request, Response};
+
+use async_recursion::async_recursion;
+
+use askama::Template;
 
 // STRUCTS
 #[derive(Template)]
@@ -18,16 +21,15 @@ pub async fn item(req: Request<()>) -> tide::Result {
 	let mut path: String = format!("{}.json?{}&raw_json=1", req.url().path(), req.url().query().unwrap_or_default());
 
 	// Set sort to sort query parameter
-	let Params { sort, .. } = req.query().unwrap_or_default();
-	let mut sort: String = sort.unwrap_or_default();
+	let mut sort: String = param(&path, "sort");
 
-	// // Grab default comment sort method from Cookies
+	// Grab default comment sort method from Cookies
 	let default_sort = cookie(&req, "comment_sort");
 
-	// // If there's no sort query but there's a default sort, set sort to default_sort
+	// If there's no sort query but there's a default sort, set sort to default_sort
 	if sort.is_empty() && !default_sort.is_empty() {
 		sort = default_sort;
-		path = format!("{}&sort={}", path, sort);
+		path = format!("{}.json?{}&sort={}&raw_json=1", req.url().path(), req.url().query().unwrap_or_default(), sort);
 	}
 
 	// Log the post ID being fetched in debug mode
@@ -37,10 +39,10 @@ pub async fn item(req: Request<()>) -> tide::Result {
 	// Send a request to the url, receive JSON in response
 	match request(path).await {
 		// Otherwise, grab the JSON output from the request
-		Ok(json) => {
+		Ok(res) => {
 			// Parse the JSON into Post and Comment structs
-			let post = parse_post(&json[0]);
-			let comments = parse_comments(&json[1]);
+			let post = parse_post(&res[0]).await;
+			let comments = parse_comments(&res[1]).await;
 
 			// Use the Post and Comment structs to generate a website to show users
 			let s = PostTemplate {
@@ -51,7 +53,7 @@ pub async fn item(req: Request<()>) -> tide::Result {
 			}
 			.render()
 			.unwrap();
-
+			
 			Ok(Response::builder(200).content_type("text/html").body(s).build())
 		}
 		// If the Reddit API returns an error, exit and send error page to user
@@ -60,7 +62,7 @@ pub async fn item(req: Request<()>) -> tide::Result {
 }
 
 // POSTS
-fn parse_post(json: &serde_json::Value) -> Post {
+async fn parse_post(json: &serde_json::Value) -> Post {
 	// Retrieve post (as opposed to comments) from JSON
 	let post: &serde_json::Value = &json["data"]["children"][0];
 
@@ -71,7 +73,7 @@ fn parse_post(json: &serde_json::Value) -> Post {
 	let ratio: f64 = post["data"]["upvote_ratio"].as_f64().unwrap_or(1.0) * 100.0;
 
 	// Determine the type of media along with the media URL
-	let (post_type, media) = media(&post["data"]);
+	let (post_type, media) = media(&post["data"]).await;
 
 	// Build a post using data parsed from Reddit post API
 	Post {
@@ -127,7 +129,8 @@ fn parse_post(json: &serde_json::Value) -> Post {
 }
 
 // COMMENTS
-fn parse_comments(json: &serde_json::Value) -> Vec<Comment> {
+#[async_recursion]
+async fn parse_comments(json: &serde_json::Value) -> Vec<Comment> {
 	// Separate the comment JSON into a Vector of comments
 	let comment_data = match json["data"]["children"].as_array() {
 		Some(f) => f.to_owned(),
@@ -148,7 +151,7 @@ fn parse_comments(json: &serde_json::Value) -> Vec<Comment> {
 		let body = rewrite_url(&val(&comment, "body_html"));
 
 		let replies: Vec<Comment> = if comment["data"]["replies"].is_object() {
-			parse_comments(&comment["data"]["replies"])
+			parse_comments(&comment["data"]["replies"]).await
 		} else {
 			Vec::new()
 		};
@@ -169,7 +172,11 @@ fn parse_comments(json: &serde_json::Value) -> Vec<Comment> {
 				},
 				distinguished: val(&comment, "distinguished"),
 			},
-			score: format_num(score),
+			score: if comment["data"]["score_hidden"].as_bool().unwrap_or_default() {
+				"•".to_string()
+			} else {
+				format_num(score)
+			},
 			rel_time,
 			created,
 			replies,

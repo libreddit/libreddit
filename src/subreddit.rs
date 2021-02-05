@@ -1,7 +1,8 @@
 // CRATES
 use crate::utils::*;
 use askama::Template;
-use tide::{Request, Response};
+use tide::{Request, Response, http::Cookie};
+use time::{Duration, OffsetDateTime};
 
 // STRUCTS
 #[derive(Template)]
@@ -24,7 +25,7 @@ struct WikiTemplate {
 }
 
 // SERVICES
-pub async fn item(req: Request<()>) -> tide::Result {
+pub async fn page(req: Request<()>) -> tide::Result {
 	// Build Reddit API path
 	let subscribed = cookie(&req, "subscriptions");
 	let front_page = cookie(&req, "front_page");
@@ -43,7 +44,7 @@ pub async fn item(req: Request<()>) -> tide::Result {
 			front_page.to_owned()
 		});
 
-	let path = format!("/r/{}/{}.json?{}", sub, sort, req.url().query().unwrap_or_default());
+	let path = format!("/r/{}/{}.json?{}&raw_json=1", sub, sort, req.url().query().unwrap_or_default());
 
 	match fetch_posts(&path, String::new()).await {
 		Ok((posts, after)) => {
@@ -82,6 +83,55 @@ pub async fn item(req: Request<()>) -> tide::Result {
 		}
 		Err(msg) => error(msg).await,
 	}
+}
+
+// Sub or unsub by setting subscription cookie using response "Set-Cookie" header
+pub async fn subscriptions(req: Request<()>) -> tide::Result {
+	let sub = req.param("sub").unwrap_or_default().to_string();
+	let path: String = req.url().path().to_string();
+	let action: &str = path.split("/").filter(|item| item == &"subscribe" || item == &"unsubscribe").collect::<Vec<&str>>()[0];
+	
+	let mut sub_list = prefs(req).subs;
+
+	// Modify sub list based on action
+	if action == "subscribe" && !sub_list.contains(&sub) {
+		sub_list.push(sub.to_owned());
+		sub_list.sort_by(|a, b| a.to_lowercase().cmp(&b.to_lowercase()));
+	} else if action == "unsubscribe" {
+		sub_list.retain(|s| s != &sub);
+	}
+
+	// Redirect back to subreddit
+	// check for redirect parameter if unsubscribing from outside sidebar
+	let redirect_path = param(path.as_str(), "redirect");
+	let path = if !redirect_path.is_empty() && redirect_path.starts_with('/') {
+		redirect_path
+	} else {
+		format!("/r/{}", sub)
+	};
+
+
+	let mut res = Response::builder(302)
+		.content_type("text/html")
+		.header("Location", path.to_owned())
+		.body(format!("Redirecting to <a href=\"{0}\">{0}</a>...", path))
+		.build();
+
+	// Delete cookie if empty, else set
+	if sub_list.is_empty() {
+		// res.del_cookie(&Cookie::build("subscriptions", "").path("/").finish());
+		res.remove_cookie(Cookie::build("subscriptions", "").path("/").finish());
+	} else {
+		res.insert_cookie(
+			Cookie::build("subscriptions", sub_list.join("+"))
+				.path("/")
+				.http_only(true)
+				.expires(OffsetDateTime::now_utc() + Duration::weeks(52))
+				.finish(),
+		);
+	}
+
+	Ok(res)
 }
 
 pub async fn wiki(req: Request<()>) -> tide::Result {
