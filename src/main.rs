@@ -160,7 +160,6 @@ async fn main() -> tide::Result<()> {
 	// View wiki of subreddit
 	app.at("/r/:sub/wiki/").get(subreddit::wiki);
 	app.at("/r/:sub/wiki/:page/").get(subreddit::wiki);
-	// 		.route("/{sort:hot|new|top|rising|controversial}/", web::get().to(subreddit::page))
 	app.at("/r/:sub/:sort/").get(subreddit::page);
 
 	// Front page
@@ -180,7 +179,6 @@ async fn main() -> tide::Result<()> {
 	app.at("/:id/").get(post::item);
 
 	// Default service in case no routes match
-	// .default_service(web::get().to(|| utils::error("Nothing here".to_string())))
 	app.at("*").get(|_| utils::error("Nothing here".to_string()));
 
 	app.listen("127.0.0.1:8080").await?;

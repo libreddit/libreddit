@@ -11,7 +11,7 @@ struct SettingsTemplate {
 	prefs: Preferences,
 }
 
-#[derive(serde::Serialize, serde::Deserialize, Default, Debug)]
+#[derive(serde::Deserialize, Default)]
 pub struct SettingsForm {
 	theme: Option<String>,
 	front_page: Option<String>,
