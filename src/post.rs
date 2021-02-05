@@ -1,6 +1,6 @@
 // CRATES
 use crate::utils::*;
-use tide::{Request, Response};
+use tide::Request;
 
 use async_recursion::async_recursion;
 
@@ -29,7 +29,12 @@ pub async fn item(req: Request<()>) -> tide::Result {
 	// If there's no sort query but there's a default sort, set sort to default_sort
 	if sort.is_empty() && !default_sort.is_empty() {
 		sort = default_sort;
-		path = format!("{}.json?{}&sort={}&raw_json=1", req.url().path(), req.url().query().unwrap_or_default(), sort);
+		path = format!(
+			"{}.json?{}&sort={}&raw_json=1",
+			req.url().path(),
+			req.url().query().unwrap_or_default(),
+			sort
+		);
 	}
 
 	// Log the post ID being fetched in debug mode
@@ -45,16 +50,12 @@ pub async fn item(req: Request<()>) -> tide::Result {
 			let comments = parse_comments(&res[1]).await;
 
 			// Use the Post and Comment structs to generate a website to show users
-			let s = PostTemplate {
+			template(PostTemplate {
 				comments,
 				post,
 				sort,
 				prefs: prefs(req),
-			}
-			.render()
-			.unwrap();
-			
-			Ok(Response::builder(200).content_type("text/html").body(s).build())
+			})
 		}
 		// If the Reddit API returns an error, exit and send error page to user
 		Err(msg) => error(msg).await,

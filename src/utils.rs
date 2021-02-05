@@ -7,7 +7,7 @@ use cached::proc_macro::cached;
 use regex::Regex;
 use serde_json::{from_str, Value};
 use std::collections::HashMap;
-use tide::{http::Cookie, Request, Response, http::url::Url};
+use tide::{http::url::Url, http::Cookie, Request, Response};
 use time::{Duration, OffsetDateTime};
 
 //
@@ -144,14 +144,24 @@ pub fn prefs(req: Request<()>) -> Preferences {
 		wide: cookie(&req, "wide"),
 		show_nsfw: cookie(&req, "show_nsfw"),
 		comment_sort: cookie(&req, "comment_sort"),
-		subs: cookie(&req, "subscriptions").split('+').map(String::from).filter(|s| !s.is_empty()).collect(),
+		subs: cookie(&req, "subscriptions")
+			.split('+')
+			.map(String::from)
+			.filter(|s| !s.is_empty())
+			.collect(),
 	}
 }
 
 // Grab a query param from a url
 pub fn param(path: &str, value: &str) -> String {
 	match Url::parse(format!("https://libredd.it/{}", path).as_str()) {
-		Ok(url) => url.query_pairs().into_owned().collect::<HashMap<_, _>>().get(value).unwrap_or(&String::new()).to_owned(),
+		Ok(url) => url
+			.query_pairs()
+			.into_owned()
+			.collect::<HashMap<_, _>>()
+			.get(value)
+			.unwrap_or(&String::new())
+			.to_owned(),
 		_ => String::new(),
 	}
 }
@@ -162,7 +172,6 @@ pub fn cookie(req: &Request<()>, name: &str) -> String {
 	let cookie = req.cookie(name).unwrap_or(Cookie::named(name));
 	cookie.value().to_string()
 }
-
 
 // Direct urls to proxy if proxy is enabled
 pub fn format_url(url: &str) -> String {
@@ -389,6 +398,15 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 //
 // NETWORKING
 //
+
+pub fn template(f: impl Template) -> tide::Result {
+	Ok(
+		Response::builder(200)
+			.content_type("text/html")
+			.body(f.render().unwrap_or_default())
+			.build(),
+	)
+}
 
 pub async fn error(msg: String) -> tide::Result {
 	let body = ErrorTemplate {

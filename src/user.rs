@@ -1,7 +1,7 @@
 // CRATES
-use crate::utils::{error, fetch_posts, format_url, param, prefs, request, Post, Preferences, User};
-use tide::{Request, Response};
+use crate::utils::*;
 use askama::Template;
+use tide::Request;
 use time::OffsetDateTime;
 
 // STRUCTS
@@ -32,16 +32,13 @@ pub async fn profile(req: Request<()>) -> tide::Result {
 			// If you can get user posts, also request user data
 			let user = user(&username).await.unwrap_or_default();
 
-			let s = UserTemplate {
+			template(UserTemplate {
 				user,
 				posts,
 				sort: (sort, param(&path, "t")),
 				ends: (param(&path, "after"), after),
 				prefs: prefs(req),
-			}
-			.render()
-			.unwrap();
-			Ok(Response::builder(200).content_type("text/html").body(s).build())
+			})
 		}
 		// If there is an error show error page
 		Err(msg) => error(msg).await,

@@ -1,7 +1,7 @@
 // CRATES
-use crate::utils::{prefs, Preferences};
-use tide::{Request, Response, http::Cookie};
+use crate::utils::{prefs, template, Preferences};
 use askama::Template;
+use tide::{http::Cookie, Request, Response};
 use time::{Duration, OffsetDateTime};
 
 // STRUCTS
@@ -25,8 +25,7 @@ pub struct SettingsForm {
 
 // Retrieve cookies from request "Cookie" header
 pub async fn get(req: Request<()>) -> tide::Result {
-	let s = SettingsTemplate { prefs: prefs(req) }.render().unwrap();
-	Ok(Response::builder(200).content_type("text/html").body(s).build())
+	template(SettingsTemplate { prefs: prefs(req) })
 }
 
 // Set cookies using response "Set-Cookie" header
@@ -49,7 +48,7 @@ pub async fn set(mut req: Request<()>) -> tide::Result {
 					.path("/")
 					.http_only(true)
 					.expires(OffsetDateTime::now_utc() + Duration::weeks(52))
-					.finish()
+					.finish(),
 			),
 			None => res.remove_cookie(Cookie::named(name.to_owned())),
 		};

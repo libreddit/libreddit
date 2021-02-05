@@ -49,22 +49,42 @@ impl<State: Clone + Send + Sync + 'static> Middleware<State> for NormalizePath {
 
 // Create Services
 async fn style(_req: Request<()>) -> tide::Result {
-	Ok(Response::builder(200).content_type("text/css").body(include_str!("../static/style.css")).build())
+	Ok(
+		Response::builder(200)
+			.content_type("text/css")
+			.body(include_str!("../static/style.css"))
+			.build(),
+	)
 }
 
 // Required for creating a PWA
 async fn manifest(_req: Request<()>) -> tide::Result {
-	Ok(Response::builder(200).content_type("application/json").body(include_str!("../static/manifest.json")).build())
+	Ok(
+		Response::builder(200)
+			.content_type("application/json")
+			.body(include_str!("../static/manifest.json"))
+			.build(),
+	)
 }
 
 // Required for the manifest to be valid
 async fn pwa_logo(_req: Request<()>) -> tide::Result {
-	Ok(Response::builder(200).content_type("image/png").body(include_bytes!("../static/logo.png").as_ref()).build())
+	Ok(
+		Response::builder(200)
+			.content_type("image/png")
+			.body(include_bytes!("../static/logo.png").as_ref())
+			.build(),
+	)
 }
 
 // Required for iOS App Icons
 async fn iphone_logo(_req: Request<()>) -> tide::Result {
-	Ok(Response::builder(200).content_type("image/png").body(include_bytes!("../static/touch-icon-iphone.png").as_ref()).build())
+	Ok(
+		Response::builder(200)
+			.content_type("image/png")
+			.body(include_bytes!("../static/touch-icon-iphone.png").as_ref())
+			.build(),
+	)
 }
 
 async fn robots(_req: Request<()>) -> tide::Result {
@@ -138,7 +158,7 @@ async fn main() -> tide::Result<()> {
 	app.at("/u/:name/").get(user::profile);
 	app.at("/u/:name/comments/:id/:title/").get(post::item);
 	app.at("/u/:name/comments/:id/:title/:comment/").get(post::item);
-	
+
 	app.at("/user/:name/").get(user::profile);
 	app.at("/user/:name/comments/:id/:title/").get(post::item);
 	app.at("/user/:name/comments/:id/:title/:comment/").get(post::item);
@@ -175,7 +195,7 @@ async fn main() -> tide::Result<()> {
 	app.at("/w/:page/").get(subreddit::wiki);
 	app.at("/wiki/").get(subreddit::wiki);
 	app.at("/wiki/:page/").get(subreddit::wiki);
-	
+
 	// Search all of Reddit
 	app.at("/search/").get(search::find);
 

@@ -1,7 +1,7 @@
 // CRATES
-use crate::utils::{cookie, error, fetch_posts, param, prefs, request, val, Post, Preferences};
-use tide::{Request, Response};
+use crate::utils::{cookie, error, fetch_posts, param, prefs, request, template, val, Post, Preferences};
 use askama::Template;
+use tide::Request;
 
 // STRUCTS
 struct SearchParams {
@@ -50,26 +50,20 @@ pub async fn find(req: Request<()>) -> tide::Result {
 	};
 
 	match fetch_posts(&path, String::new()).await {
-		Ok((posts, after)) => {
-				let s = SearchTemplate {
-					posts,
-					subreddits,
-					sub,
-					params: SearchParams {
-						q: param(&path, "q"),
-						sort,
-						t: param(&path, "t"),
-						before: param(&path, "after"),
-						after,
-						restrict_sr: param(&path, "restrict_sr"),
-					},
-					prefs: prefs(req),
-				}
-				.render()
-				.unwrap();
-
-				Ok(Response::builder(200).content_type("text/html").body(s).build())
-		},
+		Ok((posts, after)) => template(SearchTemplate {
+			posts,
+			subreddits,
+			sub,
+			params: SearchParams {
+				q: param(&path, "q"),
+				sort,
+				t: param(&path, "t"),
+				before: param(&path, "after"),
+				after,
+				restrict_sr: param(&path, "restrict_sr"),
+			},
+			prefs: prefs(req),
+		}),
 		Err(msg) => error(msg).await,
 	}
 }
