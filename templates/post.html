@@ -78,6 +78,20 @@
 			</a>
 			{% else if post.post_type == "video" || post.post_type == "gif" %}
 			<video class="post_media_video" src="{{ post.media.url }}" controls autoplay loop></video>
+			{% else if post.post_type == "gallery" %}
+			<div class="gallery">
+			{% for image in post.gallery -%}
+				<figure>
+					<a href="{{ image.url }}" ><img alt="Gallery image" src="{{ image.url }}"/></a>
+					<figcaption>
+						<p>{{ image.caption }}</p>
+						{% if image.outbound_url.len() > 0 %}
+						<p><a class="outbound_url" href="{{ image.outbound_url }}">{{ image.outbound_url }}</a>
+						{% endif %}
+					</figcaption>
+				</figure>
+			{%- endfor %}
+			</div>			
 			{% else if post.post_type == "link" %}
 			<a id="post_url" href="{{ post.media.url }}">{{ post.media.url }}</a>
 			{% endif %}
