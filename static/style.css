@@ -622,7 +622,7 @@ a.search_subreddit:hover {
 	font-weight: bold;
 }
 
-.post_media_image, .post .__NoScript_PlaceHolder__, .post_media_video  {
+.post_media_image, .post .__NoScript_PlaceHolder__, .post_media_video, .gallery  {
 	max-width: calc(100% - 40px);
 	grid-area: post_media;
 	margin: 15px auto 5px auto;
@@ -647,6 +647,24 @@ a.search_subreddit:hover {
 .post_media_image img {
 	max-width: 100%;
 	vertical-align: bottom;
+}
+
+.gallery img {
+	max-width: 100%;
+	vertical-align: bottom;
+}
+
+.gallery figcaption {
+	margin-top: 5px;
+}
+
+.gallery .outbound_url {
+	color: var(--accent);
+	text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
+	display: block;
+	padding-top: 5px;
 }
 
 #post_url {
