@@ -102,6 +102,7 @@ async fn parse_post(json: &serde_json::Value) -> Post {
 			url: format_url(val(post, "thumbnail").as_str()),
 			width: post["data"]["thumbnail_width"].as_i64().unwrap_or_default(),
 			height: post["data"]["thumbnail_height"].as_i64().unwrap_or_default(),
+			poster: "".to_string(),
 		},
 		flair: Flair {
 			flair_parts: parse_rich_flair(
