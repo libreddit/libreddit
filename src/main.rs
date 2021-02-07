@@ -188,7 +188,7 @@ async fn main() -> tide::Result<()> {
 	// Front page
 	app.at("/").get(subreddit::page);
 	// .route("/{sort:best|hot|new|top|rising|controversial}/", web::get().to(subreddit::page))
-	// app.at("/:sort").get(subreddit::item);
+	// app.at("/:sort").get(subreddit::page);
 
 	// View Reddit wiki
 	app.at("/w/").get(subreddit::wiki);

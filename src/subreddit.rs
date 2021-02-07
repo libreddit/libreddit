@@ -84,27 +84,24 @@ pub async fn page(req: Request<()>) -> tide::Result {
 // Sub or unsub by setting subscription cookie using response "Set-Cookie" header
 pub async fn subscriptions(req: Request<()>) -> tide::Result {
 	let sub = req.param("sub").unwrap_or_default().to_string();
-	let path: String = req.url().path().to_string();
-	let action: &str = path
-		.split("/")
-		.filter(|item| item == &"subscribe" || item == &"unsubscribe")
-		.collect::<Vec<&str>>()[0];
+	let query = req.url().query().unwrap_or_default().to_string();
+	let action: Vec<String> = req.url().path().split('/').map(String::from).collect();
 
 	let mut sub_list = prefs(req).subs;
 
 	// Modify sub list based on action
-	if action == "subscribe" && !sub_list.contains(&sub) {
+	if action.contains(&"subscribe".to_string()) && !sub_list.contains(&sub) {
 		sub_list.push(sub.to_owned());
 		sub_list.sort_by(|a, b| a.to_lowercase().cmp(&b.to_lowercase()));
-	} else if action == "unsubscribe" {
+	} else if action.contains(&"unsubscribe".to_string()) {
 		sub_list.retain(|s| s != &sub);
 	}
 
 	// Redirect back to subreddit
 	// check for redirect parameter if unsubscribing from outside sidebar
-	let redirect_path = param(path.as_str(), "redirect");
-	let path = if !redirect_path.is_empty() && redirect_path.starts_with('/') {
-		redirect_path
+	let redirect_path = param(format!("/?{}", query).as_str(), "redirect");
+	let path = if !redirect_path.is_empty() {
+		format!("/{}/", redirect_path)
 	} else {
 		format!("/r/{}", sub)
 	};
