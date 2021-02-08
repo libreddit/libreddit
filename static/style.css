@@ -641,6 +641,13 @@ a.search_subreddit:hover {
 	max-width: calc(100% - 40px);
 	grid-area: post_media;
 	margin: 15px auto 5px auto;
+	height: auto;
+}
+
+
+.post_media_video.short {
+	max-height: 512px;
+	width: auto;
 }
 
 .post_media_image.short svg, .post_media_image.short img{

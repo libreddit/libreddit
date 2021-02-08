@@ -44,6 +44,7 @@ pub struct Media {
 	pub url: String,
 	pub width: i64,
 	pub height: i64,
+	pub poster: String,
 }
 
 pub struct GalleryMedia {
@@ -255,6 +256,7 @@ pub async fn media(data: &Value) -> (String, Media, Vec<GalleryMedia>) {
 			url,
 			width: data["preview"]["images"][0]["source"]["width"].as_i64().unwrap_or_default(),
 			height: data["preview"]["images"][0]["source"]["height"].as_i64().unwrap_or_default(),
+			poster: format_url(data["preview"]["images"][0]["source"]["url"].as_str().unwrap_or_default()),
 		},
 		gallery,
 	)
@@ -384,6 +386,7 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 				url: format_url(val(post, "thumbnail").as_str()),
 				width: post["data"]["thumbnail_width"].as_i64().unwrap_or_default(),
 				height: post["data"]["thumbnail_height"].as_i64().unwrap_or_default(),
+				poster: "".to_string(),
 			},
 			media,
 			domain: val(post, "domain"),
