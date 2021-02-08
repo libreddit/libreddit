@@ -31,7 +31,9 @@ async fn pwa_logo() -> HttpResponse {
 
 // Required for iOS App Icons
 async fn iphone_logo() -> HttpResponse {
-	HttpResponse::Ok().content_type("image/png").body(include_bytes!("../static/touch-icon-iphone.png").as_ref())
+	HttpResponse::Ok()
+		.content_type("image/png")
+		.body(include_bytes!("../static/touch-icon-iphone.png").as_ref())
 }
 
 async fn robots() -> HttpResponse {

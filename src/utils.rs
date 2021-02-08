@@ -52,7 +52,7 @@ pub struct GalleryMedia {
 	pub width: i64,
 	pub height: i64,
 	pub caption: String,
-	pub outbound_url: String,	
+	pub outbound_url: String,
 }
 
 // Post containing content, metadata and media
@@ -227,18 +227,18 @@ pub async fn media(data: &Value) -> (String, Media, Vec<GalleryMedia>) {
 		post_type = "self";
 		data["permalink"].as_str().unwrap_or_default().to_string()
 	} else if data["is_gallery"].as_bool().unwrap_or_default() {
-		post_type = "gallery";		
+		post_type = "gallery";
 		gallery = data["gallery_data"]["items"]
 			.as_array()
-			.unwrap()
+			.unwrap_or(&Vec::<Value>::new())
 			.iter()
 			.map(|item| {
 				let media_id = item["media_id"].as_str().unwrap_or_default();
-				let image = data["media_metadata"][media_id].as_object().unwrap();
+				let image = &data["media_metadata"][media_id].as_object().map(ToOwned::to_owned).unwrap_or_default()["s"];
 				GalleryMedia {
-					url: format_url(image["s"]["u"].as_str().unwrap_or_default()),
-					width: image["s"]["x"].as_i64().unwrap_or_default(),
-					height: image["s"]["y"].as_i64().unwrap_or_default(),
+					url: format_url(image["u"].as_str().unwrap_or_default()),
+					width: image["x"].as_i64().unwrap_or_default(),
+					height: image["y"].as_i64().unwrap_or_default(),
 					caption: item["caption"].as_str().unwrap_or_default().to_string(),
 					outbound_url: item["outbound_url"].as_str().unwrap_or_default().to_string(),
 				}
