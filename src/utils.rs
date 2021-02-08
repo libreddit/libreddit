@@ -4,12 +4,12 @@
 use actix_web::{cookie::Cookie, HttpRequest, HttpResponse, Result};
 use askama::Template;
 use base64::encode;
+use cached::proc_macro::cached;
 use regex::Regex;
 use serde_json::{from_str, Value};
 use std::collections::HashMap;
 use time::{Duration, OffsetDateTime};
 use url::Url;
-// use cached::proc_macro::cached;
 
 //
 // STRUCTS
@@ -211,17 +211,15 @@ pub async fn media(data: &Value) -> (String, Media, Vec<GalleryMedia>) {
 	// Handle images, whether GIFs or pics
 	} else if data["post_hint"].as_str().unwrap_or("") == "image" {
 		let preview = data["preview"]["images"][0].clone();
-		match preview["variants"]["mp4"].as_object() {
+		let mp4 = &preview["variants"]["mp4"];
+		if mp4.is_object() {
 			// Return the mp4 if the media is a gif
-			Some(gif) => {
-				post_type = "gif";
-				format_url(gif["source"]["url"].as_str().unwrap_or_default())
-			}
+			post_type = "gif";
+			format_url(mp4["source"]["url"].as_str().unwrap_or_default())
+		} else {
 			// Return the picture if the media is an image
-			None => {
-				post_type = "image";
-				format_url(preview["source"]["url"].as_str().unwrap_or_default())
-			}
+			post_type = "image";
+			format_url(preview["source"]["url"].as_str().unwrap_or_default())
 		}
 	} else if data["is_self"].as_bool().unwrap_or_default() {
 		post_type = "self";
@@ -234,7 +232,7 @@ pub async fn media(data: &Value) -> (String, Media, Vec<GalleryMedia>) {
 			.iter()
 			.map(|item| {
 				let media_id = item["media_id"].as_str().unwrap_or_default();
-				let image = &data["media_metadata"][media_id].as_object().map(ToOwned::to_owned).unwrap_or_default()["s"];
+				let image = &data["media_metadata"][media_id]["s"];
 				GalleryMedia {
 					url: format_url(image["u"].as_str().unwrap_or_default()),
 					width: image["x"].as_i64().unwrap_or_default(),
@@ -433,7 +431,7 @@ pub async fn error(msg: String) -> HttpResponse {
 }
 
 // Make a request to a Reddit API and parse the JSON response
-// #[cached(size=100,time=60, result = true)]
+#[cached(size = 100, time = 30, result = true)]
 pub async fn request(path: String) -> Result<Value, String> {
 	let url = format!("https://www.reddit.com{}", path);
 	let user_agent = format!("web:libreddit:{}", env!("CARGO_PKG_VERSION"));

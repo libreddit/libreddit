@@ -95,7 +95,7 @@ pub async fn subscriptions(req: HttpRequest) -> HttpResponse {
 	// Modify sub list based on action
 	if action == "subscribe" && !sub_list.contains(&sub) {
 		sub_list.push(sub.to_owned());
-		sub_list.sort_by(|a, b| a.to_lowercase().cmp(&b.to_lowercase()));
+		sub_list.sort_by_key(|a| a.to_lowercase());
 	} else if action == "unsubscribe" {
 		sub_list.retain(|s| s != &sub);
 	}
