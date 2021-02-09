@@ -160,6 +160,7 @@ async fn main() -> tide::Result<()> {
 	app.at("/u/:name/comments/:id/:title/:comment/").get(post::item);
 
 	app.at("/user/:name/").get(user::profile);
+	app.at("/user/:name/comments/:id/").get(post::item);
 	app.at("/user/:name/comments/:id/:title/").get(post::item);
 	app.at("/user/:name/comments/:id/:title/:comment/").get(post::item);
 
@@ -173,6 +174,7 @@ async fn main() -> tide::Result<()> {
 	app.at("/r/:sub/subscribe/").post(subreddit::subscriptions);
 	app.at("/r/:sub/unsubscribe/").post(subreddit::subscriptions);
 	// View post on subreddit
+	app.at("/r/:sub/comments/:id/").get(post::item);
 	app.at("/r/:sub/comments/:id/:title/").get(post::item);
 	app.at("/r/:sub/comments/:id/:title/:comment_id/").get(post::item);
 	// Search inside subreddit
