@@ -86,6 +86,10 @@
 				</desc>
 		</svg>
 	</a>
+	{% else if (prefs.layout.is_empty() || prefs.layout == "card") && post.post_type == "gif" %}
+	<video class="post_media_video short" src="{{ post.media.url }}" width="{{ post.media.width }}px" height="{{ post.media.height }}px" controls loop><a href={{ post.media.url }}>Video</a></video>
+	{% else if (prefs.layout.is_empty() || prefs.layout == "card") && post.post_type == "video" %}
+	<video class="post_media_video short" src="{{ post.media.url }}" width="{{ post.media.width }}px" height="{{ post.media.height }}px" poster="{{ post.media.poster }}" preload=none controls><a href={{ post.media.url }}>Video</a></video>
 	{% else if post.post_type != "self" %}
 	<a class="post_thumbnail {% if post.thumbnail.url.is_empty() %}no_thumbnail{% endif %}" href="{% if post.post_type == "link" %}{{ post.media.url }}{% else %}{{ post.permalink }}{% endif %}">
 		{% if post.thumbnail.url.is_empty() %}

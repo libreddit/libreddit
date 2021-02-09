@@ -43,6 +43,15 @@ pub struct Media {
 	pub url: String,
 	pub width: i64,
 	pub height: i64,
+	pub poster: String,
+}
+
+pub struct GalleryMedia {
+	pub url: String,
+	pub width: i64,
+	pub height: i64,
+	pub caption: String,
+	pub outbound_url: String,
 }
 
 // Post containing content, metadata and media
@@ -64,6 +73,7 @@ pub struct Post {
 	pub rel_time: String,
 	pub created: String,
 	pub comments: String,
+	pub gallery: Vec<GalleryMedia>,
 }
 
 // Comment with content, post, score and data/time that it was posted
@@ -198,8 +208,9 @@ pub fn format_num(num: i64) -> String {
 	}
 }
 
-pub async fn media(data: &Value) -> (String, Media) {
+pub async fn media(data: &Value) -> (String, Media, Vec<GalleryMedia>) {
 	let post_type: &str;
+	let mut gallery = Vec::new();
 	// If post is a video, return the video
 	let url = if data["preview"]["reddit_video_preview"]["fallback_url"].is_string() {
 		post_type = "video";
@@ -210,21 +221,38 @@ pub async fn media(data: &Value) -> (String, Media) {
 	// Handle images, whether GIFs or pics
 	} else if data["post_hint"].as_str().unwrap_or("") == "image" {
 		let preview = data["preview"]["images"][0].clone();
-		match preview["variants"]["mp4"].as_object() {
+		let mp4 = &preview["variants"]["mp4"];
+		if mp4.is_object() {
 			// Return the mp4 if the media is a gif
-			Some(gif) => {
-				post_type = "gif";
-				format_url(gif["source"]["url"].as_str().unwrap_or_default())
-			}
+			post_type = "gif";
+			format_url(mp4["source"]["url"].as_str().unwrap_or_default())
+		} else {
 			// Return the picture if the media is an image
-			None => {
-				post_type = "image";
-				format_url(preview["source"]["url"].as_str().unwrap_or_default())
-			}
+			post_type = "image";
+			format_url(preview["source"]["url"].as_str().unwrap_or_default())
 		}
 	} else if data["is_self"].as_bool().unwrap_or_default() {
 		post_type = "self";
 		data["permalink"].as_str().unwrap_or_default().to_string()
+	} else if data["is_gallery"].as_bool().unwrap_or_default() {
+		post_type = "gallery";
+		gallery = data["gallery_data"]["items"]
+			.as_array()
+			.unwrap_or(&Vec::<Value>::new())
+			.iter()
+			.map(|item| {
+				let media_id = item["media_id"].as_str().unwrap_or_default();
+				let image = &data["media_metadata"][media_id]["s"];
+				GalleryMedia {
+					url: format_url(image["u"].as_str().unwrap_or_default()),
+					width: image["x"].as_i64().unwrap_or_default(),
+					height: image["y"].as_i64().unwrap_or_default(),
+					caption: item["caption"].as_str().unwrap_or_default().to_string(),
+					outbound_url: item["outbound_url"].as_str().unwrap_or_default().to_string(),
+				}
+			})
+			.collect::<Vec<GalleryMedia>>();
+		data["url"].as_str().unwrap_or_default().to_string()
 	} else {
 		post_type = "link";
 		data["url"].as_str().unwrap_or_default().to_string()
@@ -236,7 +264,9 @@ pub async fn media(data: &Value) -> (String, Media) {
 			url,
 			width: data["preview"]["images"][0]["source"]["width"].as_i64().unwrap_or_default(),
 			height: data["preview"]["images"][0]["source"]["height"].as_i64().unwrap_or_default(),
+			poster: format_url(data["preview"]["images"][0]["source"]["url"].as_str().unwrap_or_default()),
 		},
+		gallery,
 	)
 }
 
@@ -333,7 +363,7 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 		let title = val(post, "title");
 
 		// Determine the type of media along with the media URL
-		let (post_type, media) = media(&post["data"]).await;
+		let (post_type, media, gallery) = media(&post["data"]).await;
 
 		posts.push(Post {
 			id: val(post, "id"),
@@ -364,6 +394,7 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 				url: format_url(val(post, "thumbnail").as_str()),
 				width: post["data"]["thumbnail_width"].as_i64().unwrap_or_default(),
 				height: post["data"]["thumbnail_height"].as_i64().unwrap_or_default(),
+				poster: "".to_string(),
 			},
 			media,
 			domain: val(post, "domain"),
@@ -388,6 +419,7 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 			rel_time,
 			created,
 			comments: format_num(post["data"]["num_comments"].as_i64().unwrap_or_default()),
+			gallery,
 		});
 	}
 
