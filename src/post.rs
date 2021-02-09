@@ -47,7 +47,7 @@ pub async fn item(req: Request<()>) -> tide::Result {
 		Ok(res) => {
 			// Parse the JSON into Post and Comment structs
 			let post = parse_post(&res[0]).await;
-			let comments = parse_comments(&res[1], post).await;
+			let comments = parse_comments(&res[1], &post.permalink, &post.author.name).await;
 
 			// Use the Post and Comment structs to generate a website to show users
 			template(PostTemplate {
@@ -133,7 +133,7 @@ async fn parse_post(json: &serde_json::Value) -> Post {
 
 // COMMENTS
 #[async_recursion]
-async fn parse_comments(json: &serde_json::Value, post: Post) -> Vec<Comment> {
+async fn parse_comments(json: &serde_json::Value, post_link: &str, post_author: &str) -> Vec<Comment> {
 	// Separate the comment JSON into a Vector of comments
 	let comment_data = match json["data"]["children"].as_array() {
 		Some(f) => f.to_owned(),
@@ -151,7 +151,7 @@ async fn parse_comments(json: &serde_json::Value, post: Post) -> Vec<Comment> {
 		let body = rewrite_url(&val(&comment, "body_html"));
 
 		let replies: Vec<Comment> = if comment["data"]["replies"].is_object() {
-			parse_comments(&comment["data"]["replies"], post).await
+			parse_comments(&comment["data"]["replies"], post_link, post_author).await
 		} else {
 			Vec::new()
 		};
@@ -159,7 +159,8 @@ async fn parse_comments(json: &serde_json::Value, post: Post) -> Vec<Comment> {
 		comments.push(Comment {
 			id: val(&comment, "id"),
 			kind: comment["kind"].as_str().unwrap_or_default().to_string(),
-			post,
+			post_link: post_link.to_string(),
+			post_author: post_author.to_string(),
 			body,
 			author: Author {
 				name: val(&comment, "author"),

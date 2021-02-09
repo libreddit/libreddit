@@ -82,7 +82,8 @@ pub struct Post {
 pub struct Comment {
 	pub id: String,
 	pub kind: String,
-	pub post: Post,
+	pub post_link: String,
+	pub post_author: String,
 	pub body: String,
 	pub author: Author,
 	pub score: String,
