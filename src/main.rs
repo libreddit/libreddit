@@ -1,7 +1,6 @@
 // Import Crates
 // use askama::filters::format;
-use surf::utils::async_trait;
-use tide::{utils::After, Middleware, Next, Request, Response};
+use tide::{Middleware, Next, Request, Response, utils::{After, async_trait}};
 
 // Reference local files
 mod post;
@@ -150,6 +149,7 @@ async fn main() -> tide::Result<()> {
 	app.at("/manifest.json/").get(manifest);
 	app.at("/logo.png/").get(pwa_logo);
 	app.at("/touch-icon-iphone.png/").get(iphone_logo);
+	app.at("/apple-touch-icon.png/").get(iphone_logo);
 
 	// Proxy media through Libreddit
 	app.at("/proxy/*url/").get(proxy::handler);
@@ -199,13 +199,13 @@ async fn main() -> tide::Result<()> {
 	// Search all of Reddit
 	app.at("/search/").get(search::find);
 
-	// Short link for post
-	// .route("/{sort:best|hot|new|top|rising|controversial}/", web::get().to(subreddit::page))
-	// .route("/{id:.{5,6}}/", web::get().to(post::item))
 	app.at("/:id/").get(|req: Request<()>| async {
-		match req.param("id").unwrap_or_default() {
-			"best" | "hot" | "new" | "top" | "rising" | "controversial" => subreddit::page(req).await,
-			_ => post::item(req).await,
+		match req.param("id") {
+			// Sort front page
+			Ok("best") | Ok("hot") | Ok("new") | Ok("top") | Ok("rising") | Ok("controversial") => subreddit::page(req).await,
+			// Short link for post
+			Ok(id) if id.len() > 4 && id.len() < 7 => post::item(req).await,
+			_ => utils::error("Nothing here".to_string()).await
 		}
 	});
 
