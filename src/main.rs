@@ -210,6 +210,6 @@ async fn main() -> tide::Result<()> {
 	// Default service in case no routes match
 	app.at("*").get(|_| utils::error("Nothing here".to_string()));
 
-	app.listen("127.0.0.1:8080").await?;
+	app.listen(address).await?;
 	Ok(())
 }
