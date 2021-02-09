@@ -29,7 +29,7 @@ pub async fn page(req: Request<()>) -> tide::Result {
 	// Build Reddit API path
 	let subscribed = cookie(&req, "subscriptions");
 	let front_page = cookie(&req, "front_page");
-	let sort = req.param("sort").unwrap_or("hot").to_string();
+	let sort = req.param("sort").unwrap_or_else(|_| req.param("id").unwrap_or("hot")).to_string();
 
 	let sub = req
 		.param("sub")
@@ -92,7 +92,7 @@ pub async fn subscriptions(req: Request<()>) -> tide::Result {
 	// Modify sub list based on action
 	if action.contains(&"subscribe".to_string()) && !sub_list.contains(&sub) {
 		sub_list.push(sub.to_owned());
-		sub_list.sort_by(|a, b| a.to_lowercase().cmp(&b.to_lowercase()));
+		sub_list.sort_by_key(|a| a.to_lowercase())
 	} else if action.contains(&"unsubscribe".to_string()) {
 		sub_list.retain(|s| s != &sub);
 	}

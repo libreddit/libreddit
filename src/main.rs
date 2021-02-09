@@ -39,7 +39,7 @@ where
 #[async_trait]
 impl<State: Clone + Send + Sync + 'static> Middleware<State> for NormalizePath {
 	async fn handle(&self, request: Request<State>, next: Next<'_, State>) -> tide::Result {
-		if !request.url().path().ends_with("/") {
+		if !request.url().path().ends_with('/') {
 			Ok(Response::builder(301).header("Location", format!("{}/", request.url().path())).build())
 		} else {
 			Ok(next.run(request).await)
@@ -187,8 +187,6 @@ async fn main() -> tide::Result<()> {
 
 	// Front page
 	app.at("/").get(subreddit::page);
-	// .route("/{sort:best|hot|new|top|rising|controversial}/", web::get().to(subreddit::page))
-	// app.at("/:sort").get(subreddit::page);
 
 	// View Reddit wiki
 	app.at("/w/").get(subreddit::wiki);
@@ -200,8 +198,14 @@ async fn main() -> tide::Result<()> {
 	app.at("/search/").get(search::find);
 
 	// Short link for post
+	// .route("/{sort:best|hot|new|top|rising|controversial}/", web::get().to(subreddit::page))
 	// .route("/{id:.{5,6}}/", web::get().to(post::item))
-	app.at("/:id/").get(post::item);
+	app.at("/:id/").get(|req: Request<()>| async {
+		match req.param("id").unwrap_or_default() {
+			"best" | "hot" | "new" | "top" | "rising" | "controversial" => subreddit::page(req).await,
+			_ => post::item(req).await,
+		}
+	});
 
 	// Default service in case no routes match
 	app.at("*").get(|_| utils::error("Nothing here".to_string()));

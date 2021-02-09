@@ -168,8 +168,7 @@ pub fn param(path: &str, value: &str) -> String {
 
 // Parse Cookie value from request
 pub fn cookie(req: &Request<()>, name: &str) -> String {
-	// actix_web::HttpMessage::cookie(req, name).unwrap_or_else(|| Cookie::new(name, "")).value().to_string()
-	let cookie = req.cookie(name).unwrap_or(Cookie::named(name));
+	let cookie = req.cookie(name).unwrap_or_else(|| Cookie::named(name));
 	cookie.value().to_string()
 }
 
