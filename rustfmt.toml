@@ -1,4 +1,4 @@
 edition = "2018"
 tab_spaces = 2
 hard_tabs = true
-max_width = 175
+max_width = 150

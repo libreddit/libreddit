@@ -1,15 +1,14 @@
 //
 // CRATES
 //
-use actix_web::{cookie::Cookie, HttpRequest, HttpResponse, Result};
 use askama::Template;
 use base64::encode;
 use cached::proc_macro::cached;
 use regex::Regex;
 use serde_json::{from_str, Value};
 use std::collections::HashMap;
+use tide::{http::url::Url, http::Cookie, Request, Response};
 use time::{Duration, OffsetDateTime};
-use url::Url;
 
 //
 // STRUCTS
@@ -147,7 +146,7 @@ pub struct Preferences {
 //
 
 // Build preferences from cookies
-pub fn prefs(req: HttpRequest) -> Preferences {
+pub fn prefs(req: Request<()>) -> Preferences {
 	Preferences {
 		theme: cookie(&req, "theme"),
 		front_page: cookie(&req, "front_page"),
@@ -155,21 +154,32 @@ pub fn prefs(req: HttpRequest) -> Preferences {
 		wide: cookie(&req, "wide"),
 		show_nsfw: cookie(&req, "show_nsfw"),
 		comment_sort: cookie(&req, "comment_sort"),
-		subs: cookie(&req, "subscriptions").split('+').map(String::from).filter(|s| !s.is_empty()).collect(),
+		subs: cookie(&req, "subscriptions")
+			.split('+')
+			.map(String::from)
+			.filter(|s| !s.is_empty())
+			.collect(),
 	}
 }
 
 // Grab a query param from a url
 pub fn param(path: &str, value: &str) -> String {
 	match Url::parse(format!("https://libredd.it/{}", path).as_str()) {
-		Ok(url) => url.query_pairs().into_owned().collect::<HashMap<_, _>>().get(value).unwrap_or(&String::new()).to_owned(),
+		Ok(url) => url
+			.query_pairs()
+			.into_owned()
+			.collect::<HashMap<_, _>>()
+			.get(value)
+			.unwrap_or(&String::new())
+			.to_owned(),
 		_ => String::new(),
 	}
 }
 
 // Parse Cookie value from request
-pub fn cookie(req: &HttpRequest, name: &str) -> String {
-	actix_web::HttpMessage::cookie(req, name).unwrap_or_else(|| Cookie::new(name, "")).value().to_string()
+pub fn cookie(req: &Request<()>, name: &str) -> String {
+	let cookie = req.cookie(name).unwrap_or_else(|| Cookie::named(name));
+	cookie.value().to_string()
 }
 
 // Direct urls to proxy if proxy is enabled
@@ -177,7 +187,7 @@ pub fn format_url(url: &str) -> String {
 	if url.is_empty() || url == "self" || url == "default" || url == "nsfw" || url == "spoiler" {
 		String::new()
 	} else {
-		format!("/proxy/{}", encode(url).as_str())
+		format!("/proxy/{}/", encode(url).as_str())
 	}
 }
 
@@ -420,102 +430,57 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 // NETWORKING
 //
 
-pub async fn error(msg: String) -> HttpResponse {
+pub fn template(f: impl Template) -> tide::Result {
+	Ok(
+		Response::builder(200)
+			.content_type("text/html")
+			.body(f.render().unwrap_or_default())
+			.build(),
+	)
+}
+
+pub async fn error(msg: String) -> tide::Result {
 	let body = ErrorTemplate {
 		msg,
 		prefs: Preferences::default(),
 	}
 	.render()
 	.unwrap_or_default();
-	HttpResponse::NotFound().content_type("text/html").body(body)
+
+	Ok(Response::builder(404).content_type("text/html").body(body).build())
 }
 
 // Make a request to a Reddit API and parse the JSON response
 #[cached(size = 100, time = 30, result = true)]
 pub async fn request(path: String) -> Result<Value, String> {
 	let url = format!("https://www.reddit.com{}", path);
+	// Build reddit-compliant user agent for Libreddit
 	let user_agent = format!("web:libreddit:{}", env!("CARGO_PKG_VERSION"));
 
-	// Send request using awc
-	// async fn send(url: &str) -> Result<String, (bool, String)> {
-	// 	let client = actix_web::client::Client::default();
-	// 	let response = client.get(url).header("User-Agent", format!("web:libreddit:{}", env!("CARGO_PKG_VERSION"))).send().await;
+	// Send request using surf
+	let req = surf::get(&url).header("User-Agent", user_agent.as_str());
+	let client = surf::client().with(surf::middleware::Redirect::new(5));
 
-	// 	match response {
-	// 		Ok(mut payload) => {
-	// 			// Get first number of response HTTP status code
-	// 			match payload.status().to_string().chars().next() {
-	// 				// If success
-	// 				Some('2') => Ok(String::from_utf8(payload.body().limit(20_000_000).await.unwrap_or_default().to_vec()).unwrap_or_default()),
-	// 				// If redirection
-	// 				Some('3') => match payload.headers().get("location") {
-	// 					Some(location) => Err((true, location.to_str().unwrap_or_default().to_string())),
-	// 					None => Err((false, "Page not found".to_string())),
-	// 				},
-	// 				// Otherwise
-	// 				_ => Err((false, "Page not found".to_string())),
-	// 			}
-	// 		}
-	// 		Err(e) => { dbg!(e); Err((false, "Couldn't send request to Reddit, this instance may be being rate-limited. Try another.".to_string())) },
-	// 	}
-	// }
+	let res = client.send(req).await;
 
-	// // Print error if debugging then return error based on error message
-	// fn err(url: String, msg: String) -> Result<Value, String> {
-	// 	// #[cfg(debug_assertions)]
-	// 	dbg!(format!("{} - {}", url, msg));
-	// 	Err(msg)
-	// };
+	let body = res.unwrap().take_body().into_string().await;
 
-	// // Parse JSON from body. If parsing fails, return error
-	// fn json(url: String, body: String) -> Result<Value, String> {
-	// 	match from_str(body.as_str()) {
-	// 		Ok(json) => Ok(json),
-	// 		Err(_) => err(url, "Failed to parse page JSON data".to_string()),
-	// 	}
-	// }
-
-	// // Make request to Reddit using send function
-	// match send(&url).await {
-	// 	// If success, parse and return body
-	// 	Ok(body) => json(url, body),
-	// 	// Follow any redirects
-	// 	Err((true, location)) => match send(location.as_str()).await {
-	// 		// If success, parse and return body
-	// 		Ok(body) => json(url, body),
-	// 		// Follow any redirects again
-	// 		Err((true, location)) => err(url, location),
-	// 		// Return errors if request fails
-	// 		Err((_, msg)) => err(url, msg),
-	// 	},
-	// 	// Return errors if request fails
-	// 	Err((_, msg)) => err(url, msg),
-	// }
-
-	// Send request using ureq
-	match ureq::get(&url).set("User-Agent", user_agent.as_str()).call() {
+	match body {
 		// If response is success
 		Ok(response) => {
 			// Parse the response from Reddit as JSON
-			let json_string = &response.into_string().unwrap_or_default();
-			match from_str(json_string) {
+			match from_str(&response) {
 				Ok(json) => Ok(json),
 				Err(e) => {
-					println!("{} - Failed to parse page JSON data: {} - {}", url, e, json_string);
+					println!("{} - Failed to parse page JSON data: {}", url, e);
 					Err("Failed to parse page JSON data".to_string())
 				}
 			}
 		}
-		// If response is error
-		Err(ureq::Error::Status(_, _)) => {
-			#[cfg(debug_assertions)]
-			dbg!(format!("{} - Page not found", url));
-			Err("Page not found".to_string())
-		}
 		// If failed to send request
 		Err(e) => {
 			println!("{} - Couldn't send request to Reddit: {}", url, e);
-			Err("Couldn't send request to Reddit, this instance may be being rate-limited. Try another.".to_string())
+			Err("Couldn't send request to Reddit".to_string())
 		}
 	}
 }

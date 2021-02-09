@@ -1,15 +1,15 @@
 {
-    "name": "Libreddit",
-    "short_name": "Libreddit",
-    "display": "standalone",
-    "background_color": "#1F1F1F",
-    "description": "An alternative private front-end to Reddit",
-    "theme_color": "#1F1F1F",
-    "icons": [
-      {
-        "src": "./logo.png",
-        "sizes": "512x512",
-        "type": "image/png"
-      }
-    ]
-  }
+	"name": "Libreddit",
+	"short_name": "Libreddit",
+	"display": "standalone",
+	"background_color": "#1F1F1F",
+	"description": "An alternative private front-end to Reddit",
+	"theme_color": "#1F1F1F",
+	"icons": [
+		{
+			"src": "./logo.png",
+			"sizes": "512x512",
+			"type": "image/png"
+		}
+	]
+}

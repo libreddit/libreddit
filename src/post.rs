@@ -1,6 +1,6 @@
 // CRATES
 use crate::utils::*;
-use actix_web::{HttpRequest, HttpResponse};
+use tide::Request;
 
 use async_recursion::async_recursion;
 
@@ -16,9 +16,9 @@ struct PostTemplate {
 	prefs: Preferences,
 }
 
-pub async fn item(req: HttpRequest) -> HttpResponse {
+pub async fn item(req: Request<()>) -> tide::Result {
 	// Build Reddit API path
-	let mut path: String = format!("{}.json?{}&raw_json=1", req.path(), req.query_string());
+	let mut path: String = format!("{}.json?{}&raw_json=1", req.url().path(), req.url().query().unwrap_or_default());
 
 	// Set sort to sort query parameter
 	let mut sort: String = param(&path, "sort");
@@ -29,12 +29,17 @@ pub async fn item(req: HttpRequest) -> HttpResponse {
 	// If there's no sort query but there's a default sort, set sort to default_sort
 	if sort.is_empty() && !default_sort.is_empty() {
 		sort = default_sort;
-		path = format!("{}.json?{}&sort={}&raw_json=1", req.path(), req.query_string(), sort);
+		path = format!(
+			"{}.json?{}&sort={}&raw_json=1",
+			req.url().path(),
+			req.url().query().unwrap_or_default(),
+			sort
+		);
 	}
 
 	// Log the post ID being fetched in debug mode
 	#[cfg(debug_assertions)]
-	dbg!(req.match_info().get("id").unwrap_or(""));
+	dbg!(req.param("id").unwrap_or(""));
 
 	// Send a request to the url, receive JSON in response
 	match request(path).await {
@@ -45,15 +50,12 @@ pub async fn item(req: HttpRequest) -> HttpResponse {
 			let comments = parse_comments(&res[1]).await;
 
 			// Use the Post and Comment structs to generate a website to show users
-			let s = PostTemplate {
+			template(PostTemplate {
 				comments,
 				post,
 				sort,
 				prefs: prefs(req),
-			}
-			.render()
-			.unwrap();
-			HttpResponse::Ok().content_type("text/html").body(s)
+			})
 		}
 		// If the Reddit API returns an error, exit and send error page to user
 		Err(msg) => error(msg).await,

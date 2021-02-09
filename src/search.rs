@@ -1,7 +1,7 @@
 // CRATES
-use crate::utils::{cookie, error, fetch_posts, param, prefs, request, val, Post, Preferences};
-use actix_web::{HttpRequest, HttpResponse};
+use crate::utils::{cookie, error, fetch_posts, param, prefs, request, template, val, Post, Preferences};
 use askama::Template;
+use tide::Request;
 
 // STRUCTS
 struct SearchParams {
@@ -32,10 +32,10 @@ struct SearchTemplate {
 }
 
 // SERVICES
-pub async fn find(req: HttpRequest) -> HttpResponse {
+pub async fn find(req: Request<()>) -> tide::Result {
 	let nsfw_results = if cookie(&req, "show_nsfw") == "on" { "&include_over_18=on" } else { "" };
-	let path = format!("{}.json?{}{}", req.path(), req.query_string(), nsfw_results);
-	let sub = req.match_info().get("sub").unwrap_or("").to_string();
+	let path = format!("{}.json?{}{}", req.url().path(), req.url().query().unwrap_or_default(), nsfw_results);
+	let sub = req.param("sub").unwrap_or("").to_string();
 
 	let sort = if param(&path, "sort").is_empty() {
 		"relevance".to_string()
@@ -50,24 +50,20 @@ pub async fn find(req: HttpRequest) -> HttpResponse {
 	};
 
 	match fetch_posts(&path, String::new()).await {
-		Ok((posts, after)) => HttpResponse::Ok().content_type("text/html").body(
-			SearchTemplate {
-				posts,
-				subreddits,
-				sub,
-				params: SearchParams {
-					q: param(&path, "q"),
-					sort,
-					t: param(&path, "t"),
-					before: param(&path, "after"),
-					after,
-					restrict_sr: param(&path, "restrict_sr"),
-				},
-				prefs: prefs(req),
-			}
-			.render()
-			.unwrap(),
-		),
+		Ok((posts, after)) => template(SearchTemplate {
+			posts,
+			subreddits,
+			sub,
+			params: SearchParams {
+				q: param(&path, "q"),
+				sort,
+				t: param(&path, "t"),
+				before: param(&path, "after"),
+				after,
+				restrict_sr: param(&path, "restrict_sr"),
+			},
+			prefs: prefs(req),
+		}),
 		Err(msg) => error(msg).await,
 	}
 }

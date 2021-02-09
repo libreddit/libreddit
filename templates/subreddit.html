@@ -80,11 +80,11 @@
 					</div>
 					<div id="sub_subscription">
 						{% if prefs.subs.contains(sub.name) %}
-							<form action="/r/{{ sub.name }}/unsubscribe" method="POST">
+							<form action="/r/{{ sub.name }}/unsubscribe/" method="POST">
 								<button class="unsubscribe">Unsubscribe</button>
 							</form>
 						{% else %}
-							<form action="/r/{{ sub.name }}/subscribe" method="POST">
+							<form action="/r/{{ sub.name }}/subscribe/" method="POST">
 								<button class="subscribe">Subscribe</button>
 							</form>
 						{% endif %}

@@ -1,9 +1,8 @@
-use actix_web::{client::Client, error, web, Error, HttpResponse, Result};
-use url::Url;
-
 use base64::decode;
+use surf::{Body, Url};
+use tide::{Request, Response};
 
-pub async fn handler(web::Path(b64): web::Path<String>) -> Result<HttpResponse> {
+pub async fn handler(req: Request<()>) -> tide::Result {
 	let domains = vec![
 		// THUMBNAILS
 		"a.thumbs.redditmedia.com",
@@ -21,27 +20,31 @@ pub async fn handler(web::Path(b64): web::Path<String>) -> Result<HttpResponse> 
 		"v.redd.it",
 	];
 
-	let decoded = decode(b64).map(|bytes| String::from_utf8(bytes).unwrap_or_default());
+	let decoded = decode(req.param("url").unwrap_or_default()).map(|bytes| String::from_utf8(bytes).unwrap_or_default());
 
 	match decoded {
 		Ok(media) => match Url::parse(media.as_str()) {
 			Ok(url) => {
-				let domain = url.domain().unwrap_or_default();
+				if domains.contains(&url.domain().unwrap_or_default()) {
+					let http = surf::get(url).await.unwrap();
 
-				if domains.contains(&domain) {
-					Client::default().get(media.replace("&amp;", "&")).send().await.map_err(Error::from).map(|res| {
-						HttpResponse::build(res.status())
+					let content_length = http.header("Content-Length").map(|v| v.to_string()).unwrap_or_default();
+					let content_type = http.content_type().map(|m| m.to_string()).unwrap_or_default();
+
+					Ok(
+						Response::builder(http.status())
+							.body(Body::from_reader(http, None))
 							.header("Cache-Control", "public, max-age=1209600, s-maxage=86400")
-							.header("Content-Length", res.headers().get("Content-Length").unwrap().to_owned())
-							.header("Content-Type", res.headers().get("Content-Type").unwrap().to_owned())
-							.streaming(res)
-					})
+							.header("Content-Length", content_length)
+							.header("Content-Type", content_type)
+							.build(),
+					)
 				} else {
-					Err(error::ErrorForbidden("Resource must be from Reddit"))
+					Err(tide::Error::from_str(403, "Resource must be from Reddit"))
 				}
 			}
-			_ => Err(error::ErrorBadRequest("Can't parse base64 into URL")),
+			Err(_) => Err(tide::Error::from_str(400, "Can't parse base64 into URL")),
 		},
-		_ => Err(error::ErrorBadRequest("Can't decode base64")),
+		Err(_) => Err(tide::Error::from_str(400, "Can't decode base64")),
 	}
 }
