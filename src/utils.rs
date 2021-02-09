@@ -76,9 +76,13 @@ pub struct Post {
 	pub gallery: Vec<GalleryMedia>,
 }
 
+#[derive(Template)]
+#[template(path = "comment.html", escape = "none")]
 // Comment with content, post, score and data/time that it was posted
 pub struct Comment {
 	pub id: String,
+	pub kind: String,
+	pub post: Post,
 	pub body: String,
 	pub author: Author,
 	pub score: String,

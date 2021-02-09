@@ -17,29 +17,6 @@
 	{% call utils::sub_list(post.community.as_str()) %}
 {% endblock %}
 
-<!-- OPEN COMMENT MACRO -->
-{% macro comment(item) -%}
-<div id="{{ item.id }}" class="comment">
-	<div class="comment_left">
-		<p class="comment_score">{{ item.score }}</p>
-		<div class="line"></div>
-	</div>
-	<details class="comment_right" open>
-		<summary class="comment_data">
-			<a class="comment_author {{ item.author.distinguished }} {% if item.author.name == post.author.name %}op{% endif %}" href="/u/{{ item.author.name }}">u/{{ item.author.name }}</a>
-			{% if item.author.flair.flair_parts.len() > 0 %}
-				<small class="author_flair">{% call utils::render_flair(item.author.flair.flair_parts) %}</small>
-			{% endif %}
-			<span class="created" title="{{ post.created }}">{{ item.rel_time }}</span>
-		</summary>
-		<div class="comment_body">{{ item.body }}</div>
-{%- endmacro %}
-
-<!-- CLOSE COMMENT MACRO -->
-{% macro close() %}
-</details></div>
-{% endmacro %}
-
 {% block content %}
 	<div id="column_one">
 
@@ -124,25 +101,7 @@
 		<!-- COMMENTS -->
 		{% for c in comments -%}
 		<div class="thread">
-			<!-- EACH COMMENT -->
-			{% call comment(c) %}
-			<blockquote class="replies">{% for reply1 in c.replies %}{% call comment(reply1) %}
-				<!-- FIRST-LEVEL REPLIES -->
-				<blockquote class="replies">{% for reply2 in reply1.replies %}{% call comment(reply2) %}
-					<!-- SECOND-LEVEL REPLIES -->
-					<blockquote class="replies">{% for reply3 in reply2.replies %}{% call comment(reply3) %}
-						<!-- THIRD-LEVEL REPLIES -->
-						{% if reply3.replies.len() > 0 %}
-							<!-- LINK TO CONTINUE REPLIES -->
-							<a class="deeper_replies" href="{{ post.permalink }}{{ reply3.id }}">&rarr; More replies</a>
-						{% endif %}
-						{% call close() %}
-					{% endfor %}
-					</blockquote>{% call close() %}
-				{% endfor %}
-				</blockquote>{% call close() %}
-			{% endfor %}
-			</blockquote>{% call close() %}
+			{{ c.render().unwrap() }}
 		</div>
 		{%- endfor %}
 

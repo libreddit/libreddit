@@ -1,0 +1,24 @@
+{% import "utils.html" as utils %}
+
+{% if kind == "more" %} 
+<a class="deeper_replies" href="{{ post.permalink }}{{ id }}">&rarr; More replies</a>
+{% else if kind == "t1"  %}
+<div id="{{ id }}" class="comment">
+	<div class="comment_left">
+		<p class="comment_score">{{ score }}</p>
+		<div class="line"></div>
+	</div>
+	<details class="comment_right" open>
+		<summary class="comment_data">
+			<a class="comment_author {{ author.distinguished }} {% if item.author.name == post.author.name %}op{% endif %}" href="/u/{{ author.name }}">u/{{ author.name }}</a>
+			{% if author.flair.flair_parts.len() > 0 %}
+				<small class="author_flair">{% call utils::render_flair(author.flair.flair_parts) %}</small>
+			{% endif %}
+			<span class="created" title="{{ created }}">{{ rel_time }}</span>
+		</summary>
+		<div class="comment_body">{{ body }}</div>
+		<blockquote class="replies">{% for c in replies -%}{{ c.render().unwrap() }}{%- endfor %}
+		</blockquote>
+	</details>
+</div>
+{% endif %}
