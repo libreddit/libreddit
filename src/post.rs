@@ -171,6 +171,7 @@ async fn parse_comments(json: &serde_json::Value, post_link: &str, post_author: 
 			id,
 			kind: comment["kind"].as_str().unwrap_or_default().to_string(),
 			parent_id: parent_info[1].to_string(),
+			parent_kind: parent_info[0].to_string(),
 			post_link: post_link.to_string(),
 			post_author: post_author.to_string(),
 			body,
