@@ -89,11 +89,17 @@ pub async fn subscriptions(req: Request<()>) -> tide::Result {
 
 	let mut sub_list = prefs(req).subs;
 
+	// Find each subreddit name (separated by '+') in sub parameter
+	let split = sub.split('+');
+
 	// Modify sub list based on action
 	if action.contains(&"subscribe".to_string()) && !sub_list.contains(&sub) {
-		sub_list.push(sub.to_owned());
+		// Add each sub name to the subscribed list
+		split.map(|part| sub_list.push(part.to_owned())).min();
+		// Reorder sub names alphabettically
 		sub_list.sort_by_key(|a| a.to_lowercase())
 	} else if action.contains(&"unsubscribe".to_string()) {
+		// Remove sub name from subscribed list
 		sub_list.retain(|s| s != &sub);
 	}
 
@@ -137,7 +143,7 @@ pub async fn wiki(req: Request<()>) -> tide::Result {
 	match request(path).await {
 		Ok(res) => template(WikiTemplate {
 			sub,
-			wiki: rewrite_url(res["data"]["content_html"].as_str().unwrap_or_default()),
+			wiki: rewrite_urls(res["data"]["content_html"].as_str().unwrap_or_default()),
 			page,
 			prefs: prefs(req),
 		}),
@@ -172,7 +178,7 @@ async fn subreddit(sub: &str) -> Result<Subreddit, String> {
 				name: val(&res, "display_name"),
 				title: val(&res, "title"),
 				description: val(&res, "public_description"),
-				info: rewrite_url(&val(&res, "description_html").replace("\\", "")),
+				info: rewrite_urls(&val(&res, "description_html").replace("\\", "")),
 				icon: format_url(icon.as_str()),
 				members: format_num(members),
 				active: format_num(active),

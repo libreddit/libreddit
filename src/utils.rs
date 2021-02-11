@@ -200,7 +200,7 @@ pub fn format_url(url: &str) -> String {
 }
 
 // Rewrite Reddit links to Libreddit in body of text
-pub fn rewrite_url(text: &str) -> String {
+pub fn rewrite_urls(text: &str) -> String {
 	let re = Regex::new(r#"href="(https://|http://|)(www.|old.|np.|)(reddit).(com)/"#).unwrap();
 	re.replace_all(text, r#"href="/"#).to_string()
 }
@@ -377,7 +377,7 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 			id: val(post, "id"),
 			title: if title.is_empty() { fallback_title.to_owned() } else { title },
 			community: val(post, "subreddit"),
-			body: rewrite_url(&val(post, "body_html")),
+			body: rewrite_urls(&val(post, "body_html")),
 			author: Author {
 				name: val(post, "author"),
 				flair: Flair {

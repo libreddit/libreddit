@@ -86,7 +86,7 @@ async fn parse_post(json: &serde_json::Value) -> Post {
 		id: val(post, "id"),
 		title: val(post, "title"),
 		community: val(post, "subreddit"),
-		body: rewrite_url(&val(post, "selftext_html")),
+		body: rewrite_urls(&val(post, "selftext_html")).replace("\\", ""),
 		author: Author {
 			name: val(post, "author"),
 			flair: Flair {
@@ -153,7 +153,7 @@ async fn parse_comments(json: &serde_json::Value, post_link: &str, post_author: 
 		let (rel_time, created) = time(unix_time);
 
 		let score = comment["data"]["score"].as_i64().unwrap_or(0);
-		let body = rewrite_url(&val(&comment, "body_html"));
+		let body = rewrite_urls(&val(&comment, "body_html"));
 
 		let replies: Vec<Comment> = if comment["data"]["replies"].is_object() {
 			parse_comments(&comment["data"]["replies"], post_link, post_author, highlighted_comment).await
@@ -171,7 +171,6 @@ async fn parse_comments(json: &serde_json::Value, post_link: &str, post_author: 
 			id,
 			kind: comment["kind"].as_str().unwrap_or_default().to_string(),
 			parent_id: parent_info[1].to_string(),
-			parent_kind: parent_info[0].to_string(),
 			post_link: post_link.to_string(),
 			post_author: post_author.to_string(),
 			body,
