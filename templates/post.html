@@ -101,6 +101,12 @@
 		<!-- COMMENTS -->
 		{% for c in comments -%}
 		<div class="thread">
+			{% if single_thread %}
+			<p class="thread_nav"><a href="/{{ post.id }}">View all comments</a></p>
+			{% if c.parent_kind == "t1" %}
+			<p class="thread_nav"><a href="?context=9999">Show parent comments</a></p>
+			{% endif %}
+			{% endif %}
 			{{ c.render().unwrap() }}
 		</div>
 		{%- endfor %}

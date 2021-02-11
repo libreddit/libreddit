@@ -157,12 +157,12 @@ async fn main() -> tide::Result<()> {
 	// Browse user profile
 	app.at("/u/:name/").get(user::profile);
 	app.at("/u/:name/comments/:id/:title/").get(post::item);
-	app.at("/u/:name/comments/:id/:title/:comment/").get(post::item);
+	app.at("/u/:name/comments/:id/:title/:comment_id/").get(post::item);
 
 	app.at("/user/:name/").get(user::profile);
 	app.at("/user/:name/comments/:id/").get(post::item);
 	app.at("/user/:name/comments/:id/:title/").get(post::item);
-	app.at("/user/:name/comments/:id/:title/:comment/").get(post::item);
+	app.at("/user/:name/comments/:id/:title/:comment_id/").get(post::item);
 
 	// Configure settings
 	app.at("/settings/").get(settings::get).post(settings::set);

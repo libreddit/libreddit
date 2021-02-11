@@ -555,6 +555,12 @@ a.search_subreddit:hover {
 	word-break: break-word;
 }
 
+.thread_nav {
+	color: var(--accent);
+	font-weight: bold;
+	margin: 10px 0;
+}
+
 .post {
 	border-radius: 5px;
 	background: var(--post);
@@ -844,7 +850,12 @@ a.search_subreddit:hover {
 .comment_body {
 	opacity: 0.9;
 	font-weight: normal;
-	margin: 10px 5px;
+	padding: 5px 5px;
+	margin: 5px 0;
+}
+
+.comment_body.highlighted {
+	background: var(--highlighted);
 }
 
 .comment_body > p:not(:first-child) {
