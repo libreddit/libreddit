@@ -106,6 +106,8 @@
 			{% if c.parent_kind == "t1" %}
 			<p class="thread_nav"><a href="?context=9999">Show parent comments</a></p>
 			{% endif %}
+			{% endif %}
+			
 			{{ c.render().unwrap() }}
 		</div>
 		{%- endfor %}
