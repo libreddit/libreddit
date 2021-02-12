@@ -47,14 +47,14 @@
 				<input type="checkbox" name="show_nsfw" {% if prefs.show_nsfw == "on" %}checked{% endif %}>
 			</div>
 		</div>
-		<p id="settings_note"><b>Note:</b> settings are saved in browser cookies. Clearing your cookie data will reset them.</p>
+		<p id="settings_note"><b>Note:</b> settings are saved in browser cookies. Clearing your cookie data will reset them. <a href="/settings/restore/?theme={{ prefs.theme }}&front_page={{ prefs.front_page }}&layout={{ prefs.layout }}&wide={{ prefs.wide }}&comment_sort={{ prefs.comment_sort }}&show_nsfw={{ prefs.show_nsfw }}&subscriptions={{ prefs.subscriptions.join("%2B") }}">You can restore your current settings using this link</a></p>
 		<input id="save" type="submit" value="Save">
 	</form>
-	{% if prefs.subs.len() > 0 %}
+	{% if prefs.subscriptions.len() > 0 %}
 		<aside class="prefs">
 			<p>Subscribed Subreddits</p>
 			<ul id="settings_subs">
-				{% for sub in prefs.subs %}
+				{% for sub in prefs.subscriptions %}
 					<li>
 						<span>{{ sub }}</span>
 						<form action="/r/{{ sub }}/unsubscribe/?redirect=settings" method="POST">

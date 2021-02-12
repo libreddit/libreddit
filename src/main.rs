@@ -166,6 +166,7 @@ async fn main() -> tide::Result<()> {
 
 	// Configure settings
 	app.at("/settings/").get(settings::get).post(settings::set);
+	app.at("/settings/restore/").get(settings::restore);
 
 	// Subreddit services
 	// See posts and info about subreddit

@@ -41,7 +41,7 @@
 {%- endmacro %}
 
 {% macro sub_list(current) -%}
-{% if prefs.subs.len() > 0 %}
+{% if prefs.subscriptions.len() > 0 %}
 	<details id="feeds">
 		<summary>Feeds</summary>
 		<div id="feed_list">
@@ -50,7 +50,7 @@
 			<a href="/r/popular">Popular</a>
 			<a href="/r/all">All</a>
 			<p>REDDIT FEEDS</p>
-			{% for sub in prefs.subs %}
+			{% for sub in prefs.subscriptions %}
 				<a href="/r/{{ sub }}" {% if sub == current %}class="selected"{% endif %}>{{ sub }}</a>
 			{% endfor %}
 		</div>

@@ -146,7 +146,7 @@ pub struct Preferences {
 	pub wide: String,
 	pub show_nsfw: String,
 	pub comment_sort: String,
-	pub subs: Vec<String>,
+	pub subscriptions: Vec<String>,
 }
 
 //
@@ -162,7 +162,7 @@ pub fn prefs(req: Request<()>) -> Preferences {
 		wide: cookie(&req, "wide"),
 		show_nsfw: cookie(&req, "show_nsfw"),
 		comment_sort: cookie(&req, "comment_sort"),
-		subs: cookie(&req, "subscriptions")
+		subscriptions: cookie(&req, "subscriptions")
 			.split('+')
 			.map(String::from)
 			.filter(|s| !s.is_empty())
