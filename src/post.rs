@@ -14,6 +14,7 @@ struct PostTemplate {
 	post: Post,
 	sort: String,
 	prefs: Preferences,
+	single_thread: bool,
 }
 
 pub async fn item(req: Request<()>) -> tide::Result {
@@ -40,6 +41,9 @@ pub async fn item(req: Request<()>) -> tide::Result {
 	// Log the post ID being fetched in debug mode
 	#[cfg(debug_assertions)]
 	dbg!(req.param("id").unwrap_or(""));
+	
+	let single_thread = &req.param("comment_id").is_ok();
+	let highlighted_comment = &req.param("comment_id").unwrap_or_default();
 
 	// Send a request to the url, receive JSON in response
 	match request(path).await {
@@ -47,7 +51,7 @@ pub async fn item(req: Request<()>) -> tide::Result {
 		Ok(res) => {
 			// Parse the JSON into Post and Comment structs
 			let post = parse_post(&res[0]).await;
-			let comments = parse_comments(&res[1], &post.permalink, &post.author.name).await;
+			let comments = parse_comments(&res[1], &post.permalink, &post.author.name, *highlighted_comment).await;
 
 			// Use the Post and Comment structs to generate a website to show users
 			template(PostTemplate {
@@ -55,6 +59,7 @@ pub async fn item(req: Request<()>) -> tide::Result {
 				post,
 				sort,
 				prefs: prefs(req),
+				single_thread: *single_thread,
 			})
 		}
 		// If the Reddit API returns an error, exit and send error page to user
@@ -133,7 +138,7 @@ async fn parse_post(json: &serde_json::Value) -> Post {
 
 // COMMENTS
 #[async_recursion]
-async fn parse_comments(json: &serde_json::Value, post_link: &str, post_author: &str) -> Vec<Comment> {
+async fn parse_comments(json: &serde_json::Value, post_link: &str, post_author: &str, highlighted_comment: &str) -> Vec<Comment> {
 	// Separate the comment JSON into a Vector of comments
 	let comment_data = match json["data"]["children"].as_array() {
 		Some(f) => f.to_owned(),
@@ -151,14 +156,22 @@ async fn parse_comments(json: &serde_json::Value, post_link: &str, post_author: 
 		let body = rewrite_urls(&val(&comment, "body_html"));
 
 		let replies: Vec<Comment> = if comment["data"]["replies"].is_object() {
-			parse_comments(&comment["data"]["replies"], post_link, post_author).await
+			parse_comments(&comment["data"]["replies"], post_link, post_author, highlighted_comment).await
 		} else {
 			Vec::new()
 		};
-
+		
+		let parent_kind_and_id = val(&comment, "parent_id");
+		let parent_info = parent_kind_and_id.split("_").collect::<Vec<&str>>();
+		
+		let id = val(&comment, "id");
+		let highlighted = id == highlighted_comment;
+		
 		comments.push(Comment {
-			id: val(&comment, "id"),
+			id,
 			kind: comment["kind"].as_str().unwrap_or_default().to_string(),
+			parent_id: parent_info[1].to_string(),
+			parent_kind: parent_info[0].to_string(),
 			post_link: post_link.to_string(),
 			post_author: post_author.to_string(),
 			body,
@@ -183,6 +196,7 @@ async fn parse_comments(json: &serde_json::Value, post_link: &str, post_author: 
 			rel_time,
 			created,
 			replies,
+			highlighted,
 		});
 	}
 

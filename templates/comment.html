@@ -1,7 +1,7 @@
 {% import "utils.html" as utils %}
 
-{% if kind == "more" %} 
-<a class="deeper_replies" href="{{ post_link }}{{ id }}">&rarr; More replies</a>
+{% if kind == "more" && parent_kind == "t1" %}
+<a class="deeper_replies" href="{{ post_link }}{{ parent_id }}">&rarr; More replies</a>
 {% else if kind == "t1"  %}
 <div id="{{ id }}" class="comment">
 	<div class="comment_left">
@@ -16,7 +16,7 @@
 			{% endif %}
 			<span class="created" title="{{ created }}">{{ rel_time }}</span>
 		</summary>
-		<div class="comment_body">{{ body }}</div>
+		<div class="comment_body {% if highlighted %}highlighted{% endif %}">{{ body }}</div>
 		<blockquote class="replies">{% for c in replies -%}{{ c.render().unwrap() }}{%- endfor %}
 		</blockquote>
 	</details>

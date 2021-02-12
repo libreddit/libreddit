@@ -82,6 +82,8 @@ pub struct Post {
 pub struct Comment {
 	pub id: String,
 	pub kind: String,
+	pub parent_id: String,
+	pub parent_kind: String,
 	pub post_link: String,
 	pub post_author: String,
 	pub body: String,
@@ -90,6 +92,7 @@ pub struct Comment {
 	pub rel_time: String,
 	pub created: String,
 	pub replies: Vec<Comment>,
+	pub highlighted: bool,
 }
 
 #[derive(Default)]
