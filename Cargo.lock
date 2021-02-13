@@ -752,6 +752,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "dashmap"
+version = "4.0.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e77a43b28d0668df09411cb0bc9a8c2adc40f9a048afe863e05fd43251e8e39c"
+dependencies = [
+ "cfg-if 1.0.0",
+ "num_cpus",
+]
+
+[[package]]
 name = "data-encoding"
 version = "2.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1057,12 +1067,13 @@ dependencies = [
 
 [[package]]
 name = "http-client"
-version = "6.2.0"
+version = "6.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "010092b71b94ee49293995625ce7a607778b8b4099c8088fa84fd66bd3e0f21c"
+checksum = "518cdefb188f1e14c60151ca4ee1c186c9b6e0d7047c334e53478d3d9f2b0dfa"
 dependencies = [
  "async-std",
  "async-trait",
+ "dashmap",
  "http-types",
  "isahc",
  "log",
@@ -1510,9 +1521,9 @@ dependencies = [
 
 [[package]]
 name = "quote"
-version = "1.0.8"
+version = "1.0.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "991431c3519a3f36861882da93630ce66b52918dcf1b8e2fd66b397fc96f28df"
+checksum = "c3d0b9745dc2debf507c8422de05d7226cc1f0644216dfdfead988f9b1ab32a7"
 dependencies = [
  "proc-macro2",
 ]
@@ -1896,9 +1907,9 @@ dependencies = [
 
 [[package]]
 name = "tap"
-version = "1.0.0"
+version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "36474e732d1affd3a6ed582781b3683df3d0563714c59c39591e8ff707cf078e"
+checksum = "55937e1799185b12863d447f42597ed69d9928686b8d88a1df17376a097d8369"
 
 [[package]]
 name = "thiserror"

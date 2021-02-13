@@ -90,17 +90,17 @@ pub async fn subscriptions(req: Request<()>) -> tide::Result {
 	let mut sub_list = prefs(req).subs;
 
 	// Find each subreddit name (separated by '+') in sub parameter
-	let split = sub.split('+');
-
-	// Modify sub list based on action
-	if action.contains(&"subscribe".to_string()) && !sub_list.contains(&sub) {
-		// Add each sub name to the subscribed list
-		split.map(|part| sub_list.push(part.to_owned())).min();
-		// Reorder sub names alphabettically
-		sub_list.sort_by_key(|a| a.to_lowercase())
-	} else if action.contains(&"unsubscribe".to_string()) {
-		// Remove sub name from subscribed list
-		sub_list.retain(|s| s != &sub);
+	for part in sub.split('+') {
+		// Modify sub list based on action
+		if action.contains(&"subscribe".to_string()) && !sub_list.contains(&part.to_owned()) {
+			// Add each sub name to the subscribed list
+			sub_list.push(part.to_owned());
+			// Reorder sub names alphabettically
+			sub_list.sort_by_key(|a| a.to_lowercase())
+		} else if action.contains(&"unsubscribe".to_string()) {
+			// Remove sub name from subscribed list
+			sub_list.retain(|s| s != part);
+		}
 	}
 
 	// Redirect back to subreddit

@@ -285,6 +285,10 @@ aside {
 	margin-top: 20px;
 }
 
+#multisub {
+	margin-bottom: 20px;
+}
+
 .subscribe, .unsubscribe {
 	padding: 10px 20px;
 	border-radius: 5px;
