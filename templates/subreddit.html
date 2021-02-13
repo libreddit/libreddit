@@ -85,7 +85,7 @@
 						<div>{{ sub.active }}</div>
 					</div>
 					<div id="sub_subscription">
-						{% if prefs.subs.contains(sub.name) %}
+						{% if prefs.subscriptions.contains(sub.name) %}
 							<form action="/r/{{ sub.name }}/unsubscribe/" method="POST">
 								<button class="unsubscribe">Unsubscribe</button>
 							</form>

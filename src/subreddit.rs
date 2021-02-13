@@ -87,7 +87,7 @@ pub async fn subscriptions(req: Request<()>) -> tide::Result {
 	let query = req.url().query().unwrap_or_default().to_string();
 	let action: Vec<String> = req.url().path().split('/').map(String::from).collect();
 
-	let mut sub_list = prefs(req).subs;
+	let mut sub_list = prefs(req).subscriptions;
 
 	// Find each subreddit name (separated by '+') in sub parameter
 	for part in sub.split('+') {

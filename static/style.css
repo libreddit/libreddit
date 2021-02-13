@@ -958,18 +958,20 @@ a.search_subreddit:hover {
 
 /* Settings */
 
-#settings, #settings > form {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
+#settings {
+	max-width: 450px;
 }
 
 #settings_note {
 	font-size: 14px;
-	max-width: 300px;
 	margin-top: 10px;
 	opacity: 0.75;
 }
+
+#settings_note a {
+	color: var(--accent);
+}
+
 
 .prefs {
 	display: flex;
@@ -979,6 +981,7 @@ a.search_subreddit:hover {
 	padding: 20px;
 	background: var(--post);
 	border-radius: 5px;
+	margin-bottom: 20px;
 }
 
 .prefs > div {
@@ -987,10 +990,7 @@ a.search_subreddit:hover {
 	width: 100%;
 	height: 35px;
 	align-items: center;
-}
-
-.prefs > div:not(:last-of-type) {
-	margin-bottom: 10px;
+	margin-top: 10px;
 }
 
 .prefs select {
@@ -1015,22 +1015,6 @@ input[type="submit"] {
 	appearance: none;
 	-webkit-appearance: none;
 	-moz-appearance: none;
-}
-
-#settings_subs {
-	list-style: none;
-	padding: 0;
-}
-
-#settings_subs > li {
-	display: flex;
-	margin: 10px 0;
-}
-#settings_subs > li:last-of-type { margin-bottom: 0; }
-
-#settings_subs > li > span {
-	padding: 10px 0;
-	margin-right: auto;
 }
 
 #settings_subs .unsubscribe {
@@ -1175,6 +1159,10 @@ td, th {
 		left: 10px;
 		right: 10px;
 		min-width: auto;
+	}
+	
+	#settings {
+		max-width: unset;
 	}
 
 	aside, #subreddit, #user {
