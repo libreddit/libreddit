@@ -1,7 +1,7 @@
 // CRATES
 use crate::utils::*;
 use askama::Template;
-use tide::{http::Cookie, Request, Response};
+use tide::{http::Cookie, Request};
 use time::{Duration, OffsetDateTime};
 
 // STRUCTS
@@ -31,18 +31,15 @@ pub async fn page(req: Request<()>) -> tide::Result {
 	let front_page = cookie(&req, "front_page");
 	let sort = req.param("sort").unwrap_or_else(|_| req.param("id").unwrap_or("hot")).to_string();
 
-	let sub = req
-		.param("sub")
-		.map(String::from)
-		.unwrap_or(if front_page == "default" || front_page.is_empty() {
-			if subscribed.is_empty() {
-				"popular".to_string()
-			} else {
-				subscribed.to_owned()
-			}
+	let sub = req.param("sub").map(String::from).unwrap_or(if front_page == "default" || front_page.is_empty() {
+		if subscribed.is_empty() {
+			"popular".to_string()
 		} else {
-			front_page.to_owned()
-		});
+			subscribed.to_owned()
+		}
+	} else {
+		front_page.to_owned()
+	});
 
 	let path = format!("/r/{}/{}.json?{}&raw_json=1", sub, sort, req.url().query().unwrap_or_default());
 
@@ -112,11 +109,7 @@ pub async fn subscriptions(req: Request<()>) -> tide::Result {
 		format!("/r/{}", sub)
 	};
 
-	let mut res = Response::builder(302)
-		.content_type("text/html")
-		.header("Location", path.to_owned())
-		.body(format!("Redirecting to <a href=\"{0}\">{0}</a>...", path))
-		.build();
+	let mut res = redirect(path);
 
 	// Delete cookie if empty, else set
 	if sub_list.is_empty() {
@@ -165,14 +158,8 @@ async fn subreddit(sub: &str) -> Result<Subreddit, String> {
 			let active: i64 = res["data"]["accounts_active"].as_u64().unwrap_or_default() as i64;
 
 			// Fetch subreddit icon either from the community_icon or icon_img value
-			let community_icon: &str = res["data"]["community_icon"]
-				.as_str()
-				.map_or("", |s| s.split('?').collect::<Vec<&str>>()[0]);
-			let icon = if community_icon.is_empty() {
-				val(&res, "icon_img")
-			} else {
-				community_icon.to_string()
-			};
+			let community_icon: &str = res["data"]["community_icon"].as_str().map_or("", |s| s.split('?').collect::<Vec<&str>>()[0]);
+			let icon = if community_icon.is_empty() { val(&res, "icon_img") } else { community_icon.to_string() };
 
 			let sub = Subreddit {
 				name: val(&res, "display_name"),

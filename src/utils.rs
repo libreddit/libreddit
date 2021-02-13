@@ -162,24 +162,14 @@ pub fn prefs(req: Request<()>) -> Preferences {
 		wide: cookie(&req, "wide"),
 		show_nsfw: cookie(&req, "show_nsfw"),
 		comment_sort: cookie(&req, "comment_sort"),
-		subscriptions: cookie(&req, "subscriptions")
-			.split('+')
-			.map(String::from)
-			.filter(|s| !s.is_empty())
-			.collect(),
+		subscriptions: cookie(&req, "subscriptions").split('+').map(String::from).filter(|s| !s.is_empty()).collect(),
 	}
 }
 
 // Grab a query param from a url
 pub fn param(path: &str, value: &str) -> String {
 	match Url::parse(format!("https://libredd.it/{}", path).as_str()) {
-		Ok(url) => url
-			.query_pairs()
-			.into_owned()
-			.collect::<HashMap<_, _>>()
-			.get(value)
-			.unwrap_or(&String::new())
-			.to_owned(),
+		Ok(url) => url.query_pairs().into_owned().collect::<HashMap<_, _>>().get(value).unwrap_or(&String::new()).to_owned(),
 		_ => String::new(),
 	}
 }
@@ -226,8 +216,8 @@ pub async fn media(data: &Value) -> (String, Media, Vec<GalleryMedia>) {
 	} else if data["secure_media"]["reddit_video"]["fallback_url"].is_string() {
 		post_type = "video";
 		format_url(data["secure_media"]["reddit_video"]["fallback_url"].as_str().unwrap_or_default())
-	// Handle images, whether GIFs or pics
 	} else if data["post_hint"].as_str().unwrap_or("") == "image" {
+		// Handle images, whether GIFs or pics
 		let preview = data["preview"]["images"][0].clone();
 		let mp4 = &preview["variants"]["mp4"];
 		if mp4.is_object() {
@@ -438,13 +428,16 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 // NETWORKING
 //
 
-pub fn template(f: impl Template) -> tide::Result {
-	Ok(
-		Response::builder(200)
-			.content_type("text/html")
-			.body(f.render().unwrap_or_default())
-			.build(),
-	)
+pub fn template(t: impl Template) -> tide::Result {
+	Ok(Response::builder(200).content_type("text/html").body(t.render().unwrap_or_default()).build())
+}
+
+pub fn redirect(path: String) -> Response {
+	Response::builder(302)
+		.content_type("text/html")
+		.header("Location", &path)
+		.body(format!("Redirecting to <a href=\"{0}\">{0}</a>...", path))
+		.build()
 }
 
 pub async fn error(msg: String) -> tide::Result {

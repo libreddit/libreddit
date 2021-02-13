@@ -1,7 +1,3 @@
-// Import Crates
-// use askama::filters::format;
-use tide::{Middleware, Next, Request, Response, utils::{After, async_trait}};
-
 // Reference local files
 mod post;
 mod proxy;
@@ -10,6 +6,13 @@ mod settings;
 mod subreddit;
 mod user;
 mod utils;
+
+// Import Crates
+use tide::{
+	utils::{async_trait, After},
+	Middleware, Next, Request, Response,
+};
+use utils::{error, redirect};
 
 // Build middleware
 struct HttpsRedirect<HttpsOnly>(HttpsOnly);
@@ -28,7 +31,7 @@ where
 			let mut secured = request.url().to_owned();
 			secured.set_scheme("https").unwrap_or_default();
 
-			Ok(Response::builder(302).header("Location", secured.to_string()).build())
+			Ok(redirect(secured.to_string()))
 		} else {
 			Ok(next.run(request).await)
 		}
@@ -48,12 +51,7 @@ impl<State: Clone + Send + Sync + 'static> Middleware<State> for NormalizePath {
 
 // Create Services
 async fn style(_req: Request<()>) -> tide::Result {
-	Ok(
-		Response::builder(200)
-			.content_type("text/css")
-			.body(include_str!("../static/style.css"))
-			.build(),
-	)
+	Ok(Response::builder(200).content_type("text/css").body(include_str!("../static/style.css")).build())
 }
 
 // Required for creating a PWA
@@ -68,12 +66,7 @@ async fn manifest(_req: Request<()>) -> tide::Result {
 
 // Required for the manifest to be valid
 async fn pwa_logo(_req: Request<()>) -> tide::Result {
-	Ok(
-		Response::builder(200)
-			.content_type("image/png")
-			.body(include_bytes!("../static/logo.png").as_ref())
-			.build(),
-	)
+	Ok(Response::builder(200).content_type("image/png").body(include_bytes!("../static/logo.png").as_ref()).build())
 }
 
 // Required for iOS App Icons
@@ -206,12 +199,12 @@ async fn main() -> tide::Result<()> {
 			Ok("best") | Ok("hot") | Ok("new") | Ok("top") | Ok("rising") | Ok("controversial") => subreddit::page(req).await,
 			// Short link for post
 			Ok(id) if id.len() > 4 && id.len() < 7 => post::item(req).await,
-			_ => utils::error("Nothing here".to_string()).await
+			_ => error("Nothing here".to_string()).await,
 		}
 	});
 
 	// Default service in case no routes match
-	app.at("*").get(|_| utils::error("Nothing here".to_string()));
+	app.at("*").get(|_| error("Nothing here".to_string()));
 
 	app.listen(address).await?;
 	Ok(())

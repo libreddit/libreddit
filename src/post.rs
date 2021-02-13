@@ -30,18 +30,13 @@ pub async fn item(req: Request<()>) -> tide::Result {
 	// If there's no sort query but there's a default sort, set sort to default_sort
 	if sort.is_empty() && !default_sort.is_empty() {
 		sort = default_sort;
-		path = format!(
-			"{}.json?{}&sort={}&raw_json=1",
-			req.url().path(),
-			req.url().query().unwrap_or_default(),
-			sort
-		);
+		path = format!("{}.json?{}&sort={}&raw_json=1", req.url().path(), req.url().query().unwrap_or_default(), sort);
 	}
 
 	// Log the post ID being fetched in debug mode
 	#[cfg(debug_assertions)]
 	dbg!(req.param("id").unwrap_or(""));
-	
+
 	let single_thread = &req.param("comment_id").is_ok();
 	let highlighted_comment = &req.param("comment_id").unwrap_or_default();
 
@@ -160,13 +155,13 @@ async fn parse_comments(json: &serde_json::Value, post_link: &str, post_author: 
 		} else {
 			Vec::new()
 		};
-		
+
 		let parent_kind_and_id = val(&comment, "parent_id");
 		let parent_info = parent_kind_and_id.split("_").collect::<Vec<&str>>();
-		
+
 		let id = val(&comment, "id");
 		let highlighted = id == highlighted_comment;
-		
+
 		comments.push(Comment {
 			id,
 			kind: comment["kind"].as_str().unwrap_or_default().to_string(),
