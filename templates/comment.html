@@ -15,6 +15,7 @@
 				<small class="author_flair">{% call utils::render_flair(author.flair.flair_parts) %}</small>
 			{% endif %}
 			<span class="created" title="{{ created }}">{{ rel_time }}</span>
+			{% if edited.0 != "".to_string() %}<span class="edited" title="{{ edited.1 }}">edited {{ edited.0 }}</span>{% endif %}
 		</summary>
 		<div class="comment_body {% if highlighted %}highlighted{% endif %}">{{ body }}</div>
 		<blockquote class="replies">{% for c in replies -%}{{ c.render().unwrap() }}{%- endfor %}

@@ -91,6 +91,7 @@ pub struct Comment {
 	pub score: String,
 	pub rel_time: String,
 	pub created: String,
+	pub edited: (String, String),
 	pub replies: Vec<Comment>,
 	pub highlighted: bool,
 }
@@ -209,17 +210,21 @@ pub fn format_num(num: i64) -> String {
 pub async fn media(data: &Value) -> (String, Media, Vec<GalleryMedia>) {
 	let post_type: &str;
 	let mut gallery = Vec::new();
+
 	// If post is a video, return the video
 	let url = if data["preview"]["reddit_video_preview"]["fallback_url"].is_string() {
+		// Return video preview
 		post_type = "video";
 		format_url(data["preview"]["reddit_video_preview"]["fallback_url"].as_str().unwrap_or_default())
 	} else if data["secure_media"]["reddit_video"]["fallback_url"].is_string() {
+		// Return reddit video
 		post_type = "video";
 		format_url(data["secure_media"]["reddit_video"]["fallback_url"].as_str().unwrap_or_default())
 	} else if data["post_hint"].as_str().unwrap_or("") == "image" {
 		// Handle images, whether GIFs or pics
-		let preview = data["preview"]["images"][0].clone();
+		let preview = &data["preview"]["images"][0];
 		let mp4 = &preview["variants"]["mp4"];
+
 		if mp4.is_object() {
 			// Return the mp4 if the media is a gif
 			post_type = "gif";
@@ -230,17 +235,22 @@ pub async fn media(data: &Value) -> (String, Media, Vec<GalleryMedia>) {
 			format_url(preview["source"]["url"].as_str().unwrap_or_default())
 		}
 	} else if data["is_self"].as_bool().unwrap_or_default() {
+		// If type is self, return permalink
 		post_type = "self";
 		data["permalink"].as_str().unwrap_or_default().to_string()
 	} else if data["is_gallery"].as_bool().unwrap_or_default() {
+		// If this post contains a gallery of images
 		post_type = "gallery";
 		gallery = data["gallery_data"]["items"]
 			.as_array()
 			.unwrap_or(&Vec::<Value>::new())
 			.iter()
 			.map(|item| {
+				// For each image in gallery
 				let media_id = item["media_id"].as_str().unwrap_or_default();
 				let image = &data["media_metadata"][media_id]["s"];
+
+				// Construct gallery items
 				GalleryMedia {
 					url: format_url(image["u"].as_str().unwrap_or_default()),
 					width: image["x"].as_i64().unwrap_or_default(),
@@ -250,27 +260,31 @@ pub async fn media(data: &Value) -> (String, Media, Vec<GalleryMedia>) {
 				}
 			})
 			.collect::<Vec<GalleryMedia>>();
+
 		data["url"].as_str().unwrap_or_default().to_string()
 	} else {
+		// If type can't be determined, return url
 		post_type = "link";
 		data["url"].as_str().unwrap_or_default().to_string()
 	};
+
+	let source = &data["preview"]["images"][0]["source"];
 
 	(
 		post_type.to_string(),
 		Media {
 			url,
-			width: data["preview"]["images"][0]["source"]["width"].as_i64().unwrap_or_default(),
-			height: data["preview"]["images"][0]["source"]["height"].as_i64().unwrap_or_default(),
-			poster: format_url(data["preview"]["images"][0]["source"]["url"].as_str().unwrap_or_default()),
+			width: source["width"].as_i64().unwrap_or_default(),
+			height: source["height"].as_i64().unwrap_or_default(),
+			poster: format_url(source["url"].as_str().unwrap_or_default()),
 		},
 		gallery,
 	)
 }
 
-pub fn parse_rich_flair(flair_type: String, rich_flair: Option<&Vec<Value>>, text_flair: Option<&str>) -> Vec<FlairPart> {
+pub fn parse_rich_flair(flair_type: &str, rich_flair: Option<&Vec<Value>>, text_flair: Option<&str>) -> Vec<FlairPart> {
 	// Parse type of flair
-	match flair_type.as_str() {
+	match flair_type {
 		// If flair contains emojis and text
 		"richtext" => match rich_flair {
 			Some(rich) => rich
@@ -318,7 +332,7 @@ pub fn time(created: f64) -> (String, String) {
 		format!("{}m ago", time_delta.whole_minutes())
 	};
 
-	(rel_time, time.format("%b %d %Y, %H:%M UTC"))
+	(rel_time, time.format("%b %d %Y, %H:%M:%S UTC"))
 }
 
 //
@@ -355,13 +369,15 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 
 	// For each post from posts list
 	for post in post_list {
-		let (rel_time, created) = time(post["data"]["created_utc"].as_f64().unwrap_or_default());
-		let score = post["data"]["score"].as_i64().unwrap_or_default();
-		let ratio: f64 = post["data"]["upvote_ratio"].as_f64().unwrap_or(1.0) * 100.0;
+		let data = &post["data"];
+
+		let (rel_time, created) = time(data["created_utc"].as_f64().unwrap_or_default());
+		let score = data["score"].as_i64().unwrap_or_default();
+		let ratio: f64 = data["upvote_ratio"].as_f64().unwrap_or(1.0) * 100.0;
 		let title = val(post, "title");
 
 		// Determine the type of media along with the media URL
-		let (post_type, media, gallery) = media(&post["data"]).await;
+		let (post_type, media, gallery) = media(&data).await;
 
 		posts.push(Post {
 			id: val(post, "id"),
@@ -372,16 +388,16 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 				name: val(post, "author"),
 				flair: Flair {
 					flair_parts: parse_rich_flair(
-						val(post, "author_flair_type"),
-						post["data"]["author_flair_richtext"].as_array(),
-						post["data"]["author_flair_text"].as_str(),
+						data["author_flair_type"].as_str().unwrap_or_default(),
+						data["author_flair_richtext"].as_array(),
+						data["author_flair_text"].as_str(),
 					),
 					background_color: val(post, "author_flair_background_color"),
 					foreground_color: val(post, "author_flair_text_color"),
 				},
 				distinguished: val(post, "distinguished"),
 			},
-			score: if post["data"]["hide_score"].as_bool().unwrap_or_default() {
+			score: if data["hide_score"].as_bool().unwrap_or_default() {
 				"•".to_string()
 			} else {
 				format_num(score)
@@ -390,17 +406,17 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 			post_type,
 			thumbnail: Media {
 				url: format_url(val(post, "thumbnail").as_str()),
-				width: post["data"]["thumbnail_width"].as_i64().unwrap_or_default(),
-				height: post["data"]["thumbnail_height"].as_i64().unwrap_or_default(),
+				width: data["thumbnail_width"].as_i64().unwrap_or_default(),
+				height: data["thumbnail_height"].as_i64().unwrap_or_default(),
 				poster: "".to_string(),
 			},
 			media,
 			domain: val(post, "domain"),
 			flair: Flair {
 				flair_parts: parse_rich_flair(
-					val(post, "link_flair_type"),
-					post["data"]["link_flair_richtext"].as_array(),
-					post["data"]["link_flair_text"].as_str(),
+					data["link_flair_type"].as_str().unwrap_or_default(),
+					data["link_flair_richtext"].as_array(),
+					data["link_flair_text"].as_str(),
 				),
 				background_color: val(post, "link_flair_background_color"),
 				foreground_color: if val(post, "link_flair_text_color") == "dark" {
@@ -410,13 +426,13 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 				},
 			},
 			flags: Flags {
-				nsfw: post["data"]["over_18"].as_bool().unwrap_or_default(),
-				stickied: post["data"]["stickied"].as_bool().unwrap_or_default(),
+				nsfw: data["over_18"].as_bool().unwrap_or_default(),
+				stickied: data["stickied"].as_bool().unwrap_or_default(),
 			},
 			permalink: val(post, "permalink"),
 			rel_time,
 			created,
-			comments: format_num(post["data"]["num_comments"].as_i64().unwrap_or_default()),
+			comments: format_num(data["num_comments"].as_i64().unwrap_or_default()),
 			gallery,
 		});
 	}

@@ -86,7 +86,7 @@ async fn parse_post(json: &serde_json::Value) -> Post {
 			name: val(post, "author"),
 			flair: Flair {
 				flair_parts: parse_rich_flair(
-					val(post, "author_flair_type"),
+					post["data"]["author_flair_type"].as_str().unwrap_or_default(),
 					post["data"]["author_flair_richtext"].as_array(),
 					post["data"]["author_flair_text"].as_str(),
 				),
@@ -108,7 +108,7 @@ async fn parse_post(json: &serde_json::Value) -> Post {
 		},
 		flair: Flair {
 			flair_parts: parse_rich_flair(
-				val(post, "link_flair_type"),
+				post["data"]["link_flair_type"].as_str().unwrap_or_default(),
 				post["data"]["link_flair_richtext"].as_array(),
 				post["data"]["link_flair_text"].as_str(),
 			),
@@ -144,14 +144,22 @@ async fn parse_comments(json: &serde_json::Value, post_link: &str, post_author: 
 
 	// For each comment, retrieve the values to build a Comment object
 	for comment in comment_data {
-		let unix_time = comment["data"]["created_utc"].as_f64().unwrap_or_default();
+		let kind = comment["kind"].as_str().unwrap_or_default().to_string();
+		let data = &comment["data"];
+
+		let unix_time = data["created_utc"].as_f64().unwrap_or_default();
 		let (rel_time, created) = time(unix_time);
 
-		let score = comment["data"]["score"].as_i64().unwrap_or(0);
+		let edited = match data["edited"].as_f64() {
+			Some(stamp) => time(stamp),
+			None => (String::new(), String::new()),
+		};
+
+		let score = data["score"].as_i64().unwrap_or(0);
 		let body = rewrite_urls(&val(&comment, "body_html"));
 
-		let replies: Vec<Comment> = if comment["data"]["replies"].is_object() {
-			parse_comments(&comment["data"]["replies"], post_link, post_author, highlighted_comment).await
+		let replies: Vec<Comment> = if data["replies"].is_object() {
+			parse_comments(&data["replies"], post_link, post_author, highlighted_comment).await
 		} else {
 			Vec::new()
 		};
@@ -164,7 +172,7 @@ async fn parse_comments(json: &serde_json::Value, post_link: &str, post_author: 
 
 		comments.push(Comment {
 			id,
-			kind: comment["kind"].as_str().unwrap_or_default().to_string(),
+			kind,
 			parent_id: parent_info[1].to_string(),
 			parent_kind: parent_info[0].to_string(),
 			post_link: post_link.to_string(),
@@ -174,22 +182,23 @@ async fn parse_comments(json: &serde_json::Value, post_link: &str, post_author: 
 				name: val(&comment, "author"),
 				flair: Flair {
 					flair_parts: parse_rich_flair(
-						val(&comment, "author_flair_type"),
-						comment["data"]["author_flair_richtext"].as_array(),
-						comment["data"]["author_flair_text"].as_str(),
+						data["author_flair_type"].as_str().unwrap_or_default(),
+						data["author_flair_richtext"].as_array(),
+						data["author_flair_text"].as_str(),
 					),
 					background_color: val(&comment, "author_flair_background_color"),
 					foreground_color: val(&comment, "author_flair_text_color"),
 				},
 				distinguished: val(&comment, "distinguished"),
 			},
-			score: if comment["data"]["score_hidden"].as_bool().unwrap_or_default() {
+			score: if data["score_hidden"].as_bool().unwrap_or_default() {
 				"•".to_string()
 			} else {
 				format_num(score)
 			},
 			rel_time,
 			created,
+			edited,
 			replies,
 			highlighted,
 		});

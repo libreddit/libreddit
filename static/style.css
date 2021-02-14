@@ -889,6 +889,12 @@ a.search_subreddit:hover {
 	opacity: 0.5;
 }
 
+.edited {
+	opacity: 0.4;
+	font-style: italic;
+	font-size: 14px;
+}
+
 .line {
 	width: 2px;
 	height: 100%;
