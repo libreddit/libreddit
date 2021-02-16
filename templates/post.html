@@ -10,7 +10,20 @@
 {% block root %}/r/{{ post.community }}{% endblock %}{% block location %}r/{{ post.community }}{% endblock %}
 {% block head %}
 	{% call super() %}
+	<!-- Meta Tags -->
 	<meta name="author" content="u/{{ post.author.name }}">
+	<meta name="title" content="{{ post.title }} - r/{{ post.community }}">
+	<meta name="description" content="View on Libreddit, an alternative private front-end to Reddit.">
+	<meta property="og:type" content="website">
+	<meta property="og:url" content="{{ post.permalink }}">
+	<meta property="og:title" content="{{ post.title }} - r/{{ post.community }}">
+	<meta property="og:description" content="View on Libreddit, an alternative private front-end to Reddit.">
+	<meta property="og:image" content="{{ post.thumbnail.url }}">
+	<meta property="twitter:card" content="summary_large_image">
+	<meta property="twitter:url" content="{{ post.permalink }}">
+	<meta property="twitter:title" content="{{ post.title }} - r/{{ post.community }}">
+	<meta property="twitter:description" content="View on Libreddit, an alternative private front-end to Reddit.">
+	<meta property="twitter:image" content="{{ post.thumbnail.url }}">
 {% endblock %}
 
 {% block subscriptions %}
