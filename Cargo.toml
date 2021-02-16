@@ -8,13 +8,12 @@ authors = ["spikecodes <19519553+spikecodes@users.noreply.github.com>"]
 edition = "2018"
 
 [dependencies]
-tide = "0.16.0"
+tide = { version = "0.16.0", default-features = false, features = ["h1-server", "cookies"] }
 async-std = { version = "1.9.0", features = ["attributes"] }
-surf = "2.1.0"
+surf = { version = "2.1.0", default-features = false, features = ["curl-client", "encoding"] }
 base64 = "0.13.0"
 cached = "0.23.0"
-futures = "0.3.12"
-askama = "0.10.5"
+askama = { version = "0.10.5", default-features = false, features = ["config"] }
 serde = { version = "1.0.123", features = ["derive"] }
 serde_json = "1.0.62"
 async-recursion = "0.3.2"
