@@ -186,13 +186,28 @@ pub fn format_url(url: &str) -> String {
 	if url.is_empty() || url == "self" || url == "default" || url == "nsfw" || url == "spoiler" {
 		String::new()
 	} else {
-		format!("/proxy/{}/", encode(url).as_str())
+		let domain = Url::parse(url).map(|f| f.domain().unwrap_or_default().to_owned()).unwrap_or_default();
+
+		match domain.as_str() {
+			"v.redd.it" => {
+				let re = Regex::new(r"https://v\.redd\.it/(.*)/DASH_([0-9]{2,4}(\.mp4|$))").unwrap();
+
+				match re.captures(url) {
+					Some(caps) => format!("/vid/{}/{}", &caps[1], &caps[2]),
+					None => {
+						dbg!(url);
+						String::new()
+					}
+				}
+			}
+			_ => format!("/proxy/{}/", encode(url).as_str()),
+		}
 	}
 }
 
 // Rewrite Reddit links to Libreddit in body of text
 pub fn rewrite_urls(text: &str) -> String {
-	let re = Regex::new(r#"href="(https://|http://|)(www.|old.|np.|)(reddit).(com)/"#).unwrap();
+	let re = Regex::new(r#"href="(https|http|)://(www.|old.|np.|)(reddit).(com)/"#).unwrap();
 	re.replace_all(text, r#"href="/"#).to_string()
 }
 
@@ -208,12 +223,12 @@ pub fn format_num(num: i64) -> String {
 }
 
 pub async fn media(data: &Value) -> (String, Media, Vec<GalleryMedia>) {
-	let post_type: &str;
+	let post_type;
 	let mut gallery = Vec::new();
 
 	// If post is a video, return the video
 	let url = if data["preview"]["reddit_video_preview"]["fallback_url"].is_string() {
-		// Return video preview
+		// Return reddit video
 		post_type = "video";
 		format_url(data["preview"]["reddit_video_preview"]["fallback_url"].as_str().unwrap_or_default())
 	} else if data["secure_media"]["reddit_video"]["fallback_url"].is_string() {

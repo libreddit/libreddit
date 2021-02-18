@@ -165,7 +165,7 @@ async fn parse_comments(json: &serde_json::Value, post_link: &str, post_author: 
 		};
 
 		let parent_kind_and_id = val(&comment, "parent_id");
-		let parent_info = parent_kind_and_id.split("_").collect::<Vec<&str>>();
+		let parent_info = parent_kind_and_id.split('_').collect::<Vec<&str>>();
 
 		let id = val(&comment, "id");
 		let highlighted = id == highlighted_comment;
