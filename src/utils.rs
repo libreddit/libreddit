@@ -194,10 +194,7 @@ pub fn format_url(url: &str) -> String {
 
 				match re.captures(url) {
 					Some(caps) => format!("/vid/{}/{}", &caps[1], &caps[2]),
-					None => {
-						dbg!(url);
-						String::new()
-					}
+					None => String::new()
 				}
 			}
 			_ => format!("/proxy/{}/", encode(url).as_str()),

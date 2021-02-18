@@ -193,7 +193,8 @@ libreddit
 
 | Short | Long               | Example                           |
 |-------|--------------------|-----------------------------------|
-| `-a`  | `--address`        | `libreddit --adress=0.0.0.0:8111` |
+| `-a`  | `--address`        | `libreddit --adress=0.0.0.0`      |
+| `-p`  | `--port`           | `libreddit --port=3030`           |
 | `-r`  | `--redirect-https` | `libreddit --redirect-https`      |
 
 ## Building

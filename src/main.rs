@@ -111,7 +111,16 @@ async fn main() -> tide::Result<()> {
 				.long("address")
 				.value_name("ADDRESS")
 				.help("Sets address to listen on")
-				.default_value("0.0.0.0:8080")
+				.default_value("0.0.0.0")
+				.takes_value(true),
+		)
+		.arg(
+			Arg::with_name("port")
+				.short("p")
+				.long("port")
+				.value_name("PORT")
+				.help("Port to listen on")
+				.default_value("8080")
 				.takes_value(true),
 		)
 		.arg(
@@ -123,13 +132,14 @@ async fn main() -> tide::Result<()> {
 		)
 		.get_matches();
 
-	let address = matches.value_of("address").unwrap_or("0.0.0.0:8080");
+	let address = matches.value_of("address").unwrap_or("0.0.0.0");
+	let port = matches.value_of("port").unwrap_or("8080");
 	let force_https = matches.is_present("redirect-https");
 
-	dbg!(&force_https);
+	let listener = format!("{}:{}", address, port);
 
 	// Start HTTP server
-	println!("Running Libreddit v{} on {}!", env!("CARGO_PKG_VERSION"), &address);
+	println!("Running Libreddit v{} on {}!", env!("CARGO_PKG_VERSION"), &listener);
 
 	let mut app = tide::new();
 
@@ -224,6 +234,6 @@ async fn main() -> tide::Result<()> {
 	// Default service in case no routes match
 	app.at("*").get(|_| error("Nothing here".to_string()));
 
-	app.listen(address).await?;
+	app.listen(listener).await?;
 	Ok(())
 }
