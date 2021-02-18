@@ -8,6 +8,7 @@ mod user;
 mod utils;
 
 // Import Crates
+use clap::{App, Arg};
 use tide::{
 	utils::{async_trait, After},
 	Middleware, Next, Request, Response,
@@ -101,16 +102,31 @@ async fn favicon(_req: Request<()>) -> tide::Result {
 
 #[async_std::main]
 async fn main() -> tide::Result<()> {
-	let mut address = "0.0.0.0:8080".to_string();
-	let mut force_https = false;
+	let matches = App::new("Libreddit")
+		.version(env!("CARGO_PKG_VERSION"))
+		.about("Private front-end for Reddit written in Rust ")
+		.arg(
+			Arg::with_name("address")
+				.short("a")
+				.long("address")
+				.value_name("ADDRESS")
+				.help("Sets address to listen on")
+				.default_value("0.0.0.0:8080")
+				.takes_value(true),
+		)
+		.arg(
+			Arg::with_name("redirect-https")
+				.short("r")
+				.long("redirect-https")
+				.help("Redirect all HTTP requests to HTTPS")
+				.takes_value(false),
+		)
+		.get_matches();
 
-	for arg in std::env::args().collect::<Vec<String>>() {
-		match arg.split('=').collect::<Vec<&str>>()[0] {
-			"--address" | "-a" => address = arg.split('=').collect::<Vec<&str>>()[1].to_string(),
-			"--redirect-https" | "-r" => force_https = true,
-			_ => (),
-		}
-	}
+	let address = matches.value_of("address").unwrap_or("0.0.0.0:8080");
+	let force_https = matches.is_present("redirect-https");
+
+	dbg!(&force_https);
 
 	// Start HTTP server
 	println!("Running Libreddit v{} on {}!", env!("CARGO_PKG_VERSION"), &address);
