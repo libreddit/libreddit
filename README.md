@@ -55,9 +55,9 @@ Find Libreddit on 💬 [Matrix](https://matrix.to/#/#libreddit:kde.org), 🐋 [D
 ## Built with
 
 - [Rust](https://www.rust-lang.org/) - Programming language
-- [Actix Web](https://github.com/actix/actix-web) - Web server
+- [Tide](https://github.com/http-rs/tide) - Web server
 - [Askama](https://github.com/djc/askama) - Templating engine
-- [ureq](https://github.com/algesten/ureq) - HTTP client
+- [Surf](https://github.com/http-rs/surf) - HTTP client
 
 ## Info
 Libreddit hopes to provide an easier way to browse Reddit, without the ads, trackers, and bloat. Libreddit was inspired by other alternative front-ends to popular services such as [Invidious](https://github.com/iv-org/invidious) for YouTube, [Nitter](https://github.com/zedeus/nitter) for Twitter, and [Bibliogram](https://sr.ht/~cadence/bibliogram/) for Instagram.
@@ -188,14 +188,6 @@ Once installed, deploy Libreddit to `0.0.0.0:8080` by running:
 ```
 libreddit
 ```
-
-## Options
-
-| Short | Long               | Example                           |
-|-------|--------------------|-----------------------------------|
-| `-a`  | `--address`        | `libreddit --adress=0.0.0.0`      |
-| `-p`  | `--port`           | `libreddit --port=3030`           |
-| `-r`  | `--redirect-https` | `libreddit --redirect-https`      |
 
 ## Building
 
