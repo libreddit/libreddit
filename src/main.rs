@@ -174,6 +174,7 @@ async fn main() -> tide::Result<()> {
 	app.at("/proxy/*url/").get(proxy::handler);
 	app.at("/vid/:id/:size/").get(proxy::video);
 	app.at("/img/:id/").get(proxy::image);
+	app.at("/thumb/:point/:id/").get(proxy::thumbnail);
 
 	// Browse user profile
 	app.at("/u/:name/").get(user::profile);

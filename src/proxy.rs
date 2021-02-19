@@ -4,9 +4,6 @@ use tide::{Request, Response};
 
 pub async fn handler(req: Request<()>) -> tide::Result {
 	let domains = vec![
-		// THUMBNAILS
-		"a.thumbs.redditmedia.com",
-		"b.thumbs.redditmedia.com",
 		// EMOJI
 		"emoji.redditmedia.com",
 		// ICONS
@@ -15,8 +12,6 @@ pub async fn handler(req: Request<()>) -> tide::Result {
 		// PREVIEWS
 		"preview.redd.it",
 		"external-preview.redd.it",
-		// MEDIA
-		"i.redd.it",
 	];
 
 	let decoded = decode(req.param("url").unwrap_or_default()).map(|bytes| String::from_utf8(bytes).unwrap_or_default());
@@ -46,6 +41,13 @@ pub async fn video(req: Request<()>) -> tide::Result {
 pub async fn image(req: Request<()>) -> tide::Result {
 	let id = req.param("id").unwrap_or_default();
 	let url = format!("https://i.redd.it/{}", id);
+	request(url).await
+}
+
+pub async fn thumbnail(req: Request<()>) -> tide::Result {
+	let id = req.param("id").unwrap_or_default();
+	let point = req.param("point").unwrap_or_default();
+	let url = format!("https://{}.thumbs.redditmedia.com/{}", point, id);
 	request(url).await
 }
 

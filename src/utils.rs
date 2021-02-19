@@ -188,15 +188,27 @@ pub fn format_url(url: &str) -> String {
 	} else {
 		let domain = Url::parse(url).map(|f| f.domain().unwrap_or_default().to_owned()).unwrap_or_default();
 
+		let capture = |regex: &str, format: &str| {
+			Regex::new(regex)
+				.map(|re| match re.captures(url) {
+					Some(caps) => [format, &caps[1], "/"].join(""),
+					None => String::new(),
+				})
+				.unwrap_or_default()
+		};
+
 		match domain.as_str() {
 			"v.redd.it" => {
 				let re = Regex::new(r"https://v\.redd\.it/(.*)/DASH_([0-9]{2,4}(\.mp4|$))").unwrap();
 
 				match re.captures(url) {
 					Some(caps) => format!("/vid/{}/{}", &caps[1], &caps[2]),
-					None => String::new()
+					None => String::new(),
 				}
 			}
+			"i.redd.it" => capture(r"https://i\.redd\.it/(.*)", "/img/"),
+			"a.thumbs.redditmedia.com" => capture(r"https://a\.thumbs\.redditmedia\.com/(.*)", "/thumb/a/"),
+			"b.thumbs.redditmedia.com" => capture(r"https://b\.thumbs\.redditmedia\.com/(.*)", "/thumb/b/"),
 			_ => format!("/proxy/{}/", encode(url).as_str()),
 		}
 	}
@@ -244,7 +256,11 @@ pub async fn media(data: &Value) -> (String, Media, Vec<GalleryMedia>) {
 		} else {
 			// Return the picture if the media is an image
 			post_type = "image";
-			format_url(preview["source"]["url"].as_str().unwrap_or_default())
+			if data["domain"] == "i.redd.it" {
+				format_url(data["url"].as_str().unwrap_or_default())
+			} else {
+				format_url(preview["source"]["url"].as_str().unwrap_or_default())
+			}
 		}
 	} else if data["is_self"].as_bool().unwrap_or_default() {
 		// If type is self, return permalink
