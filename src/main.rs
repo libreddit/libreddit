@@ -186,7 +186,7 @@ async fn main() -> tide::Result<()> {
 		.get(|req| handler(req, "https://emoji.redditmedia.com/{}/{}", vec!["id", "name"]));
 	app
 		.at("/preview/:loc/:id/:query/")
-		.get(|req| handler(req, "https://{}preview.redd.it/{}?{}", vec!["loc", "id", "query"]));
+		.get(|req| handler(req, "https://{}view.redd.it/{}?{}", vec!["loc", "id", "query"]));
 	app
 		.at("/style/*path/") /*        */
 		.get(|req| handler(req, "https://styles.redditmedia.com/{}", vec!["path"]));
