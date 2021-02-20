@@ -4,14 +4,9 @@ use tide::{Request, Response};
 
 pub async fn handler(req: Request<()>) -> tide::Result {
 	let domains = vec![
-		// EMOJI
-		"emoji.redditmedia.com",
 		// ICONS
 		"styles.redditmedia.com",
 		"www.redditstatic.com",
-		// PREVIEWS
-		"preview.redd.it",
-		"external-preview.redd.it",
 	];
 
 	let decoded = decode(req.param("url").unwrap_or_default()).map(|bytes| String::from_utf8(bytes).unwrap_or_default());
@@ -55,6 +50,23 @@ pub async fn emoji(req: Request<()>) -> tide::Result {
 	let id = req.param("id").unwrap_or_default();
 	let name = req.param("name").unwrap_or_default();
 	let url = format!("https://emoji.redditmedia.com/{}/{}", id, name);
+	request(url).await
+}
+
+pub async fn preview(req: Request<()>) -> tide::Result {
+	let id = req.param("id").unwrap_or_default();
+	let query = req.param("query").unwrap_or_default();
+	let prefix = match req.param("location").unwrap_or_default() {
+		"ext" => "external-",
+		_ => ""
+	};
+	let url = format!("https://{}preview.redd.it/{}?{}", prefix, id, query);
+	request(url).await
+}
+
+pub async fn style(req: Request<()>) -> tide::Result {
+	let path = req.param("path").unwrap_or_default();
+	let url = format!("https://styles.redditmedia.com/{}", path);
 	request(url).await
 }
 

@@ -186,7 +186,8 @@ pub fn format_url(url: &str) -> String {
 	if url.is_empty() || url == "self" || url == "default" || url == "nsfw" || url == "spoiler" {
 		String::new()
 	} else {
-		let domain = Url::parse(url).map(|f| f.domain().unwrap_or_default().to_owned()).unwrap_or_default();
+		let parsed = Url::parse(url).unwrap();
+		let domain = parsed.domain().unwrap_or_default();
 
 		let capture = |regex: &str, format: &str, levels: i16| {
 			Regex::new(regex)
@@ -194,19 +195,22 @@ pub fn format_url(url: &str) -> String {
 					Some(caps) => match levels {
 						1 => [format, &caps[1], "/"].join(""),
 						2 => [format, &caps[1], "/", &caps[2], "/"].join(""),
-						_ => String::new()
+						_ => String::new(),
 					},
 					None => String::new(),
 				})
 				.unwrap_or_default()
 		};
 
-		match domain.as_str() {
+		match domain {
 			"v.redd.it" => capture(r"https://v\.redd\.it/(.*)/DASH_([0-9]{2,4}(\.mp4|$))", "/vid/", 2),
 			"i.redd.it" => capture(r"https://i\.redd\.it/(.*)", "/img/", 1),
 			"a.thumbs.redditmedia.com" => capture(r"https://a\.thumbs\.redditmedia\.com/(.*)", "/thumb/a/", 1),
 			"b.thumbs.redditmedia.com" => capture(r"https://b\.thumbs\.redditmedia\.com/(.*)", "/thumb/b/", 1),
 			"emoji.redditmedia.com" => capture(r"https://emoji\.redditmedia\.com/(.*)/(.*)", "/emoji/", 2),
+			"preview.redd.it" => capture(r"https://preview\.redd\.it/(.*)\?(.*)", "/preview/int/", 2),
+			"external-preview.redd.it" => capture(r"https://external\-preview\.redd\.it/(.*)\?(.*)", "/preview/ext/", 2),
+			// "styles.redditmedia.com" => capture(r"https://styles\.redditmedia\.com/(.*)", "/style/", 1),
 			_ => format!("/proxy/{}/", encode(url).as_str()),
 		}
 	}
