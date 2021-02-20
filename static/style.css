@@ -701,7 +701,7 @@ a.search_subreddit:hover {
 
 #post_url {
 	color: var(--accent);
-	margin: 5px 20px;
+	margin: 5px 15px;
 	grid-area: post_media;
 }
 
