@@ -1,72 +1,14 @@
-use base64::decode;
-use surf::{Body, Url};
+use surf::Body;
 use tide::{Request, Response};
 
-pub async fn handler(req: Request<()>) -> tide::Result {
-	let domains = vec![
-		// ICONS
-		"styles.redditmedia.com",
-		"www.redditstatic.com",
-	];
+pub async fn handler(req: Request<()>, format: &str, params: Vec<&str>) -> tide::Result {
+	let mut url = format.to_string();
 
-	let decoded = decode(req.param("url").unwrap_or_default()).map(|bytes| String::from_utf8(bytes).unwrap_or_default());
-
-	match decoded {
-		Ok(media) => match Url::parse(media.as_str()) {
-			Ok(url) => {
-				if domains.contains(&url.domain().unwrap_or_default()) {
-					request(url.to_string()).await
-				} else {
-					Err(tide::Error::from_str(403, "Resource must be from Reddit"))
-				}
-			}
-			Err(_) => Err(tide::Error::from_str(400, "Can't parse base64 into URL")),
-		},
-		Err(_) => Err(tide::Error::from_str(400, "Can't decode base64")),
+	for name in params {
+		let param = req.param(name).unwrap_or_default();
+		url = url.replacen("{}", param, 1);
 	}
-}
 
-pub async fn video(req: Request<()>) -> tide::Result {
-	let id = req.param("id").unwrap_or_default();
-	let size = req.param("size").unwrap_or("720.mp4");
-	let url = format!("https://v.redd.it/{}/DASH_{}", id, size);
-	request(url).await
-}
-
-pub async fn image(req: Request<()>) -> tide::Result {
-	let id = req.param("id").unwrap_or_default();
-	let url = format!("https://i.redd.it/{}", id);
-	request(url).await
-}
-
-pub async fn thumbnail(req: Request<()>) -> tide::Result {
-	let id = req.param("id").unwrap_or_default();
-	let point = req.param("point").unwrap_or_default();
-	let url = format!("https://{}.thumbs.redditmedia.com/{}", point, id);
-	request(url).await
-}
-
-pub async fn emoji(req: Request<()>) -> tide::Result {
-	let id = req.param("id").unwrap_or_default();
-	let name = req.param("name").unwrap_or_default();
-	let url = format!("https://emoji.redditmedia.com/{}/{}", id, name);
-	request(url).await
-}
-
-pub async fn preview(req: Request<()>) -> tide::Result {
-	let id = req.param("id").unwrap_or_default();
-	let query = req.param("query").unwrap_or_default();
-	let prefix = match req.param("location").unwrap_or_default() {
-		"ext" => "external-",
-		_ => ""
-	};
-	let url = format!("https://{}preview.redd.it/{}?{}", prefix, id, query);
-	request(url).await
-}
-
-pub async fn style(req: Request<()>) -> tide::Result {
-	let path = req.param("path").unwrap_or_default();
-	let url = format!("https://styles.redditmedia.com/{}", path);
 	request(url).await
 }
 

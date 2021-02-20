@@ -9,6 +9,7 @@ mod utils;
 
 // Import Crates
 use clap::{App, Arg};
+use proxy::handler;
 use tide::{
 	utils::{async_trait, After},
 	Middleware, Next, Request, Response,
@@ -171,13 +172,27 @@ async fn main() -> tide::Result<()> {
 	app.at("/apple-touch-icon.png/").get(iphone_logo);
 
 	// Proxy media through Libreddit
-	app.at("/proxy/*url/").get(proxy::handler);
-	app.at("/vid/:id/:size/").get(proxy::video);
-	app.at("/img/:id/").get(proxy::image);
-	app.at("/thumb/:point/:id/").get(proxy::thumbnail);
-	app.at("/emoji/:id/:name/").get(proxy::emoji);
-	app.at("/preview/:location/:id/:query/").get(proxy::preview);
-	app.at("/style/*path/").get(proxy::style);
+	app
+		.at("/vid/:id/:size/") /*      */
+		.get(|req| handler(req, "https://v.redd.it/{}/DASH_{}", vec!["id", "size"]));
+	app
+		.at("/img/:id/") /*            */
+		.get(|req| handler(req, "https://i.redd.it/{}", vec!["id"]));
+	app
+		.at("/thumb/:point/:id/") /*   */
+		.get(|req| handler(req, "https://{}.thumbs.redditmedia.com/{}", vec!["point", "id"]));
+	app
+		.at("/emoji/:id/:name/") /*    */
+		.get(|req| handler(req, "https://emoji.redditmedia.com/{}/{}", vec!["id", "name"]));
+	app
+		.at("/preview/:loc/:id/:query/")
+		.get(|req| handler(req, "https://{}preview.redd.it/{}?{}", vec!["loc", "id", "query"]));
+	app
+		.at("/style/*path/") /*        */
+		.get(|req| handler(req, "https://styles.redditmedia.com/{}", vec!["path"]));
+	app
+		.at("/static/*path/") /*       */
+		.get(|req| handler(req, "https://www.redditstatic.com/{}", vec!["path"]));
 
 	// Browse user profile
 	app.at("/u/:name/").get(user::profile);

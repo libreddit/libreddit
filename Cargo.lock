@@ -1147,7 +1147,6 @@ dependencies = [
  "askama",
  "async-recursion",
  "async-std",
- "base64 0.13.0",
  "cached",
  "clap",
  "regex",

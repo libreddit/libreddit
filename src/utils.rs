@@ -2,7 +2,6 @@
 // CRATES
 //
 use askama::Template;
-use base64::encode;
 use cached::proc_macro::cached;
 use regex::Regex;
 use serde_json::{from_str, Value};
@@ -186,32 +185,37 @@ pub fn format_url(url: &str) -> String {
 	if url.is_empty() || url == "self" || url == "default" || url == "nsfw" || url == "spoiler" {
 		String::new()
 	} else {
-		let parsed = Url::parse(url).unwrap();
-		let domain = parsed.domain().unwrap_or_default();
+		match Url::parse(url) {
+			Ok(parsed) => {
+				let domain = parsed.domain().unwrap_or_default();
 
-		let capture = |regex: &str, format: &str, levels: i16| {
-			Regex::new(regex)
-				.map(|re| match re.captures(url) {
-					Some(caps) => match levels {
-						1 => [format, &caps[1], "/"].join(""),
-						2 => [format, &caps[1], "/", &caps[2], "/"].join(""),
-						_ => String::new(),
-					},
-					None => String::new(),
-				})
-				.unwrap_or_default()
-		};
+				let capture = |regex: &str, format: &str, levels: i16| {
+					Regex::new(regex)
+						.map(|re| match re.captures(url) {
+							Some(caps) => match levels {
+								1 => [format, &caps[1], "/"].join(""),
+								2 => [format, &caps[1], "/", &caps[2], "/"].join(""),
+								_ => String::new(),
+							},
+							None => String::new(),
+						})
+						.unwrap_or_default()
+				};
 
-		match domain {
-			"v.redd.it" => capture(r"https://v\.redd\.it/(.*)/DASH_([0-9]{2,4}(\.mp4|$))", "/vid/", 2),
-			"i.redd.it" => capture(r"https://i\.redd\.it/(.*)", "/img/", 1),
-			"a.thumbs.redditmedia.com" => capture(r"https://a\.thumbs\.redditmedia\.com/(.*)", "/thumb/a/", 1),
-			"b.thumbs.redditmedia.com" => capture(r"https://b\.thumbs\.redditmedia\.com/(.*)", "/thumb/b/", 1),
-			"emoji.redditmedia.com" => capture(r"https://emoji\.redditmedia\.com/(.*)/(.*)", "/emoji/", 2),
-			"preview.redd.it" => capture(r"https://preview\.redd\.it/(.*)\?(.*)", "/preview/int/", 2),
-			"external-preview.redd.it" => capture(r"https://external\-preview\.redd\.it/(.*)\?(.*)", "/preview/ext/", 2),
-			// "styles.redditmedia.com" => capture(r"https://styles\.redditmedia\.com/(.*)", "/style/", 1),
-			_ => format!("/proxy/{}/", encode(url).as_str()),
+				match domain {
+					"v.redd.it" => capture(r"https://v\.redd\.it/(.*)/DASH_([0-9]{2,4}(\.mp4|$))", "/vid/", 2),
+					"i.redd.it" => capture(r"https://i\.redd\.it/(.*)", "/img/", 1),
+					"a.thumbs.redditmedia.com" => capture(r"https://a\.thumbs\.redditmedia\.com/(.*)", "/thumb/a/", 1),
+					"b.thumbs.redditmedia.com" => capture(r"https://b\.thumbs\.redditmedia\.com/(.*)", "/thumb/b/", 1),
+					"emoji.redditmedia.com" => capture(r"https://emoji\.redditmedia\.com/(.*)/(.*)", "/emoji/", 2),
+					"preview.redd.it" => capture(r"https://preview\.redd\.it/(.*)\?(.*)", "/preview//", 2),
+					"external-preview.redd.it" => capture(r"https://external\-preview\.redd\.it/(.*)\?(.*)", "/preview/external-/", 2),
+					"styles.redditmedia.com" => capture(r"https://styles\.redditmedia\.com/(.*)", "/style/", 1),
+					"www.redditstatic.com" => capture(r"https://www\.redditstatic\.com/(.*)", "/static/", 1),
+					_ => String::new(),
+				}
+			}
+			Err(_) => String::new(),
 		}
 	}
 }
@@ -510,20 +514,25 @@ pub async fn request(path: String) -> Result<Value, String> {
 
 	let res = client.send(req).await;
 
-	let body = res.unwrap().take_body().into_string().await;
-
-	match body {
-		// If response is success
-		Ok(response) => {
-			// Parse the response from Reddit as JSON
-			match from_str(&response) {
-				Ok(json) => Ok(json),
-				Err(e) => {
-					println!("{} - Failed to parse page JSON data: {}", url, e);
-					Err("Failed to parse page JSON data".to_string())
+	match res {
+		Ok(mut response) => match response.take_body().into_string().await {
+			// If response is success
+			Ok(body) => {
+				// Parse the response from Reddit as JSON
+				match from_str(&body) {
+					Ok(json) => Ok(json),
+					Err(e) => {
+						println!("{} - Failed to parse page JSON data: {}", url, e);
+						Err("Failed to parse page JSON data".to_string())
+					}
 				}
 			}
-		}
+			// Failed to parse body
+			Err(e) => {
+				println!("{} - Couldn't parse request body: {}", url, e);
+				Err("Couldn't parse request body".to_string())
+			}
+		},
 		// If failed to send request
 		Err(e) => {
 			println!("{} - Couldn't send request to Reddit: {}", url, e);
