@@ -64,7 +64,7 @@ async fn user(name: &str) -> Result<User, String> {
 			Ok(User {
 				name: name.to_string(),
 				title: about("title"),
-				icon: format_url(about("icon_img").as_str()),
+				icon: format_url(&about("icon_img")),
 				karma: res["data"]["total_karma"].as_i64().unwrap_or(0),
 				created: OffsetDateTime::from_unix_timestamp(created).format("%b %d '%y"),
 				banner: about("banner_img"),

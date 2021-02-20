@@ -16,6 +16,7 @@ use time::{Duration, OffsetDateTime};
 // Post flair with content, background color and foreground color
 pub struct Flair {
 	pub flair_parts: Vec<FlairPart>,
+	pub text: String,
 	pub background_color: String,
 	pub foreground_color: String,
 }
@@ -428,6 +429,7 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 						data["author_flair_richtext"].as_array(),
 						data["author_flair_text"].as_str(),
 					),
+					text: val(post, "link_flair_text"),
 					background_color: val(post, "author_flair_background_color"),
 					foreground_color: val(post, "author_flair_text_color"),
 				},
@@ -454,6 +456,7 @@ pub async fn fetch_posts(path: &str, fallback_title: String) -> Result<(Vec<Post
 					data["link_flair_richtext"].as_array(),
 					data["link_flair_text"].as_str(),
 				),
+				text: val(post, "link_flair_text"),
 				background_color: val(post, "link_flair_background_color"),
 				foreground_color: if val(post, "link_flair_text_color") == "dark" {
 					"black".to_string()

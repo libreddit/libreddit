@@ -36,6 +36,7 @@ pub async fn find(req: Request<()>) -> tide::Result {
 	let nsfw_results = if cookie(&req, "show_nsfw") == "on" { "&include_over_18=on" } else { "" };
 	let path = format!("{}.json?{}{}", req.url().path(), req.url().query().unwrap_or_default(), nsfw_results);
 	let sub = req.param("sub").unwrap_or("").to_string();
+	let query = param(&path, "q");
 
 	let sort = if param(&path, "sort").is_empty() {
 		"relevance".to_string()
@@ -44,7 +45,7 @@ pub async fn find(req: Request<()>) -> tide::Result {
 	};
 
 	let subreddits = if param(&path, "restrict_sr").is_empty() {
-		search_subreddits(param(&path, "q")).await
+		search_subreddits(&query).await
 	} else {
 		Vec::new()
 	};
@@ -55,7 +56,7 @@ pub async fn find(req: Request<()>) -> tide::Result {
 			subreddits,
 			sub,
 			params: SearchParams {
-				q: param(&path, "q"),
+				q: query.replace('"', "&quot;"),
 				sort,
 				t: param(&path, "t"),
 				before: param(&path, "after"),
@@ -68,7 +69,7 @@ pub async fn find(req: Request<()>) -> tide::Result {
 	}
 }
 
-async fn search_subreddits(q: String) -> Vec<Subreddit> {
+async fn search_subreddits(q: &str) -> Vec<Subreddit> {
 	let subreddit_search_path = format!("/subreddits/search.json?q={}&limit=3", q.replace(' ', "+"));
 
 	// Send a request to the url

@@ -102,7 +102,7 @@ pub async fn subscriptions(req: Request<()>) -> tide::Result {
 
 	// Redirect back to subreddit
 	// check for redirect parameter if unsubscribing from outside sidebar
-	let redirect_path = param(format!("/?{}", query).as_str(), "redirect");
+	let redirect_path = param(&format!("/?{}", query), "redirect");
 	let path = if !redirect_path.is_empty() {
 		format!("/{}/", redirect_path)
 	} else {
@@ -166,7 +166,7 @@ async fn subreddit(sub: &str) -> Result<Subreddit, String> {
 				title: val(&res, "title"),
 				description: val(&res, "public_description"),
 				info: rewrite_urls(&val(&res, "description_html").replace("\\", "")),
-				icon: format_url(icon.as_str()),
+				icon: format_url(&icon),
 				members: format_num(members),
 				active: format_num(active),
 				wiki: res["data"]["wiki_enabled"].as_bool().unwrap_or_default(),

@@ -33,11 +33,11 @@
 </form>
 {%- endmacro %}
 
-{% macro render_flair(flair) -%}
-{% for flair_part in flair %}
-	{% if flair_part.flair_part_type == "emoji" %}<span class="emoji" style="background-image:url('{{ flair_part.value }}');"></span>
-	{% else if flair_part.flair_part_type == "text" && !flair_part.value.is_empty() %}<span>{{ flair_part.value }}</span>{% endif %}
-{% endfor %}
+{% macro render_flair(flair_parts) -%}
+	{% for flair_part in flair_parts %}
+		{% if flair_part.flair_part_type == "emoji" %}<span class="emoji" style="background-image:url('{{ flair_part.value }}');"></span>
+		{% else if flair_part.flair_part_type == "text" && !flair_part.value.is_empty() %}<span>{{ flair_part.value }}</span>{% endif %}
+	{% endfor %}
 {%- endmacro %}
 
 {% macro sub_list(current) -%}
@@ -69,7 +69,9 @@
 	</p>
 	<p class="post_title">
 		{% if post.flair.flair_parts.len() > 0 %}
-		<small class="post_flair" style="color:{{ post.flair.foreground_color }}; background:{{ post.flair.background_color }};">{% call render_flair(post.flair.flair_parts) %}</small>
+			<a href="/r/{{ post.community }}/search/?q=flair_name%3A%22{{ post.flair.text }}%22&restrict_sr=on" class="post_flair" style="color:{{ post.flair.foreground_color }}; background:{{ post.flair.background_color }};">
+				{% call render_flair(post.flair.flair_parts) %}
+			</a>
 		{% endif %}
 		<a href="{{ post.permalink }}">{{ post.title }}</a>{% if post.flags.nsfw %} <small class="nsfw">NSFW</small>{% endif %}
 	</p>
@@ -87,9 +89,9 @@
 		</svg>
 	</a>
 	{% else if (prefs.layout.is_empty() || prefs.layout == "card") && post.post_type == "gif" %}
-	<video class="post_media_video short" src="{{ post.media.url }}" width="{{ post.media.width }}px" height="{{ post.media.height }}px" controls loop><a href={{ post.media.url }}>Video</a></video>
+	<video class="post_media_video short" src="{{ post.media.url }}" width="{{ post.media.width }}px" height="{{ post.media.height }}px" controls loop autoplay><a href={{ post.media.url }}>Video</a></video>
 	{% else if (prefs.layout.is_empty() || prefs.layout == "card") && post.post_type == "video" %}
-	<video class="post_media_video short" src="{{ post.media.url }}" width="{{ post.media.width }}px" height="{{ post.media.height }}px" poster="{{ post.media.poster }}" preload=none controls><a href={{ post.media.url }}>Video</a></video>
+	<video class="post_media_video short" src="{{ post.media.url }}" width="{{ post.media.width }}px" height="{{ post.media.height }}px" poster="{{ post.media.poster }}" preload="none" controls autoplay><a href={{ post.media.url }}>Video</a></video>
 	{% else if post.post_type != "self" %}
 	<a class="post_thumbnail {% if post.thumbnail.url.is_empty() %}no_thumbnail{% endif %}" href="{% if post.post_type == "link" %}{{ post.media.url }}{% else %}{{ post.permalink }}{% endif %}">
 		{% if post.thumbnail.url.is_empty() %}
