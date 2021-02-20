@@ -51,6 +51,13 @@ pub async fn thumbnail(req: Request<()>) -> tide::Result {
 	request(url).await
 }
 
+pub async fn emoji(req: Request<()>) -> tide::Result {
+	let id = req.param("id").unwrap_or_default();
+	let name = req.param("name").unwrap_or_default();
+	let url = format!("https://emoji.redditmedia.com/{}/{}", id, name);
+	request(url).await
+}
+
 async fn request(url: String) -> tide::Result {
 	let http = surf::get(url).await.unwrap();
 
