@@ -38,7 +38,6 @@ Feel free to [open an issue](https://github.com/spikecodes/libreddit/issues/new)
 | [libredd.it](https://libredd.it) (official) | 🇺🇸 US  |  |
 | [libreddit.spike.codes](https://libreddit.spike.codes) (official) | 🇺🇸 US  |  |
 | [libreddit.dothq.co](https://libreddit.dothq.co) | 🇺🇸 US  | ✅ |
-| [libreddit.insanity.wtf](https://libreddit.insanity.wtf) | 🇺🇸 US  | ✅ |
 | [libreddit.kavin.rocks](https://libreddit.kavin.rocks) | 🇮🇳 IN  | ✅ |
 | [libreddit.himiko.cloud](https://libreddit.himiko.cloud) | 🇧🇬 BG |  |
 | [spjmllawtheisznfs7uryhxumin26ssv2draj7oope3ok3wuhy43eoyd.onion](http://spjmllawtheisznfs7uryhxumin26ssv2draj7oope3ok3wuhy43eoyd.onion) | 🇮🇳 IN  |  |
