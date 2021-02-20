@@ -1,7 +1,7 @@
 {% macro options(current, values, default) -%}
 	{% for value in values %}
 		<option value="{{ value }}" {% if current == value || (current == "" && value == default) %}selected{% endif %}>
-			{{ format!("{}{}", value.get(0..1).unwrap().to_uppercase(), value.get(1..).unwrap()) }}
+			{{ format!("{}{}", value.get(0..1).unwrap_or_default().to_uppercase(), value.get(1..).unwrap_or_default()) }}
 		</option>
 	{% endfor %}
 {%- endmacro %}
@@ -9,7 +9,7 @@
 {% macro sort(root, methods, selected) -%}
 	{% for method in methods %}
 		<a {% if method == selected %}class="selected"{% endif %} href="{{ root }}/{{ method }}">
-			{{ format!("{}{}", method.get(0..1).unwrap().to_uppercase(), method.get(1..).unwrap()) }}
+			{{ format!("{}{}", method.get(0..1).unwrap_or_default().to_uppercase(), method.get(1..).unwrap_or_default()) }}
 		</a>
 	{% endfor %}
 {%- endmacro %}

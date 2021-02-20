@@ -222,8 +222,10 @@ pub fn format_url(url: &str) -> String {
 
 // Rewrite Reddit links to Libreddit in body of text
 pub fn rewrite_urls(text: &str) -> String {
-	let re = Regex::new(r#"href="(https|http|)://(www.|old.|np.|)(reddit).(com)/"#).unwrap();
-	re.replace_all(text, r#"href="/"#).to_string()
+	match Regex::new(r#"href="(https|http|)://(www.|old.|np.|)(reddit).(com)/"#) {
+		Ok(re) => re.replace_all(text, r#"href="/"#).to_string(),
+		Err(_) => String::new(),
+	}
 }
 
 // Append `m` and `k` for millions and thousands respectively

@@ -13,17 +13,20 @@ pub async fn handler(req: Request<()>, format: &str, params: Vec<&str>) -> tide:
 }
 
 async fn request(url: String) -> tide::Result {
-	let http = surf::get(url).await.unwrap();
+	match surf::get(url).await {
+		Ok(res) => {
+			let content_length = res.header("Content-Length").map(|v| v.to_string()).unwrap_or_default();
+			let content_type = res.content_type().map(|m| m.to_string()).unwrap_or_default();
 
-	let content_length = http.header("Content-Length").map(|v| v.to_string()).unwrap_or_default();
-	let content_type = http.content_type().map(|m| m.to_string()).unwrap_or_default();
-
-	Ok(
-		Response::builder(http.status())
-			.body(Body::from_reader(http, None))
-			.header("Cache-Control", "public, max-age=1209600, s-maxage=86400")
-			.header("Content-Length", content_length)
-			.header("Content-Type", content_type)
-			.build(),
-	)
+			Ok(
+				Response::builder(res.status())
+					.body(Body::from_reader(res, None))
+					.header("Cache-Control", "public, max-age=1209600, s-maxage=86400")
+					.header("Content-Length", content_length)
+					.header("Content-Type", content_type)
+					.build(),
+			)
+		}
+		Err(e) => Ok(Response::builder(503).body(e.to_string()).build()),
+	}
 }
