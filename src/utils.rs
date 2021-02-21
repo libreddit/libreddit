@@ -495,13 +495,8 @@ pub fn redirect(path: String) -> Response {
 		.build()
 }
 
-pub async fn error(msg: String) -> tide::Result {
-	let body = ErrorTemplate {
-		msg,
-		prefs: Preferences::default(),
-	}
-	.render()
-	.unwrap_or_default();
+pub async fn error(req: Request<()>, msg: String) -> tide::Result {
+	let body = ErrorTemplate { msg, prefs: prefs(req) }.render().unwrap_or_default();
 
 	Ok(Response::builder(404).content_type("text/html").body(body).build())
 }

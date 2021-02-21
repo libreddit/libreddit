@@ -65,7 +65,7 @@ pub async fn find(req: Request<()>) -> tide::Result {
 			},
 			prefs: prefs(req),
 		}),
-		Err(msg) => error(msg).await,
+		Err(msg) => error(req, msg).await,
 	}
 }
 

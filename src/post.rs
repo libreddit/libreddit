@@ -58,7 +58,7 @@ pub async fn item(req: Request<()>) -> tide::Result {
 			})
 		}
 		// If the Reddit API returns an error, exit and send error page to user
-		Err(msg) => error(msg).await,
+		Err(msg) => error(req, msg).await,
 	}
 }
 

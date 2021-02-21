@@ -41,7 +41,7 @@ pub async fn profile(req: Request<()>) -> tide::Result {
 			})
 		}
 		// If there is an error show error page
-		Err(msg) => error(msg).await,
+		Err(msg) => error(req, msg).await,
 	}
 }
 

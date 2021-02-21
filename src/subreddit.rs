@@ -74,7 +74,7 @@ pub async fn page(req: Request<()>) -> tide::Result {
 				prefs: prefs(req),
 			})
 		}
-		Err(msg) => error(msg).await,
+		Err(msg) => error(req, msg).await,
 	}
 }
 
@@ -140,7 +140,7 @@ pub async fn wiki(req: Request<()>) -> tide::Result {
 			page,
 			prefs: prefs(req),
 		}),
-		Err(msg) => error(msg).await,
+		Err(msg) => error(req, msg).await,
 	}
 }
 

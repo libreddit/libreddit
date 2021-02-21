@@ -246,12 +246,12 @@ async fn main() -> tide::Result<()> {
 			Ok("best") | Ok("hot") | Ok("new") | Ok("top") | Ok("rising") | Ok("controversial") => subreddit::page(req).await,
 			// Short link for post
 			Ok(id) if id.len() > 4 && id.len() < 7 => post::item(req).await,
-			_ => error("Nothing here".to_string()).await,
+			_ => error(req, "Nothing here".to_string()).await,
 		}
 	});
 
 	// Default service in case no routes match
-	app.at("*").get(|_| error("Nothing here".to_string()));
+	app.at("*").get(|req| error(req, "Nothing here".to_string()));
 
 	app.listen(listener).await?;
 	Ok(())
