@@ -1096,6 +1096,13 @@ td, th {
 	padding: 10px;
 }
 
+/* Errors */
+
+#error { text-align: center; }
+#error h1 { margin-bottom: 10px; }
+#error h3 { opacity: 0.85; }
+#error a { color: var(--accent); }
+
 /* Mobile */
 
 @media screen and (max-width: 480px) {

@@ -2,5 +2,8 @@
 {% block title %}Error: {{ msg }}{% endblock %}
 {% block sortstyle %}{% endblock %}
 {% block content %}
-	<h1 style="text-align: center; font-size: 50px;">{{ msg }}</h1>
+	<div id="error">
+		<h1>{{ msg }}</h1>
+		<h3>Head back <a href="/">home</a>?</h3>
+	</div>
 {% endblock %}
