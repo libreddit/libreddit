@@ -240,6 +240,9 @@ async fn main() -> tide::Result<()> {
 	// Search all of Reddit
 	app.at("/search/").get(search::find);
 
+	// Handle about pages
+	app.at("/about/").get(|req| error(req, "About pages aren't here yet".to_string()));
+
 	app.at("/:id/").get(|req: Request<()>| async {
 		match req.param("id") {
 			// Sort front page
