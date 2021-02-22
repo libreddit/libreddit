@@ -15,6 +15,12 @@
 
 ---
 
+**BTC:** bc1qwyxjnafpu3gypcpgs025cw9wa7ryudtecmwa6y
+
+**XMR:** 45FJrEuFPtG2o7QZz2Nps77TbHD4sPqxViwbdyV9A6ktfHiWs47UngG5zXPcLoDXAc8taeuBgeNjfeprwgeXYXhN3C9tVSR
+
+---
+
 ## Jump to...
 - [About](#about)
   - [Teddit Comparison](#how-does-it-compare-to-teddit)
