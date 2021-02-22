@@ -260,10 +260,11 @@ aside {
 }
 
 #user_description, #sub_description {
-	margin: 0 20px;
+	margin: 0 15px;
+	text-align: left;
 }
 
-#user_name, #user_description:not(:empty), #user_icon
+#user_name, #user_description:not(:empty), #user_icon,
 #sub_name, #sub_icon, #sub_description:not(:empty) {
 	margin-bottom: 20px;
 }
