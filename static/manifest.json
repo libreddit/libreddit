@@ -7,9 +7,17 @@
 	"theme_color": "#1F1F1F",
 	"icons": [
 		{
-			"src": "./logo.png/",
+			"src": "logo.png",
 			"sizes": "512x512",
 			"type": "image/png"
+		},
+		{
+			"src": "touch-icon-iphone.png",
+			"sizes": "152x152"
+		},
+		{
+			"src": "favicon.ico",
+			"sizes": "32x32"
 		}
 	]
 }
