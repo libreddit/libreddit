@@ -34,10 +34,7 @@
 {%- endmacro %}
 
 {% macro render_flair(flair_parts) -%}
-	{% for flair_part in flair_parts %}
-		{% if flair_part.flair_part_type == "emoji" %}<span class="emoji" style="background-image:url('{{ flair_part.value }}');"></span>
-		{% else if flair_part.flair_part_type == "text" && !flair_part.value.is_empty() %}<span>{{ flair_part.value }}</span>{% endif %}
-	{% endfor %}
+	{% for flair_part in flair_parts %}{% if flair_part.flair_part_type == "emoji" %}<span class="emoji" style="background-image:url('{{ flair_part.value }}');"></span>{% else if flair_part.flair_part_type == "text" && !flair_part.value.is_empty() %}<span>{{ flair_part.value }}</span>{% endif %}{% endfor %}
 {%- endmacro %}
 
 {% macro sub_list(current) -%}
@@ -69,9 +66,9 @@
 	</p>
 	<p class="post_title">
 		{% if post.flair.flair_parts.len() > 0 %}
-			<a href="/r/{{ post.community }}/search/?q=flair_name%3A%22{{ post.flair.text }}%22&restrict_sr=on" class="post_flair" style="color:{{ post.flair.foreground_color }}; background:{{ post.flair.background_color }};">
-				{% call render_flair(post.flair.flair_parts) %}
-			</a>
+			<a href="/r/{{ post.community }}/search/?q=flair_name%3A%22{{ post.flair.text }}%22&restrict_sr=on"
+				class="post_flair"
+				style="color:{{ post.flair.foreground_color }}; background:{{ post.flair.background_color }};">{% call render_flair(post.flair.flair_parts) %}</a>
 		{% endif %}
 		<a href="{{ post.permalink }}">{{ post.title }}</a>{% if post.flags.nsfw %} <small class="nsfw">NSFW</small>{% endif %}
 	</p>

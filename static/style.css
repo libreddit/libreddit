@@ -627,6 +627,10 @@ a.search_subreddit:hover {
 	font-weight: bold;
 }
 
+.post_flair:empty {
+	display: none;
+}
+
 .emoji {
 	width: 1em;
 	height: 1em;
