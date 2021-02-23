@@ -12,4 +12,6 @@ COPY --from=builder /usr/local/cargo/bin/libreddit /usr/local/bin/libreddit
 RUN useradd --system --user-group --home-dir /nonexistent --no-create-home --shell /usr/sbin/nologin libreddit
 USER libreddit
 
+EXPOSE 8080
+
 CMD ["libreddit"]
