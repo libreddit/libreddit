@@ -4,7 +4,7 @@
 use askama::Template;
 use cached::proc_macro::cached;
 use regex::Regex;
-use serde_json::{from_str, Value};
+use serde_json::{from_str, Error, Value};
 use std::collections::HashMap;
 use tide::{http::url::Url, http::Cookie, Request, Response};
 use time::{Duration, OffsetDateTime};
@@ -514,29 +514,39 @@ pub async fn request(path: String) -> Result<Value, String> {
 
 	let res = client.send(req).await;
 
+	let err = |msg: &str, e: String| -> Result<Value, String> {
+		println!("{} - {}: {}", url, msg, e);
+		Err(msg.to_string())
+	};
+
 	match res {
 		Ok(mut response) => match response.take_body().into_string().await {
 			// If response is success
 			Ok(body) => {
 				// Parse the response from Reddit as JSON
-				match from_str(&body) {
-					Ok(json) => Ok(json),
-					Err(e) => {
-						println!("{} - Failed to parse page JSON data: {}", url, e);
-						Err("Failed to parse page JSON data".to_string())
+				let parsed: Result<Value, Error> = from_str(&body);
+				match parsed {
+					Ok(json) => {
+						// If Reddit returned an error
+						if json["error"].is_i64() {
+							Err(
+								json["reason"]
+									.as_str()
+									.unwrap_or_else(|| {
+										println!("{} - Error parsing reddit error", url);
+										"Error parsing reddit error"
+									})
+									.to_string(),
+							)
+						} else {
+							Ok(json)
+						}
 					}
+					Err(e) => err("Failed to parse page JSON data", e.to_string()),
 				}
 			}
-			// Failed to parse body
-			Err(e) => {
-				println!("{} - Couldn't parse request body: {}", url, e);
-				Err("Couldn't parse request body".to_string())
-			}
+			Err(e) => err("Couldn't parse request body", e.to_string()),
 		},
-		// If failed to send request
-		Err(e) => {
-			println!("{} - Couldn't send request to Reddit: {}", url, e);
-			Err("Couldn't send request to Reddit".to_string())
-		}
+		Err(e) => err("Couldn't send request to Reddit", e.to_string()),
 	}
 }

@@ -74,7 +74,12 @@ pub async fn page(req: Request<()>) -> tide::Result {
 				prefs: prefs(req),
 			})
 		}
-		Err(msg) => error(req, msg).await,
+		Err(msg) => match msg.as_str() {
+			"quarantined" => error(req, format!("r/{} has been quarantined by Reddit", sub)).await,
+			"private" => error(req, format!("r/{} is a private community", sub)).await,
+			"banned" => error(req, format!("r/{} has been banned from Reddit", sub)).await,
+			_ => error(req, msg).await,
+		},
 	}
 }
 
