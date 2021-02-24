@@ -532,10 +532,14 @@ pub async fn request(path: String) -> Result<Value, String> {
 							Err(
 								json["reason"]
 									.as_str()
-									.unwrap_or_else(|| {
-										println!("{} - Error parsing reddit error", url);
-										"Error parsing reddit error"
-									})
+									.unwrap_or(
+										json["message"]
+											.as_str()
+											.unwrap_or_else(|| {
+												println!("{} - Error parsing reddit error", url);
+												"Error parsing reddit error"
+											}),
+									)
 									.to_string(),
 							)
 						} else {
