@@ -160,6 +160,7 @@ async fn parse_comments(json: &serde_json::Value, post_link: &str, post_author: 
 		let score = data["score"].as_i64().unwrap_or(0);
 		let body = rewrite_urls(&val(&comment, "body_html"));
 
+		// If this comment contains replies, handle those too
 		let replies: Vec<Comment> = if data["replies"].is_object() {
 			parse_comments(&data["replies"], post_link, post_author, highlighted_comment).await
 		} else {

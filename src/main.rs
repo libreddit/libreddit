@@ -52,19 +52,6 @@ impl<State: Clone + Send + Sync + 'static> Middleware<State> for NormalizePath {
 }
 
 // Create Services
-async fn style(_req: Request<()>) -> tide::Result {
-	Ok(Response::builder(200).content_type("text/css").body(include_str!("../static/style.css")).build())
-}
-
-// Required for creating a PWA
-async fn manifest(_req: Request<()>) -> tide::Result {
-	Ok(
-		Response::builder(200)
-			.content_type("application/json")
-			.body(include_str!("../static/manifest.json"))
-			.build(),
-	)
-}
 
 // Required for the manifest to be valid
 async fn pwa_logo(_req: Request<()>) -> tide::Result {
@@ -81,16 +68,6 @@ async fn iphone_logo(_req: Request<()>) -> tide::Result {
 	)
 }
 
-async fn robots(_req: Request<()>) -> tide::Result {
-	Ok(
-		Response::builder(200)
-			.content_type("text/plain")
-			.header("Cache-Control", "public, max-age=1209600, s-maxage=86400")
-			.body("User-agent: *\nAllow: /")
-			.build(),
-	)
-}
-
 async fn favicon(_req: Request<()>) -> tide::Result {
 	Ok(
 		Response::builder(200)
@@ -99,6 +76,19 @@ async fn favicon(_req: Request<()>) -> tide::Result {
 			.body(include_bytes!("../static/favicon.ico").as_ref())
 			.build(),
 	)
+}
+
+async fn resource(body: &str, content_type: &str, cache: bool) -> tide::Result {
+	let mut res = Response::new(200);
+
+	if cache {
+		res.insert_header("Cache-Control", "public, max-age=1209600, s-maxage=86400");
+	}
+
+	res.set_content_type(content_type);
+	res.set_body(body);
+
+	Ok(res)
 }
 
 #[async_std::main]
@@ -140,8 +130,6 @@ async fn main() -> tide::Result<()> {
 	let listener = format!("{}:{}", address, port);
 
 	// Start HTTP server
-	println!("Running Libreddit v{} on {}!", env!("CARGO_PKG_VERSION"), &listener);
-
 	let mut app = tide::new();
 
 	// Redirect to HTTPS if "--redirect-https" enabled
@@ -163,10 +151,10 @@ async fn main() -> tide::Result<()> {
 	}));
 
 	// Read static files
-	app.at("/style.css/").get(style);
+	app.at("/style.css/").get(|_| resource(include_str!("../static/style.css"), "text/css", false));
+	app.at("/manifest.json/").get(|_| resource(include_str!("../static/manifest.json"), "application/json", false));
+	app.at("/robots.txt/").get(|_| resource("User-agent: *\nAllow: /", "text/plain", true));
 	app.at("/favicon.ico/").get(favicon);
-	app.at("/robots.txt/").get(robots);
-	app.at("/manifest.json/").get(manifest);
 	app.at("/logo.png/").get(pwa_logo);
 	app.at("/touch-icon-iphone.png/").get(iphone_logo);
 	app.at("/apple-touch-icon.png/").get(iphone_logo);
@@ -209,23 +197,22 @@ async fn main() -> tide::Result<()> {
 	app.at("/settings/restore/").get(settings::restore);
 
 	// Subreddit services
-	// See posts and info about subreddit
 	app.at("/r/:sub/").get(subreddit::page);
-	// Handle subscribe/unsubscribe
+
 	app.at("/r/:sub/subscribe/").post(subreddit::subscriptions);
 	app.at("/r/:sub/unsubscribe/").post(subreddit::subscriptions);
-	// View post on subreddit
+
 	app.at("/r/:sub/comments/:id/").get(post::item);
 	app.at("/r/:sub/comments/:id/:title/").get(post::item);
 	app.at("/r/:sub/comments/:id/:title/:comment_id/").get(post::item);
-	// Search inside subreddit
+
 	app.at("/r/:sub/search/").get(search::find);
-	// View wiki of subreddit
-	app.at("/r/:sub/w/").get(subreddit::wiki);
-	app.at("/r/:sub/w/:page/").get(subreddit::wiki);
+
 	app.at("/r/:sub/wiki/").get(subreddit::wiki);
 	app.at("/r/:sub/wiki/:page/").get(subreddit::wiki);
-	// Sort subreddit posts
+	app.at("/r/:sub/w/").get(subreddit::wiki);
+	app.at("/r/:sub/w/:page/").get(subreddit::wiki);
+
 	app.at("/r/:sub/:sort/").get(subreddit::page);
 
 	// Front page
@@ -249,6 +236,7 @@ async fn main() -> tide::Result<()> {
 			Ok("best") | Ok("hot") | Ok("new") | Ok("top") | Ok("rising") | Ok("controversial") => subreddit::page(req).await,
 			// Short link for post
 			Ok(id) if id.len() > 4 && id.len() < 7 => post::item(req).await,
+			// Error message for unknown pages
 			_ => error(req, "Nothing here".to_string()).await,
 		}
 	});
@@ -256,6 +244,7 @@ async fn main() -> tide::Result<()> {
 	// Default service in case no routes match
 	app.at("*").get(|req| error(req, "Nothing here".to_string()));
 
-	app.listen(listener).await?;
-	Ok(())
+	app.listen(&listener).await?;
+
+	Ok(println!("Running Libreddit v{} on {}!", env!("CARGO_PKG_VERSION"), listener))
 }
