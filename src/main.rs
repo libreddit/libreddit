@@ -129,6 +129,8 @@ async fn main() -> tide::Result<()> {
 
 	let listener = format!("{}:{}", address, port);
 
+	println!("Starting Libreddit...");
+
 	// Start HTTP server
 	let mut app = tide::new();
 
@@ -244,7 +246,9 @@ async fn main() -> tide::Result<()> {
 	// Default service in case no routes match
 	app.at("*").get(|req| error(req, "Nothing here".to_string()));
 
+	println!("Running Libreddit v{} on {}!", env!("CARGO_PKG_VERSION"), listener);
+
 	app.listen(&listener).await?;
 
-	Ok(println!("Running Libreddit v{} on {}!", env!("CARGO_PKG_VERSION"), listener))
+	Ok(())
 }
