@@ -715,6 +715,7 @@ a.search_subreddit:hover {
 	font-weight: normal;
 	margin: 5px 15px;
 	grid-area: post_body;
+	width: calc(100% - 30px);
 }
 
 .post_footer {
