@@ -1033,6 +1033,10 @@ input[type="submit"] {
 
 /* Markdown */
 
+.md {
+	width: 100%;
+}
+
 .md > *:not(:first-child) {
 	margin-top: 20px;
 }
