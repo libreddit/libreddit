@@ -25,7 +25,7 @@ pub async fn profile(req: Request<()>) -> tide::Result {
 	let username = req.param("name").unwrap_or("").to_string();
 
 	// Request user posts/comments from Reddit
-	let posts = fetch_posts(&path, "Comment".to_string()).await;
+	let posts = Post::fetch(&path, "Comment".to_string()).await;
 
 	match posts {
 		Ok((posts, after)) => {
@@ -37,7 +37,7 @@ pub async fn profile(req: Request<()>) -> tide::Result {
 				posts,
 				sort: (sort, param(&path, "t")),
 				ends: (param(&path, "after"), after),
-				prefs: prefs(req),
+				prefs: Preferences::new(req),
 			})
 		}
 		// If there is an error show error page

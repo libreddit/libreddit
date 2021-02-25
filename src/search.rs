@@ -1,5 +1,5 @@
 // CRATES
-use crate::utils::{cookie, error, fetch_posts, param, prefs, request, template, val, Post, Preferences};
+use crate::utils::{cookie, error, param, request, template, val, Post, Preferences};
 use askama::Template;
 use tide::Request;
 
@@ -50,7 +50,7 @@ pub async fn find(req: Request<()>) -> tide::Result {
 		Vec::new()
 	};
 
-	match fetch_posts(&path, String::new()).await {
+	match Post::fetch(&path, String::new()).await {
 		Ok((posts, after)) => template(SearchTemplate {
 			posts,
 			subreddits,
@@ -63,7 +63,7 @@ pub async fn find(req: Request<()>) -> tide::Result {
 				after,
 				restrict_sr: param(&path, "restrict_sr"),
 			},
-			prefs: prefs(req),
+			prefs: Preferences::new(req),
 		}),
 		Err(msg) => error(req, msg).await,
 	}

@@ -43,7 +43,7 @@ pub async fn page(req: Request<()>) -> tide::Result {
 
 	let path = format!("/r/{}/{}.json?{}&raw_json=1", sub, sort, req.url().query().unwrap_or_default());
 
-	match fetch_posts(&path, String::new()).await {
+	match Post::fetch(&path, String::new()).await {
 		Ok((posts, after)) => {
 			// If you can get subreddit posts, also request subreddit metadata
 			let sub = if !sub.contains('+') && sub != subscribed && sub != "popular" && sub != "all" {
@@ -71,7 +71,7 @@ pub async fn page(req: Request<()>) -> tide::Result {
 				posts,
 				sort: (sort, param(&path, "t")),
 				ends: (param(&path, "after"), after),
-				prefs: prefs(req),
+				prefs: Preferences::new(req),
 			})
 		}
 		Err(msg) => match msg.as_str() {
@@ -89,7 +89,7 @@ pub async fn subscriptions(req: Request<()>) -> tide::Result {
 	let query = req.url().query().unwrap_or_default().to_string();
 	let action: Vec<String> = req.url().path().split('/').map(String::from).collect();
 
-	let mut sub_list = prefs(req).subscriptions;
+	let mut sub_list = Preferences::new(req).subscriptions;
 
 	// Find each subreddit name (separated by '+') in sub parameter
 	for part in sub.split('+') {
@@ -143,7 +143,7 @@ pub async fn wiki(req: Request<()>) -> tide::Result {
 			sub,
 			wiki: rewrite_urls(res["data"]["content_html"].as_str().unwrap_or_default()),
 			page,
-			prefs: prefs(req),
+			prefs: Preferences::new(req),
 		}),
 		Err(msg) => error(req, msg).await,
 	}

@@ -53,7 +53,7 @@ pub async fn item(req: Request<()>) -> tide::Result {
 				comments,
 				post,
 				sort,
-				prefs: prefs(req),
+				prefs: Preferences::new(req),
 				single_thread: *single_thread,
 			})
 		}
@@ -74,7 +74,7 @@ async fn parse_post(json: &serde_json::Value) -> Post {
 	let ratio: f64 = post["data"]["upvote_ratio"].as_f64().unwrap_or(1.0) * 100.0;
 
 	// Determine the type of media along with the media URL
-	let (post_type, media, gallery) = media(&post["data"]).await;
+	let (post_type, media, gallery) = Media::parse(&post["data"]).await;
 
 	// Build a post using data parsed from Reddit post API
 	Post {
@@ -85,7 +85,7 @@ async fn parse_post(json: &serde_json::Value) -> Post {
 		author: Author {
 			name: val(post, "author"),
 			flair: Flair {
-				flair_parts: parse_rich_flair(
+				flair_parts: FlairPart::parse(
 					post["data"]["author_flair_type"].as_str().unwrap_or_default(),
 					post["data"]["author_flair_richtext"].as_array(),
 					post["data"]["author_flair_text"].as_str(),
@@ -108,7 +108,7 @@ async fn parse_post(json: &serde_json::Value) -> Post {
 			poster: "".to_string(),
 		},
 		flair: Flair {
-			flair_parts: parse_rich_flair(
+			flair_parts: FlairPart::parse(
 				post["data"]["link_flair_type"].as_str().unwrap_or_default(),
 				post["data"]["link_flair_richtext"].as_array(),
 				post["data"]["link_flair_text"].as_str(),
@@ -184,7 +184,7 @@ async fn parse_comments(json: &serde_json::Value, post_link: &str, post_author: 
 			author: Author {
 				name: val(&comment, "author"),
 				flair: Flair {
-					flair_parts: parse_rich_flair(
+					flair_parts: FlairPart::parse(
 						data["author_flair_type"].as_str().unwrap_or_default(),
 						data["author_flair_richtext"].as_array(),
 						data["author_flair_text"].as_str(),

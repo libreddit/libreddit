@@ -1,5 +1,5 @@
 // CRATES
-use crate::utils::{prefs, redirect, template, Preferences};
+use crate::utils::{redirect, template, Preferences};
 use askama::Template;
 use tide::{http::Cookie, Request};
 use time::{Duration, OffsetDateTime};
@@ -28,7 +28,7 @@ pub struct SettingsForm {
 
 // Retrieve cookies from request "Cookie" header
 pub async fn get(req: Request<()>) -> tide::Result {
-	template(SettingsTemplate { prefs: prefs(req) })
+	template(SettingsTemplate { prefs: Preferences::new(req) })
 }
 
 // Set cookies using response "Set-Cookie" header
