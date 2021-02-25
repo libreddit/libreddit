@@ -222,7 +222,6 @@ impl Post {
 
 			// Determine the type of media along with the media URL
 			let (post_type, media, gallery) = Media::parse(&data).await;
-			dbg!(&media.url);
 
 			posts.push(Self {
 				id: val(post, "id"),
