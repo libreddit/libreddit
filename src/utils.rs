@@ -83,7 +83,7 @@ impl Media {
 		let mut gallery = Vec::new();
 
 		// If post is a video, return the video
-		let (post_type, url) = if data["preview"]["reddit_video_preview"]["fallback_url"].is_string() {
+		let (post_type, url_val) = if data["preview"]["reddit_video_preview"]["fallback_url"].is_string() {
 			// Return reddit video
 			("video", &data["preview"]["reddit_video_preview"]["fallback_url"])
 		} else if data["secure_media"]["reddit_video"]["fallback_url"].is_string() {
@@ -120,10 +120,16 @@ impl Media {
 
 		let source = &data["preview"]["images"][0]["source"];
 
+		let url = if post_type == "self" || post_type == "link" {
+			url_val.as_str().unwrap_or_default().to_string()
+		} else {
+			format_url(url_val.as_str().unwrap_or_default()).to_string()
+		};
+
 		(
 			post_type.to_string(),
 			Self {
-				url: format_url(url.as_str().unwrap_or_default()).to_string(),
+				url,
 				width: source["width"].as_i64().unwrap_or_default(),
 				height: source["height"].as_i64().unwrap_or_default(),
 				poster: format_url(source["url"].as_str().unwrap_or_default()),
