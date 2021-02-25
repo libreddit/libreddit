@@ -63,7 +63,7 @@ async fn iphone_logo(_req: Request<()>) -> tide::Result {
 	Ok(
 		Response::builder(200)
 			.content_type("image/png")
-			.body(include_bytes!("../static/touch-icon-iphone.png").as_ref())
+			.body(include_bytes!("../static/apple-touch-icon.png").as_ref())
 			.build(),
 	)
 }
@@ -71,9 +71,9 @@ async fn iphone_logo(_req: Request<()>) -> tide::Result {
 async fn favicon(_req: Request<()>) -> tide::Result {
 	Ok(
 		Response::builder(200)
-			.content_type("image/vnd.microsoft.icon")
+			.content_type("image/png")
 			.header("Cache-Control", "public, max-age=1209600, s-maxage=86400")
-			.body(include_bytes!("../static/favicon.ico").as_ref())
+			.body(include_bytes!("../static/favicon.png").as_ref())
 			.build(),
 	)
 }
@@ -154,9 +154,11 @@ async fn main() -> tide::Result<()> {
 
 	// Read static files
 	app.at("/style.css/").get(|_| resource(include_str!("../static/style.css"), "text/css", false));
-	app.at("/manifest.json/").get(|_| resource(include_str!("../static/manifest.json"), "application/json", false));
+	app
+		.at("/manifest.json/")
+		.get(|_| resource(include_str!("../static/manifest.json"), "application/json", false));
 	app.at("/robots.txt/").get(|_| resource("User-agent: *\nAllow: /", "text/plain", true));
-	app.at("/favicon.ico/").get(favicon);
+	app.at("/favicon.png/").get(favicon);
 	app.at("/logo.png/").get(pwa_logo);
 	app.at("/touch-icon-iphone.png/").get(iphone_logo);
 	app.at("/apple-touch-icon.png/").get(iphone_logo);

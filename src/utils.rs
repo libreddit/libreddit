@@ -143,7 +143,8 @@ pub struct GalleryMedia {
 
 impl GalleryMedia {
 	fn parse(items: &Value, metadata: &Value) -> Vec<Self> {
-		items.as_array()
+		items
+			.as_array()
 			.unwrap_or(&Vec::new())
 			.iter()
 			.map(|item| {
@@ -497,7 +498,12 @@ pub fn redirect(path: String) -> Response {
 }
 
 pub async fn error(req: Request<()>, msg: String) -> tide::Result {
-	let body = ErrorTemplate { msg, prefs: Preferences::new(req) }.render().unwrap_or_default();
+	let body = ErrorTemplate {
+		msg,
+		prefs: Preferences::new(req),
+	}
+	.render()
+	.unwrap_or_default();
 
 	Ok(Response::builder(404).content_type("text/html").body(body).build())
 }
