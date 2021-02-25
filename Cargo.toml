@@ -12,10 +12,10 @@ tide = { version = "0.16.0", default-features = false, features = ["h1-server", 
 async-std = { version = "1.9.0", features = ["attributes"] }
 surf = { version = "2.1.0", default-features = false, features = ["curl-client", "encoding"] }
 cached = "0.23.0"
-askama = { version = "0.10.5", default-features = false, features = ["config"] }
+askama = { version = "0.10.5", default-features = false }
 serde = { version = "1.0.123", features = ["derive"] }
 serde_json = "1.0.62"
 async-recursion = "0.3.2"
 regex = "1.4.3"
+clap = { version = "2.33.3", default-features = false }
 time = "0.2.25"
-clap = "2.33.3"
