@@ -123,7 +123,7 @@ impl Media {
 		(
 			post_type.to_string(),
 			Self {
-				url: url.as_str().unwrap_or_default().to_string(),
+				url: format_url(url.as_str().unwrap_or_default()).to_string(),
 				width: source["width"].as_i64().unwrap_or_default(),
 				height: source["height"].as_i64().unwrap_or_default(),
 				poster: format_url(source["url"].as_str().unwrap_or_default()),
@@ -222,6 +222,7 @@ impl Post {
 
 			// Determine the type of media along with the media URL
 			let (post_type, media, gallery) = Media::parse(&data).await;
+			dbg!(&media.url);
 
 			posts.push(Self {
 				id: val(post, "id"),
@@ -539,10 +540,12 @@ pub async fn request(path: String) -> Result<Value, String> {
 							Err(
 								json["reason"]
 									.as_str()
-									.unwrap_or(json["message"].as_str().unwrap_or_else(|| {
-										println!("{} - Error parsing reddit error", url);
-										"Error parsing reddit error"
-									}))
+									.unwrap_or_else(|| {
+										json["message"].as_str().unwrap_or_else(|| {
+											println!("{} - Error parsing reddit error", url);
+											"Error parsing reddit error"
+										})
+									})
 									.to_string(),
 							)
 						} else {
