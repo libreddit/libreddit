@@ -628,7 +628,7 @@ a.search_subreddit:hover {
 	font-weight: bold;
 }
 
-.post_flair:empty {
+.author_flair, .post_flair:empty {
 	display: none;
 }
 
