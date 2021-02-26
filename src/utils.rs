@@ -478,10 +478,6 @@ pub fn time(created: f64) -> (String, String) {
 	(rel_time, time.format("%b %d %Y, %H:%M:%S UTC"))
 }
 
-//
-// JSON PARSING
-//
-
 // val() function used to parse JSON from Reddit APIs
 pub fn val(j: &Value, k: &str) -> String {
 	j["data"][k].as_str().unwrap_or_default().to_string()
@@ -528,7 +524,7 @@ pub async fn request(path: String) -> Result<Value, String> {
 	let res = client.send(req).await;
 
 	let err = |msg: &str, e: String| -> Result<Value, String> {
-		println!("{} - {}: {}", url, msg, e);
+		eprintln!("{} - {}: {}", url, msg, e);
 		Err(msg.to_string())
 	};
 
@@ -547,7 +543,7 @@ pub async fn request(path: String) -> Result<Value, String> {
 									.as_str()
 									.unwrap_or_else(|| {
 										json["message"].as_str().unwrap_or_else(|| {
-											println!("{} - Error parsing reddit error", url);
+											eprintln!("{} - Error parsing reddit error", url);
 											"Error parsing reddit error"
 										})
 									})
