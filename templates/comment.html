@@ -14,7 +14,7 @@
 			{% if author.flair.flair_parts.len() > 0 %}
 				<small class="author_flair">{% call utils::render_flair(author.flair.flair_parts) %}</small>
 			{% endif %}
-			<span class="created" title="{{ created }}">{{ rel_time }}</span>
+			<a href="{{ post_link }}{{ id }}/?context=3" class="created" title="{{ created }}">{{ rel_time }}</a>
 			{% if edited.0 != "".to_string() %}<span class="edited" title="{{ edited.1 }}">edited {{ edited.0 }}</span>{% endif %}
 		</summary>
 		<div class="comment_body {% if highlighted %}highlighted{% endif %}">{{ body }}</div>
