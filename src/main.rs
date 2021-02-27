@@ -43,10 +43,17 @@ where
 #[async_trait]
 impl<State: Clone + Send + Sync + 'static> Middleware<State> for NormalizePath {
 	async fn handle(&self, request: Request<State>, next: Next<'_, State>) -> tide::Result {
-		if !request.url().path().ends_with('/') {
-			Ok(Response::builder(301).header("Location", format!("{}/", request.url().path())).build())
-		} else {
+		let path = request.url().path();
+		let query = request.url().query().unwrap_or_default();
+		if path.ends_with('/') {
 			Ok(next.run(request).await)
+		} else {
+			let normalized = if query != "" {
+				format!("{}/?{}", path.replace("//", "/"), query)
+			} else {
+				format!("{}/", path.replace("//", "/"))
+			};
+			Ok(redirect(normalized))
 		}
 	}
 }
