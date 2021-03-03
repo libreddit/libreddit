@@ -10,7 +10,7 @@ edition = "2018"
 [dependencies]
 tide = { version = "0.16.0", default-features = false, features = ["h1-server", "cookies"] }
 async-std = { version = "1.9.0", features = ["attributes"] }
-surf = { version = "2.2.0", default-features = false, features = ["h1-client-rustls", "encoding"] }
+surf = { version = "2.2.0", default-features = false, features = ["h1-client", "encoding"] }
 cached = "0.23.0"
 askama = { version = "0.10.5", default-features = false }
 serde = { version = "1.0.123", features = ["derive"] }
