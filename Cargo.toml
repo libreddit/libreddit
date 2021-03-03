@@ -3,18 +3,18 @@ name = "libreddit"
 description = " Alternative private front-end to Reddit"
 license = "AGPL-3.0"
 repository = "https://github.com/spikecodes/libreddit"
-version = "0.2.9"
+version = "0.3.0"
 authors = ["spikecodes <19519553+spikecodes@users.noreply.github.com>"]
 edition = "2018"
 
 [dependencies]
 tide = { version = "0.16.0", default-features = false, features = ["h1-server", "cookies"] }
 async-std = { version = "1.9.0", features = ["attributes"] }
-surf = { version = "2.1.0", default-features = false, features = ["curl-client", "encoding"] }
+surf = { version = "2.2.0", default-features = false, features = ["h1-client-rustls", "encoding"] }
 cached = "0.23.0"
 askama = { version = "0.10.5", default-features = false }
 serde = { version = "1.0.123", features = ["derive"] }
-serde_json = "1.0.62"
+serde_json = "1.0.64"
 async-recursion = "0.3.2"
 regex = "1.4.3"
 clap = { version = "2.33.3", default-features = false }
