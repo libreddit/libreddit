@@ -197,6 +197,14 @@ Once installed, deploy Libreddit to `0.0.0.0:8080` by running:
 libreddit
 ```
 
+## Proxying using NGINX
+
+**NOTE** If you're [proxying Libreddit through a NGINX Reverse Proxy](https://github.com/spikecodes/libreddit/issues/122#issuecomment-782226853), add
+```nginx
+proxy_http_version 1.1;
+```
+to your NGINX configuration file above your `proxy_pass` line.
+
 ## Building
 
 ```
