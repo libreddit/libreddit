@@ -2,7 +2,7 @@
 
 > An alternative private front-end to Reddit 
 
-![screenshot](https://i.ibb.co/F0JsY5K/image.png)
+![screenshot](https://i.ibb.co/ZzMnQzS/image.jpg)
 
 ---
 
