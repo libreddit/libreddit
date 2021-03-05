@@ -226,6 +226,9 @@ async fn main() -> tide::Result<()> {
 
 	app.at("/r/:sub/:sort/").get(subreddit::page);
 
+	// Comments handler
+	app.at("/comments/:id/").get(post::item);
+
 	// Front page
 	app.at("/").get(subreddit::page);
 
