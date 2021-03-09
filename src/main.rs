@@ -1,3 +1,7 @@
+// Global specifiers
+#![forbid(unsafe_code)]
+#![warn(clippy::pedantic, clippy::all)]
+
 // Reference local files
 mod post;
 mod proxy;
@@ -48,10 +52,10 @@ impl<State: Clone + Send + Sync + 'static> Middleware<State> for NormalizePath {
 		if path.ends_with('/') {
 			Ok(next.run(request).await)
 		} else {
-			let normalized = if query != "" {
-				format!("{}/?{}", path.replace("//", "/"), query)
-			} else {
+			let normalized = if query.is_empty() {
 				format!("{}/", path.replace("//", "/"))
+			} else {
+				format!("{}/?{}", path.replace("//", "/"), query)
 			};
 			Ok(redirect(normalized))
 		}

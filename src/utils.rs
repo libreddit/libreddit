@@ -123,7 +123,7 @@ impl Media {
 		let url = if post_type == "self" || post_type == "link" {
 			url_val.as_str().unwrap_or_default().to_string()
 		} else {
-			format_url(url_val.as_str().unwrap_or_default()).to_string()
+			format_url(url_val.as_str().unwrap_or_default())
 		};
 
 		(
@@ -221,7 +221,7 @@ impl Post {
 		for post in post_list {
 			let data = &post["data"];
 
-			let (rel_time, created) = time(data["created_utc"].as_f64().unwrap_or_default());
+			let (rel_time, created) = time(data["created_utc"].as_i64().unwrap_or_default());
 			let score = data["score"].as_i64().unwrap_or_default();
 			let ratio: f64 = data["upvote_ratio"].as_f64().unwrap_or(1.0) * 100.0;
 			let title = val(post, "title");
@@ -249,7 +249,7 @@ impl Post {
 					distinguished: val(post, "distinguished"),
 				},
 				score: if data["hide_score"].as_bool().unwrap_or_default() {
-					"•".to_string()
+					"\u{2022}".to_string()
 				} else {
 					format_num(score)
 				},
@@ -459,8 +459,8 @@ pub fn format_num(num: i64) -> String {
 }
 
 // Parse a relative and absolute time from a UNIX timestamp
-pub fn time(created: f64) -> (String, String) {
-	let time = OffsetDateTime::from_unix_timestamp(created.round() as i64);
+pub fn time(created: i64) -> (String, String) {
+	let time = OffsetDateTime::from_unix_timestamp(created);
 	let time_delta = OffsetDateTime::now_utc() - time;
 
 	// If the time difference is more than a month, show full date

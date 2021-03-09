@@ -1,5 +1,5 @@
 // CRATES
-use crate::utils::*;
+use crate::utils::{Post, Preferences, Subreddit, cookie, error, format_num, format_url, param, redirect, request, rewrite_urls, template, val};
 use askama::Template;
 use tide::{http::Cookie, Request};
 use time::{Duration, OffsetDateTime};
@@ -108,10 +108,10 @@ pub async fn subscriptions(req: Request<()>) -> tide::Result {
 	// Redirect back to subreddit
 	// check for redirect parameter if unsubscribing from outside sidebar
 	let redirect_path = param(&format!("/?{}", query), "redirect");
-	let path = if !redirect_path.is_empty() {
-		format!("/{}/", redirect_path)
-	} else {
+	let path = if redirect_path.is_empty() {
 		format!("/r/{}", sub)
+	} else {
+		format!("/{}/", redirect_path)
 	};
 
 	let mut res = redirect(path);
@@ -139,9 +139,9 @@ pub async fn wiki(req: Request<()>) -> tide::Result {
 	let path: String = format!("/r/{}/wiki/{}.json?raw_json=1", sub, page);
 
 	match request(path).await {
-		Ok(res) => template(WikiTemplate {
+		Ok(response) => template(WikiTemplate {
 			sub,
-			wiki: rewrite_urls(res["data"]["content_html"].as_str().unwrap_or_default()),
+			wiki: rewrite_urls(response["data"]["content_html"].as_str().unwrap_or_default()),
 			page,
 			prefs: Preferences::new(req),
 		}),
@@ -159,8 +159,8 @@ async fn subreddit(sub: &str) -> Result<Subreddit, String> {
 		// If success, receive JSON in response
 		Ok(res) => {
 			// Metadata regarding the subreddit
-			let members: i64 = res["data"]["subscribers"].as_u64().unwrap_or_default() as i64;
-			let active: i64 = res["data"]["accounts_active"].as_u64().unwrap_or_default() as i64;
+			let members: i64 = res["data"]["subscribers"].as_i64().unwrap_or_default();
+			let active: i64 = res["data"]["accounts_active"].as_i64().unwrap_or_default();
 
 			// Fetch subreddit icon either from the community_icon or icon_img value
 			let community_icon: &str = res["data"]["community_icon"].as_str().map_or("", |s| s.split('?').collect::<Vec<&str>>()[0]);

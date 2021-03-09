@@ -13,7 +13,7 @@ struct SettingsTemplate {
 
 #[derive(serde::Deserialize, Default)]
 #[serde(default)]
-pub struct SettingsForm {
+pub struct Form {
 	theme: Option<String>,
 	front_page: Option<String>,
 	layout: Option<String>,
@@ -33,7 +33,7 @@ pub async fn get(req: Request<()>) -> tide::Result {
 
 // Set cookies using response "Set-Cookie" header
 pub async fn set(mut req: Request<()>) -> tide::Result {
-	let form: SettingsForm = req.body_form().await.unwrap_or_default();
+	let form: Form = req.body_form().await.unwrap_or_default();
 
 	let mut res = redirect("/settings".to_string());
 
@@ -58,7 +58,7 @@ pub async fn set(mut req: Request<()>) -> tide::Result {
 
 // Set cookies using response "Set-Cookie" header
 pub async fn restore(req: Request<()>) -> tide::Result {
-	let form: SettingsForm = req.query()?;
+	let form: Form = req.query()?;
 
 	let path = match form.redirect {
 		Some(value) => format!("/{}/", value),

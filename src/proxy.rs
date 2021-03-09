@@ -15,7 +15,7 @@ pub async fn handler(req: Request<()>, format: &str, params: Vec<&str>) -> tide:
 async fn request(url: String) -> tide::Result {
 	match surf::get(url).await {
 		Ok(res) => {
-			let content_length = res.header("Content-Length").map(|v| v.to_string()).unwrap_or_default();
+			let content_length = res.header("Content-Length").map(std::string::ToString::to_string).unwrap_or_default();
 			let content_type = res.content_type().map(|m| m.to_string()).unwrap_or_default();
 
 			Ok(
