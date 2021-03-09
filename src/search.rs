@@ -84,7 +84,7 @@ async fn search_subreddits(q: &str) -> Vec<Subreddit> {
 						name: val(subreddit, "display_name_prefixed"),
 						url: val(subreddit, "url"),
 						description: val(subreddit, "public_description"),
-						subscribers: subreddit["data"]["subscribers"].as_i64().unwrap_or_default(),
+						subscribers: subreddit["data"]["subscribers"].as_f64().unwrap_or_default() as i64,
 					})
 					.collect::<Vec<Subreddit>>(),
 				_ => Vec::new(),

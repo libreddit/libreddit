@@ -1,5 +1,5 @@
 // CRATES
-use crate::utils::{Post, Preferences, User, error, format_url, param, request, template};
+use crate::utils::{error, format_url, param, request, template, Post, Preferences, User};
 use askama::Template;
 use tide::Request;
 use time::OffsetDateTime;
@@ -55,7 +55,7 @@ async fn user(name: &str) -> Result<User, String> {
 		// If success, receive JSON in response
 		Ok(res) => {
 			// Grab creation date as unix timestamp
-			let created: i64 = res["data"]["created"].as_i64().unwrap_or(0);
+			let created: i64 = res["data"]["created"].as_f64().unwrap_or(0.0).round() as i64;
 
 			// nested_val function used to parse JSON from Reddit APIs
 			let about = |item| res["data"]["subreddit"][item].as_str().unwrap_or_default().to_string();

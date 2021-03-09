@@ -1,5 +1,7 @@
 // CRATES
-use crate::utils::{Author, Comment, Flags, Flair, FlairPart, Media, Post, Preferences, cookie, error, format_num, format_url, param, request, rewrite_urls, template, time, val};
+use crate::utils::{
+	cookie, error, format_num, format_url, param, request, rewrite_urls, template, time, val, Author, Comment, Flags, Flair, FlairPart, Media, Post, Preferences,
+};
 use tide::Request;
 
 use async_recursion::async_recursion;
@@ -68,7 +70,7 @@ async fn parse_post(json: &serde_json::Value) -> Post {
 	let post: &serde_json::Value = &json["data"]["children"][0];
 
 	// Grab UTC time as unix timestamp
-	let (rel_time, created) = time(post["data"]["created_utc"].as_i64().unwrap_or_default());
+	let (rel_time, created) = time(post["data"]["created_utc"].as_f64().unwrap_or_default());
 	// Parse post score and upvote ratio
 	let score = post["data"]["score"].as_i64().unwrap_or_default();
 	let ratio: f64 = post["data"]["upvote_ratio"].as_f64().unwrap_or(1.0) * 100.0;
@@ -149,10 +151,10 @@ async fn parse_comments(json: &serde_json::Value, post_link: &str, post_author: 
 		let kind = comment["kind"].as_str().unwrap_or_default().to_string();
 		let data = &comment["data"];
 
-		let unix_time = data["created_utc"].as_i64().unwrap_or_default();
+		let unix_time = data["created_utc"].as_f64().unwrap_or_default();
 		let (rel_time, created) = time(unix_time);
 
-		let edited = match data["edited"].as_i64() {
+		let edited = match data["edited"].as_f64() {
 			Some(stamp) => time(stamp),
 			None => (String::new(), String::new()),
 		};
