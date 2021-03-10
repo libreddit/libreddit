@@ -8,14 +8,14 @@ authors = ["spikecodes <19519553+spikecodes@users.noreply.github.com>"]
 edition = "2018"
 
 [dependencies]
-tide = { version = "0.16.0", default-features = false, features = ["h1-server", "cookies"] }
+askama = { version = "0.10.5", default-features = false }
+async-recursion = "0.3.2"
 async-std = { version = "1.9.0", features = ["attributes"] }
 async-tls = { version = "0.11.0", default-features = false, features = ["client"] }
 cached = "0.23.0"
-askama = { version = "0.10.5", default-features = false }
+clap = { version = "2.33.3", default-features = false }
+regex = "1.4.3"
 serde = { version = "1.0.124", features = ["derive"] }
 serde_json = "1.0.64"
-async-recursion = "0.3.2"
-regex = "1.4.3"
-clap = { version = "2.33.3", default-features = false }
+tide = { version = "0.16.0", default-features = false, features = ["h1-server", "cookies"] }
 time = "0.2.25"

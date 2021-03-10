@@ -1115,46 +1115,6 @@ td, th {
 
 /* Mobile */
 
-@media screen and (max-width: 480px) {
-	#version { display: none; }
-
-	.post {
-		grid-template: 	"post_header post_header post_thumbnail" auto
-				"post_title  post_title  post_thumbnail" 1fr
-				"post_media  post_media  post_thumbnail" auto
-				"post_body   post_body   post_thumbnail" auto
-				"post_score  post_footer post_thumbnail" auto
-				/ auto 1fr fit-content(min(20%, 152px));
-	}
-	
-	.post_score {
-		margin: 5px 0px 20px 15px;
-		padding: 0;
-	}
-	
-	.compact .post_score { padding: 0; }
-	
-	.post_score::before {	content: "↑" }
-
-	.post_header { font-size: 14px; }
-	.post_footer { margin-left: 15px;	}
-
-	.replies > .comment {
-		margin-left: -25px;
-		padding: 5px 0;
-	}
-
-	.comment_left {
-		min-width: 45px;
-		padding: 5px 0px;
-	}
-
-	.comment_author { margin-left: 10px; }
-	.comment_score { min-width: 35px;	}
-	.comment_data::marker { font-size: 18px; }
-	.created { width: 100%; }
-}
-
 @media screen and (max-width: 800px) {
 	body { padding-top: 120px }
 
@@ -1195,4 +1155,61 @@ td, th {
 	#user, #sidebar { margin: 20px 0;	}
 	#logo, #links { margin-bottom: 5px; }
 	#searchbox { width: calc(100vw - 35px); }
+}
+
+@media screen and (max-width: 480px) {
+	body { padding-top: 100px; }
+	#version { display: none; }
+
+	.post {
+		grid-template: 	"post_header post_header post_thumbnail" auto
+				"post_title  post_title  post_thumbnail" 1fr
+				"post_media  post_media  post_thumbnail" auto
+				"post_body   post_body   post_thumbnail" auto
+				"post_score  post_footer post_thumbnail" auto
+				/ auto 1fr fit-content(min(20%, 152px));
+	}
+	
+	.post_score {
+		margin: 5px 0px 20px 15px;
+		padding: 0;
+	}
+	
+	.compact .post_score { padding: 0; }
+	
+	.post_score::before {	content: "↑" }
+
+	.post_header { font-size: 14px; }
+	.post_footer { margin-left: 15px;	}
+
+	.replies > .comment {
+		margin-left: -12px;
+		padding: 5px 0;
+	}
+
+	.comment_left {
+		min-width: auto;
+		padding: 5px 0px;
+		align-items: initial;
+		margin-top: -5px;
+	}
+
+	.line {
+		margin-left: 5px;
+	}
+
+	/* .thread { margin-left: -5px; } */
+	.comment_right { padding: 5px 0 10px 2px; }
+	.comment_author { margin-left: 5px; }
+	.comment_data { margin-left: 12px; }
+	.comment_data::marker { font-size: 22px; }
+	.created { width: 100%; }
+
+	.comment_score {
+		min-width: 32px;
+		height: 20px;
+		font-size: 15px;
+		padding: 7px 0px;
+		margin-right: -5px;
+	}
 }
