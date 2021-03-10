@@ -514,7 +514,7 @@ pub async fn error(req: Request<()>, msg: String) -> tide::Result {
 }
 
 #[async_recursion]
-async fn connect(path: String) -> io::Result<(i16, String)> {
+async fn connect(path: String) -> io::Result<String> {
 	// Build reddit-compliant user agent for Libreddit
 	let user_agent = format!("web:libreddit:{}", env!("CARGO_PKG_VERSION"));
 
@@ -557,7 +557,7 @@ async fn connect(path: String) -> io::Result<(i16, String)> {
 			.collect::<Vec<&str>>()[1];
 		connect(location.replace("https://www.reddit.com", "")).await
 	} else {
-		Ok((status, body))
+		Ok(body)
 	}
 }
 
@@ -572,35 +572,29 @@ pub async fn request(path: String) -> Result<Value, String> {
 	};
 
 	match connect(path).await {
-		Ok((status, body)) => {
-			match status {
-				// If response is success
-				200 => {
-					// Parse the response from Reddit as JSON
-					let parsed: Result<Value, Error> = from_str(&body);
-					match parsed {
-						Ok(json) => {
-							// If Reddit returned an error
-							if json["error"].is_i64() {
-								Err(
-									json["reason"]
-										.as_str()
-										.unwrap_or_else(|| {
-											json["message"].as_str().unwrap_or_else(|| {
-												eprintln!("{} - Error parsing reddit error", url);
-												"Error parsing reddit error"
-											})
-										})
-										.to_string(),
-								)
-							} else {
-								Ok(json)
-							}
-						}
-						Err(e) => err("Failed to parse page JSON data", e.to_string()),
+		Ok(body) => {
+			// Parse the response from Reddit as JSON
+			let parsed: Result<Value, Error> = from_str(&body);
+			match parsed {
+				Ok(json) => {
+					// If Reddit returned an error
+					if json["error"].is_i64() {
+						Err(
+							json["reason"]
+								.as_str()
+								.unwrap_or_else(|| {
+									json["message"].as_str().unwrap_or_else(|| {
+										eprintln!("{} - Error parsing reddit error", url);
+										"Error parsing reddit error"
+									})
+								})
+								.to_string(),
+						)
+					} else {
+						Ok(json)
 					}
 				}
-				_ => err("Couldn't send request to Reddit", status.to_string()),
+				Err(e) => err("Failed to parse page JSON data", e.to_string()),
 			}
 		}
 		Err(e) => err("Couldn't send request to Reddit", e.to_string()),
