@@ -2,10 +2,11 @@
 #![forbid(unsafe_code)]
 #![warn(clippy::pedantic, clippy::all)]
 #![allow(
-	clippy::clippy::needless_pass_by_value,
+	clippy::needless_pass_by_value,
 	clippy::match_wildcard_for_single_variants,
 	clippy::cast_possible_truncation,
-	clippy::similar_names
+	clippy::similar_names,
+	clippy::cast_possible_wrap
 )]
 
 // Reference local files

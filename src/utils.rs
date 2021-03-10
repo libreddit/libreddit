@@ -2,6 +2,9 @@
 // CRATES
 //
 use askama::Template;
+use async_recursion::async_recursion;
+use async_std::{io, net::TcpStream, prelude::*};
+use async_tls::TlsConnector;
 use cached::proc_macro::cached;
 use regex::Regex;
 use serde_json::{from_str, Error, Value};
@@ -510,54 +513,96 @@ pub async fn error(req: Request<()>, msg: String) -> tide::Result {
 	Ok(Response::builder(404).content_type("text/html").body(body).build())
 }
 
+#[async_recursion]
+async fn connect(path: String) -> io::Result<(i16, String)> {
+	// Build reddit-compliant user agent for Libreddit
+	let user_agent = format!("web:libreddit:{}", env!("CARGO_PKG_VERSION"));
+
+	// Construct an HTTP request body
+	let req = format!(
+		"GET {} HTTP/1.1\r\nHost: www.reddit.com\r\nAccept: */*\r\nConnection: close\r\nUser-Agent: {}\r\n\r\n",
+		path, user_agent
+	);
+
+	// Open a TCP connection
+	let tcp_stream = TcpStream::connect("www.reddit.com:443").await?;
+
+	// Initialize TLS connector for requests
+	let connector = TlsConnector::default();
+
+	// Use the connector to start the handshake process
+	let mut tls_stream = connector.connect("www.reddit.com", tcp_stream).await?;
+
+	// Write the crafted HTTP request to the stream
+	tls_stream.write_all(req.as_bytes()).await?;
+
+	// And read the response
+	let mut writer = Vec::new();
+	io::copy(&mut tls_stream, &mut writer).await?;
+	let response = String::from_utf8_lossy(&writer).to_string();
+
+	let split = response.split("\r\n\r\n").collect::<Vec<&str>>();
+
+	let headers = split[0].split("\r\n").collect::<Vec<&str>>();
+	let status: i16 = headers[0].split(' ').collect::<Vec<&str>>()[1].parse().unwrap_or(200);
+	let body = split[1].to_string();
+
+	if (300..400).contains(&status) {
+		let location = headers
+			.iter()
+			.find(|header| header.starts_with("location:"))
+			.map(|f| f.to_owned())
+			.unwrap_or_default()
+			.split(": ")
+			.collect::<Vec<&str>>()[1];
+		connect(location.replace("https://www.reddit.com", "")).await
+	} else {
+		Ok((status, body))
+	}
+}
+
 // Make a request to a Reddit API and parse the JSON response
 #[cached(size = 100, time = 30, result = true)]
 pub async fn request(path: String) -> Result<Value, String> {
 	let url = format!("https://www.reddit.com{}", path);
-	// Build reddit-compliant user agent for Libreddit
-	let user_agent = format!("web:libreddit:{}", env!("CARGO_PKG_VERSION"));
-
-	// Send request using surf
-	let req = surf::get(&url).header("User-Agent", user_agent.as_str());
-	let client = surf::client().with(surf::middleware::Redirect::new(5));
-
-	let res = client.send(req).await;
 
 	let err = |msg: &str, e: String| -> Result<Value, String> {
 		eprintln!("{} - {}: {}", url, msg, e);
 		Err(msg.to_string())
 	};
 
-	match res {
-		Ok(mut response) => match response.take_body().into_string().await {
-			// If response is success
-			Ok(body) => {
-				// Parse the response from Reddit as JSON
-				let parsed: Result<Value, Error> = from_str(&body);
-				match parsed {
-					Ok(json) => {
-						// If Reddit returned an error
-						if json["error"].is_i64() {
-							Err(
-								json["reason"]
-									.as_str()
-									.unwrap_or_else(|| {
-										json["message"].as_str().unwrap_or_else(|| {
-											eprintln!("{} - Error parsing reddit error", url);
-											"Error parsing reddit error"
+	match connect(path).await {
+		Ok((status, body)) => {
+			match status {
+				// If response is success
+				200 => {
+					// Parse the response from Reddit as JSON
+					let parsed: Result<Value, Error> = from_str(&body);
+					match parsed {
+						Ok(json) => {
+							// If Reddit returned an error
+							if json["error"].is_i64() {
+								Err(
+									json["reason"]
+										.as_str()
+										.unwrap_or_else(|| {
+											json["message"].as_str().unwrap_or_else(|| {
+												eprintln!("{} - Error parsing reddit error", url);
+												"Error parsing reddit error"
+											})
 										})
-									})
-									.to_string(),
-							)
-						} else {
-							Ok(json)
+										.to_string(),
+								)
+							} else {
+								Ok(json)
+							}
 						}
+						Err(e) => err("Failed to parse page JSON data", e.to_string()),
 					}
-					Err(e) => err("Failed to parse page JSON data", e.to_string()),
 				}
+				_ => err("Couldn't send request to Reddit", status.to_string()),
 			}
-			Err(e) => err("Couldn't parse request body", e.to_string()),
-		},
+		}
 		Err(e) => err("Couldn't send request to Reddit", e.to_string()),
 	}
 }
