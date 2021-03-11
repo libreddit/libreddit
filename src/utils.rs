@@ -411,10 +411,10 @@ pub fn format_url(url: &str) -> String {
 			Ok(parsed) => {
 				let domain = parsed.domain().unwrap_or_default();
 
-				let capture = |regex: &str, format: &str, levels: i16| {
+				let capture = |regex: &str, format: &str, segments: i16| {
 					Regex::new(regex)
 						.map(|re| match re.captures(url) {
-							Some(caps) => match levels {
+							Some(caps) => match segments {
 								1 => [format, &caps[1], "/"].join(""),
 								2 => [format, &caps[1], "/", &caps[2], "/"].join(""),
 								_ => String::new(),

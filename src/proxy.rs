@@ -2,6 +2,7 @@ use async_std::{io, net::TcpStream, prelude::*};
 use async_tls::TlsConnector;
 use tide::{http::url::Url, Request, Response};
 
+/// Handle tide routes to proxy by parsing `params` from `req`uest.
 pub async fn handler(req: Request<()>, format: &str, params: Vec<&str>) -> tide::Result {
 	let mut url = format.to_string();
 
@@ -13,6 +14,9 @@ pub async fn handler(req: Request<()>, format: &str, params: Vec<&str>) -> tide:
 	request(url).await
 }
 
+/// Sends a request to a Reddit media domain and proxy the response.
+///
+/// Relays the `Content-Length` and `Content-Type` header.
 async fn request(url: String) -> tide::Result {
 	// Parse url into parts
 	let parts = Url::parse(&url).unwrap();
@@ -65,9 +69,11 @@ async fn request(url: String) -> tide::Result {
 					.unwrap_or_default()
 			};
 
+			// Parse Content-Length and Content-Type from headers
 			let content_length = header("Content-Length");
 			let content_type = header("Content-Type");
 
+			// Build response
 			Ok(
 				Response::builder(status)
 					.body(tide::http::Body::from_bytes(body))
