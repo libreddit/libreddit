@@ -25,7 +25,7 @@ struct WikiTemplate {
 }
 
 // SERVICES
-pub async fn page(req: Request<()>) -> tide::Result {
+pub async fn community(req: Request<()>) -> tide::Result {
 	// Build Reddit API path
 	let subscribed = cookie(&req, "subscriptions");
 	let front_page = cookie(&req, "front_page");

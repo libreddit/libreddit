@@ -219,7 +219,7 @@ async fn main() -> tide::Result<()> {
 	app.at("/settings/restore/").get(settings::restore);
 
 	// Subreddit services
-	app.at("/r/:sub/").get(subreddit::page);
+	app.at("/r/:sub/").get(subreddit::community);
 
 	app.at("/r/:sub/subscribe/").post(subreddit::subscriptions);
 	app.at("/r/:sub/unsubscribe/").post(subreddit::subscriptions);
@@ -235,13 +235,13 @@ async fn main() -> tide::Result<()> {
 	app.at("/r/:sub/w/").get(subreddit::wiki);
 	app.at("/r/:sub/w/:page/").get(subreddit::wiki);
 
-	app.at("/r/:sub/:sort/").get(subreddit::page);
+	app.at("/r/:sub/:sort/").get(subreddit::community);
 
 	// Comments handler
 	app.at("/comments/:id/").get(post::item);
 
 	// Front page
-	app.at("/").get(subreddit::page);
+	app.at("/").get(subreddit::community);
 
 	// View Reddit wiki
 	app.at("/w/").get(subreddit::wiki);
@@ -258,7 +258,7 @@ async fn main() -> tide::Result<()> {
 	app.at("/:id/").get(|req: Request<()>| async {
 		match req.param("id") {
 			// Sort front page
-			Ok("best") | Ok("hot") | Ok("new") | Ok("top") | Ok("rising") | Ok("controversial") => subreddit::page(req).await,
+			Ok("best") | Ok("hot") | Ok("new") | Ok("top") | Ok("rising") | Ok("controversial") => subreddit::community(req).await,
 			// Short link for post
 			Ok(id) if id.len() > 4 && id.len() < 7 => post::item(req).await,
 			// Error message for unknown pages
