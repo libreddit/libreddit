@@ -1,4 +1,5 @@
 // CRATES
+use crate::esc;
 use crate::utils::{error, format_url, param, request, template, Post, Preferences, User};
 use askama::Template;
 use tide::Request;
@@ -57,17 +58,17 @@ async fn user(name: &str) -> Result<User, String> {
 			// Grab creation date as unix timestamp
 			let created: i64 = res["data"]["created"].as_f64().unwrap_or(0.0).round() as i64;
 
-			// nested_val function used to parse JSON from Reddit APIs
+			// Closure used to parse JSON from Reddit APIs
 			let about = |item| res["data"]["subreddit"][item].as_str().unwrap_or_default().to_string();
 
 			// Parse the JSON output into a User struct
 			Ok(User {
 				name: name.to_string(),
-				title: about("title"),
+				title: esc!(about("title")),
 				icon: format_url(&about("icon_img")),
 				karma: res["data"]["total_karma"].as_i64().unwrap_or(0),
 				created: OffsetDateTime::from_unix_timestamp(created).format("%b %d '%y"),
-				banner: about("banner_img"),
+				banner: esc!(about("banner_img")),
 				description: about("public_description"),
 			})
 		}

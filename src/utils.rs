@@ -1,6 +1,7 @@
 //
 // CRATES
 //
+use crate::esc;
 use askama::Template;
 use async_recursion::async_recursion;
 use async_std::{io, net::TcpStream, prelude::*};
@@ -227,14 +228,14 @@ impl Post {
 			let (rel_time, created) = time(data["created_utc"].as_f64().unwrap_or_default());
 			let score = data["score"].as_i64().unwrap_or_default();
 			let ratio: f64 = data["upvote_ratio"].as_f64().unwrap_or(1.0) * 100.0;
-			let title = val(post, "title");
+			let title = esc!(post, "title");
 
 			// Determine the type of media along with the media URL
 			let (post_type, media, gallery) = Media::parse(&data).await;
 
 			posts.push(Self {
 				id: val(post, "id"),
-				title: if title.is_empty() { fallback_title.to_owned() } else { title },
+				title: esc!(if title.is_empty() { fallback_title.to_owned() } else { title }),
 				community: val(post, "subreddit"),
 				body: rewrite_urls(&val(post, "body_html")),
 				author: Author {
@@ -245,7 +246,7 @@ impl Post {
 							data["author_flair_richtext"].as_array(),
 							data["author_flair_text"].as_str(),
 						),
-						text: val(post, "link_flair_text"),
+						text: esc!(post, "link_flair_text"),
 						background_color: val(post, "author_flair_background_color"),
 						foreground_color: val(post, "author_flair_text_color"),
 					},
@@ -272,7 +273,7 @@ impl Post {
 						data["link_flair_richtext"].as_array(),
 						data["link_flair_text"].as_str(),
 					),
-					text: val(post, "link_flair_text"),
+					text: esc!(post, "link_flair_text"),
 					background_color: val(post, "link_flair_background_color"),
 					foreground_color: if val(post, "link_flair_text_color") == "dark" {
 						"black".to_string()
@@ -485,6 +486,27 @@ pub fn time(created: f64) -> (String, String) {
 pub fn val(j: &Value, k: &str) -> String {
 	j["data"][k].as_str().unwrap_or_default().to_string()
 }
+
+#[macro_export]
+macro_rules! esc {
+	($f:expr) => {
+		$f.replace('<', "&lt;").replace('>', "&gt;")
+	};
+	($j:expr, $k:expr) => {
+		$j["data"][$k].as_str().unwrap_or_default().to_string().replace('<', "&lt;").replace('>', "&gt;")
+	};
+}
+
+// Escape < and > to accurately render HTML
+// pub fn esc(j: &Value, k: &str) -> String {
+// 	val(j,k)
+// 		// .replace('&', "&amp;")
+// 		.replace('<', "&lt;")
+// 		.replace('>', "&gt;")
+// 		// .replace('"', "&quot;")
+// 		// .replace('\'', "&#x27;")
+// 		// .replace('/', "&#x2f;")
+// }
 
 //
 // NETWORKING

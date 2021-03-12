@@ -1,4 +1,5 @@
 // CRATES
+use crate::esc;
 use crate::utils::{cookie, error, format_num, format_url, param, redirect, request, rewrite_urls, template, val, Post, Preferences, Subreddit};
 use askama::Template;
 use tide::{http::Cookie, Request};
@@ -167,9 +168,9 @@ async fn subreddit(sub: &str) -> Result<Subreddit, String> {
 			let icon = if community_icon.is_empty() { val(&res, "icon_img") } else { community_icon.to_string() };
 
 			let sub = Subreddit {
-				name: val(&res, "display_name"),
-				title: val(&res, "title"),
-				description: val(&res, "public_description"),
+				name: esc!(&res, "display_name"),
+				title: esc!(&res, "title"),
+				description: esc!(&res, "public_description"),
 				info: rewrite_urls(&val(&res, "description_html").replace("\\", "")),
 				icon: format_url(&icon),
 				members: format_num(members),

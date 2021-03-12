@@ -1,4 +1,5 @@
 // CRATES
+use crate::esc;
 use crate::utils::{
 	cookie, error, format_num, format_url, param, request, rewrite_urls, template, time, val, Author, Comment, Flags, Flair, FlairPart, Media, Post, Preferences,
 };
@@ -81,7 +82,7 @@ async fn parse_post(json: &serde_json::Value) -> Post {
 	// Build a post using data parsed from Reddit post API
 	Post {
 		id: val(post, "id"),
-		title: val(post, "title"),
+		title: esc!(post, "title"),
 		community: val(post, "subreddit"),
 		body: rewrite_urls(&val(post, "selftext_html")).replace("\\", ""),
 		author: Author {
@@ -92,7 +93,7 @@ async fn parse_post(json: &serde_json::Value) -> Post {
 					post["data"]["author_flair_richtext"].as_array(),
 					post["data"]["author_flair_text"].as_str(),
 				),
-				text: val(post, "link_flair_text"),
+				text: esc!(post, "link_flair_text"),
 				background_color: val(post, "author_flair_background_color"),
 				foreground_color: val(post, "author_flair_text_color"),
 			},
@@ -115,7 +116,7 @@ async fn parse_post(json: &serde_json::Value) -> Post {
 				post["data"]["link_flair_richtext"].as_array(),
 				post["data"]["link_flair_text"].as_str(),
 			),
-			text: val(post, "link_flair_text"),
+			text: esc!(post, "link_flair_text"),
 			background_color: val(post, "link_flair_background_color"),
 			foreground_color: if val(post, "link_flair_text_color") == "dark" {
 				"black".to_string()
@@ -191,7 +192,7 @@ async fn parse_comments(json: &serde_json::Value, post_link: &str, post_author: 
 						data["author_flair_richtext"].as_array(),
 						data["author_flair_text"].as_str(),
 					),
-					text: val(&comment, "link_flair_text"),
+					text: esc!(&comment, "link_flair_text"),
 					background_color: val(&comment, "author_flair_background_color"),
 					foreground_color: val(&comment, "author_flair_text_color"),
 				},
