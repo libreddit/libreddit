@@ -19,8 +19,8 @@ pub async fn handler(req: Request<()>, format: &str, params: Vec<&str>) -> tide:
 /// Relays the `Content-Length` and `Content-Type` header.
 async fn request(url: String) -> tide::Result {
 	// Parse url into parts
-	let parts = Url::parse(&url).unwrap();
-	let host = parts.host().unwrap().to_string();
+	let parts = Url::parse(&url)?;
+	let host = parts.host().map(|host| host.to_string()).unwrap_or_default();
 	let domain = parts.domain().unwrap_or_default();
 	let path = format!("{}?{}", parts.path(), parts.query().unwrap_or_default());
 	// Build reddit-compliant user agent for Libreddit
@@ -36,17 +36,17 @@ async fn request(url: String) -> tide::Result {
 	let connector = TlsConnector::default();
 
 	// Open a TCP connection
-	let tcp_stream = TcpStream::connect(format!("{}:443", domain)).await.unwrap();
+	let tcp_stream = TcpStream::connect(format!("{}:443", domain)).await?;
 
 	// Use the connector to start the handshake process
-	let mut tls_stream = connector.connect(domain, tcp_stream).await.unwrap();
+	let mut tls_stream = connector.connect(domain, tcp_stream).await?;
 
 	// Write the aforementioned HTTP request to the stream
-	tls_stream.write_all(req.as_bytes()).await.unwrap();
+	tls_stream.write_all(req.as_bytes()).await?;
 
 	// And read the response
 	let mut writer = Vec::new();
-	io::copy(&mut tls_stream, &mut writer).await.unwrap();
+	io::copy(&mut tls_stream, &mut writer).await?;
 
 	// Find the delimiter which separates the body and headers
 	match (0..writer.len()).find(|i| writer[i.to_owned()] == 10_u8 && writer[i - 2] == 10_u8) {
