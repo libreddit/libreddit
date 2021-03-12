@@ -30,7 +30,7 @@
   - [Docker](#2-docker)
   - [AUR](#3-aur)
   - [GitHub Releases](#4-github-releases)
-  - [Repl.it](#5-replit)
+  - [Replit](#5-replit)
 - [Deployment](#deployment)
 
 ---
@@ -139,7 +139,7 @@ For transparency, I hope to describe all the ways Libreddit handles user privacy
 
 **Cookies:** Libreddit uses optional cookies to store any configured settings in [the settings menu](https://libredd.it/settings). This is not a cross-site cookie and the cookie holds no personal data, only a value of the possible layout.
 
-**Hosting:** The official instances are hosted on [Repl.it](https://repl.it/) which monitors usage to prevent abuse. I can understand if this invalidates certain users' threat models and therefore, selfhosting and browsing through Tor are welcomed.
+**Hosting:** The official instances are hosted on [Replit](https://replit.com/) which monitors usage to prevent abuse. I can understand if this invalidates certain users' threat models and therefore, selfhosting and browsing through Tor are welcomed.
 
 ---
 
@@ -177,15 +177,15 @@ yay -S libreddit-git
 
 If you're on Linux and none of these methods work for you, you can grab a Linux binary from [the newest release](https://github.com/spikecodes/libreddit/releases/latest).
 
-## 5) Repl.it
+## 5) Replit
 
-**Note:** Repl.it is a free option but they are *not* private and will monitor server usage to prevent abuse. If you need a free and easy setup, this method may work best for you.
+**Note:** Replit is a free option but they are *not* private and will monitor server usage to prevent abuse. If you need a free and easy setup, this method may work best for you.
 
-1. Create a Repl.it account (see note above)
-2. Visit [the official Repl](https://repl.it/@spikethecoder/libreddit) and fork it
+1. Create a Replit account (see note above)
+2. Visit [the official Repl](https://replit.com/@spikethecoder/libreddit) and fork it
 3. Hit the run button to download the latest Libreddit version and start it
 
-In the web preview (defaults to top right), you should see your instance hosted where you can assign a [custom domain](https://docs.repl.it/repls/web-hosting#custom-domains).
+In the web preview (defaults to top right), you should see your instance hosted where you can assign a [custom domain](https://docs.replit.com/repls/web-hosting#custom-domains).
 
 ---
 
