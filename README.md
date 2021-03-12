@@ -6,7 +6,7 @@
 
 ---
 
-**10 second pitch:** Libreddit is a portmanteau of "libre" (meaning freedom) and "Reddit". It is a private front-end like [Invidious](https://github.com/iv-org/invidious) but for Reddit. Browse the coldest takes of [r/unpopularopinion](https://libredd.it/r/unpopularopinion) without being [tracked](#reddit).
+**10 second pitch:** Libreddit is a portmanteau of "libre" (meaning freedom) and "Reddit". It is a private front-end like [Invidious](https://github.com/iv-org/invidious) but for Reddit. Browse the coldest takes of [r/unpopularopinion](https://libreddit.spike.codes/r/unpopularopinion) without being [tracked](#reddit).
 
 - 🚀 Fast: written in Rust for blazing fast speeds and memory safety
 - ☁️ Light: no JavaScript, no ads, no tracking, no bloat
@@ -137,7 +137,7 @@ For transparency, I hope to describe all the ways Libreddit handles user privacy
 
 **DNS:** Both official domains (`libredd.it` and `libreddit.spike.codes`) use Cloudflare as the DNS resolver. Though, the sites are not proxied through Cloudflare meaning Cloudflare doesn't have access to user traffic.
 
-**Cookies:** Libreddit uses optional cookies to store any configured settings in [the settings menu](https://libredd.it/settings). This is not a cross-site cookie and the cookie holds no personal data, only a value of the possible layout.
+**Cookies:** Libreddit uses optional cookies to store any configured settings in [the settings menu](https://libreddit.spike.codes/settings). This is not a cross-site cookie and the cookie holds no personal data, only a value of the possible layout.
 
 **Hosting:** The official instances are hosted on [Replit](https://replit.com/) which monitors usage to prevent abuse. I can understand if this invalidates certain users' threat models and therefore, selfhosting and browsing through Tor are welcomed.
 
