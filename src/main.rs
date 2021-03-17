@@ -21,7 +21,7 @@ mod utils;
 use clap::{App as cli, Arg};
 
 use futures_lite::FutureExt;
-use hyper::{Body, Request, Response};
+use hyper::{header::HeaderValue, Body, Request, Response};
 
 mod client;
 use client::proxy;
@@ -73,7 +73,12 @@ async fn resource(body: &str, content_type: &str, cache: bool) -> Result<Respons
 		.unwrap_or_default();
 
 	if cache {
-		res.headers_mut().insert("Cache-Control", "public, max-age=1209600, s-maxage=86400".parse().unwrap());
+		match HeaderValue::from_str("public, max-age=1209600, s-maxage=86400") {
+			Ok(val) => {
+				res.headers_mut().insert("Cache-Control", val);
+			}
+			Err(_) => (),
+		}
 	}
 
 	Ok(res)

@@ -1,6 +1,7 @@
 use cookie::Cookie;
 use futures_lite::{future::Boxed, Future, FutureExt};
 use hyper::{
+	header::HeaderValue,
 	service::{make_service_fn, service_fn},
 	HeaderMap,
 };
@@ -27,7 +28,10 @@ macro_rules! headers(
 		{
 			let mut m = hyper::HeaderMap::new();
 			$(
-				m.insert($key, hyper::header::HeaderValue::from_str($value).unwrap());
+				match hyper::header::HeaderValue::from_str($value) {
+					Ok(val) => { m.insert($key, val); }
+					Err(_) => ()
+				}
 			)+
 			m
 		}
@@ -92,14 +96,24 @@ impl ResponseExt for Response<Body> {
 	}
 
 	fn insert_cookie(&mut self, cookie: Cookie) {
-		self.headers_mut().append("Set-Cookie", cookie.to_string().parse().unwrap());
+		match HeaderValue::from_str(&cookie.to_string()) {
+			Ok(val) => {
+				self.headers_mut().append("Set-Cookie", val);
+			}
+			Err(_) => (),
+		}
 	}
 
 	fn remove_cookie(&mut self, name: String) {
 		let mut cookie = Cookie::named(name);
 		cookie.set_path("/");
 		cookie.set_max_age(Duration::second());
-		self.headers_mut().append("Set-Cookie", cookie.to_string().parse().unwrap());
+		match HeaderValue::from_str(&cookie.to_string()) {
+			Ok(val) => {
+				self.headers_mut().append("Set-Cookie", val);
+			}
+			Err(_) => (),
+		}
 	}
 }
 

@@ -19,7 +19,7 @@ pub async fn proxy(req: Request<Body>, format: &str) -> Result<Response<Body>, S
 
 async fn stream(url: &str) -> Result<Response<Body>, String> {
 	// First parameter is target URL (mandatory).
-	let url = Uri::from_str(url).unwrap();
+	let url = Uri::from_str(url).map_err(|_| "Couldn't parse URL".to_string())?;
 
 	// Prepare the HTTPS connector.
 	let https = hyper_rustls::HttpsConnector::with_native_roots();
@@ -71,7 +71,15 @@ fn request(url: String) -> Boxed<Result<Response<Body>, String>> {
 		match client.request(req(url)).await {
 			Ok(response) => {
 				if response.status().to_string().starts_with('3') {
-					request(response.headers().get("Location").unwrap().to_str().unwrap_or_default().to_string()).await
+					request(
+						response
+							.headers()
+							.get("Location")
+							.map(|val| val.to_str().unwrap_or_default())
+							.unwrap_or_default()
+							.to_string(),
+					)
+					.await
 				} else {
 					Ok(response)
 				}
