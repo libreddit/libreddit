@@ -11,7 +11,6 @@
 
 // Reference local files
 mod post;
-mod proxy;
 mod search;
 mod settings;
 mod subreddit;
@@ -19,99 +18,70 @@ mod user;
 mod utils;
 
 // Import Crates
-use clap::{App, Arg};
-use proxy::handler;
-use tide::{
-	utils::{async_trait, After},
-	Middleware, Next, Request, Response,
-};
+use clap::{App as cli, Arg};
+
+use futures_lite::FutureExt;
+use hyper::{Body, Request, Response};
+
+mod client;
+use client::proxy;
+use server::RequestExt;
 use utils::{error, redirect};
 
-// Build middleware
-struct HttpsRedirect<HttpsOnly>(HttpsOnly);
-struct NormalizePath;
-
-#[async_trait]
-impl<State, HttpsOnly> Middleware<State> for HttpsRedirect<HttpsOnly>
-where
-	State: Clone + Send + Sync + 'static,
-	HttpsOnly: Into<bool> + Copy + Send + Sync + 'static,
-{
-	async fn handle(&self, request: Request<State>, next: Next<'_, State>) -> tide::Result {
-		let secure = request.url().scheme() == "https";
-
-		if self.0.into() && !secure {
-			let mut secured = request.url().to_owned();
-			secured.set_scheme("https").unwrap_or_default();
-
-			Ok(redirect(secured.to_string()))
-		} else {
-			Ok(next.run(request).await)
-		}
-	}
-}
-
-#[async_trait]
-impl<State: Clone + Send + Sync + 'static> Middleware<State> for NormalizePath {
-	async fn handle(&self, request: Request<State>, next: Next<'_, State>) -> tide::Result {
-		let path = request.url().path();
-		let query = request.url().query().unwrap_or_default();
-		if path.ends_with('/') {
-			Ok(next.run(request).await)
-		} else {
-			let normalized = if query.is_empty() {
-				format!("{}/", path.replace("//", "/"))
-			} else {
-				format!("{}/?{}", path.replace("//", "/"), query)
-			};
-			Ok(redirect(normalized))
-		}
-	}
-}
+mod server;
 
 // Create Services
 
 // Required for the manifest to be valid
-async fn pwa_logo(_req: Request<()>) -> tide::Result {
-	Ok(Response::builder(200).content_type("image/png").body(include_bytes!("../static/logo.png").as_ref()).build())
+async fn pwa_logo() -> Result<Response<Body>, String> {
+	Ok(
+		Response::builder()
+			.status(200)
+			.header("content-type", "image/png")
+			.body(include_bytes!("../static/logo.png").as_ref().into())
+			.unwrap_or_default(),
+	)
 }
 
 // Required for iOS App Icons
-async fn iphone_logo(_req: Request<()>) -> tide::Result {
+async fn iphone_logo() -> Result<Response<Body>, String> {
 	Ok(
-		Response::builder(200)
-			.content_type("image/png")
-			.body(include_bytes!("../static/apple-touch-icon.png").as_ref())
-			.build(),
+		Response::builder()
+			.status(200)
+			.header("content-type", "image/png")
+			.body(include_bytes!("../static/apple-touch-icon.png").as_ref().into())
+			.unwrap_or_default(),
 	)
 }
 
-async fn favicon(_req: Request<()>) -> tide::Result {
+async fn favicon() -> Result<Response<Body>, String> {
 	Ok(
-		Response::builder(200)
-			.content_type("image/vnd.microsoft.icon")
+		Response::builder()
+			.status(200)
+			.header("content-type", "image/vnd.microsoft.icon")
 			.header("Cache-Control", "public, max-age=1209600, s-maxage=86400")
-			.body(include_bytes!("../static/favicon.ico").as_ref())
-			.build(),
+			.body(include_bytes!("../static/favicon.ico").as_ref().into())
+			.unwrap_or_default(),
 	)
 }
 
-async fn resource(body: &str, content_type: &str, cache: bool) -> tide::Result {
-	let mut res = Response::new(200);
+async fn resource(body: &str, content_type: &str, cache: bool) -> Result<Response<Body>, String> {
+	let mut res = Response::builder()
+		.status(200)
+		.header("content-type", content_type)
+		.body(body.to_string().into())
+		.unwrap_or_default();
 
 	if cache {
-		res.insert_header("Cache-Control", "public, max-age=1209600, s-maxage=86400");
+		res.headers_mut().insert("Cache-Control", "public, max-age=1209600, s-maxage=86400".parse().unwrap());
 	}
-
-	res.set_content_type(content_type);
-	res.set_body(body);
 
 	Ok(res)
 }
 
-#[async_std::main]
-async fn main() -> tide::Result<()> {
-	let matches = App::new("Libreddit")
+#[tokio::main]
+async fn main() {
+	let matches = cli::new("Libreddit")
 		.version(env!("CARGO_PKG_VERSION"))
 		.about("Private front-end for Reddit written in Rust ")
 		.arg(
@@ -136,142 +106,126 @@ async fn main() -> tide::Result<()> {
 			Arg::with_name("redirect-https")
 				.short("r")
 				.long("redirect-https")
-				.help("Redirect all HTTP requests to HTTPS")
+				.help("Redirect all HTTP requests to HTTPS (no longer functional)")
 				.takes_value(false),
 		)
 		.get_matches();
 
 	let address = matches.value_of("address").unwrap_or("0.0.0.0");
 	let port = matches.value_of("port").unwrap_or("8080");
-	let force_https = matches.is_present("redirect-https");
+	let _force_https = matches.is_present("redirect-https");
 
 	let listener = format!("{}:{}", address, port);
 
 	println!("Starting Libreddit...");
 
-	// Start HTTP server
-	let mut app = tide::new();
+	// Begin constructing a server
+	let mut app = server::Server::new();
 
-	// Redirect to HTTPS if "--redirect-https" enabled
-	app.with(HttpsRedirect(force_https));
-
-	// Append trailing slash and remove double slashes
-	app.with(NormalizePath);
-
-	// Apply default headers for security
-	app.with(After(|mut res: Response| async move {
-		res.insert_header("Referrer-Policy", "no-referrer");
-		res.insert_header("X-Content-Type-Options", "nosniff");
-		res.insert_header("X-Frame-Options", "DENY");
-		res.insert_header(
-			"Content-Security-Policy",
-			"default-src 'none'; manifest-src 'self'; media-src 'self'; style-src 'self' 'unsafe-inline'; base-uri 'none'; img-src 'self' data:; form-action 'self'; frame-ancestors 'none';",
-		);
-		Ok(res)
-	}));
+	// Define default headers (added to all responses)
+	app.default_headers = headers! {
+		"Referrer-Policy" => "no-referrer",
+		"X-Content-Type-Options" => "nosniff",
+		"X-Frame-Options" => "DENY",
+		"Content-Security-Policy" => "default-src 'none'; manifest-src 'self'; media-src 'self'; style-src 'self' 'unsafe-inline'; base-uri 'none'; img-src 'self' data:; form-action 'self'; frame-ancestors 'none';"
+	};
 
 	// Read static files
-	app.at("/style.css/").get(|_| resource(include_str!("../static/style.css"), "text/css", false));
+	app.at("/style.css").get(|_| resource(include_str!("../static/style.css"), "text/css", false).boxed());
 	app
-		.at("/manifest.json/")
-		.get(|_| resource(include_str!("../static/manifest.json"), "application/json", false));
-	app.at("/robots.txt/").get(|_| resource("User-agent: *\nAllow: /", "text/plain", true));
-	app.at("/favicon.ico/").get(favicon);
-	app.at("/logo.png/").get(pwa_logo);
-	app.at("/touch-icon-iphone.png/").get(iphone_logo);
-	app.at("/apple-touch-icon.png/").get(iphone_logo);
+		.at("/manifest.json")
+		.get(|_| resource(include_str!("../static/manifest.json"), "application/json", false).boxed());
+	app.at("/robots.txt").get(|_| resource("User-agent: *\nAllow: /", "text/plain", true).boxed());
+	app.at("/favicon.ico").get(|_| favicon().boxed());
+	app.at("/logo.png").get(|_| pwa_logo().boxed());
+	app.at("/touch-icon-iphone.png").get(|_| iphone_logo().boxed());
+	app.at("/apple-touch-icon.png").get(|_| iphone_logo().boxed());
 
 	// Proxy media through Libreddit
-	app
-		.at("/vid/:id/:size/") /*      */
-		.get(|req| handler(req, "https://v.redd.it/{}/DASH_{}", vec!["id", "size"]));
-	app
-		.at("/img/:id/") /*            */
-		.get(|req| handler(req, "https://i.redd.it/{}", vec!["id"]));
-	app
-		.at("/thumb/:point/:id/") /*   */
-		.get(|req| handler(req, "https://{}.thumbs.redditmedia.com/{}", vec!["point", "id"]));
-	app
-		.at("/emoji/:id/:name/") /*    */
-		.get(|req| handler(req, "https://emoji.redditmedia.com/{}/{}", vec!["id", "name"]));
-	app
-		.at("/preview/:loc/:id/:query/")
-		.get(|req| handler(req, "https://{}view.redd.it/{}?{}", vec!["loc", "id", "query"]));
-	app
-		.at("/style/*path/") /*        */
-		.get(|req| handler(req, "https://styles.redditmedia.com/{}", vec!["path"]));
-	app
-		.at("/static/*path/") /*       */
-		.get(|req| handler(req, "https://www.redditstatic.com/{}", vec!["path"]));
+	app.at("/vid/:id/:size").get(|r| proxy(r, "https://v.redd.it/{id}/DASH_{size}").boxed());
+	app.at("/img/:id").get(|r| proxy(r, "https://i.redd.it/{id}").boxed());
+	app.at("/thumb/:point/:id").get(|r| proxy(r, "https://{point}.thumbs.redditmedia.com/{id}").boxed());
+	app.at("/emoji/:id/:name").get(|r| proxy(r, "https://emoji.redditmedia.com/{id}/{name}").boxed());
+	app.at("/preview/:loc/:id/:query").get(|r| proxy(r, "https://{loc}view.redd.it/{id}?{query}").boxed());
+	app.at("/style/*path").get(|r| proxy(r, "https://styles.redditmedia.com/{path}").boxed());
+	app.at("/static/*path").get(|r| proxy(r, "https://www.redditstatic.com/{path}").boxed());
 
 	// Browse user profile
-	app.at("/u/:name/").get(user::profile);
-	app.at("/u/:name/comments/:id/:title/").get(post::item);
-	app.at("/u/:name/comments/:id/:title/:comment_id/").get(post::item);
+	app
+		.at("/u/:name")
+		.get(|r| async move { Ok(redirect(format!("/user/{}", r.param("name").unwrap_or_default()))) }.boxed());
+	app.at("/u/:name/comments/:id/:title").get(|r| post::item(r).boxed());
+	app.at("/u/:name/comments/:id/:title/:comment_id").get(|r| post::item(r).boxed());
 
-	app.at("/user/:name/").get(user::profile);
-	app.at("/user/:name/comments/:id/").get(post::item);
-	app.at("/user/:name/comments/:id/:title/").get(post::item);
-	app.at("/user/:name/comments/:id/:title/:comment_id/").get(post::item);
+	app.at("/user/:name").get(|r| user::profile(r).boxed());
+	app.at("/user/:name/comments/:id").get(|r| post::item(r).boxed());
+	app.at("/user/:name/comments/:id/:title").get(|r| post::item(r).boxed());
+	app.at("/user/:name/comments/:id/:title/:comment_id").get(|r| post::item(r).boxed());
 
 	// Configure settings
-	app.at("/settings/").get(settings::get).post(settings::set);
-	app.at("/settings/restore/").get(settings::restore);
+	app.at("/settings").get(|r| settings::get(r).boxed()).post(|r| settings::set(r).boxed());
+	app.at("/settings/restore").get(|r| settings::restore(r).boxed());
 
 	// Subreddit services
-	app.at("/r/:sub/").get(subreddit::community);
+	app.at("/r/:sub").get(|r| subreddit::community(r).boxed());
 
-	app.at("/r/:sub/subscribe/").post(subreddit::subscriptions);
-	app.at("/r/:sub/unsubscribe/").post(subreddit::subscriptions);
+	app.at("/r/:sub/subscribe").post(|r| subreddit::subscriptions(r).boxed());
+	app.at("/r/:sub/unsubscribe").post(|r| subreddit::subscriptions(r).boxed());
 
-	app.at("/r/:sub/comments/:id/").get(post::item);
-	app.at("/r/:sub/comments/:id/:title/").get(post::item);
-	app.at("/r/:sub/comments/:id/:title/:comment_id/").get(post::item);
+	app.at("/r/:sub/comments/:id").get(|r| post::item(r).boxed());
+	app.at("/r/:sub/comments/:id/:title").get(|r| post::item(r).boxed());
+	app.at("/r/:sub/comments/:id/:title/:comment_id").get(|r| post::item(r).boxed());
 
-	app.at("/r/:sub/search/").get(search::find);
+	app.at("/r/:sub/search").get(|r| search::find(r).boxed());
 
-	app.at("/r/:sub/wiki/").get(subreddit::wiki);
-	app.at("/r/:sub/wiki/:page/").get(subreddit::wiki);
-	app.at("/r/:sub/w/").get(subreddit::wiki);
-	app.at("/r/:sub/w/:page/").get(subreddit::wiki);
+	app.at("/r/:sub/wiki/").get(|r| subreddit::wiki(r).boxed());
+	app.at("/r/:sub/wiki/:page").get(|r| subreddit::wiki(r).boxed());
+	app.at("/r/:sub/w").get(|r| subreddit::wiki(r).boxed());
+	app.at("/r/:sub/w/:page").get(|r| subreddit::wiki(r).boxed());
 
-	app.at("/r/:sub/:sort/").get(subreddit::community);
+	app.at("/r/:sub/:sort").get(|r| subreddit::community(r).boxed());
 
 	// Comments handler
-	app.at("/comments/:id/").get(post::item);
+	app.at("/comments/:id/").get(|r| post::item(r).boxed());
 
 	// Front page
-	app.at("/").get(subreddit::community);
+	app.at("/").get(|r| subreddit::community(r).boxed());
 
 	// View Reddit wiki
-	app.at("/w/").get(subreddit::wiki);
-	app.at("/w/:page/").get(subreddit::wiki);
-	app.at("/wiki/").get(subreddit::wiki);
-	app.at("/wiki/:page/").get(subreddit::wiki);
+	app.at("/w").get(|r| subreddit::wiki(r).boxed());
+	app.at("/w/:page").get(|r| subreddit::wiki(r).boxed());
+	app.at("/wiki").get(|r| subreddit::wiki(r).boxed());
+	app.at("/wiki/:page").get(|r| subreddit::wiki(r).boxed());
 
 	// Search all of Reddit
-	app.at("/search/").get(search::find);
+	app.at("/search").get(|r| search::find(r).boxed());
 
 	// Handle about pages
-	app.at("/about/").get(|req| error(req, "About pages aren't here yet".to_string()));
+	app.at("/about").get(|req| error(req, "About pages aren't added yet".to_string()).boxed());
 
-	app.at("/:id/").get(|req: Request<()>| async {
-		match req.param("id") {
-			// Sort front page
-			Ok("best") | Ok("hot") | Ok("new") | Ok("top") | Ok("rising") | Ok("controversial") => subreddit::community(req).await,
-			// Short link for post
-			Ok(id) if id.len() > 4 && id.len() < 7 => post::item(req).await,
-			// Error message for unknown pages
-			_ => error(req, "Nothing here".to_string()).await,
+	app.at("/:id").get(|req: Request<Body>| {
+		async {
+			match req.param("id") {
+				// Sort front page
+				// Some("best") | Some("hot") | Some("new") | Some("top") | Some("rising") | Some("controversial") => subreddit::community(req).await,
+				// Short link for post
+				Some(id) if id.len() > 4 && id.len() < 7 => post::item(req).await,
+				// Error message for unknown pages
+				_ => error(req, "Nothing here".to_string()).await,
+			}
 		}
+		.boxed()
 	});
 
 	// Default service in case no routes match
-	app.at("*").get(|req| error(req, "Nothing here".to_string()));
+	app.at("/*").get(|req| error(req, "Nothing here".to_string()).boxed());
 
 	println!("Running Libreddit v{} on {}!", env!("CARGO_PKG_VERSION"), listener);
 
-	app.listen(&listener).await?;
+	let server = app.listen(listener);
 
-	Ok(())
+	// Run this server for... forever!
+	if let Err(e) = server.await {
+		eprintln!("Server error: {}", e);
+	}
 }

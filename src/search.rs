@@ -1,7 +1,8 @@
 // CRATES
-use crate::utils::{cookie, error, param, request, template, val, Post, Preferences};
+use crate::utils::{cookie, error, param, template, val, Post, Preferences};
+use crate::{client::json, RequestExt};
 use askama::Template;
-use tide::Request;
+use hyper::{Body, Request, Response};
 
 // STRUCTS
 struct SearchParams {
@@ -32,10 +33,10 @@ struct SearchTemplate {
 }
 
 // SERVICES
-pub async fn find(req: Request<()>) -> tide::Result {
+pub async fn find(req: Request<Body>) -> Result<Response<Body>, String> {
 	let nsfw_results = if cookie(&req, "show_nsfw") == "on" { "&include_over_18=on" } else { "" };
-	let path = format!("{}.json?{}{}", req.url().path(), req.url().query().unwrap_or_default(), nsfw_results);
-	let sub = req.param("sub").unwrap_or("").to_string();
+	let path = format!("{}.json?{}{}", req.uri().path(), req.uri().query().unwrap_or_default(), nsfw_results);
+	let sub = req.param("sub").unwrap_or_default();
 	let query = param(&path, "q");
 
 	let sort = if param(&path, "sort").is_empty() {
@@ -73,7 +74,7 @@ async fn search_subreddits(q: &str) -> Vec<Subreddit> {
 	let subreddit_search_path = format!("/subreddits/search.json?q={}&limit=3", q.replace(' ', "+"));
 
 	// Send a request to the url
-	match request(subreddit_search_path).await {
+	match json(subreddit_search_path).await {
 		// If success, receive JSON in response
 		Ok(response) => {
 			match response["data"]["children"].as_array() {

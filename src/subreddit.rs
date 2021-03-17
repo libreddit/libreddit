@@ -1,8 +1,10 @@
 // CRATES
 use crate::esc;
-use crate::utils::{cookie, error, format_num, format_url, param, redirect, request, rewrite_urls, template, val, Post, Preferences, Subreddit};
+use crate::utils::{cookie, error, format_num, format_url, param, redirect, rewrite_urls, template, val, Post, Preferences, Subreddit};
+use crate::{client::json, server::ResponseExt, RequestExt};
 use askama::Template;
-use tide::{http::Cookie, Request};
+use cookie::Cookie;
+use hyper::{Body, Request, Response};
 use time::{Duration, OffsetDateTime};
 
 // STRUCTS
@@ -26,11 +28,11 @@ struct WikiTemplate {
 }
 
 // SERVICES
-pub async fn community(req: Request<()>) -> tide::Result {
+pub async fn community(req: Request<Body>) -> Result<Response<Body>, String> {
 	// Build Reddit API path
 	let subscribed = cookie(&req, "subscriptions");
 	let front_page = cookie(&req, "front_page");
-	let sort = req.param("sort").unwrap_or_else(|_| req.param("id").unwrap_or("hot")).to_string();
+	let sort = req.param("sort").unwrap_or_else(|| req.param("id").unwrap_or("hot".to_string()));
 
 	let sub = req.param("sub").map(String::from).unwrap_or(if front_page == "default" || front_page.is_empty() {
 		if subscribed.is_empty() {
@@ -42,7 +44,7 @@ pub async fn community(req: Request<()>) -> tide::Result {
 		front_page.to_owned()
 	});
 
-	let path = format!("/r/{}/{}.json?{}&raw_json=1", sub, sort, req.url().query().unwrap_or_default());
+	let path = format!("/r/{}/{}.json?{}&raw_json=1", sub, sort, req.uri().query().unwrap_or_default());
 
 	match Post::fetch(&path, String::new()).await {
 		Ok((posts, after)) => {
@@ -52,7 +54,7 @@ pub async fn community(req: Request<()>) -> tide::Result {
 				subreddit(&sub).await.unwrap_or_default()
 			} else if sub == subscribed {
 				// Subscription feed
-				if req.url().path().starts_with("/r/") {
+				if req.uri().path().starts_with("/r/") {
 					subreddit(&sub).await.unwrap_or_default()
 				} else {
 					Subreddit::default()
@@ -85,10 +87,10 @@ pub async fn community(req: Request<()>) -> tide::Result {
 }
 
 // Sub or unsub by setting subscription cookie using response "Set-Cookie" header
-pub async fn subscriptions(req: Request<()>) -> tide::Result {
+pub async fn subscriptions(req: Request<Body>) -> Result<Response<Body>, String> {
 	let sub = req.param("sub").unwrap_or_default().to_string();
-	let query = req.url().query().unwrap_or_default().to_string();
-	let action: Vec<String> = req.url().path().split('/').map(String::from).collect();
+	let query = req.uri().query().unwrap_or_default().to_string();
+	let action: Vec<String> = req.uri().path().split('/').map(String::from).collect();
 
 	let mut sub_list = Preferences::new(req).subscriptions;
 
@@ -119,8 +121,7 @@ pub async fn subscriptions(req: Request<()>) -> tide::Result {
 
 	// Delete cookie if empty, else set
 	if sub_list.is_empty() {
-		// res.del_cookie(&Cookie::build("subscriptions", "").path("/").finish());
-		res.remove_cookie(Cookie::build("subscriptions", "").path("/").finish());
+		res.remove_cookie("subscriptions".to_string());
 	} else {
 		res.insert_cookie(
 			Cookie::build("subscriptions", sub_list.join("+"))
@@ -134,12 +135,12 @@ pub async fn subscriptions(req: Request<()>) -> tide::Result {
 	Ok(res)
 }
 
-pub async fn wiki(req: Request<()>) -> tide::Result {
-	let sub = req.param("sub").unwrap_or("reddit.com").to_string();
-	let page = req.param("page").unwrap_or("index").to_string();
+pub async fn wiki(req: Request<Body>) -> Result<Response<Body>, String> {
+	let sub = req.param("sub").unwrap_or("reddit.com".to_string());
+	let page = req.param("page").unwrap_or("index".to_string());
 	let path: String = format!("/r/{}/wiki/{}.json?raw_json=1", sub, page);
 
-	match request(path).await {
+	match json(path).await {
 		Ok(response) => template(WikiTemplate {
 			sub,
 			wiki: rewrite_urls(response["data"]["content_html"].as_str().unwrap_or_default()),
@@ -156,7 +157,7 @@ async fn subreddit(sub: &str) -> Result<Subreddit, String> {
 	let path: String = format!("/r/{}/about.json?raw_json=1", sub);
 
 	// Send a request to the url
-	match request(path).await {
+	match json(path).await {
 		// If success, receive JSON in response
 		Ok(res) => {
 			// Metadata regarding the subreddit

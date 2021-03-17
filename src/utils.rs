@@ -1,17 +1,15 @@
 //
 // CRATES
 //
-use crate::esc;
+use crate::{client::json, esc, server::RequestExt};
 use askama::Template;
-use async_recursion::async_recursion;
-use async_std::{io, net::TcpStream, prelude::*};
-use async_tls::TlsConnector;
-use cached::proc_macro::cached;
+use cookie::Cookie;
+use hyper::{Body, Request, Response};
 use regex::Regex;
-use serde_json::{from_str, Error, Value};
+use serde_json::Value;
 use std::collections::HashMap;
-use tide::{http::url::Url, http::Cookie, Request, Response};
 use time::{Duration, OffsetDateTime};
+use url::Url;
 
 // Post flair with content, background color and foreground color
 pub struct Flair {
@@ -204,7 +202,7 @@ impl Post {
 		let post_list;
 
 		// Send a request to the url
-		match request(path.to_string()).await {
+		match json(path.to_string()).await {
 			// If success, receive JSON in response
 			Ok(response) => {
 				res = response;
@@ -372,7 +370,7 @@ pub struct Preferences {
 
 impl Preferences {
 	// Build preferences from cookies
-	pub fn new(req: Request<()>) -> Self {
+	pub fn new(req: Request<Body>) -> Self {
 		Self {
 			theme: cookie(&req, "theme"),
 			front_page: cookie(&req, "front_page"),
@@ -398,7 +396,7 @@ pub fn param(path: &str, value: &str) -> String {
 }
 
 // Parse a cookie value from request
-pub fn cookie(req: &Request<()>, name: &str) -> String {
+pub fn cookie(req: &Request<Body>, name: &str) -> String {
 	let cookie = req.cookie(name).unwrap_or_else(|| Cookie::named(name));
 	cookie.value().to_string()
 }
@@ -512,19 +510,26 @@ macro_rules! esc {
 // NETWORKING
 //
 
-pub fn template(t: impl Template) -> tide::Result {
-	Ok(Response::builder(200).content_type("text/html").body(t.render().unwrap_or_default()).build())
+pub fn template(t: impl Template) -> Result<Response<Body>, String> {
+	Ok(
+		Response::builder()
+			.status(200)
+			.header("content-type", "text/html")
+			.body(t.render().unwrap_or_default().into())
+			.unwrap_or_default(),
+	)
 }
 
-pub fn redirect(path: String) -> Response {
-	Response::builder(302)
-		.content_type("text/html")
+pub fn redirect(path: String) -> Response<Body> {
+	Response::builder()
+		.status(302)
+		.header("content-type", "text/html")
 		.header("Location", &path)
-		.body(format!("Redirecting to <a href=\"{0}\">{0}</a>...", path))
-		.build()
+		.body(format!("Redirecting to <a href=\"{0}\">{0}</a>...", path).into())
+		.unwrap_or_default()
 }
 
-pub async fn error(req: Request<()>, msg: String) -> tide::Result {
+pub async fn error(req: Request<Body>, msg: String) -> Result<Response<Body>, String> {
 	let body = ErrorTemplate {
 		msg,
 		prefs: Preferences::new(req),
@@ -532,93 +537,51 @@ pub async fn error(req: Request<()>, msg: String) -> tide::Result {
 	.render()
 	.unwrap_or_default();
 
-	Ok(Response::builder(404).content_type("text/html").body(body).build())
+	Ok(Response::builder().status(404).header("content-type", "text/html").body(body.into()).unwrap_or_default())
 }
 
-#[async_recursion]
-async fn connect(path: String) -> io::Result<String> {
-	// Build reddit-compliant user agent for Libreddit
-	let user_agent = format!("web:libreddit:{}", env!("CARGO_PKG_VERSION"));
+// #[async_recursion]
+// async fn connect(path: String) -> io::Result<String> {
 
-	// Construct an HTTP request body
-	let req = format!(
-		"GET {} HTTP/1.1\r\nHost: www.reddit.com\r\nAccept: */*\r\nConnection: close\r\nUser-Agent: {}\r\n\r\n",
-		path, user_agent
-	);
+// 	// Construct an HTTP request body
+// 	let req = format!(
+// 		"GET {} HTTP/1.1\r\nHost: www.reddit.com\r\nAccept: */*\r\nConnection: close\r\nUser-Agent: {}\r\n\r\n",
+// 		path, user_agent
+// 	);
 
-	// Open a TCP connection
-	let tcp_stream = TcpStream::connect("www.reddit.com:443").await?;
+// 	// Open a TCP connection
+// 	let tcp_stream = TcpStream::connect("www.reddit.com:443").await?;
 
-	// Initialize TLS connector for requests
-	let connector = TlsConnector::default();
+// 	// Initialize TLS connector for requests
+// 	let connector = TlsConnector::default();
 
-	// Use the connector to start the handshake process
-	let mut tls_stream = connector.connect("www.reddit.com", tcp_stream).await?;
+// 	// Use the connector to start the handshake process
+// 	let mut tls_stream = connector.connect("www.reddit.com", tcp_stream).await?;
 
-	// Write the crafted HTTP request to the stream
-	tls_stream.write_all(req.as_bytes()).await?;
+// 	// Write the crafted HTTP request to the stream
+// 	tls_stream.write_all(req.as_bytes()).await?;
 
-	// And read the response
-	let mut writer = Vec::new();
-	io::copy(&mut tls_stream, &mut writer).await?;
-	let response = String::from_utf8_lossy(&writer).to_string();
+// 	// And read the response
+// 	let mut writer = Vec::new();
+// 	io::copy(&mut tls_stream, &mut writer).await?;
+// 	let response = String::from_utf8_lossy(&writer).to_string();
 
-	let split = response.split("\r\n\r\n").collect::<Vec<&str>>();
+// 	let split = response.split("\r\n\r\n").collect::<Vec<&str>>();
 
-	let headers = split[0].split("\r\n").collect::<Vec<&str>>();
-	let status: i16 = headers[0].split(' ').collect::<Vec<&str>>()[1].parse().unwrap_or(200);
-	let body = split[1].to_string();
+// 	let headers = split[0].split("\r\n").collect::<Vec<&str>>();
+// 	let status: i16 = headers[0].split(' ').collect::<Vec<&str>>()[1].parse().unwrap_or(200);
+// 	let body = split[1].to_string();
 
-	if (300..400).contains(&status) {
-		let location = headers
-			.iter()
-			.find(|header| header.starts_with("location:"))
-			.map(|f| f.to_owned())
-			.unwrap_or_default()
-			.split(": ")
-			.collect::<Vec<&str>>()[1];
-		connect(location.replace("https://www.reddit.com", "")).await
-	} else {
-		Ok(body)
-	}
-}
-
-// Make a request to a Reddit API and parse the JSON response
-#[cached(size = 100, time = 30, result = true)]
-pub async fn request(path: String) -> Result<Value, String> {
-	let url = format!("https://www.reddit.com{}", path);
-
-	let err = |msg: &str, e: String| -> Result<Value, String> {
-		eprintln!("{} - {}: {}", url, msg, e);
-		Err(msg.to_string())
-	};
-
-	match connect(path).await {
-		Ok(body) => {
-			// Parse the response from Reddit as JSON
-			let parsed: Result<Value, Error> = from_str(&body);
-			match parsed {
-				Ok(json) => {
-					// If Reddit returned an error
-					if json["error"].is_i64() {
-						Err(
-							json["reason"]
-								.as_str()
-								.unwrap_or_else(|| {
-									json["message"].as_str().unwrap_or_else(|| {
-										eprintln!("{} - Error parsing reddit error", url);
-										"Error parsing reddit error"
-									})
-								})
-								.to_string(),
-						)
-					} else {
-						Ok(json)
-					}
-				}
-				Err(e) => err("Failed to parse page JSON data", e.to_string()),
-			}
-		}
-		Err(e) => err("Couldn't send request to Reddit", e.to_string()),
-	}
-}
+// 	if (300..400).contains(&status) {
+// 		let location = headers
+// 			.iter()
+// 			.find(|header| header.starts_with("location:"))
+// 			.map(|f| f.to_owned())
+// 			.unwrap_or_default()
+// 			.split(": ")
+// 			.collect::<Vec<&str>>()[1];
+// 		connect(location.replace("https://www.reddit.com", "")).await
+// 	} else {
+// 		Ok(body)
+// 	}
+// }

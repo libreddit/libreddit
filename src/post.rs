@@ -1,9 +1,9 @@
 // CRATES
+use crate::client::json;
 use crate::esc;
-use crate::utils::{
-	cookie, error, format_num, format_url, param, request, rewrite_urls, template, time, val, Author, Comment, Flags, Flair, FlairPart, Media, Post, Preferences,
-};
-use tide::Request;
+use crate::server::RequestExt;
+use crate::utils::{cookie, error, format_num, format_url, param, rewrite_urls, template, time, val, Author, Comment, Flags, Flair, FlairPart, Media, Post, Preferences};
+use hyper::{Body, Request, Response};
 
 use async_recursion::async_recursion;
 
@@ -20,9 +20,9 @@ struct PostTemplate {
 	single_thread: bool,
 }
 
-pub async fn item(req: Request<()>) -> tide::Result {
+pub async fn item(req: Request<Body>) -> Result<Response<Body>, String> {
 	// Build Reddit API path
-	let mut path: String = format!("{}.json?{}&raw_json=1", req.url().path(), req.url().query().unwrap_or_default());
+	let mut path: String = format!("{}.json?{}&raw_json=1", req.uri().path(), req.uri().query().unwrap_or_default());
 
 	// Set sort to sort query parameter
 	let mut sort: String = param(&path, "sort");
@@ -33,23 +33,23 @@ pub async fn item(req: Request<()>) -> tide::Result {
 	// If there's no sort query but there's a default sort, set sort to default_sort
 	if sort.is_empty() && !default_sort.is_empty() {
 		sort = default_sort;
-		path = format!("{}.json?{}&sort={}&raw_json=1", req.url().path(), req.url().query().unwrap_or_default(), sort);
+		path = format!("{}.json?{}&sort={}&raw_json=1", req.uri().path(), req.uri().query().unwrap_or_default(), sort);
 	}
 
 	// Log the post ID being fetched in debug mode
 	#[cfg(debug_assertions)]
-	dbg!(req.param("id").unwrap_or(""));
+	dbg!(req.param("id").unwrap_or_default());
 
-	let single_thread = &req.param("comment_id").is_ok();
+	let single_thread = &req.param("comment_id").is_some();
 	let highlighted_comment = &req.param("comment_id").unwrap_or_default();
 
 	// Send a request to the url, receive JSON in response
-	match request(path).await {
+	match json(path).await {
 		// Otherwise, grab the JSON output from the request
 		Ok(res) => {
 			// Parse the JSON into Post and Comment structs
 			let post = parse_post(&res[0]).await;
-			let comments = parse_comments(&res[1], &post.permalink, &post.author.name, *highlighted_comment).await;
+			let comments = parse_comments(&res[1], &post.permalink, &post.author.name, highlighted_comment).await;
 
 			// Use the Post and Comment structs to generate a website to show users
 			template(PostTemplate {

@@ -1,8 +1,10 @@
 // CRATES
+use crate::client::json;
 use crate::esc;
-use crate::utils::{error, format_url, param, request, template, Post, Preferences, User};
+use crate::server::RequestExt;
+use crate::utils::{error, format_url, param, template, Post, Preferences, User};
 use askama::Template;
-use tide::Request;
+use hyper::{Body, Request, Response};
 use time::OffsetDateTime;
 
 // STRUCTS
@@ -17,13 +19,13 @@ struct UserTemplate {
 }
 
 // FUNCTIONS
-pub async fn profile(req: Request<()>) -> tide::Result {
+pub async fn profile(req: Request<Body>) -> Result<Response<Body>, String> {
 	// Build the Reddit JSON API path
-	let path = format!("{}.json?{}&raw_json=1", req.url().path(), req.url().query().unwrap_or_default());
+	let path = format!("{}.json?{}&raw_json=1", req.uri().path(), req.uri().query().unwrap_or_default());
 
 	// Retrieve other variables from Libreddit request
 	let sort = param(&path, "sort");
-	let username = req.param("name").unwrap_or("").to_string();
+	let username = req.param("name").unwrap_or_default();
 
 	// Request user posts/comments from Reddit
 	let posts = Post::fetch(&path, "Comment".to_string()).await;
@@ -52,7 +54,7 @@ async fn user(name: &str) -> Result<User, String> {
 	let path: String = format!("/user/{}/about.json?raw_json=1", name);
 
 	// Send a request to the url
-	match request(path).await {
+	match json(path).await {
 		// If success, receive JSON in response
 		Ok(res) => {
 			// Grab creation date as unix timestamp
