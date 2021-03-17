@@ -64,7 +64,11 @@ fn request(url: String) -> Boxed<Result<Response<Body>, String>> {
 			.header("Accept-Language", "en-US,en;q=0.5")
 			.header("Connection", "keep-alive")
 			.body(Body::empty())
-			.expect("request builder")
+			.map_err(|e| {
+				println!("Error building request to send to Reddit: {} - URL: {}", e.to_string(), uri);
+				e	
+			})
+			.unwrap_or_default()
 	};
 
 	async move {
