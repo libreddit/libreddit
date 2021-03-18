@@ -64,9 +64,9 @@ Find Libreddit on 💬 [Matrix](https://matrix.to/#/#libreddit:kde.org), 🐋 [D
 ## Built with
 
 - [Rust](https://www.rust-lang.org/) - Programming language
-- [Tide](https://github.com/http-rs/tide) - Web server
+- [Hyper](https://github.com/hyperium/hyper) - HTTP server and client
 - [Askama](https://github.com/djc/askama) - Templating engine
-- [Surf](https://github.com/http-rs/surf) - HTTP client
+- [Rustls](https://github.com/ctz/rustls) - TLS library
 
 ## Info
 Libreddit hopes to provide an easier way to browse Reddit, without the ads, trackers, and bloat. Libreddit was inspired by other alternative front-ends to popular services such as [Invidious](https://github.com/iv-org/invidious) for YouTube, [Nitter](https://github.com/zedeus/nitter) for Twitter, and [Bibliogram](https://sr.ht/~cadence/bibliogram/) for Instagram.
