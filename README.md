@@ -157,11 +157,13 @@ cargo install libreddit
 
 Deploy the [Docker image](https://hub.docker.com/r/spikecodes/libreddit) of Libreddit:
 ```
+docker pull spikecodes/libreddit
 docker run -d --name libreddit -p 8080:8080 spikecodes/libreddit
 ```
 
 Deploy using a different port (in this case, port 80):
 ```
+docker pull spikecodes/libreddit
 docker run -d --name libreddit -p 80:8080 spikecodes/libreddit
 ```
 
