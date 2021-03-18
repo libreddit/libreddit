@@ -2,7 +2,7 @@
 
 > An alternative private front-end to Reddit 
 
-![screenshot](https://i.ibb.co/74gZ4pd/libreddit-rust.png)
+![screenshot](https://i.ibb.co/QYbqTQt/libreddit-rust.png)
 
 ---
 
