@@ -54,41 +54,37 @@ fn request(url: String) -> Boxed<Result<Response<Body>, String>> {
 	// Build the hyper client from the HTTPS connector.
 	let client: client::Client<_, hyper::Body> = client::Client::builder().build(https);
 
-	let req = |uri: String| {
-		Request::builder()
+	let builder = Request::builder()
 			.method("GET")
-			.uri(&uri)
+			.uri(&url)
 			.header("User-Agent", format!("web:libreddit:{}", env!("CARGO_PKG_VERSION")))
 			.header("Host", "www.reddit.com")
 			.header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8")
 			.header("Accept-Language", "en-US,en;q=0.5")
 			.header("Connection", "keep-alive")
-			.body(Body::empty())
-			.map_err(|e| {
-				println!("Error building request to send to Reddit: {} - URL: {}", e.to_string(), uri);
-				e	
-			})
-			.unwrap_or_default()
-	};
+			.body(Body::empty());
 
 	async move {
-		match client.request(req(url)).await {
-			Ok(response) => {
-				if response.status().to_string().starts_with('3') {
-					request(
-						response
-							.headers()
-							.get("Location")
-							.map(|val| val.to_str().unwrap_or_default())
-							.unwrap_or_default()
-							.to_string(),
-					)
-					.await
-				} else {
-					Ok(response)
+		match builder {
+			Ok(req) => match client.request(req).await {
+				Ok(response) => {
+					if response.status().to_string().starts_with('3') {
+						request(
+							response
+								.headers()
+								.get("Location")
+								.map(|val| val.to_str().unwrap_or_default())
+								.unwrap_or_default()
+								.to_string(),
+						)
+						.await
+					} else {
+						Ok(response)
+					}
 				}
-			}
-			Err(e) => Err(e.to_string()),
+				Err(e) => Err(e.to_string()),
+			},
+			Err(_) => Err("Post url contains non-ASCII characters".to_string())
 		}
 	}
 	.boxed()
@@ -102,8 +98,8 @@ pub async fn json(path: String) -> Result<Value, String> {
 
 	// Closure to quickly build errors
 	let err = |msg: &str, e: String| -> Result<Value, String> {
-		eprintln!("{} - {}: {}", url, msg, e);
-		Err(msg.to_string())
+		// eprintln!("{} - {}: {}", url, msg, e);
+		Err(format!("{}: {}", msg, e))
 	};
 
 	// Fetch the url...
@@ -136,7 +132,7 @@ pub async fn json(path: String) -> Result<Value, String> {
 						Err(e) => err("Failed to parse page JSON data", e.to_string()),
 					}
 				}
-				Err(e) => err("Failed receiving JSON body from Reddit", e.to_string()),
+				Err(e) => err("Failed receiving body from Reddit", e.to_string()),
 			}
 		}
 		Err(e) => err("Couldn't send request to Reddit", e.to_string()),
