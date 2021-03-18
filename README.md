@@ -47,6 +47,7 @@ Feel free to [open an issue](https://github.com/spikecodes/libreddit/issues/new)
 | [libreddit.kavin.rocks](https://libreddit.kavin.rocks) | 🇮🇳 IN | ✅ |
 | [libreddit.himiko.cloud](https://libreddit.himiko.cloud) | 🇫🇮 FI |  |
 | [libreddit.bcow.xyz](https://libreddit.bcow.xyz) | 🇺🇸 US |  |
+| [libreddit.40two.app](https://libreddit.40two.app) | 🇳🇱 NL |  |
 | [spjmllawtheisznfs7uryhxumin26ssv2draj7oope3ok3wuhy43eoyd.onion](http://spjmllawtheisznfs7uryhxumin26ssv2draj7oope3ok3wuhy43eoyd.onion) | 🇮🇳 IN  |  |
 | [fwhhsbrbltmrct5hshrnqlqygqvcgmnek3cnka55zj4y7nuus5muwyyd.onion](http://fwhhsbrbltmrct5hshrnqlqygqvcgmnek3cnka55zj4y7nuus5muwyyd.onion) | 🇩🇪 DE  |  |
 | [libreddit.himiko7xl2skojc6odi7hykl626gt4qki3vxdbv33u2u3af76d6k32ad.onion](http://libreddit.himiko7xl2skojc6odi7hykl626gt4qki3vxdbv33u2u3af76d6k32ad.onion) | 🇫🇮 FI |  |
