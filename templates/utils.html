@@ -15,7 +15,7 @@
 {%- endmacro %}
 
 {% macro search(root, search) -%}
-<form action="{% if root != "/r/" && !root.is_empty() %}{{ root }}{% endif %}/search/" id="searchbox">
+<form action="{% if root != "/r/" && !root.is_empty() %}{{ root }}{% endif %}/search" id="searchbox">
 	<input id="search" type="text" name="q" placeholder="Search" title="Search libreddit" value="{{ search }}">
 	{% if root != "/r/" && !root.is_empty() %}
 	<div id="inside">
@@ -66,7 +66,7 @@
 	</p>
 	<p class="post_title">
 		{% if post.flair.flair_parts.len() > 0 %}
-			<a href="/r/{{ post.community }}/search/?q=flair_name%3A%22{{ post.flair.text }}%22&restrict_sr=on"
+			<a href="/r/{{ post.community }}/search?q=flair_name%3A%22{{ post.flair.text }}%22&restrict_sr=on"
 				class="post_flair"
 				style="color:{{ post.flair.foreground_color }}; background:{{ post.flair.background_color }};">{% call render_flair(post.flair.flair_parts) %}</a>
 		{% endif %}
