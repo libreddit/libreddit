@@ -21,7 +21,11 @@ struct UserTemplate {
 // FUNCTIONS
 pub async fn profile(req: Request<Body>) -> Result<Response<Body>, String> {
 	// Build the Reddit JSON API path
-	let path = format!("{}.json?{}&raw_json=1", req.uri().path(), req.uri().query().unwrap_or_default());
+	let path = format!(
+		"/user/{}.json?{}&raw_json=1",
+		req.param("name").unwrap_or("reddit".to_string()),
+		req.uri().query().unwrap_or_default()
+	);
 
 	// Retrieve other variables from Libreddit request
 	let sort = param(&path, "sort");

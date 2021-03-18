@@ -162,6 +162,7 @@ async fn main() {
 	app.at("/u/:name/comments/:id/:title").get(|r| post::item(r).boxed());
 	app.at("/u/:name/comments/:id/:title/:comment_id").get(|r| post::item(r).boxed());
 
+	app.at("/user/[deleted]").get(|req| error(req, "User has deleted their account".to_string()).boxed());
 	app.at("/user/:name").get(|r| user::profile(r).boxed());
 	app.at("/user/:name/comments/:id").get(|r| post::item(r).boxed());
 	app.at("/user/:name/comments/:id/:title").get(|r| post::item(r).boxed());
@@ -183,22 +184,28 @@ async fn main() {
 
 	app.at("/r/:sub/search").get(|r| search::find(r).boxed());
 
-	app.at("/r/:sub/wiki/").get(|r| subreddit::wiki(r).boxed());
+	app
+		.at("/r/:sub/w")
+		.get(|r| async move { Ok(redirect(format!("/r/{}/wiki", r.param("sub").unwrap_or_default()))) }.boxed());
+	app
+		.at("/r/:sub/w/:page")
+		.get(|r| async move { Ok(redirect(format!("/r/{}/wiki/{}", r.param("sub").unwrap_or_default(), r.param("wiki").unwrap_or_default()))) }.boxed());
+	app.at("/r/:sub/wiki").get(|r| subreddit::wiki(r).boxed());
 	app.at("/r/:sub/wiki/:page").get(|r| subreddit::wiki(r).boxed());
-	app.at("/r/:sub/w").get(|r| subreddit::wiki(r).boxed());
-	app.at("/r/:sub/w/:page").get(|r| subreddit::wiki(r).boxed());
 
 	app.at("/r/:sub/:sort").get(|r| subreddit::community(r).boxed());
 
 	// Comments handler
-	app.at("/comments/:id/").get(|r| post::item(r).boxed());
+	app.at("/comments/:id").get(|r| post::item(r).boxed());
 
 	// Front page
 	app.at("/").get(|r| subreddit::community(r).boxed());
 
 	// View Reddit wiki
-	app.at("/w").get(|r| subreddit::wiki(r).boxed());
-	app.at("/w/:page").get(|r| subreddit::wiki(r).boxed());
+	app.at("/w").get(|_| async move { Ok(redirect("/wiki".to_string())) }.boxed());
+	app
+		.at("/w/:page")
+		.get(|r| async move { Ok(redirect(format!("/wiki/{}", r.param("page").unwrap_or_default()))) }.boxed());
 	app.at("/wiki").get(|r| subreddit::wiki(r).boxed());
 	app.at("/wiki/:page").get(|r| subreddit::wiki(r).boxed());
 

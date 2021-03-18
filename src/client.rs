@@ -55,14 +55,14 @@ fn request(url: String) -> Boxed<Result<Response<Body>, String>> {
 	let client: client::Client<_, hyper::Body> = client::Client::builder().build(https);
 
 	let builder = Request::builder()
-			.method("GET")
-			.uri(&url)
-			.header("User-Agent", format!("web:libreddit:{}", env!("CARGO_PKG_VERSION")))
-			.header("Host", "www.reddit.com")
-			.header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8")
-			.header("Accept-Language", "en-US,en;q=0.5")
-			.header("Connection", "keep-alive")
-			.body(Body::empty());
+		.method("GET")
+		.uri(&url)
+		.header("User-Agent", format!("web:libreddit:{}", env!("CARGO_PKG_VERSION")))
+		.header("Host", "www.reddit.com")
+		.header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8")
+		.header("Accept-Language", "en-US,en;q=0.5")
+		.header("Connection", "keep-alive")
+		.body(Body::empty());
 
 	async move {
 		match builder {
@@ -84,7 +84,7 @@ fn request(url: String) -> Boxed<Result<Response<Body>, String>> {
 				}
 				Err(e) => Err(e.to_string()),
 			},
-			Err(_) => Err("Post url contains non-ASCII characters".to_string())
+			Err(_) => Err("Post url contains non-ASCII characters".to_string()),
 		}
 	}
 	.boxed()
