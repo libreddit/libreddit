@@ -628,13 +628,13 @@ a.search_subreddit:hover {
 	font-weight: bold;
 }
 
-.author_flair, .post_flair:empty {
+.author_flair:empty, .post_flair:empty {
 	display: none;
 }
 
 .emoji {
-	width: 1em;
-	height: 1em;
+	width: 1.25em;
+	height: 1.25em;
 	display: inline-block;
 	background-size: contain;
 	background-position: 50% 50%;
