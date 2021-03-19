@@ -522,7 +522,26 @@ button.submit:hover > svg { stroke: var(--accent); }
 
 .search_subreddit { 
 	padding: 16px 20px;
-	display: block;
+	display: flex;
+}
+
+.search_subreddit_left {
+	display: flex;
+	align-items: center;
+}
+
+.search_subreddit_left:not(:empty) {
+	margin-right: 10px;
+}
+
+.search_subreddit_left img {
+	width: 35px;
+	height: 35px;
+	border-radius: 100%;
+}
+
+.search_subreddit_right {
+	overflow: auto;
 }
 
 a.search_subreddit:hover {

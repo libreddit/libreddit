@@ -1,5 +1,5 @@
 // CRATES
-use crate::utils::{cookie, error, param, template, val, Post, Preferences};
+use crate::utils::{cookie, error, format_num, format_url, param, template, val, Post, Preferences};
 use crate::{client::json, RequestExt};
 use askama::Template;
 use hyper::{Body, Request, Response};
@@ -18,8 +18,9 @@ struct SearchParams {
 struct Subreddit {
 	name: String,
 	url: String,
+	icon: String,
 	description: String,
-	subscribers: i64,
+	subscribers: String,
 }
 
 #[derive(Template)]
@@ -81,11 +82,22 @@ async fn search_subreddits(q: &str) -> Vec<Subreddit> {
 				// For each subreddit from subreddit list
 				Some(list) => list
 					.iter()
-					.map(|subreddit| Subreddit {
-						name: val(subreddit, "display_name_prefixed"),
-						url: val(subreddit, "url"),
-						description: val(subreddit, "public_description"),
-						subscribers: subreddit["data"]["subscribers"].as_f64().unwrap_or_default() as i64,
+					.map(|subreddit| {
+						// Fetch subreddit icon either from the community_icon or icon_img value
+						let community_icon: &str = subreddit["data"]["community_icon"].as_str().map_or("", |s| s.split('?').collect::<Vec<&str>>()[0]);
+						let icon = if community_icon.is_empty() {
+							val(&subreddit, "icon_img")
+						} else {
+							community_icon.to_string()
+						};
+
+						Subreddit {
+							name: val(subreddit, "display_name_prefixed"),
+							url: val(subreddit, "url"),
+							icon: format_url(&icon),
+							description: val(subreddit, "public_description"),
+							subscribers: format_num(subreddit["data"]["subscribers"].as_f64().unwrap_or_default() as i64),
+						}
 					})
 					.collect::<Vec<Subreddit>>(),
 				_ => Vec::new(),
