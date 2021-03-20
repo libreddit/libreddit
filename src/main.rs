@@ -175,6 +175,10 @@ async fn main() {
 	// Subreddit services
 	app.at("/r/:sub").get(|r| subreddit::community(r).boxed());
 
+	app
+		.at("/r/u_:name")
+		.get(|r| async move { Ok(redirect(format!("/user/{}", r.param("name").unwrap_or_default()))) }.boxed());
+
 	app.at("/r/:sub/subscribe").post(|r| subreddit::subscriptions(r).boxed());
 	app.at("/r/:sub/unsubscribe").post(|r| subreddit::subscriptions(r).boxed());
 
@@ -215,18 +219,13 @@ async fn main() {
 	// Handle about pages
 	app.at("/about").get(|req| error(req, "About pages aren't added yet".to_string()).boxed());
 
-	app.at("/:id").get(|req: Request<Body>| {
-		async {
-			match req.param("id").as_deref() {
-				// Sort front page
-				Some("best") | Some("hot") | Some("new") | Some("top") | Some("rising") | Some("controversial") => subreddit::community(req).await,
-				// Short link for post
-				Some(id) if id.len() > 4 && id.len() < 7 => post::item(req).await,
-				// Error message for unknown pages
-				_ => error(req, "Nothing here".to_string()).await,
-			}
-		}
-		.boxed()
+	app.at("/:id").get(|req: Request<Body>| match req.param("id").as_deref() {
+		// Sort front page
+		Some("best") | Some("hot") | Some("new") | Some("top") | Some("rising") | Some("controversial") => subreddit::community(req).boxed(),
+		// Short link for post
+		Some(id) if id.len() > 4 && id.len() < 7 => post::item(req).boxed(),
+		// Error message for unknown pages
+		_ => error(req, "Nothing here".to_string()).boxed(),
 	});
 
 	// Default service in case no routes match

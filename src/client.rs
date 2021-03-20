@@ -3,7 +3,6 @@ use futures_lite::{future::Boxed, FutureExt};
 use hyper::{body::Buf, client, Body, Request, Response, Uri};
 use serde_json::Value;
 use std::{result::Result, str::FromStr};
-// use async_recursion::async_recursion;
 
 use crate::server::RequestExt;
 
