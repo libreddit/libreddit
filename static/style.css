@@ -1219,9 +1219,9 @@ td, th {
 
 	/* .thread { margin-left: -5px; } */
 	.comment_right { padding: 5px 0 10px 2px; }
-	.comment_author { margin-left: 5px; }
+	.comment_author { margin-left: 12px; }
 	.comment_data { margin-left: 12px; }
-	.comment_data::marker { font-size: 22px; }
+	.comment_data::marker { font-size: 25px; }
 	.created { width: 100%; }
 
 	.comment_score {
