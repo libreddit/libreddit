@@ -39,7 +39,7 @@
 					<p class="search_subreddit_header"> 
 						<span class="search_subreddit_name">{{ subreddit.name }}</span>
 						<span class="dot">&bull;</span>
-						<span class="search_subreddit_members">{{ subreddit.subscribers }} Members</span>
+						<span class="search_subreddit_members" title="{{ subreddit.subscribers.1 }} Members">{{ subreddit.subscribers.0 }} Members</span>
 					</p>
 					<p class="search_subreddit_description">{{ subreddit.description }}</p>
 				</div>
@@ -55,7 +55,7 @@
 		{% else %}
 			<div class="comment">
 				<div class="comment_left">
-					<p class="comment_score">{{ post.score }}</p>
+					<p class="comment_score" title="{{ post.score.1 }}">{{ post.score.0 }}</p>
 					<div class="line"></div>
 				</div>
 				<details class="comment_right" open>

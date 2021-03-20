@@ -206,7 +206,7 @@ async fn main() {
 	app.at("/").get(|r| subreddit::community(r).boxed());
 
 	// View Reddit wiki
-	app.at("/w").get(|_| async move { Ok(redirect("/wiki".to_string())) }.boxed());
+	app.at("/w").get(|_| async { Ok(redirect("/wiki".to_string())) }.boxed());
 	app
 		.at("/w/:page")
 		.get(|r| async move { Ok(redirect(format!("/wiki/{}", r.param("page").unwrap_or_default()))) }.boxed());

@@ -81,8 +81,8 @@
 					<div id="sub_details">
 						<label>Members</label>
 						<label>Active</label>
-						<div>{{ sub.members }}</div>
-						<div>{{ sub.active }}</div>
+						<div title="{{ sub.members.1 }}">{{ sub.members.0 }}</div>
+						<div title="{{ sub.active.1 }}">{{ sub.active.0 }}</div>
 					</div>
 					<div id="sub_subscription">
 						{% if prefs.subscriptions.contains(sub.name) %}

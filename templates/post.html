@@ -89,7 +89,7 @@
 
 			<!-- POST BODY -->
 			<div class="post_body">{{ post.body }}</div>
-			<div class="post_score">{{ post.score }}<span class="label"> Upvotes</span></div>
+			<div class="post_score" title="{{ post.score.1 }}">{{ post.score.0 }}<span class="label"> Upvotes</span></div>
 			<div class="post_footer">
 				<ul id="post_links">
 					<li><a href="/{{ post.id }}">permalink</a></li>

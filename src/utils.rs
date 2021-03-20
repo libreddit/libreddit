@@ -181,7 +181,7 @@ pub struct Post {
 	pub body: String,
 	pub author: Author,
 	pub permalink: String,
-	pub score: String,
+	pub score: (String, String),
 	pub upvote_ratio: i64,
 	pub post_type: String,
 	pub flair: Flair,
@@ -191,7 +191,7 @@ pub struct Post {
 	pub domain: String,
 	pub rel_time: String,
 	pub created: String,
-	pub comments: String,
+	pub comments: (String, String),
 	pub gallery: Vec<GalleryMedia>,
 }
 
@@ -251,7 +251,7 @@ impl Post {
 					distinguished: val(post, "distinguished"),
 				},
 				score: if data["hide_score"].as_bool().unwrap_or_default() {
-					"\u{2022}".to_string()
+					("\u{2022}".to_string(), "Hidden".to_string())
 				} else {
 					format_num(score)
 				},
@@ -307,7 +307,7 @@ pub struct Comment {
 	pub post_author: String,
 	pub body: String,
 	pub author: Author,
-	pub score: String,
+	pub score: (String, String),
 	pub rel_time: String,
 	pub created: String,
 	pub edited: (String, String),
@@ -342,8 +342,8 @@ pub struct Subreddit {
 	pub description: String,
 	pub info: String,
 	pub icon: String,
-	pub members: String,
-	pub active: String,
+	pub members: (String, String),
+	pub active: (String, String),
 	pub wiki: bool,
 }
 
@@ -414,8 +414,8 @@ pub fn format_url(url: &str) -> String {
 					Regex::new(regex)
 						.map(|re| match re.captures(url) {
 							Some(caps) => match segments {
-								1 => [format, &caps[1], "/"].join(""),
-								2 => [format, &caps[1], "/", &caps[2], "/"].join(""),
+								1 => [format, &caps[1]].join(""),
+								2 => [format, &caps[1], "/", &caps[2]].join(""),
 								_ => String::new(),
 							},
 							None => String::new(),
@@ -443,21 +443,23 @@ pub fn format_url(url: &str) -> String {
 
 // Rewrite Reddit links to Libreddit in body of text
 pub fn rewrite_urls(text: &str) -> String {
-	match Regex::new(r#"href="(https|http|)://(www.|old.|np.|)(reddit).(com)/"#) {
+	match Regex::new(r#"href="(https|http|)://(www.|old.|np.|amp.|)(reddit).(com)/"#) {
 		Ok(re) => re.replace_all(text, r#"href="/"#).to_string(),
 		Err(_) => String::new(),
 	}
 }
 
 // Append `m` and `k` for millions and thousands respectively
-pub fn format_num(num: i64) -> String {
-	if num >= 1_000_000 || num <= -1_000_000 {
+pub fn format_num(num: i64) -> (String, String) {
+	let truncated = if num >= 1_000_000 || num <= -1_000_000 {
 		format!("{}m", num / 1_000_000)
 	} else if num >= 1000 || num <= -1000 {
 		format!("{}k", num / 1_000)
 	} else {
 		num.to_string()
-	}
+	};
+
+	(truncated, num.to_string())
 }
 
 // Parse a relative and absolute time from a UNIX timestamp
@@ -539,49 +541,3 @@ pub async fn error(req: Request<Body>, msg: String) -> Result<Response<Body>, St
 
 	Ok(Response::builder().status(404).header("content-type", "text/html").body(body.into()).unwrap_or_default())
 }
-
-// #[async_recursion]
-// async fn connect(path: String) -> io::Result<String> {
-
-// 	// Construct an HTTP request body
-// 	let req = format!(
-// 		"GET {} HTTP/1.1\r\nHost: www.reddit.com\r\nAccept: */*\r\nConnection: close\r\nUser-Agent: {}\r\n\r\n",
-// 		path, user_agent
-// 	);
-
-// 	// Open a TCP connection
-// 	let tcp_stream = TcpStream::connect("www.reddit.com:443").await?;
-
-// 	// Initialize TLS connector for requests
-// 	let connector = TlsConnector::default();
-
-// 	// Use the connector to start the handshake process
-// 	let mut tls_stream = connector.connect("www.reddit.com", tcp_stream).await?;
-
-// 	// Write the crafted HTTP request to the stream
-// 	tls_stream.write_all(req.as_bytes()).await?;
-
-// 	// And read the response
-// 	let mut writer = Vec::new();
-// 	io::copy(&mut tls_stream, &mut writer).await?;
-// 	let response = String::from_utf8_lossy(&writer).to_string();
-
-// 	let split = response.split("\r\n\r\n").collect::<Vec<&str>>();
-
-// 	let headers = split[0].split("\r\n").collect::<Vec<&str>>();
-// 	let status: i16 = headers[0].split(' ').collect::<Vec<&str>>()[1].parse().unwrap_or(200);
-// 	let body = split[1].to_string();
-
-// 	if (300..400).contains(&status) {
-// 		let location = headers
-// 			.iter()
-// 			.find(|header| header.starts_with("location:"))
-// 			.map(|f| f.to_owned())
-// 			.unwrap_or_default()
-// 			.split(": ")
-// 			.collect::<Vec<&str>>()[1];
-// 		connect(location.replace("https://www.reddit.com", "")).await
-// 	} else {
-// 		Ok(body)
-// 	}
-// }

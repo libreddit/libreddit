@@ -199,7 +199,7 @@ async fn parse_comments(json: &serde_json::Value, post_link: &str, post_author: 
 				distinguished: val(&comment, "distinguished"),
 			},
 			score: if data["score_hidden"].as_bool().unwrap_or_default() {
-				"\u{2022}".to_string()
+				("\u{2022}".to_string(), "Hidden".to_string())
 			} else {
 				format_num(score)
 			},

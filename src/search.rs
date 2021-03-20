@@ -20,7 +20,7 @@ struct Subreddit {
 	url: String,
 	icon: String,
 	description: String,
-	subscribers: String,
+	subscribers: (String, String),
 }
 
 #[derive(Template)]

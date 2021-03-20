@@ -5,7 +5,7 @@
 {% else if kind == "t1"  %}
 <div id="{{ id }}" class="comment">
 	<div class="comment_left">
-		<p class="comment_score">{{ score }}</p>
+		<p class="comment_score" title="{{ score.1 }}">{{ score.0 }}</p>
 		<div class="line"></div>
 	</div>
 	<details class="comment_right" open>
