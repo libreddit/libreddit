@@ -73,11 +73,8 @@ async fn resource(body: &str, content_type: &str, cache: bool) -> Result<Respons
 		.unwrap_or_default();
 
 	if cache {
-		match HeaderValue::from_str("public, max-age=1209600, s-maxage=86400") {
-			Ok(val) => {
-				res.headers_mut().insert("Cache-Control", val);
-			}
-			Err(_) => (),
+		if let Ok(val) = HeaderValue::from_str("public, max-age=1209600, s-maxage=86400") {
+			res.headers_mut().insert("Cache-Control", val);
 		}
 	}
 
@@ -114,11 +111,20 @@ async fn main() {
 				.help("Redirect all HTTP requests to HTTPS (no longer functional)")
 				.takes_value(false),
 		)
+		.arg(
+			Arg::with_name("hsts")
+				.short("H")
+				.long("hsts")
+				.value_name("EXPIRE_TIME")
+				.help("HSTS header to tell browsers that this site should only be accessed over HTTPS")
+				.default_value("604800")
+				.takes_value(true),
+		)
 		.get_matches();
 
 	let address = matches.value_of("address").unwrap_or("0.0.0.0");
 	let port = matches.value_of("port").unwrap_or("8080");
-	let _force_https = matches.is_present("redirect-https");
+	let hsts = matches.value_of("hsts");
 
 	let listener = format!("{}:{}", address, port);
 
@@ -134,6 +140,12 @@ async fn main() {
 		"X-Frame-Options" => "DENY",
 		"Content-Security-Policy" => "default-src 'none'; manifest-src 'self'; media-src 'self'; style-src 'self' 'unsafe-inline'; base-uri 'none'; img-src 'self' data:; form-action 'self'; frame-ancestors 'none';"
 	};
+
+	if let Some(expire_time) = hsts {
+		if let Ok(val) = HeaderValue::from_str(&format!("max-age={}", expire_time)) {
+			app.default_headers.insert("Strict-Transport-Security", val);
+		}
+	}
 
 	// Read static files
 	app.at("/style.css").get(|_| resource(include_str!("../static/style.css"), "text/css", false).boxed());

@@ -28,9 +28,8 @@ macro_rules! headers(
 		{
 			let mut m = hyper::HeaderMap::new();
 			$(
-				match hyper::header::HeaderValue::from_str($value) {
-					Ok(val) => { m.insert($key, val); }
-					Err(_) => ()
+				if let Ok(val) = hyper::header::HeaderValue::from_str($value) {
+					m.insert($key, val);
 				}
 			)+
 			m
@@ -96,11 +95,8 @@ impl ResponseExt for Response<Body> {
 	}
 
 	fn insert_cookie(&mut self, cookie: Cookie) {
-		match HeaderValue::from_str(&cookie.to_string()) {
-			Ok(val) => {
-				self.headers_mut().append("Set-Cookie", val);
-			}
-			Err(_) => (),
+		if let Ok(val) = HeaderValue::from_str(&cookie.to_string()) {
+			self.headers_mut().append("Set-Cookie", val);
 		}
 	}
 
@@ -108,11 +104,8 @@ impl ResponseExt for Response<Body> {
 		let mut cookie = Cookie::named(name);
 		cookie.set_path("/");
 		cookie.set_max_age(Duration::second());
-		match HeaderValue::from_str(&cookie.to_string()) {
-			Ok(val) => {
-				self.headers_mut().append("Set-Cookie", val);
-			}
-			Err(_) => (),
+		if let Ok(val) = HeaderValue::from_str(&cookie.to_string()) {
+			self.headers_mut().append("Set-Cookie", val);
 		}
 	}
 }
