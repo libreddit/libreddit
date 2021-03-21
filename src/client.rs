@@ -56,6 +56,7 @@ fn request(url: String) -> Boxed<Result<Response<Body>, String>> {
 	let builder = Request::builder()
 		.method("GET")
 		.uri(&url)
+		.version(hyper::Version::HTTP_2)
 		.header("User-Agent", format!("web:libreddit:{}", env!("CARGO_PKG_VERSION")))
 		.header("Host", "www.reddit.com")
 		.header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8")
