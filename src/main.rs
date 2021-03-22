@@ -209,6 +209,8 @@ async fn main() {
 	app.at("/r/:sub/wiki").get(|r| subreddit::wiki(r).boxed());
 	app.at("/r/:sub/wiki/:page").get(|r| subreddit::wiki(r).boxed());
 
+	app.at("/r/:sub/about/sidebar").get(|r| subreddit::sidebar(r).boxed());
+
 	app.at("/r/:sub/:sort").get(|r| subreddit::community(r).boxed());
 
 	// Comments handler

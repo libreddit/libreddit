@@ -151,6 +151,25 @@ pub async fn wiki(req: Request<Body>) -> Result<Response<Body>, String> {
 	}
 }
 
+pub async fn sidebar(req: Request<Body>) -> Result<Response<Body>, String> {
+	let sub = req.param("sub").unwrap_or("reddit.com".to_string());
+
+	// Build the Reddit JSON API url
+	let path: String = format!("/r/{}/about.json?raw_json=1", sub);
+
+	// Send a request to the url
+	match json(path).await {
+		// If success, receive JSON in response
+		Ok(response) => template(WikiTemplate {
+			sub,
+			wiki: rewrite_urls(&val(&response, "description_html").replace("\\", "")),
+			page: "Sidebar".to_string(),
+			prefs: Preferences::new(req),
+		}),
+		Err(msg) => error(req, msg).await,
+	}
+}
+
 // SUBREDDIT
 async fn subreddit(sub: &str) -> Result<Subreddit, String> {
 	// Build the Reddit JSON API url
