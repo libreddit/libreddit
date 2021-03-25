@@ -315,6 +315,13 @@ pub struct Comment {
 	pub highlighted: bool,
 }
 
+#[derive(Default, Debug)]
+pub struct Award {
+	pub name: String,
+	pub icon_url: String,
+	pub description: String,
+}
+
 #[derive(Template)]
 #[template(path = "error.html", escape = "none")]
 pub struct ErrorTemplate {

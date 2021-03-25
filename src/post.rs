@@ -2,7 +2,7 @@
 use crate::client::json;
 use crate::esc;
 use crate::server::RequestExt;
-use crate::utils::{cookie, error, format_num, format_url, param, rewrite_urls, template, time, val, Author, Comment, Flags, Flair, FlairPart, Media, Post, Preferences};
+use crate::utils::{cookie, error, format_num, format_url, param, rewrite_urls, template, time, val, Author, Award, Comment, Flags, Flair, FlairPart, Media, Post, Preferences};
 use hyper::{Body, Request, Response};
 
 use async_recursion::async_recursion;
@@ -50,6 +50,7 @@ pub async fn item(req: Request<Body>) -> Result<Response<Body>, String> {
 			// Parse the JSON into Post and Comment structs
 			let post = parse_post(&res[0]).await;
 			let comments = parse_comments(&res[1], &post.permalink, &post.author.name, highlighted_comment).await;
+			let awards = parse_awards(&res[0]).await;
 
 			// Use the Post and Comment structs to generate a website to show users
 			template(PostTemplate {
@@ -134,6 +135,33 @@ async fn parse_post(json: &serde_json::Value) -> Post {
 		comments: format_num(post["data"]["num_comments"].as_i64().unwrap_or_default()),
 		gallery,
 	}
+}
+
+// AWARDS
+async fn parse_awards(json: &serde_json::Value) -> Vec<Award> {
+	// Retrieve awards
+	let awards: &serde_json::Value = &json["data"]["children"][0];
+
+	let award_data = match awards["data"]["all_awardings"].as_array() {
+		Some(f) => f.to_owned(),
+		None => Vec::new(),
+	};
+
+	let mut awards_vec: Vec<Award> = Vec::new();
+
+	for award in award_data {
+		let name = award["name"].as_str().unwrap_or_default().to_string();
+		let icon_url = award["icon_url"].as_str().unwrap_or_default().to_string();
+		let description = award["description"].as_str().unwrap_or_default().to_string();
+
+		awards_vec.push(Award{
+			name,
+			icon_url,
+			description,
+		});
+	}
+
+	awards_vec
 }
 
 // COMMENTS
