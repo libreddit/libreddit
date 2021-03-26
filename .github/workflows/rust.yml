@@ -21,9 +21,24 @@ jobs:
 
       - name: Build
         run: cargo build --release
-
-      - uses: actions/upload-artifact@v2.2.1
-        name: Upload a Build Artifact
+        
+      - name: Versions
+        id: version
+        run: |
+          echo "::set-output name=version::$(cargo metadata --format-version 1 --no-deps | jq .packages[0].version -r | sed 's/^/v/')"
+          echo "::set-output name=tag::${GITHUB_REF#refs/*/}"
+        
+      - name: Release
+        uses: softprops/action-gh-release@v1
         with:
-          name: libreddit
-          path: target/release/libreddit
+          tag_name: ${{ steps.version.outputs.version }}
+          name: ${{ steps.version.outputs.version }} - NAME
+          draft: true
+          files: target/release/libreddit
+          fail_on_unmatched_files: true
+          body: |
+            - CHANGES
+
+            See full list of changes [here](https://github.com/spikecodes/libreddit/compare/${{ steps.version.outputs.tag }}...${{ steps.version.outputs.version }}).
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
