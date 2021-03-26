@@ -141,33 +141,6 @@ async fn parse_post(json: &serde_json::Value) -> Post {
 	}
 }
 
-// AWARDS
-async fn parse_awards(json: &serde_json::Value) -> Vec<Award> {
-	// Retrieve awards
-	let awards: &serde_json::Value = &json["data"]["children"][0];
-
-	let award_data = match awards["data"]["all_awardings"].as_array() {
-		Some(f) => f.to_owned(),
-		None => Vec::new(),
-	};
-
-	let mut awards_vec: Vec<Award> = Vec::new();
-
-	for award in award_data {
-		let name = award["name"].as_str().unwrap_or_default().to_string();
-		let icon_url = award["icon_url"].as_str().unwrap_or_default().to_string();
-		let description = award["description"].as_str().unwrap_or_default().to_string();
-
-		awards_vec.push(Award{
-			name,
-			icon_url,
-			description,
-		});
-	}
-
-	awards_vec
-}
-
 // COMMENTS
 #[async_recursion]
 async fn parse_comments(json: &serde_json::Value, post_link: &str, post_author: &str, highlighted_comment: &str) -> Vec<Comment> {
