@@ -32,7 +32,8 @@ pub async fn community(req: Request<Body>) -> Result<Response<Body>, String> {
 	// Build Reddit API path
 	let subscribed = cookie(&req, "subscriptions");
 	let front_page = cookie(&req, "front_page");
-	let sort = req.param("sort").unwrap_or_else(|| req.param("id").unwrap_or("hot".to_string()));
+	let post_sort = req.cookie("post_sort").map(|c| c.value().to_string()).unwrap_or("hot".to_string());
+	let sort = req.param("sort").unwrap_or(req.param("id").unwrap_or(post_sort));
 
 	let sub = req.param("sub").map(String::from).unwrap_or(if front_page == "default" || front_page.is_empty() {
 		if subscribed.is_empty() {

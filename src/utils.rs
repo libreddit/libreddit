@@ -365,6 +365,7 @@ pub struct Preferences {
 	pub wide: String,
 	pub show_nsfw: String,
 	pub comment_sort: String,
+	pub post_sort: String,
 	pub subscriptions: Vec<String>,
 }
 
@@ -378,6 +379,7 @@ impl Preferences {
 			wide: cookie(&req, "wide"),
 			show_nsfw: cookie(&req, "show_nsfw"),
 			comment_sort: cookie(&req, "comment_sort"),
+			post_sort: cookie(&req, "post_sort"),
 			subscriptions: cookie(&req, "subscriptions").split('+').map(String::from).filter(|s| !s.is_empty()).collect(),
 		}
 	}

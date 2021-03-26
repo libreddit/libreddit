@@ -3,7 +3,7 @@ name = "libreddit"
 description = " Alternative private front-end to Reddit"
 license = "AGPL-3.0"
 repository = "https://github.com/spikecodes/libreddit"
-version = "0.7.0"
+version = "0.8.0"
 authors = ["spikecodes <19519553+spikecodes@users.noreply.github.com>"]
 edition = "2018"
 
@@ -13,7 +13,7 @@ async-recursion = "0.3.2"
 cached = "0.23.0"
 clap = { version = "2.33.3", default-features = false }
 regex = "1.4.5"
-serde = { version = "1.0.124", features = ["derive"] }
+serde = { version = "1.0.125", features = ["derive"] }
 cookie = "0.15.0"
 futures-lite = "1.11.3"
 hyper = { version = "0.14.4", features = ["full"] }

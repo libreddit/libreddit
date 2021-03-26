@@ -36,6 +36,12 @@
 				<input type="checkbox" name="wide" {% if prefs.wide == "on" %}checked{% endif %}>
 			</div>
 			<p>Content</p>
+			<div id="post_sort">
+				<label for="post_sort" title="Applies only to subreddit feeds">Default subreddit post sort:</label>
+				<select name="post_sort"> 
+					{% call utils::options(prefs.post_sort, ["hot", "new", "top", "rising", "controversial"], "hot") %}
+				</select>
+			</div>
 			<div id="comment_sort">
 				<label for="comment_sort">Default comment sort:</label>
 				<select name="comment_sort"> 

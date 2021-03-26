@@ -40,7 +40,7 @@ pub async fn item(req: Request<Body>) -> Result<Response<Body>, String> {
 	#[cfg(debug_assertions)]
 	dbg!(req.param("id").unwrap_or_default());
 
-	let single_thread = &req.param("comment_id").is_some();
+	let single_thread = req.param("comment_id").is_some();
 	let highlighted_comment = &req.param("comment_id").unwrap_or_default();
 
 	// Send a request to the url, receive JSON in response
@@ -57,7 +57,7 @@ pub async fn item(req: Request<Body>) -> Result<Response<Body>, String> {
 				post,
 				sort,
 				prefs: Preferences::new(req),
-				single_thread: *single_thread,
+				single_thread,
 			})
 		}
 		// If the Reddit API returns an error, exit and send error page to user
