@@ -2,7 +2,7 @@
 use crate::client::json;
 use crate::esc;
 use crate::server::RequestExt;
-use crate::utils::{cookie, error, format_num, format_url, param, rewrite_urls, template, time, val, Author, Award, Comment, Flags, Flair, FlairPart, Media, Post, Preferences};
+use crate::utils::{cookie, error, format_num, format_url, param, rewrite_urls, template, time, val, Author, Award, Awards, Comment, Flags, Flair, FlairPart, Media, Post, Preferences};
 use hyper::{Body, Request, Response};
 
 use async_recursion::async_recursion;
@@ -50,8 +50,7 @@ pub async fn item(req: Request<Body>) -> Result<Response<Body>, String> {
 			// Parse the JSON into Post and Comment structs
 			let post = parse_post(&res[0]).await;
 			let comments = parse_comments(&res[1], &post.permalink, &post.author.name, highlighted_comment).await;
-			let awards = parse_awards(&res[0]).await;
-
+			
 			// Use the Post and Comment structs to generate a website to show users
 			template(PostTemplate {
 				comments,
@@ -79,6 +78,10 @@ async fn parse_post(json: &serde_json::Value) -> Post {
 
 	// Determine the type of media along with the media URL
 	let (post_type, media, gallery) = Media::parse(&post["data"]).await;
+
+	let mut awards: Awards = Awards::new();
+
+	awards.parse(&post["data"]["all_awardings"]).await;
 
 	// Build a post using data parsed from Reddit post API
 	Post {
@@ -134,6 +137,7 @@ async fn parse_post(json: &serde_json::Value) -> Post {
 		created,
 		comments: format_num(post["data"]["num_comments"].as_i64().unwrap_or_default()),
 		gallery,
+		awards,
 	}
 }
 

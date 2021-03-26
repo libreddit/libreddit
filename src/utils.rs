@@ -193,6 +193,7 @@ pub struct Post {
 	pub created: String,
 	pub comments: (String, String),
 	pub gallery: Vec<GalleryMedia>,
+	pub awards: Awards
 }
 
 impl Post {
@@ -230,6 +231,9 @@ impl Post {
 
 			// Determine the type of media along with the media URL
 			let (post_type, media, gallery) = Media::parse(&data).await;
+			let mut awards = Awards::new();
+			
+			awards.parse(&data["all_awardings"]).await;
 
 			posts.push(Self {
 				id: val(post, "id"),
@@ -288,6 +292,7 @@ impl Post {
 				created,
 				comments: format_num(data["num_comments"].as_i64().unwrap_or_default()),
 				gallery,
+				awards
 			});
 		}
 
@@ -315,11 +320,66 @@ pub struct Comment {
 	pub highlighted: bool,
 }
 
-#[derive(Default, Debug)]
+
+#[derive(Debug)]
 pub struct Award {
 	pub name: String,
 	pub icon_url: String,
 	pub description: String,
+}
+
+impl std::fmt::Display for Award {
+	fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+		write!(f, "{} {} {}", self.name, self.icon_url, self.description)
+	}
+}
+
+pub struct Awards(pub Vec<Award>);
+
+impl std::ops::Deref for Awards {
+	type Target = Vec<Award>;
+
+	fn deref(&self) -> &Self::Target {
+		&self.0
+	}
+}
+
+impl std::fmt::Display for Awards {
+	fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+		self.iter().fold(Ok(()), |result, award| {
+			result.and_then(|_| writeln!(f, "{}", award))
+		})
+	}
+}
+
+impl Awards {
+	pub fn new() -> Self {
+		let awards: Vec<Award> = Vec::new();
+		Self(awards)
+	}
+
+	pub async fn parse(&mut self, items: &Value) -> &mut Self {
+
+		if let Some(array_items) = items.as_array() {
+			for item in array_items.iter() {
+				let name = item["name"].as_str().unwrap_or_default().to_string();
+				let icon_url = item["icon_url"].as_str().unwrap_or_default().to_string();
+				let description = item["description"].as_str().unwrap_or_default().to_string();
+
+				self.0.push(
+					Award {
+						name,
+						icon_url,
+						description,
+					}
+				)
+			}
+			
+			self
+		} else {
+			self
+		}
+	}
 }
 
 #[derive(Template)]
