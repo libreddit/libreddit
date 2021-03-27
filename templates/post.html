@@ -43,6 +43,14 @@
 				{% endif %}
 				<span class="dot">&bull;</span>
 				<span class="created" title="{{ post.created }}">{{ post.rel_time }}</span>
+				{% if post.awards.len() > 0 %}
+				<span class="dot">&bull;</span>
+					{% for award in post.awards.clone() %}
+					<span>	
+					<img alt="{{ award.icon_url }}" src="{{ award.icon_url }}"/>
+					</span>
+					{% endfor %}
+				{% endif %}
 			</p>
 			<p class="post_title">
 				<a href="{{ post.permalink }}">{{ post.title }}</a>

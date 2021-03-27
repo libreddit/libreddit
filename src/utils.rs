@@ -193,7 +193,7 @@ pub struct Post {
 	pub created: String,
 	pub comments: (String, String),
 	pub gallery: Vec<GalleryMedia>,
-	pub awards: Awards
+	pub awards: Awards,
 }
 
 impl Post {
@@ -321,7 +321,7 @@ pub struct Comment {
 }
 
 
-#[derive(Debug)]
+#[derive(Default, Clone)]
 pub struct Award {
 	pub name: String,
 	pub icon_url: String,
