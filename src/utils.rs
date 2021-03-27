@@ -363,9 +363,9 @@ impl Awards {
 		if let Some(array_items) = items.as_array() {
 			for item in array_items.iter() {
 				let name = item["name"].as_str().unwrap_or_default().to_string();
-				let icon_url = item["icon_url"].as_str().unwrap_or_default().to_string();
+				let icon_url = format_url(&item["icon_url"].as_str().unwrap_or_default().to_string());
 				let description = item["description"].as_str().unwrap_or_default().to_string();
-
+				
 				self.0.push(
 					Award {
 						name,
