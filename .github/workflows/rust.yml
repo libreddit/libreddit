@@ -33,6 +33,9 @@ jobs:
         run: |
           echo "::set-output name=version::$(cargo metadata --format-version 1 --no-deps | jq .packages[0].version -r | sed 's/^/v/')"
           echo "::set-output name=tag::${GITHUB_REF#refs/*/}"
+          
+      - name: Calculate SHA512 checksum
+        run: sha512sum target/release/libreddit > libreddit.sha512
         
       - name: Release
         uses: softprops/action-gh-release@v1
@@ -40,7 +43,9 @@ jobs:
           tag_name: ${{ steps.version.outputs.version }}
           name: ${{ steps.version.outputs.version }} - NAME
           draft: true
-          files: target/release/libreddit
+          files: |
+            target/release/libreddit
+            libreddit.sha512
           body: |
             - CHANGES
 
