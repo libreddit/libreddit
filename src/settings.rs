@@ -50,7 +50,7 @@ pub async fn set(req: Request<Body>) -> Result<Response<Body>, String> {
 
 	let mut res = redirect("/settings".to_string());
 
-	let names = vec!["theme", "front_page", "layout", "wide", "comment_sort", "post_sort", "show_nsfw", "subscriptions"];
+	let names = vec!["theme", "front_page", "layout", "wide", "comment_sort", "post_sort", "show_nsfw"];
 
 	for name in names {
 		match form.get(name) {
