@@ -61,7 +61,7 @@ impl RequestExt for Request<Body> {
 	}
 
 	fn param(&self, name: &str) -> Option<String> {
-		self.params().find(name).map(|s| s.to_owned())
+		self.params().find(name).map(std::borrow::ToOwned::to_owned)
 	}
 
 	fn set_params(&mut self, params: Params) -> Option<Params> {
@@ -72,14 +72,14 @@ impl RequestExt for Request<Body> {
 		let mut cookies = Vec::new();
 		if let Some(header) = self.headers().get("Cookie") {
 			for cookie in header.to_str().unwrap_or_default().split("; ") {
-				cookies.push(Cookie::parse(cookie).unwrap_or(Cookie::named("")));
+				cookies.push(Cookie::parse(cookie).unwrap_or_else(|_| Cookie::named("")));
 			}
 		}
 		cookies
 	}
 
 	fn cookie(&self, name: &str) -> Option<Cookie> {
-		self.cookies().iter().find(|c| c.name() == name).map(|c| c.to_owned())
+		self.cookies().iter().find(|c| c.name() == name).map(std::borrow::ToOwned::to_owned)
 	}
 }
 

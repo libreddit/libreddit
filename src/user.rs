@@ -23,7 +23,7 @@ pub async fn profile(req: Request<Body>) -> Result<Response<Body>, String> {
 	// Build the Reddit JSON API path
 	let path = format!(
 		"/user/{}.json?{}&raw_json=1",
-		req.param("name").unwrap_or("reddit".to_string()),
+		req.param("name").unwrap_or_else(|| "reddit".to_string()),
 		req.uri().query().unwrap_or_default()
 	);
 

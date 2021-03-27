@@ -21,20 +21,6 @@
 
 ---
 
-## Jump to...
-- [About](#about)
-  - [Teddit Comparison](#how-does-it-compare-to-teddit)
-- [Comparison](#comparison)
-- [Installation](#installation)
-  - [Cargo](#1-cargo)
-  - [Docker](#2-docker)
-  - [AUR](#3-aur)
-  - [GitHub Releases](#4-github-releases)
-  - [Replit](#5-replit)
-- [Deployment](#deployment)
-
----
-
 # Instances
 
 Feel free to [open an issue](https://github.com/spikecodes/libreddit/issues/new) to have your [selfhosted instance](#deployment) listed here!

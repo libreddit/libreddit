@@ -134,6 +134,6 @@ pub async fn json(path: String) -> Result<Value, String> {
 				Err(e) => err("Failed receiving body from Reddit", e.to_string()),
 			}
 		}
-		Err(e) => err("Couldn't send request to Reddit", e.to_string()),
+		Err(e) => err("Couldn't send request to Reddit", e),
 	}
 }

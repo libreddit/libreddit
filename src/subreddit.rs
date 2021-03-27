@@ -32,18 +32,21 @@ pub async fn community(req: Request<Body>) -> Result<Response<Body>, String> {
 	// Build Reddit API path
 	let subscribed = cookie(&req, "subscriptions");
 	let front_page = cookie(&req, "front_page");
-	let post_sort = req.cookie("post_sort").map(|c| c.value().to_string()).unwrap_or("hot".to_string());
-	let sort = req.param("sort").unwrap_or(req.param("id").unwrap_or(post_sort));
+	let post_sort = req.cookie("post_sort").map_or_else(|| "hot".to_string(), |c| c.value().to_string());
+	let sort = req.param("sort").unwrap_or_else(|| req.param("id").unwrap_or(post_sort));
 
-	let sub = req.param("sub").map(String::from).unwrap_or(if front_page == "default" || front_page.is_empty() {
-		if subscribed.is_empty() {
-			"popular".to_string()
+	let sub = req.param("sub").map_or(
+		if front_page == "default" || front_page.is_empty() {
+			if subscribed.is_empty() {
+				"popular".to_string()
+			} else {
+				subscribed.to_owned()
+			}
 		} else {
-			subscribed.to_owned()
-		}
-	} else {
-		front_page.to_owned()
-	});
+			front_page.to_owned()
+		},
+		String::from,
+	);
 
 	let path = format!("/r/{}/{}.json?{}&raw_json=1", sub, sort, req.uri().query().unwrap_or_default());
 
@@ -89,7 +92,7 @@ pub async fn community(req: Request<Body>) -> Result<Response<Body>, String> {
 
 // Sub or unsub by setting subscription cookie using response "Set-Cookie" header
 pub async fn subscriptions(req: Request<Body>) -> Result<Response<Body>, String> {
-	let sub = req.param("sub").unwrap_or_default().to_string();
+	let sub = req.param("sub").unwrap_or_default();
 	let query = req.uri().query().unwrap_or_default().to_string();
 	let action: Vec<String> = req.uri().path().split('/').map(String::from).collect();
 
@@ -137,8 +140,8 @@ pub async fn subscriptions(req: Request<Body>) -> Result<Response<Body>, String>
 }
 
 pub async fn wiki(req: Request<Body>) -> Result<Response<Body>, String> {
-	let sub = req.param("sub").unwrap_or("reddit.com".to_string());
-	let page = req.param("page").unwrap_or("index".to_string());
+	let sub = req.param("sub").unwrap_or_else(|| "reddit.com".to_string());
+	let page = req.param("page").unwrap_or_else(|| "index".to_string());
 	let path: String = format!("/r/{}/wiki/{}.json?raw_json=1", sub, page);
 
 	match json(path).await {
@@ -153,7 +156,7 @@ pub async fn wiki(req: Request<Body>) -> Result<Response<Body>, String> {
 }
 
 pub async fn sidebar(req: Request<Body>) -> Result<Response<Body>, String> {
-	let sub = req.param("sub").unwrap_or("reddit.com".to_string());
+	let sub = req.param("sub").unwrap_or_else(|| "reddit.com".to_string());
 
 	// Build the Reddit JSON API url
 	let path: String = format!("/r/{}/about.json?raw_json=1", sub);

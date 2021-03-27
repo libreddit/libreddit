@@ -6,7 +6,8 @@
 	clippy::match_wildcard_for_single_variants,
 	clippy::cast_possible_truncation,
 	clippy::similar_names,
-	clippy::cast_possible_wrap
+	clippy::cast_possible_wrap,
+	clippy::find_map
 )]
 
 // Reference local files

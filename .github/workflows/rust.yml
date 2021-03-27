@@ -21,6 +21,12 @@ jobs:
 
       - name: Build
         run: cargo build --release
+      
+      - uses: actions/upload-artifact@v2.2.1
+        name: Upload a Build Artifact
+        with:
+          name: libreddit
+          path: target/release/libreddit
         
       - name: Versions
         id: version
@@ -35,7 +41,6 @@ jobs:
           name: ${{ steps.version.outputs.version }} - NAME
           draft: true
           files: target/release/libreddit
-          fail_on_unmatched_files: true
           body: |
             - CHANGES
 
