@@ -171,9 +171,9 @@ impl Server {
 							parammed.set_params(found.params().to_owned());
 
 							// Run the route's function
-							let yeet = (found.handler().to_owned().to_owned())(parammed);
+							let func = (found.handler().to_owned().to_owned())(parammed);
 							async move {
-								let res: Result<Response<Body>, String> = yeet.await;
+								let res: Result<Response<Body>, String> = func.await;
 								// Add default headers to response
 								res.map(|mut response| {
 									response.headers_mut().extend(headers);
