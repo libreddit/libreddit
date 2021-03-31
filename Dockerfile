@@ -1,17 +1,12 @@
-FROM rust:latest as builder
-
+FROM rust:alpine as builder
 WORKDIR /usr/src/libreddit
 COPY . .
+RUN apk add --no-cache g++
 RUN cargo install --path .
 
-
-FROM debian:buster-slim
-
-RUN apt-get update && apt-get install -y libcurl4 && rm -rf /var/lib/apt/lists/*
+FROM alpine:latest
+RUN apk add --no-cache curl
 COPY --from=builder /usr/local/cargo/bin/libreddit /usr/local/bin/libreddit
-RUN useradd --system --user-group --home-dir /nonexistent --no-create-home --shell /usr/sbin/nologin libreddit
-USER libreddit
-
 EXPOSE 8080
-
+HEALTHCHECK --interval=5m --timeout=3s CMD curl -f http://localhost:8080/settings || exit 1
 CMD ["libreddit"]
