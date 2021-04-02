@@ -65,7 +65,33 @@
 	--shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
+/* Dracula theme setting */
+.dracula {
+	--accent: #bd93f9;
+	--green: #50fa7b;
+	--text: #f8f8f2;
+	--foreground: #3d4051;
+	--background: #282a36;
+	--outside: #44475a;
+	--post: #44475a;
+	--panel-border: 2px solid #44475a;
+	--highlighted: #4e5267;
+	--shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
 
+/* Nord theme setting */
+.nord {
+	--accent: #8fbcbb; 
+	--green: #a3be8c;
+	--text: #eceff4;
+	--foreground: #3b4252;
+	--background: #2e3440;
+	--outside: #434c5e;
+	--post: #434c5e;
+	--panel-border: 2px solid #4c566a;
+	--highlighted: #3b4252;
+	--shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
 /* General */
 
 ::selection {
