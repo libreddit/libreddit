@@ -106,6 +106,7 @@ async fn parse_post(json: &serde_json::Value) -> Post {
 		media,
 		thumbnail: Media {
 			url: format_url(val(post, "thumbnail").as_str()),
+			alt_url: String::new(),
 			width: post["data"]["thumbnail_width"].as_i64().unwrap_or_default(),
 			height: post["data"]["thumbnail_height"].as_i64().unwrap_or_default(),
 			poster: "".to_string(),

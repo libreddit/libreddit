@@ -13,10 +13,10 @@ pub async fn proxy(req: Request<Body>, format: &str) -> Result<Response<Body>, S
 		url = url.replace(&format!("{{{}}}", name), value);
 	}
 
-	stream(&url).await
+	stream(&url, &req).await
 }
 
-async fn stream(url: &str) -> Result<Response<Body>, String> {
+async fn stream(url: &str, req: &Request<Body>) -> Result<Response<Body>, String> {
 	// First parameter is target URL (mandatory).
 	let url = Uri::from_str(url).map_err(|_| "Couldn't parse URL".to_string())?;
 
@@ -26,8 +26,21 @@ async fn stream(url: &str) -> Result<Response<Body>, String> {
 	// Build the hyper client from the HTTPS connector.
 	let client: client::Client<_, hyper::Body> = client::Client::builder().build(https);
 
+	let mut builder = Request::get(url);
+
+	// Copy useful headers from original request
+	let headers = req.headers();
+	let headers_keys = vec!["Range", "If-Modified-Since", "Cache-Control"];
+	for key in headers_keys {
+		if let Some(value) = headers.get(key) {
+			builder = builder.header(key, value);
+		}
+	}
+
+	let stream_request = builder.body(Body::default()).expect("stream");
+
 	client
-		.get(url)
+		.request(stream_request)
 		.await
 		.map(|mut res| {
 			let mut rm = |key: &str| res.headers_mut().remove(key);
@@ -40,6 +53,8 @@ async fn stream(url: &str) -> Result<Response<Body>, String> {
 			rm("x-cdn-client-region");
 			rm("x-cdn-name");
 			rm("x-cdn-server-region");
+			rm("x-reddit-cdn");
+			rm("x-reddit-video-features");
 
 			res
 		})

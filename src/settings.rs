@@ -50,7 +50,7 @@ pub async fn set(req: Request<Body>) -> Result<Response<Body>, String> {
 
 	let mut res = redirect("/settings".to_string());
 
-	let names = vec!["theme", "front_page", "layout", "wide", "comment_sort", "post_sort", "show_nsfw"];
+	let names = vec!["theme", "front_page", "layout", "wide", "comment_sort", "post_sort", "show_nsfw", "use_hls"];
 
 	for name in names {
 		match form.get(name) {
@@ -85,7 +85,17 @@ pub async fn restore(req: Request<Body>) -> Result<Response<Body>, String> {
 
 	let form = url::form_urlencoded::parse(query).collect::<HashMap<_, _>>();
 
-	let names = vec!["theme", "front_page", "layout", "wide", "comment_sort", "post_sort", "show_nsfw", "subscriptions"];
+	let names = vec![
+		"theme",
+		"front_page",
+		"layout",
+		"wide",
+		"comment_sort",
+		"post_sort",
+		"show_nsfw",
+		"use_hls",
+		"subscriptions",
+	];
 
 	let path = match form.get("redirect") {
 		Some(value) => format!("/{}/", value),
