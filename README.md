@@ -36,6 +36,7 @@ Feel free to [open an issue](https://github.com/spikecodes/libreddit/issues/new)
 | [libreddit.40two.app](https://libreddit.40two.app) | 🇳🇱 NL |  |
 | [reddit.invak.id](https://reddit.invak.id) | 🇧🇬 BG |  |
 | [reddit.phii.me](https://reddit.phii.me) | 🇺🇸 US |  |
+| [libreddit.silkky.cloud](https://libreddit.silkky.cloud) | 🇫🇮 FI |  |
 | [spjmllawtheisznfs7uryhxumin26ssv2draj7oope3ok3wuhy43eoyd.onion](http://spjmllawtheisznfs7uryhxumin26ssv2draj7oope3ok3wuhy43eoyd.onion) | 🇮🇳 IN  |  |
 | [fwhhsbrbltmrct5hshrnqlqygqvcgmnek3cnka55zj4y7nuus5muwyyd.onion](http://fwhhsbrbltmrct5hshrnqlqygqvcgmnek3cnka55zj4y7nuus5muwyyd.onion) | 🇩🇪 DE  |  |
 | [libreddit.himiko7xl2skojc6odi7hykl626gt4qki3vxdbv33u2u3af76d6k32ad.onion](http://libreddit.himiko7xl2skojc6odi7hykl626gt4qki3vxdbv33u2u3af76d6k32ad.onion) | 🇫🇮 FI |  |
