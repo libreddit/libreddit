@@ -307,7 +307,7 @@ aside {
 
 /* Subscriptions */
 
-#sub_subscription {
+#sub_subscription, #user_subscription {
 	margin-top: 20px;
 }
 

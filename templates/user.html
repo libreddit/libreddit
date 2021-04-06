@@ -75,6 +75,18 @@
 					<div>{{ user.karma }}</div>
 					<div>{{ user.created }}</div>
 				</div>
+				<div id="user_subscription">
+					{% let name = ["u_", user.name.as_str()].join("") %}
+					{% if prefs.subscriptions.contains(name) %}
+						<form action="/r/u_{{ user.name }}/unsubscribe" method="POST">
+							<button class="unsubscribe">Unfollow</button>
+						</form>
+					{% else %}
+						<form action="/r/u_{{ user.name }}/subscribe" method="POST">
+							<button class="subscribe">Follow</button>
+						</form>
+					{% endif %}
+				</div>
 			</div>
 		</aside>
 	</main>

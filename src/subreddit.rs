@@ -35,18 +35,19 @@ pub async fn community(req: Request<Body>) -> Result<Response<Body>, String> {
 	let post_sort = req.cookie("post_sort").map_or_else(|| "hot".to_string(), |c| c.value().to_string());
 	let sort = req.param("sort").unwrap_or_else(|| req.param("id").unwrap_or(post_sort));
 
-	let sub = req.param("sub").map_or(
-		if front_page == "default" || front_page.is_empty() {
-			if subscribed.is_empty() {
-				"popular".to_string()
-			} else {
-				subscribed.to_owned()
-			}
+	let sub = req.param("sub").unwrap_or(if front_page == "default" || front_page.is_empty() {
+		if subscribed.is_empty() {
+			"popular".to_string()
 		} else {
-			front_page.to_owned()
-		},
-		String::from,
-	);
+			subscribed.to_owned()
+		}
+	} else {
+		front_page.to_owned()
+	});
+
+	if req.param("sub").is_some() && sub.starts_with("u_") {
+		return Ok(redirect(["/user/", &sub[2..]].concat()));
+	}
 
 	let path = format!("/r/{}/{}.json?{}&raw_json=1", sub, sort, req.uri().query().unwrap_or_default());
 

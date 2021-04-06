@@ -58,7 +58,13 @@
 {% macro post_in_list(post) -%}
 <div class="post {% if post.flags.stickied %}stickied{% endif %}">	
 	<p class="post_header">
-		<a class="post_subreddit" href="/r/{{ post.community }}">r/{{ post.community }}</a>
+		{% let community -%}
+		{% if post.community.starts_with("u_") -%}
+			{% let community = format!("u/{}", &post.community[2..]) -%}
+		{% else -%}
+			{% let community = format!("r/{}", post.community) -%}
+		{% endif -%}
+		<a class="post_subreddit" href="/{{ community }}">{{ community }}</a>
 		<span class="dot">&bull;</span>
 		<a class="post_author" href="/u/{{ post.author.name }}">u/{{ post.author.name }}</a>
 		<span class="dot">&bull;</span>
