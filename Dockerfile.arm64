@@ -1,11 +1,9 @@
 ####################################################################################################
 ## Builder
 ####################################################################################################
-FROM rust:latest AS builder
+FROM rust:alpine AS builder
 
-RUN rustup target add aarch64-unknown-linux-musl
-RUN apt update && apt install -y musl-tools musl-dev
-RUN update-ca-certificates
+RUN apk add --no-cache musl-dev
 
 RUN adduser --home /nonexistent --no-create-home --disabled-password libreddit
 
