@@ -164,7 +164,7 @@ async fn main() {
 	app.at("/img/:id").get(|r| proxy(r, "https://i.redd.it/{id}").boxed());
 	app.at("/thumb/:point/:id").get(|r| proxy(r, "https://{point}.thumbs.redditmedia.com/{id}").boxed());
 	app.at("/emoji/:id/:name").get(|r| proxy(r, "https://emoji.redditmedia.com/{id}/{name}").boxed());
-	app.at("/preview/:loc/:id/:query").get(|r| proxy(r, "https://{loc}view.redd.it/{id}?{query}").boxed());
+	app.at("/preview/:loc/:id").get(|r| proxy(r, "https://{loc}view.redd.it/{id}").boxed());
 	app.at("/style/*path").get(|r| proxy(r, "https://styles.redditmedia.com/{path}").boxed());
 	app.at("/static/*path").get(|r| proxy(r, "https://www.redditstatic.com/{path}").boxed());
 

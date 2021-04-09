@@ -7,7 +7,7 @@ use std::{result::Result, str::FromStr};
 use crate::server::RequestExt;
 
 pub async fn proxy(req: Request<Body>, format: &str) -> Result<Response<Body>, String> {
-	let mut url = format.to_string();
+	let mut url = format!("{}?{}", format, req.uri().query().unwrap_or_default());
 
 	for (name, value) in req.params().iter() {
 		url = url.replace(&format!("{{{}}}", name), value);
