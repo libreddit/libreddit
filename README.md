@@ -157,6 +157,8 @@ docker pull spikecodes/libreddit
 docker run -d --name libreddit -p 80:8080 spikecodes/libreddit
 ```
 
+To deploy on `arm64` platforms, simply replace `spikecodes/libreddit` in the commands above with `spikecodes/libreddit:arm`.
+
 ## 3) AUR
 
 For ArchLinux users, Libreddit is available from the AUR as [`libreddit-git`](https://aur.archlinux.org/packages/libreddit-git).

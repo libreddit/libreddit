@@ -33,4 +33,4 @@ jobs:
           file: ./Dockerfile.arm64
           platforms: linux/arm64
           push: true
-          tags: spikecodes/libreddit:latest
+          tags: spikecodes/libreddit:arm
