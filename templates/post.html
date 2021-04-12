@@ -43,8 +43,9 @@
 				{% endif %}
 				<span class="dot">&bull;</span>
 				<span class="created" title="{{ post.created }}">{{ post.rel_time }}</span>
-				{% if post.awards.len() > 0 %}
-				<span class="dot">&bull;</span>
+				<!-- Post logic for optimization: If the post has more than 4 awards, we should display the first 3 + show a "+" button to 
+				tell the user that there are more awards, upon clicking we can display a little pop up that contains the posts -->
+				{% if post.awards.len() > 0  && post.awards.len() < 4 %}
 					{% for award in post.awards.clone() %}
 					<span>	
 					<img alt="{{ award.icon_url }}" src="{{ award.icon_url }}" width="16" height="16"/>
