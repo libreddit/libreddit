@@ -387,6 +387,7 @@ aside {
 #wiki {
 	background: var(--foreground);
 	padding: 35px;
+	overflow-x: scroll;
 }
 
 #top {
