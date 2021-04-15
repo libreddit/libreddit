@@ -16,6 +16,10 @@ RUN cargo install --path .
 ####################################################################################################
 FROM alpine:latest
 
+# Import ca-certificates from builder
+COPY --from=builder /usr/share/ca-certificates /usr/share/ca-certificates
+COPY --from=builder /etc/ssl/certs /etc/ssl/certs
+
 # Copy our build
 COPY --from=builder /usr/local/cargo/bin/libreddit /usr/local/bin/libreddit
 
