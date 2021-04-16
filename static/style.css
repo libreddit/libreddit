@@ -387,7 +387,6 @@ aside {
 #wiki {
 	background: var(--foreground);
 	padding: 35px;
-	overflow-x: scroll;
 }
 
 #top {
@@ -1130,6 +1129,8 @@ input[type="submit"] {
 
 .md table {
 	margin: 5px;
+	display: block;
+	overflow-x: auto;
 }
 
 .md code {
