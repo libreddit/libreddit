@@ -1,7 +1,9 @@
 ####################################################################################################
 ## Builder
 ####################################################################################################
-FROM --platform=$BUILDPLATFORM rust:latest AS builder
+FROM rust:alpine AS builder
+
+RUN apk add --no-cache g++
 
 WORKDIR /usr/src/libreddit
 
@@ -12,7 +14,7 @@ RUN cargo install --path .
 ####################################################################################################
 ## Final image
 ####################################################################################################
-FROM --platform=$BUILDPLATFORM alpine:latest
+FROM alpine:latest
 
 # Import ca-certificates from builder
 COPY --from=builder /usr/share/ca-certificates /usr/share/ca-certificates

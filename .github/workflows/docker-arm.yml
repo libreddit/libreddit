@@ -31,6 +31,6 @@ jobs:
         with:
           context: .
           file: ./Dockerfile.arm
-          platforms: linux/arm64,linux/arm/v7
+          platforms: linux/arm64
           push: true
           tags: spikecodes/libreddit:arm
