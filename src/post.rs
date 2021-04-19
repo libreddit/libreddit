@@ -175,6 +175,10 @@ async fn parse_comments(json: &serde_json::Value, post_link: &str, post_author: 
 			Vec::new()
 		};
 
+		let mut awards: Awards = Awards::new();
+
+		awards.parse(&data["all_awardings"]).await;
+
 		let parent_kind_and_id = val(&comment, "parent_id");
 		let parent_info = parent_kind_and_id.split('_').collect::<Vec<&str>>();
 
@@ -213,6 +217,7 @@ async fn parse_comments(json: &serde_json::Value, post_link: &str, post_author: 
 			edited,
 			replies,
 			highlighted,
+			awards,
 		});
 	}
 

@@ -14,6 +14,13 @@
 			{% if author.flair.flair_parts.len() > 0 %}
 				<small class="author_flair">{% call utils::render_flair(author.flair.flair_parts) %}</small>
 			{% endif %}
+			{% if awards.len() > 0 %}
+			{% for award in awards.clone() %}
+			<span>
+				<img alt="{{ award.icon_url }}" src="{{ award.icon_url }}" width="16" height="16"/>
+			</span>
+			{% endfor %}
+			{% endif %}
 			<a href="{{ post_link }}{{ id }}/?context=3" class="created" title="{{ created }}">{{ rel_time }}</a>
 			{% if edited.0 != "".to_string() %}<span class="edited" title="{{ edited.1 }}">edited {{ edited.0 }}</span>{% endif %}
 		</summary>
