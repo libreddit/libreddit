@@ -1,3 +1,4 @@
+// @license http://www.gnu.org/licenses/agpl-3.0.html AGPL-3.0
 (function () {
     if (Hls.isSupported()) {
         var videoSources = document.querySelectorAll("video source[type='application/vnd.apple.mpegurl']");
@@ -73,3 +74,4 @@
         });
     }
 })();
+// @license-end
