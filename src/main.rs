@@ -161,6 +161,9 @@ async fn main() {
 	app
 		.at("/playHLSVideo.js")
 		.get(|_| resource(include_str!("../static/playHLSVideo.js"), "text/javascript", false).boxed());
+	app
+		.at("/hls.min.js")
+		.get(|_| resource(include_str!("../static/hls.min.js"), "text/javascript", false).boxed());
 
 	// Proxy media through Libreddit
 	app.at("/vid/:id/:size").get(|r| proxy(r, "https://v.redd.it/{id}/DASH_{size}").boxed());
@@ -171,7 +174,6 @@ async fn main() {
 	app.at("/preview/:loc/:id/:query").get(|r| proxy(r, "https://{loc}view.redd.it/{id}?{query}").boxed());
 	app.at("/style/*path").get(|r| proxy(r, "https://styles.redditmedia.com/{path}").boxed());
 	app.at("/static/*path").get(|r| proxy(r, "https://www.redditstatic.com/{path}").boxed());
-	app.at("/hls.js").get(|r| proxy(r, "https://cdn.jsdelivr.net/npm/hls.js@latest").boxed());
 
 	// Browse user profile
 	app
