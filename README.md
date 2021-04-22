@@ -39,6 +39,7 @@ Feel free to [open an issue](https://github.com/spikecodes/libreddit/issues/new)
 | [libreddit.silkky.cloud](https://libreddit.silkky.cloud) | 🇫🇮 FI |  |
 | [libreddit.database.red](https://libreddit.database.red) | 🇺🇸 US | ✅ |
 | [libreddit.exonip.de](https://libreddit.exonip.de) | 🇩🇪 DE  |  |
+| [libreddit.domain.glass](https://libreddit.domain.glass) | 🇺🇸 US | ✅ |
 | [spjmllawtheisznfs7uryhxumin26ssv2draj7oope3ok3wuhy43eoyd.onion](http://spjmllawtheisznfs7uryhxumin26ssv2draj7oope3ok3wuhy43eoyd.onion) | 🇮🇳 IN  |  |
 | [fwhhsbrbltmrct5hshrnqlqygqvcgmnek3cnka55zj4y7nuus5muwyyd.onion](http://fwhhsbrbltmrct5hshrnqlqygqvcgmnek3cnka55zj4y7nuus5muwyyd.onion) | 🇩🇪 DE  |  |
 | [libreddit.himiko7xl2skojc6odi7hykl626gt4qki3vxdbv33u2u3af76d6k32ad.onion](http://libreddit.himiko7xl2skojc6odi7hykl626gt4qki3vxdbv33u2u3af76d6k32ad.onion) | 🇫🇮 FI |  |
