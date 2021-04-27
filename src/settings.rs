@@ -50,7 +50,17 @@ pub async fn set(req: Request<Body>) -> Result<Response<Body>, String> {
 
 	let mut res = redirect("/settings".to_string());
 
-	let names = vec!["theme", "front_page", "layout", "wide", "comment_sort", "post_sort", "show_nsfw", "use_hls"];
+	let names = vec![
+		"theme",
+		"front_page",
+		"layout",
+		"wide",
+		"comment_sort",
+		"post_sort",
+		"show_nsfw",
+		"use_hls",
+		"hide_hls_notification",
+	];
 
 	for name in names {
 		match form.get(name) {
@@ -68,8 +78,7 @@ pub async fn set(req: Request<Body>) -> Result<Response<Body>, String> {
 	Ok(res)
 }
 
-// Set cookies using response "Set-Cookie" header
-pub async fn restore(req: Request<Body>) -> Result<Response<Body>, String> {
+fn set_cookies_method(req: Request<Body>, remove_cookies: bool) -> Response<Body> {
 	// Split the body into parts
 	let (parts, _) = req.into_parts();
 
@@ -94,13 +103,18 @@ pub async fn restore(req: Request<Body>) -> Result<Response<Body>, String> {
 		"post_sort",
 		"show_nsfw",
 		"use_hls",
+		"hide_hls_notification",
 		"subscriptions",
 	];
 
-	let path = match form.get("redirect") {
-		Some(value) => format!("/{}/", value),
+	let mut path = match form.get("redirect") {
+		Some(value) => format!("/{}", value.replace("%26", "&").replace("%23", "#")),
 		None => "/".to_string(),
 	};
+
+	if path.find('#') == None {
+		path += "/";
+	}
 
 	let mut res = redirect(path);
 
@@ -113,9 +127,22 @@ pub async fn restore(req: Request<Body>) -> Result<Response<Body>, String> {
 					.expires(OffsetDateTime::now_utc() + Duration::weeks(52))
 					.finish(),
 			),
-			None => res.remove_cookie(name.to_string()),
+			None => {
+				if remove_cookies {
+					res.remove_cookie(name.to_string())
+				}
+			}
 		};
 	}
 
-	Ok(res)
+	res
+}
+
+// Set cookies using response "Set-Cookie" header
+pub async fn restore(req: Request<Body>) -> Result<Response<Body>, String> {
+	Ok(set_cookies_method(req, true))
+}
+
+pub async fn update(req: Request<Body>) -> Result<Response<Body>, String> {
+	Ok(set_cookies_method(req, false))
 }

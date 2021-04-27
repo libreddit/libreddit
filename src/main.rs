@@ -191,6 +191,7 @@ async fn main() {
 	// Configure settings
 	app.at("/settings").get(|r| settings::get(r).boxed()).post(|r| settings::set(r).boxed());
 	app.at("/settings/restore").get(|r| settings::restore(r).boxed());
+	app.at("/settings/update").get(|r| settings::update(r).boxed());
 
 	// Subreddit services
 	app.at("/r/:sub").get(|r| subreddit::community(r).boxed());

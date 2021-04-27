@@ -16,6 +16,7 @@ struct UserTemplate {
 	sort: (String, String),
 	ends: (String, String),
 	prefs: Preferences,
+	url: String,
 }
 
 // FUNCTIONS
@@ -33,6 +34,7 @@ pub async fn profile(req: Request<Body>) -> Result<Response<Body>, String> {
 
 	// Request user posts/comments from Reddit
 	let posts = Post::fetch(&path, "Comment".to_string()).await;
+	let url = String::from(req.uri().path_and_query().map_or("", |val| val.as_str()));
 
 	match posts {
 		Ok((posts, after)) => {
@@ -45,6 +47,7 @@ pub async fn profile(req: Request<Body>) -> Result<Response<Body>, String> {
 				sort: (sort, param(&path, "t")),
 				ends: (param(&path, "after"), after),
 				prefs: Preferences::new(req),
+				url,
 			})
 		}
 		// If there is an error show error page

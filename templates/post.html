@@ -77,6 +77,7 @@
 			<script src="/playHLSVideo.js"></script>
 			{% else %}
 			<video class="post_media_video" src="{{ post.media.url }}" controls autoplay loop><a href={{ post.media.url }}>Video</a></video>
+			{% call utils::render_hls_notification(post.permalink[1..]) %}
 			{% endif %}
 			{% else if post.post_type == "gallery" %}
 			<div class="gallery">
