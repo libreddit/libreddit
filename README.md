@@ -72,7 +72,7 @@ Teddit is another awesome open source project designed to provide an alternative
 
 If you are looking to compare, the biggest differences I have noticed are:
 - Libreddit is themed around Reddit's redesign whereas Teddit appears to stick much closer to Reddit's old design. This may suit some users better as design is always subjective.
-- Libreddit is written in [Rust](https://www.rust-lang.org) for speed and memory safety. It uses [Actix Web](https://actix.rs), which was [benchmarked as the fastest web server for single queries](https://www.techempower.com/benchmarks/#hw=ph&test=db).
+- Libreddit is written in [Rust](https://www.rust-lang.org) for speed and memory safety. It uses [Hyper](https://hyper.rs), a speedy and lightweight HTTP server/client implementation.
 
 ---
 
