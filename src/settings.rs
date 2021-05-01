@@ -112,7 +112,7 @@ fn set_cookies_method(req: Request<Body>, remove_cookies: bool) -> Response<Body
 		None => "/".to_string(),
 	};
 
-	if path.find('#') == None {
+	if path.contains('#') {
 		path += "/";
 	}
 
