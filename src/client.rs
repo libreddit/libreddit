@@ -30,8 +30,7 @@ async fn stream(url: &str, req: &Request<Body>) -> Result<Response<Body>, String
 
 	// Copy useful headers from original request
 	let headers = req.headers();
-	let headers_keys = vec!["Range", "If-Modified-Since", "Cache-Control"];
-	for key in headers_keys {
+	for &key in ["Range", "If-Modified-Since", "Cache-Control"].iter() {
 		if let Some(value) = headers.get(key) {
 			builder = builder.header(key, value);
 		}
