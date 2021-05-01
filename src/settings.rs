@@ -16,6 +16,21 @@ struct SettingsTemplate {
 	prefs: Preferences,
 }
 
+// CONSTANTS
+
+const PREFS: [&str; 10] = [
+	"theme",
+	"front_page",
+	"layout",
+	"wide",
+	"comment_sort",
+	"post_sort",
+	"show_nsfw",
+	"use_hls",
+	"hide_hls_notification",
+	"subscriptions",
+];
+
 // FUNCTIONS
 
 // Retrieve cookies from request "Cookie" header
@@ -50,19 +65,7 @@ pub async fn set(req: Request<Body>) -> Result<Response<Body>, String> {
 
 	let mut res = redirect("/settings".to_string());
 
-	let names = vec![
-		"theme",
-		"front_page",
-		"layout",
-		"wide",
-		"comment_sort",
-		"post_sort",
-		"show_nsfw",
-		"use_hls",
-		"hide_hls_notification",
-	];
-
-	for name in names {
+	for &name in PREFS.iter() {
 		match form.get(name) {
 			Some(value) => res.insert_cookie(
 				Cookie::build(name.to_owned(), value.to_owned())
@@ -94,19 +97,6 @@ fn set_cookies_method(req: Request<Body>, remove_cookies: bool) -> Response<Body
 
 	let form = url::form_urlencoded::parse(query).collect::<HashMap<_, _>>();
 
-	let names = vec![
-		"theme",
-		"front_page",
-		"layout",
-		"wide",
-		"comment_sort",
-		"post_sort",
-		"show_nsfw",
-		"use_hls",
-		"hide_hls_notification",
-		"subscriptions",
-	];
-
 	let mut path = match form.get("redirect") {
 		Some(value) => format!("/{}", value.replace("%26", "&").replace("%23", "#")),
 		None => "/".to_string(),
@@ -118,7 +108,7 @@ fn set_cookies_method(req: Request<Body>, remove_cookies: bool) -> Response<Body
 
 	let mut res = redirect(path);
 
-	for name in names {
+	for &name in PREFS.iter() {
 		match form.get(name) {
 			Some(value) => res.insert_cookie(
 				Cookie::build(name.to_owned(), value.to_owned())
