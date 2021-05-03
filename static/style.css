@@ -107,6 +107,34 @@
 	--shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
+/* Violet theme setting */
+.violet {
+	--accent: #363f81;
+	--green: #5cff85;
+	--text: white;
+	--foreground: #12152b;
+	--background: #06070e;
+	--outside: #0c0e1d;
+	--post: #0c0e1d;
+	--panel-border: 1px solid #12152b;
+	--highlighted: #12152b;
+	--shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+/* Gold theme setting */
+.gold {
+	--accent: #f2aa4c;
+	--green: #5cff85;
+	--text: white;
+	--foreground: #234;
+	--background: #101820;
+	--outside: #1b2936;
+	--post: #1b2936;
+	--panel-border: 0px solid black;
+	--highlighted: #234;
+	--shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+}
+
 /* General */
 
 ::selection {
