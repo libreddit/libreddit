@@ -148,9 +148,7 @@ pub async fn wiki(req: Request<Body>) -> Result<Response<Body>, String> {
 	match json(path).await {
 		Ok(response) => template(WikiTemplate {
 			sub,
-			wiki: rewrite_urls(response["data"]["content_html"]
-                            .as_str()
-                            .unwrap_or("<h3>Wiki not found</h3>")),
+			wiki: rewrite_urls(response["data"]["content_html"].as_str().unwrap_or("<h3>Wiki not found</h3>")),
 			page,
 			prefs: Preferences::new(req),
 		}),
@@ -168,46 +166,47 @@ pub async fn sidebar(req: Request<Body>) -> Result<Response<Body>, String> {
 	match json(path).await {
 		// If success, receive JSON in response
 		Ok(response) => template(WikiTemplate {
-			wiki: format!("{}<hr><h1>Moderators</h1><br><ul>{}</ul>", 
-                            rewrite_urls(&val(&response, "description_html").replace("\\", "")),
-                            moderators(&sub).await?.join(""),
-                        ),
-                        sub,
+			wiki: format!(
+				"{}<hr><h1>Moderators</h1><br><ul>{}</ul>",
+				rewrite_urls(&val(&response, "description_html").replace("\\", "")),
+				moderators(&sub).await?.join(""),
+			),
+			sub,
 			page: "Sidebar".to_string(),
 			prefs: Preferences::new(req),
 		}),
 		Err(msg) => error(req, msg).await,
 	}
-
 }
 
 pub async fn moderators(sub: &str) -> Result<Vec<String>, String> {
-        // Retrieve and format the html for the moderators list
-        Ok(moderators_list(sub)
-            .await?
-            .iter()
-            .map(|m| format!("<li><a style=\"color: var(--accent)\" href=\"/u/{name}\">{name}</a></li>", name=m))
-            .collect()
-        )
+	// Retrieve and format the html for the moderators list
+	Ok(
+		moderators_list(sub)
+			.await?
+			.iter()
+			.map(|m| format!("<li><a style=\"color: var(--accent)\" href=\"/u/{name}\">{name}</a></li>", name = m))
+			.collect(),
+	)
 }
 
 async fn moderators_list(sub: &str) -> Result<Vec<String>, String> {
-    // Build the moderator list URL
-    let path: String = format!("/r/{}/about/moderators.json?raw_json=1", sub);
+	// Build the moderator list URL
+	let path: String = format!("/r/{}/about/moderators.json?raw_json=1", sub);
 
-    // Retrieve response
-    let response = json(path).await?["data"]["children"].clone();
-    Ok(if let Some(response) = response.as_array() {
-        // Traverse json tree and format into list of strings
-        response
-            .iter()
-            .map(|m| m["name"].as_str().unwrap_or(""))
-            .filter(|m| !m.is_empty())
-            .map(|m| m.to_string())
-            .collect::<Vec<_>>()
-    } else {
-        vec![]
-    })
+	// Retrieve response
+	let response = json(path).await?["data"]["children"].clone();
+	Ok(if let Some(response) = response.as_array() {
+		// Traverse json tree and format into list of strings
+		response
+			.iter()
+			.map(|m| m["name"].as_str().unwrap_or(""))
+			.filter(|m| !m.is_empty())
+			.map(|m| m.to_string())
+			.collect::<Vec<_>>()
+	} else {
+		vec![]
+	})
 }
 
 // SUBREDDIT
@@ -232,7 +231,7 @@ async fn subreddit(sub: &str) -> Result<Subreddit, String> {
 				title: esc!(&res, "title"),
 				description: esc!(&res, "public_description"),
 				info: rewrite_urls(&val(&res, "description_html").replace("\\", "")),
-                                moderators: moderators_list(sub).await?,
+				moderators: moderators_list(sub).await?,
 				icon: format_url(&icon),
 				members: format_num(members),
 				active: format_num(active),
