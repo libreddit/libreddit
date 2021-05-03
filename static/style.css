@@ -109,15 +109,15 @@
 
 /* Violet theme setting */
 .violet {
-	--accent: #363f81;
+	--accent: #5c51c2;
 	--green: #5cff85;
 	--text: white;
-	--foreground: #12152b;
-	--background: #06070e;
-	--outside: #0c0e1d;
-	--post: #0c0e1d;
-	--panel-border: 1px solid #12152b;
-	--highlighted: #12152b;
+	--foreground: #1F2347;
+	--background: #12152b;
+	--outside: #181c3a;
+	--post: #181c3a;
+	--panel-border: 1px solid #1F2347;
+	--highlighted: #1F2347;
 	--shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
 }
 
