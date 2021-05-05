@@ -6,6 +6,7 @@ use askama::Template;
 use cookie::Cookie;
 use hyper::{Body, Request, Response};
 use time::{Duration, OffsetDateTime};
+use std::collections::HashMap;
 
 // STRUCTS
 #[derive(Template)]
@@ -99,8 +100,31 @@ pub async fn subscriptions(req: Request<Body>) -> Result<Response<Body>, String>
 
 	let mut sub_list = Preferences::new(req).subscriptions;
 
+        // Retrieve list of posts for these subreddits to extract display names
+        let mut display_lookup = HashMap::new();
+        let path: String = format!("/r/{}/hot.json?raw_json=1", sub);
+        let display = json(path).await?;
+        for post in display["data"]["children"].as_array().unwrap() {
+            let display_name = post["data"]["subreddit"].as_str().unwrap();
+            display_lookup.insert(display_name.to_lowercase(), display_name);
+        }
+
 	// Find each subreddit name (separated by '+') in sub parameter
 	for part in sub.split('+') {
+                // Retrieve display name for the subreddit
+                let display;
+                let part = if let Some(display) = display_lookup.get(&part.to_lowercase()) {
+                    // This is already known, doesn't require seperate request
+                    display
+                } else {
+                    // This subreddit display name isn't known, retrieve it
+                    let path: String = format!("/r/{}/about.json?raw_json=1", part);
+                    display = json(path).await?;
+                    display["data"]["display_name"]
+                        .as_str()
+                        .ok_or_else(|| "Failed to query subreddit name".to_string())?
+                };
+
 		// Modify sub list based on action
 		if action.contains(&"subscribe".to_string()) && !sub_list.contains(&part.to_owned()) {
 			// Add each sub name to the subscribed list
