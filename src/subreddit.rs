@@ -101,10 +101,15 @@ pub async fn subscriptions(req: Request<Body>) -> Result<Response<Body>, String>
 
 	// Retrieve list of posts for these subreddits to extract display names
 	let display = json(format!("/r/{}/hot.json?raw_json=1", sub)).await?;
-	let display_lookup: Vec<(String, &str)> = display["data"]["children"].as_array().unwrap().iter().map(|post| {
-		let display_name = post["data"]["subreddit"].as_str().unwrap();
-		(display_name.to_lowercase(), display_name)
-	}).collect();
+	let display_lookup: Vec<(String, &str)> = display["data"]["children"]
+		.as_array()
+		.unwrap()
+		.iter()
+		.map(|post| {
+			let display_name = post["data"]["subreddit"].as_str().unwrap();
+			(display_name.to_lowercase(), display_name)
+		})
+		.collect();
 
 	// Find each subreddit name (separated by '+') in sub parameter
 	for part in sub.split('+') {
@@ -221,7 +226,7 @@ async fn moderators_list(sub: &str) -> Result<Vec<String>, String> {
 			.iter()
 			.map(|m| m["name"].as_str().unwrap_or(""))
 			.filter(|m| !m.is_empty())
-			.map(|m| m.to_string())
+			.map(std::string::ToString::to_string)
 			.collect::<Vec<_>>()
 	} else {
 		vec![]
