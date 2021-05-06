@@ -5,7 +5,6 @@ use crate::{client::json, server::ResponseExt, RequestExt};
 use askama::Template;
 use cookie::Cookie;
 use hyper::{Body, Request, Response};
-use std::collections::HashMap;
 use time::{Duration, OffsetDateTime};
 
 // STRUCTS
@@ -101,19 +100,17 @@ pub async fn subscriptions(req: Request<Body>) -> Result<Response<Body>, String>
 	let mut sub_list = Preferences::new(req).subscriptions;
 
 	// Retrieve list of posts for these subreddits to extract display names
-	let mut display_lookup = HashMap::new();
-	let path: String = format!("/r/{}/hot.json?raw_json=1", sub);
-	let display = json(path).await?;
-	for post in display["data"]["children"].as_array().unwrap() {
+	let display = json(format!("/r/{}/hot.json?raw_json=1", sub)).await?;
+	let display_lookup: Vec<(String, &str)> = display["data"]["children"].as_array().unwrap().iter().map(|post| {
 		let display_name = post["data"]["subreddit"].as_str().unwrap();
-		display_lookup.insert(display_name.to_lowercase(), display_name);
-	}
+		(display_name.to_lowercase(), display_name)
+	}).collect();
 
 	// Find each subreddit name (separated by '+') in sub parameter
 	for part in sub.split('+') {
 		// Retrieve display name for the subreddit
 		let display;
-		let part = if let Some(display) = display_lookup.get(&part.to_lowercase()) {
+		let part = if let Some(&(_, display)) = display_lookup.iter().find(|x| x.0 == part.to_lowercase()) {
 			// This is already known, doesn't require seperate request
 			display
 		} else {
