@@ -1,5 +1,5 @@
 // CRATES
-use crate::utils::{cookie, error, format_num, format_url, param, template, val, Post, Preferences};
+use crate::utils::{catch_random, cookie, error, format_num, format_url, param, template, val, Post, Preferences};
 use crate::{client::json, RequestExt};
 use askama::Template;
 use hyper::{Body, Request, Response};
@@ -38,6 +38,10 @@ pub async fn find(req: Request<Body>) -> Result<Response<Body>, String> {
 	let nsfw_results = if cookie(&req, "show_nsfw") == "on" { "&include_over_18=on" } else { "" };
 	let path = format!("{}.json?{}{}", req.uri().path(), req.uri().query().unwrap_or_default(), nsfw_results);
 	let sub = req.param("sub").unwrap_or_default();
+	// Handle random subreddits
+	if let Ok(random) = catch_random(&sub, "/find").await {
+		return Ok(random);
+	}
 	let query = param(&path, "q");
 
 	let sort = if param(&path, "sort").is_empty() {
