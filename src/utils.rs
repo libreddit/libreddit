@@ -445,9 +445,27 @@ pub fn format_url(url: &str) -> String {
 }
 
 // Rewrite Reddit links to Libreddit in body of text
-pub fn rewrite_urls(text: &str) -> String {
-	match Regex::new(r#"href="(https|http|)://(www.|old.|np.|amp.|)(reddit).(com)/"#) {
-		Ok(re) => re.replace_all(text, r#"href="/"#).to_string(),
+pub fn rewrite_urls(input_text: &str) -> String {
+	let text1 = match Regex::new(r#"href="(https|http|)://(www.|old.|np.|amp.|)(reddit).(com)/"#) {
+		Ok(re) => re.replace_all(input_text, r#"href="/"#).to_string(),
+		Err(_) => String::new(),
+	};
+
+	// Remove links to Giphy
+	let text2 = match Regex::new(r#"<a href=".*giphy\.com.*".*[A-z]">|</a>"#) {
+		Ok(re) => re.replace_all(&text1, "").to_string(),
+		Err(_) => String::new(),
+	};
+
+	// Rewrite external media previews to Libreddit
+	match Regex::new(r"https://external-preview\.redd\.it(.*)[^?]") {
+		Ok(re) => {
+			if re.is_match(&text2) {
+				re.replace_all(&text2, format_url(re.find(&text2).unwrap().as_str())).to_string()
+			} else {
+				text2
+			}
+		},
 		Err(_) => String::new(),
 	}
 }
