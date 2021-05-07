@@ -266,7 +266,7 @@ async fn subreddit(sub: &str) -> Result<Subreddit, String> {
 			let active: i64 = res["data"]["accounts_active"].as_u64().unwrap_or_default() as i64;
 
 			// Fetch subreddit icon either from the community_icon or icon_img value
-			let community_icon: &str = res["data"]["community_icon"].as_str().map_or("", |s| s.split('?').collect::<Vec<&str>>()[0]);
+                        let community_icon: &str = res["data"]["community_icon"].as_str().unwrap();
 			let icon = if community_icon.is_empty() { val(&res, "icon_img") } else { community_icon.to_string() };
 
 			let sub = Subreddit {
