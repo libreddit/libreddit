@@ -2,7 +2,7 @@
 use crate::client::json;
 use crate::esc;
 use crate::server::RequestExt;
-use crate::utils::{cookie, error, format_num, format_url, param, rewrite_urls, template, time, val, Author, Comment, Flags, Flair, FlairPart, Media, Post, Preferences};
+use crate::utils::{cookie, error, format_num, format_url, param, rewrite_urls, template, time, val, Author, Comment, Flags, Flair, FlairPart, Media, Post, Preferences, md_to_html};
 use hyper::{Body, Request, Response};
 
 use async_recursion::async_recursion;
@@ -84,7 +84,7 @@ async fn parse_post(json: &serde_json::Value) -> Post {
 		id: val(post, "id"),
 		title: esc!(post, "title"),
 		community: val(post, "subreddit"),
-		body: rewrite_urls(&val(post, "selftext_html")).replace("\\", ""),
+		body: rewrite_urls(&md_to_html(&val(post, "selftext"))).replace("\\", ""),
 		author: Author {
 			name: val(post, "author"),
 			flair: Flair {
