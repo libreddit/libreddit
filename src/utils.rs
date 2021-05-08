@@ -452,8 +452,8 @@ pub fn rewrite_urls(input_text: &str) -> String {
 	};
 
 	// Remove links to Giphy
-	let text2 = match Regex::new(r#"<a href=".*giphy\.com.*".*[A-z]">|</a>"#) {
-		Ok(re) => re.replace_all(&text1, "").to_string(),
+	let text2 = match Regex::new(r#"<a href=".*giphy\.com.*".*[A-z]">(?P<img>.*)</a>"#) {
+		Ok(re) => re.replace(&text1, "$img").to_string(),
 		Err(_) => String::new(),
 	};
 
