@@ -404,6 +404,19 @@ pub fn cookie(req: &Request<Body>, name: &str) -> String {
 	cookie.value().to_string()
 }
 
+// Detect and redirect in the event of a random subreddit
+pub async fn catch_random(sub: &str, additional: &str) -> Result<Response<Body>, String> {
+	if (sub == "random" || sub == "randnsfw") && !sub.contains('+') {
+		let new_sub = json(format!("/r/{}/about.json?raw_json=1", sub)).await?["data"]["display_name"]
+			.as_str()
+			.unwrap_or_default()
+			.to_string();
+		return Ok(redirect(format!("/r/{}{}", new_sub, additional)));
+	} else {
+		return Err("No redirect needed".to_string());
+	}
+}
+
 // Direct urls to proxy if proxy is enabled
 pub fn format_url(url: &str) -> String {
 	if url.is_empty() || url == "self" || url == "default" || url == "nsfw" || url == "spoiler" {

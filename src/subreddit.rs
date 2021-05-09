@@ -1,6 +1,6 @@
 // CRATES
 use crate::esc;
-use crate::utils::{cookie, error, format_num, format_url, param, redirect, rewrite_urls, template, val, Post, Preferences, Subreddit};
+use crate::utils::{catch_random, cookie, error, format_num, format_url, param, redirect, rewrite_urls, template, val, Post, Preferences, Subreddit};
 use crate::{client::json, server::ResponseExt, RequestExt};
 use askama::Template;
 use cookie::Cookie;
@@ -44,6 +44,11 @@ pub async fn community(req: Request<Body>) -> Result<Response<Body>, String> {
 	} else {
 		front_page.to_owned()
 	});
+
+	// Handle random subreddits
+	if let Ok(random) = catch_random(&sub, "").await {
+		return Ok(random);
+	}
 
 	if req.param("sub").is_some() && sub.starts_with("u_") {
 		return Ok(redirect(["/user/", &sub[2..]].concat()));
@@ -94,6 +99,11 @@ pub async fn community(req: Request<Body>) -> Result<Response<Body>, String> {
 // Sub or unsub by setting subscription cookie using response "Set-Cookie" header
 pub async fn subscriptions(req: Request<Body>) -> Result<Response<Body>, String> {
 	let sub = req.param("sub").unwrap_or_default();
+	// Handle random subreddits
+	if sub == "random" || sub == "randnsfw" {
+		return Err("Can't subscribe to random subreddit!".to_string());
+	}
+
 	let query = req.uri().query().unwrap_or_default().to_string();
 	let action: Vec<String> = req.uri().path().split('/').map(String::from).collect();
 
@@ -166,6 +176,11 @@ pub async fn subscriptions(req: Request<Body>) -> Result<Response<Body>, String>
 
 pub async fn wiki(req: Request<Body>) -> Result<Response<Body>, String> {
 	let sub = req.param("sub").unwrap_or_else(|| "reddit.com".to_string());
+	// Handle random subreddits
+	if let Ok(random) = catch_random(&sub, "/wiki").await {
+		return Ok(random);
+	}
+
 	let page = req.param("page").unwrap_or_else(|| "index".to_string());
 	let path: String = format!("/r/{}/wiki/{}.json?raw_json=1", sub, page);
 
@@ -182,6 +197,10 @@ pub async fn wiki(req: Request<Body>) -> Result<Response<Body>, String> {
 
 pub async fn sidebar(req: Request<Body>) -> Result<Response<Body>, String> {
 	let sub = req.param("sub").unwrap_or_else(|| "reddit.com".to_string());
+	// Handle random subreddits
+	if let Ok(random) = catch_random(&sub, "/about/sidebar").await {
+		return Ok(random);
+	}
 
 	// Build the Reddit JSON API url
 	let path: String = format!("/r/{}/about.json?raw_json=1", sub);
@@ -247,7 +266,7 @@ async fn subreddit(sub: &str) -> Result<Subreddit, String> {
 			let active: i64 = res["data"]["accounts_active"].as_u64().unwrap_or_default() as i64;
 
 			// Fetch subreddit icon either from the community_icon or icon_img value
-			let community_icon: &str = res["data"]["community_icon"].as_str().map_or("", |s| s.split('?').collect::<Vec<&str>>()[0]);
+			let community_icon: &str = res["data"]["community_icon"].as_str().unwrap();
 			let icon = if community_icon.is_empty() { val(&res, "icon_img") } else { community_icon.to_string() };
 
 			let sub = Subreddit {
