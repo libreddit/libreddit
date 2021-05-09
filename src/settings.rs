@@ -65,7 +65,7 @@ pub async fn set(req: Request<Body>) -> Result<Response<Body>, String> {
 
 	let mut res = redirect("/settings".to_string());
 
-	for &name in PREFS.iter() {
+	for &name in &PREFS {
 		match form.get(name) {
 			Some(value) => res.insert_cookie(
 				Cookie::build(name.to_owned(), value.to_owned())
@@ -97,18 +97,14 @@ fn set_cookies_method(req: Request<Body>, remove_cookies: bool) -> Response<Body
 
 	let form = url::form_urlencoded::parse(query).collect::<HashMap<_, _>>();
 
-	let mut path = match form.get("redirect") {
+	let path = match form.get("redirect") {
 		Some(value) => format!("/{}", value.replace("%26", "&").replace("%23", "#")),
 		None => "/".to_string(),
 	};
 
-	if !path.contains('#') {
-		path += "/";
-	}
-
 	let mut res = redirect(path);
 
-	for &name in PREFS.iter() {
+	for &name in &PREFS {
 		match form.get(name) {
 			Some(value) => res.insert_cookie(
 				Cookie::build(name.to_owned(), value.to_owned())
