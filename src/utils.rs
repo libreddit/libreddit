@@ -459,7 +459,7 @@ pub fn rewrite_urls(input_text: &str) -> String {
 			} else {
 				text1
 			}
-		},
+		}
 		Err(_) => String::new(),
 	}
 }
