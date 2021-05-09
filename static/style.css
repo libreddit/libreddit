@@ -667,10 +667,8 @@ a.search_subreddit:hover {
 .post_notification {
 	grid-area: post_notification;
 	margin: 5px 15px;
-	background-color: var(--highlighted);
-	color: var(--text);
 	text-align: center;
-	font-size: 10px;
+	font-size: 12px;
 }
 
 .post_notification a {
