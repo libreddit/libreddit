@@ -451,19 +451,13 @@ pub fn rewrite_urls(input_text: &str) -> String {
 		Err(_) => String::new(),
 	};
 
-	// Remove links to Giphy
-	let text2 = match Regex::new(r#"<a href=".*giphy\.com.*".*[A-z]">(?P<img>.*)</a>"#) {
-		Ok(re) => re.replace(&text1, "$img").to_string(),
-		Err(_) => String::new(),
-	};
-
 	// Rewrite external media previews to Libreddit
 	match Regex::new(r"https://external-preview\.redd\.it(.*)[^?]") {
 		Ok(re) => {
-			if re.is_match(&text2) {
-				re.replace_all(&text2, format_url(re.find(&text2).unwrap().as_str())).to_string()
+			if re.is_match(&text1) {
+				re.replace_all(&text1, format_url(re.find(&text1).unwrap().as_str())).to_string()
 			} else {
-				text2
+				text1
 			}
 		},
 		Err(_) => String::new(),
