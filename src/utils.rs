@@ -2,7 +2,6 @@
 // CRATES
 //
 use crate::{client::json, esc, server::RequestExt};
-use comrak::{markdown_to_html, ComrakOptions};
 use askama::Template;
 use cookie::Cookie;
 use hyper::{Body, Request, Response};
@@ -416,21 +415,6 @@ pub async fn catch_random(sub: &str, additional: &str) -> Result<Response<Body>,
 	} else {
 		return Err("No redirect needed".to_string());
 	}
-}
-
-// Convert Reddit markdown into HTML
-pub fn md_to_html(contents: &str) -> String {
-    // Set up markdown to html conversion
-    let mut options = ComrakOptions::default();
-    // Enable extensions
-    options.extension.strikethrough = true;
-    options.extension.table = true;
-    options.extension.autolink = true;
-    options.extension.superscript = true;
-    options.extension.footnotes = true;
-    options.extension.description_lists = true;
-    // Do conversion
-    markdown_to_html(contents, &options)
 }
 
 // Direct urls to proxy if proxy is enabled
