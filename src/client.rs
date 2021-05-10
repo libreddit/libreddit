@@ -75,6 +75,7 @@ fn request(url: String) -> Boxed<Result<Response<Body>, String>> {
 		.header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8")
 		.header("Accept-Language", "en-US,en;q=0.5")
 		.header("Connection", "keep-alive")
+		.header("Cookie", "_options=%7B%22pref_quarantine_optin%22%3A%20true%7D")
 		.body(Body::empty());
 
 	async move {
