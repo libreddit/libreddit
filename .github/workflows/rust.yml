@@ -39,6 +39,7 @@ jobs:
         
       - name: Release
         uses: softprops/action-gh-release@v1
+        if: github.base_ref != 'master'
         with:
           tag_name: ${{ steps.version.outputs.version }}
           name: ${{ steps.version.outputs.version }} - NAME
