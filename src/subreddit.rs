@@ -16,6 +16,7 @@ struct SubredditTemplate {
 	sort: (String, String),
 	ends: (String, String),
 	prefs: Preferences,
+	url: String,
 }
 
 #[derive(Template)]
@@ -79,12 +80,15 @@ pub async fn community(req: Request<Body>) -> Result<Response<Body>, String> {
 				Subreddit::default()
 			};
 
+			let url = String::from(req.uri().path_and_query().map_or("", |val| val.as_str()));
+
 			template(SubredditTemplate {
 				sub,
 				posts,
 				sort: (sort, param(&path, "t")),
 				ends: (param(&path, "after"), after),
 				prefs: Preferences::new(req),
+				url,
 			})
 		}
 		Err(msg) => match msg.as_str() {

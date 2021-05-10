@@ -52,6 +52,14 @@
 				<label for="show_nsfw">Show NSFW posts:</label>
 				<input type="checkbox" name="show_nsfw" {% if prefs.show_nsfw == "on" %}checked{% endif %}>
 			</div>
+			<div id="use_hls">
+				<label for="use_hls">Use HLS for videos</label>
+				<input type="checkbox" name="use_hls" {% if prefs.use_hls == "on" %}checked{% endif %}>
+			</div>
+			<div id="hide_hls_notification">
+				<label for="hide_hls_notification">Hide notification about possible HLS usage</label>
+				<input type="checkbox" name="hide_hls_notification" {% if prefs.hide_hls_notification == "on" %}checked{% endif %}>
+			</div>
 			<input id="save" type="submit" value="Save">
 		</div>
 	</form>
@@ -68,10 +76,10 @@
 			{% endfor %}
 		</div>
 	{% endif %}
-	
+
 	<div id="settings_note">
 		<p><b>Note:</b> settings and subscriptions are saved in browser cookies. Clearing your cookies will reset them.</p><br>
-		<p>You can restore your current settings and subscriptions after clearing your cookies using <a href="/settings/restore/?theme={{ prefs.theme }}&front_page={{ prefs.front_page }}&layout={{ prefs.layout }}&wide={{ prefs.wide }}&comment_sort={{ prefs.comment_sort }}&show_nsfw={{ prefs.show_nsfw }}&subscriptions={{ prefs.subscriptions.join("%2B") }}">this link</a>.</p>
+		<p>You can restore your current settings and subscriptions after clearing your cookies using <a href="/settings/restore/?theme={{ prefs.theme }}&front_page={{ prefs.front_page }}&layout={{ prefs.layout }}&wide={{ prefs.wide }}&comment_sort={{ prefs.comment_sort }}&show_nsfw={{ prefs.show_nsfw }}&use_hls={{ prefs.use_hls }}&hide_hls_notification={{ prefs.hide_hls_notification }}&subscriptions={{ prefs.subscriptions.join("%2B") }}">this link</a>.</p>
 	</div>
 </div>
 

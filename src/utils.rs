@@ -75,6 +75,7 @@ pub struct Flags {
 
 pub struct Media {
 	pub url: String,
+	pub alt_url: String,
 	pub width: i64,
 	pub height: i64,
 	pub poster: String,
@@ -85,12 +86,28 @@ impl Media {
 		let mut gallery = Vec::new();
 
 		// If post is a video, return the video
-		let (post_type, url_val) = if data["preview"]["reddit_video_preview"]["fallback_url"].is_string() {
+		let (post_type, url_val, alt_url_val) = if data["preview"]["reddit_video_preview"]["fallback_url"].is_string() {
 			// Return reddit video
-			("video", &data["preview"]["reddit_video_preview"]["fallback_url"])
+			(
+				if data["preview"]["reddit_video_preview"]["is_gif"].as_bool().unwrap_or(false) {
+					"gif"
+				} else {
+					"video"
+				},
+				&data["preview"]["reddit_video_preview"]["fallback_url"],
+				Some(&data["preview"]["reddit_video_preview"]["hls_url"]),
+			)
 		} else if data["secure_media"]["reddit_video"]["fallback_url"].is_string() {
 			// Return reddit video
-			("video", &data["secure_media"]["reddit_video"]["fallback_url"])
+			(
+				if data["preview"]["reddit_video_preview"]["is_gif"].as_bool().unwrap_or(false) {
+					"gif"
+				} else {
+					"video"
+				},
+				&data["secure_media"]["reddit_video"]["fallback_url"],
+				Some(&data["secure_media"]["reddit_video"]["hls_url"]),
+			)
 		} else if data["post_hint"].as_str().unwrap_or("") == "image" {
 			// Handle images, whether GIFs or pics
 			let preview = &data["preview"]["images"][0];
@@ -98,26 +115,26 @@ impl Media {
 
 			if mp4.is_object() {
 				// Return the mp4 if the media is a gif
-				("gif", &mp4["source"]["url"])
+				("gif", &mp4["source"]["url"], None)
 			} else {
 				// Return the picture if the media is an image
 				if data["domain"] == "i.redd.it" {
-					("image", &data["url"])
+					("image", &data["url"], None)
 				} else {
-					("image", &preview["source"]["url"])
+					("image", &preview["source"]["url"], None)
 				}
 			}
 		} else if data["is_self"].as_bool().unwrap_or_default() {
 			// If type is self, return permalink
-			("self", &data["permalink"])
+			("self", &data["permalink"], None)
 		} else if data["is_gallery"].as_bool().unwrap_or_default() {
 			// If this post contains a gallery of images
 			gallery = GalleryMedia::parse(&data["gallery_data"]["items"], &data["media_metadata"]);
 
-			("gallery", &data["url"])
+			("gallery", &data["url"], None)
 		} else {
 			// If type can't be determined, return url
-			("link", &data["url"])
+			("link", &data["url"], None)
 		};
 
 		let source = &data["preview"]["images"][0]["source"];
@@ -128,10 +145,13 @@ impl Media {
 			format_url(url_val.as_str().unwrap_or_default())
 		};
 
+		let alt_url = alt_url_val.map_or(String::new(), |val| format_url(val.as_str().unwrap_or_default()));
+
 		(
 			post_type.to_string(),
 			Self {
 				url,
+				alt_url,
 				width: source["width"].as_i64().unwrap_or_default(),
 				height: source["height"].as_i64().unwrap_or_default(),
 				poster: format_url(source["url"].as_str().unwrap_or_default()),
@@ -259,6 +279,7 @@ impl Post {
 				post_type,
 				thumbnail: Media {
 					url: format_url(val(post, "thumbnail").as_str()),
+					alt_url: String::new(),
 					width: data["thumbnail_width"].as_i64().unwrap_or_default(),
 					height: data["thumbnail_height"].as_i64().unwrap_or_default(),
 					poster: "".to_string(),
@@ -365,6 +386,8 @@ pub struct Preferences {
 	pub layout: String,
 	pub wide: String,
 	pub show_nsfw: String,
+	pub hide_hls_notification: String,
+	pub use_hls: String,
 	pub comment_sort: String,
 	pub post_sort: String,
 	pub subscriptions: Vec<String>,
@@ -379,6 +402,8 @@ impl Preferences {
 			layout: cookie(&req, "layout"),
 			wide: cookie(&req, "wide"),
 			show_nsfw: cookie(&req, "show_nsfw"),
+			use_hls: cookie(&req, "use_hls"),
+			hide_hls_notification: cookie(&req, "hide_hls_notification"),
 			comment_sort: cookie(&req, "comment_sort"),
 			post_sort: cookie(&req, "post_sort"),
 			subscriptions: cookie(&req, "subscriptions").split('+').map(String::from).filter(|s| !s.is_empty()).collect(),
@@ -439,8 +464,32 @@ pub fn format_url(url: &str) -> String {
 						.unwrap_or_default()
 				};
 
+				macro_rules! chain {
+					() => {
+						{
+							String::new()
+						}
+					};
+
+					( $first_fn:expr, $($other_fns:expr), *) => {
+						{
+							let result = $first_fn;
+							if result.is_empty() {
+								chain!($($other_fns,)*)
+							}
+							else
+							{
+								result
+							}
+						}
+					};
+				}
+
 				match domain {
-					"v.redd.it" => capture(r"https://v\.redd\.it/(.*)/DASH_([0-9]{2,4}(\.mp4|$))", "/vid/", 2),
+					"v.redd.it" => chain!(
+						capture(r"https://v\.redd\.it/(.*)/DASH_([0-9]{2,4}(\.mp4|$))", "/vid/", 2),
+						capture(r"https://v\.redd\.it/(.+)/(HLSPlaylist\.m3u8.*)$", "/hls/", 2)
+					),
 					"i.redd.it" => capture(r"https://i\.redd\.it/(.*)", "/img/", 1),
 					"a.thumbs.redditmedia.com" => capture(r"https://a\.thumbs\.redditmedia\.com/(.*)", "/thumb/a/", 1),
 					"b.thumbs.redditmedia.com" => capture(r"https://b\.thumbs\.redditmedia\.com/(.*)", "/thumb/b/", 1),

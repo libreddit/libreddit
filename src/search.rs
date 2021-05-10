@@ -31,6 +31,7 @@ struct SearchTemplate {
 	sub: String,
 	params: SearchParams,
 	prefs: Preferences,
+	url: String,
 }
 
 // SERVICES
@@ -56,6 +57,8 @@ pub async fn find(req: Request<Body>) -> Result<Response<Body>, String> {
 		Vec::new()
 	};
 
+	let url = String::from(req.uri().path_and_query().map_or("", |val| val.as_str()));
+
 	match Post::fetch(&path, String::new()).await {
 		Ok((posts, after)) => template(SearchTemplate {
 			posts,
@@ -70,6 +73,7 @@ pub async fn find(req: Request<Body>) -> Result<Response<Body>, String> {
 				restrict_sr: param(&path, "restrict_sr"),
 			},
 			prefs: Preferences::new(req),
+			url,
 		}),
 		Err(msg) => error(req, msg).await,
 	}

@@ -139,7 +139,7 @@ async fn main() {
 		"Referrer-Policy" => "no-referrer",
 		"X-Content-Type-Options" => "nosniff",
 		"X-Frame-Options" => "DENY",
-		"Content-Security-Policy" => "default-src 'none'; manifest-src 'self'; media-src 'self'; style-src 'self' 'unsafe-inline'; base-uri 'none'; img-src 'self' data:; form-action 'self'; frame-ancestors 'none';"
+		"Content-Security-Policy" => "default-src 'none'; script-src 'self' blob:; manifest-src 'self'; media-src 'self' data: blob: about:; style-src 'self' 'unsafe-inline'; base-uri 'none'; img-src 'self' data:; form-action 'self'; frame-ancestors 'none'; connect-src 'self'; worker-src blob:;"
 	};
 
 	if let Some(expire_time) = hsts {
@@ -158,9 +158,16 @@ async fn main() {
 	app.at("/logo.png").get(|_| pwa_logo().boxed());
 	app.at("/touch-icon-iphone.png").get(|_| iphone_logo().boxed());
 	app.at("/apple-touch-icon.png").get(|_| iphone_logo().boxed());
+	app
+		.at("/playHLSVideo.js")
+		.get(|_| resource(include_str!("../static/playHLSVideo.js"), "text/javascript", false).boxed());
+	app
+		.at("/hls.min.js")
+		.get(|_| resource(include_str!("../static/hls.min.js"), "text/javascript", false).boxed());
 
 	// Proxy media through Libreddit
 	app.at("/vid/:id/:size").get(|r| proxy(r, "https://v.redd.it/{id}/DASH_{size}").boxed());
+	app.at("/hls/:id/*path").get(|r| proxy(r, "https://v.redd.it/{id}/{path}").boxed());
 	app.at("/img/:id").get(|r| proxy(r, "https://i.redd.it/{id}").boxed());
 	app.at("/thumb/:point/:id").get(|r| proxy(r, "https://{point}.thumbs.redditmedia.com/{id}").boxed());
 	app.at("/emoji/:id/:name").get(|r| proxy(r, "https://emoji.redditmedia.com/{id}/{name}").boxed());
@@ -184,6 +191,7 @@ async fn main() {
 	// Configure settings
 	app.at("/settings").get(|r| settings::get(r).boxed()).post(|r| settings::set(r).boxed());
 	app.at("/settings/restore").get(|r| settings::restore(r).boxed());
+	app.at("/settings/update").get(|r| settings::update(r).boxed());
 
 	// Subreddit services
 	app.at("/r/:sub").get(|r| subreddit::community(r).boxed());
