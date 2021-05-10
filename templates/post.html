@@ -87,14 +87,14 @@
 					<figcaption>
 						<p>{{ image.caption }}</p>
 						{% if image.outbound_url.len() > 0 %}
-						<p><a class="outbound_url" href="{{ image.outbound_url }}">{{ image.outbound_url }}</a>
+						<p><a class="outbound_url" href="{{ image.outbound_url }}" rel="nofollow">{{ image.outbound_url }}</a>
 						{% endif %}
 					</figcaption>
 				</figure>
 			{%- endfor %}
 			</div>			
 			{% else if post.post_type == "link" %}
-			<a id="post_url" href="{{ post.media.url }}">{{ post.media.url }}</a>
+			<a id="post_url" href="{{ post.media.url }}" rel="nofollow">{{ post.media.url }}</a>
 			{% endif %}
 
 			<!-- POST BODY -->
@@ -103,7 +103,7 @@
 			<div class="post_footer">
 				<ul id="post_links">
 					<li><a href="/{{ post.id }}">permalink</a></li>
-					<li><a href="https://reddit.com/{{ post.id }}">reddit</a></li>
+					<li><a href="https://reddit.com/{{ post.id }}" rel="nofollow">reddit</a></li>
 				</ul>
 				<p>{{ post.upvote_ratio }}% Upvoted</p>
 			</div>
