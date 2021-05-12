@@ -1,6 +1,6 @@
 // CRATES
 use crate::utils::{catch_random, cookie, error, format_num, format_url, param, template, val, Post, Preferences};
-use crate::{client::json, RequestExt};
+use crate::{client::json, subreddit::quarantine, RequestExt};
 use askama::Template;
 use hyper::{Body, Request, Response};
 
@@ -39,6 +39,7 @@ pub async fn find(req: Request<Body>) -> Result<Response<Body>, String> {
 	let nsfw_results = if cookie(&req, "show_nsfw") == "on" { "&include_over_18=on" } else { "" };
 	let path = format!("{}.json?{}{}", req.uri().path(), req.uri().query().unwrap_or_default(), nsfw_results);
 	let sub = req.param("sub").unwrap_or_default();
+	let quarantined: bool = cookie(&req, "quarantine_exception").parse().unwrap_or(false);
 	// Handle random subreddits
 	if let Ok(random) = catch_random(&sub, "/find").await {
 		return Ok(random);
@@ -59,7 +60,7 @@ pub async fn find(req: Request<Body>) -> Result<Response<Body>, String> {
 
 	let url = String::from(req.uri().path_and_query().map_or("", |val| val.as_str()));
 
-	match Post::fetch(&path, String::new()).await {
+	match Post::fetch(&path, String::new(), quarantined).await {
 		Ok((posts, after)) => template(SearchTemplate {
 			posts,
 			subreddits,
@@ -75,7 +76,14 @@ pub async fn find(req: Request<Body>) -> Result<Response<Body>, String> {
 			prefs: Preferences::new(req),
 			url,
 		}),
-		Err(msg) => error(req, msg).await,
+		Err(msg) => {
+			if msg == "quarantined" {
+				let sub = req.param("sub").unwrap_or_default();
+				quarantine(req, sub)
+			} else {
+				error(req, msg).await
+			}
+		}
 	}
 }
 
@@ -83,7 +91,7 @@ async fn search_subreddits(q: &str) -> Vec<Subreddit> {
 	let subreddit_search_path = format!("/subreddits/search.json?q={}&limit=3", q.replace(' ', "+"));
 
 	// Send a request to the url
-	match json(subreddit_search_path).await {
+	match json(subreddit_search_path, false).await {
 		// If success, receive JSON in response
 		Ok(response) => {
 			match response["data"]["children"].as_array() {

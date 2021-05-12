@@ -28,11 +28,23 @@ struct WikiTemplate {
 	prefs: Preferences,
 }
 
+#[derive(Template)]
+#[template(path = "wall.html", escape = "none")]
+struct WallTemplate {
+	title: String,
+	sub: String,
+	msg: String,
+	prefs: Preferences,
+	url: String,
+}
+
 // SERVICES
 pub async fn community(req: Request<Body>) -> Result<Response<Body>, String> {
 	// Build Reddit API path
+	let root = req.uri().path() == "/";
 	let subscribed = cookie(&req, "subscriptions");
 	let front_page = cookie(&req, "front_page");
+	let quarantined: bool = cookie(&req, "quarantine_exception").parse().unwrap_or(false) || root;
 	let post_sort = req.cookie("post_sort").map_or_else(|| "hot".to_string(), |c| c.value().to_string());
 	let sort = req.param("sort").unwrap_or_else(|| req.param("id").unwrap_or(post_sort));
 
@@ -57,16 +69,16 @@ pub async fn community(req: Request<Body>) -> Result<Response<Body>, String> {
 
 	let path = format!("/r/{}/{}.json?{}&raw_json=1", sub, sort, req.uri().query().unwrap_or_default());
 
-	match Post::fetch(&path, String::new()).await {
+	match Post::fetch(&path, String::new(), quarantined).await {
 		Ok((posts, after)) => {
 			// If you can get subreddit posts, also request subreddit metadata
 			let sub = if !sub.contains('+') && sub != subscribed && sub != "popular" && sub != "all" {
 				// Regular subreddit
-				subreddit(&sub).await.unwrap_or_default()
+				subreddit(&sub, quarantined).await.unwrap_or_default()
 			} else if sub == subscribed {
 				// Subscription feed
 				if req.uri().path().starts_with("/r/") {
-					subreddit(&sub).await.unwrap_or_default()
+					subreddit(&sub, quarantined).await.unwrap_or_default()
 				} else {
 					Subreddit::default()
 				}
@@ -92,7 +104,7 @@ pub async fn community(req: Request<Body>) -> Result<Response<Body>, String> {
 			})
 		}
 		Err(msg) => match msg.as_str() {
-			"quarantined" => error(req, format!("r/{} has been quarantined by Reddit", sub)).await,
+			"quarantined" => quarantine(req, sub),
 			"private" => error(req, format!("r/{} is a private community", sub)).await,
 			"banned" => error(req, format!("r/{} has been banned from Reddit", sub)).await,
 			_ => error(req, msg).await,
@@ -100,9 +112,37 @@ pub async fn community(req: Request<Body>) -> Result<Response<Body>, String> {
 	}
 }
 
+pub fn quarantine(req: Request<Body>, sub: String) -> Result<Response<Body>, String> {
+	let body = WallTemplate {
+		title: format!("r/{} is quarantined", sub),
+		msg: "Please click the button below to continue to this subreddit.".to_string(),
+		url: req.uri().to_string(),
+		sub,
+		prefs: Preferences::new(req),
+	}
+	.render()
+	.unwrap_or_default();
+	Ok(Response::builder().status(403).header("content-type", "text/html").body(body.into()).unwrap_or_default())
+}
+
+pub async fn add_quarantine_exception(req: Request<Body>) -> Result<Response<Body>, String> {
+	let subreddit = req.uri();
+	let redir = subreddit.to_string().split("?redir=").last().unwrap_or_else(|| subreddit.path()).to_string();
+	let mut res = redirect(redir);
+	res.insert_cookie(
+		Cookie::build("quarantine_exception", "true")
+			.path(subreddit.path())
+			.http_only(true)
+			.expires(cookie::Expiration::Session)
+			.finish(),
+	);
+	Ok(res)
+}
+
 // Sub or unsub by setting subscription cookie using response "Set-Cookie" header
 pub async fn subscriptions(req: Request<Body>) -> Result<Response<Body>, String> {
 	let sub = req.param("sub").unwrap_or_default();
+	let quarantined: bool = cookie(&req, "quarantine_exception").parse().unwrap_or(false);
 	// Handle random subreddits
 	if sub == "random" || sub == "randnsfw" {
 		return Err("Can't subscribe to random subreddit!".to_string());
@@ -114,7 +154,7 @@ pub async fn subscriptions(req: Request<Body>) -> Result<Response<Body>, String>
 	let mut sub_list = Preferences::new(req).subscriptions;
 
 	// Retrieve list of posts for these subreddits to extract display names
-	let display = json(format!("/r/{}/hot.json?raw_json=1", sub)).await?;
+	let display = json(format!("/r/{}/hot.json?raw_json=1", sub), quarantined).await?;
 	let display_lookup: Vec<(String, &str)> = display["data"]["children"]
 		.as_array()
 		.unwrap()
@@ -135,7 +175,7 @@ pub async fn subscriptions(req: Request<Body>) -> Result<Response<Body>, String>
 		} else {
 			// This subreddit display name isn't known, retrieve it
 			let path: String = format!("/r/{}/about.json?raw_json=1", part);
-			display = json(path).await?;
+			display = json(path, quarantined).await?;
 			display["data"]["display_name"].as_str().ok_or_else(|| "Failed to query subreddit name".to_string())?
 		};
 
@@ -180,6 +220,7 @@ pub async fn subscriptions(req: Request<Body>) -> Result<Response<Body>, String>
 
 pub async fn wiki(req: Request<Body>) -> Result<Response<Body>, String> {
 	let sub = req.param("sub").unwrap_or_else(|| "reddit.com".to_string());
+	let quarantined: bool = cookie(&req, "quarantine_exception").parse().unwrap_or(false);
 	// Handle random subreddits
 	if let Ok(random) = catch_random(&sub, "/wiki").await {
 		return Ok(random);
@@ -188,7 +229,7 @@ pub async fn wiki(req: Request<Body>) -> Result<Response<Body>, String> {
 	let page = req.param("page").unwrap_or_else(|| "index".to_string());
 	let path: String = format!("/r/{}/wiki/{}.json?raw_json=1", sub, page);
 
-	match json(path).await {
+	match json(path, quarantined).await {
 		Ok(response) => template(WikiTemplate {
 			sub,
 			wiki: rewrite_urls(response["data"]["content_html"].as_str().unwrap_or("<h3>Wiki not found</h3>")),
@@ -201,6 +242,7 @@ pub async fn wiki(req: Request<Body>) -> Result<Response<Body>, String> {
 
 pub async fn sidebar(req: Request<Body>) -> Result<Response<Body>, String> {
 	let sub = req.param("sub").unwrap_or_else(|| "reddit.com".to_string());
+	let quarantined: bool = cookie(&req, "quarantine_exception").parse().unwrap_or(false);
 	// Handle random subreddits
 	if let Ok(random) = catch_random(&sub, "/about/sidebar").await {
 		return Ok(random);
@@ -210,13 +252,13 @@ pub async fn sidebar(req: Request<Body>) -> Result<Response<Body>, String> {
 	let path: String = format!("/r/{}/about.json?raw_json=1", sub);
 
 	// Send a request to the url
-	match json(path).await {
+	match json(path, quarantined).await {
 		// If success, receive JSON in response
 		Ok(response) => template(WikiTemplate {
 			wiki: format!(
 				"{}<hr><h1>Moderators</h1><br><ul>{}</ul>",
 				rewrite_urls(&val(&response, "description_html").replace("\\", "")),
-				moderators(&sub).await?.join(""),
+				moderators(&sub, quarantined).await?.join(""),
 			),
 			sub,
 			page: "Sidebar".to_string(),
@@ -226,10 +268,10 @@ pub async fn sidebar(req: Request<Body>) -> Result<Response<Body>, String> {
 	}
 }
 
-pub async fn moderators(sub: &str) -> Result<Vec<String>, String> {
+pub async fn moderators(sub: &str, quarantined: bool) -> Result<Vec<String>, String> {
 	// Retrieve and format the html for the moderators list
 	Ok(
-		moderators_list(sub)
+		moderators_list(sub, quarantined)
 			.await?
 			.iter()
 			.map(|m| format!("<li><a style=\"color: var(--accent)\" href=\"/u/{name}\">{name}</a></li>", name = m))
@@ -237,12 +279,12 @@ pub async fn moderators(sub: &str) -> Result<Vec<String>, String> {
 	)
 }
 
-async fn moderators_list(sub: &str) -> Result<Vec<String>, String> {
+async fn moderators_list(sub: &str, quarantined: bool) -> Result<Vec<String>, String> {
 	// Build the moderator list URL
 	let path: String = format!("/r/{}/about/moderators.json?raw_json=1", sub);
 
 	// Retrieve response
-	let response = json(path).await?["data"]["children"].clone();
+	let response = json(path, quarantined).await?["data"]["children"].clone();
 	Ok(if let Some(response) = response.as_array() {
 		// Traverse json tree and format into list of strings
 		response
@@ -257,12 +299,12 @@ async fn moderators_list(sub: &str) -> Result<Vec<String>, String> {
 }
 
 // SUBREDDIT
-async fn subreddit(sub: &str) -> Result<Subreddit, String> {
+async fn subreddit(sub: &str, quarantined: bool) -> Result<Subreddit, String> {
 	// Build the Reddit JSON API url
 	let path: String = format!("/r/{}/about.json?raw_json=1", sub);
 
 	// Send a request to the url
-	match json(path).await {
+	match json(path, quarantined).await {
 		// If success, receive JSON in response
 		Ok(res) => {
 			// Metadata regarding the subreddit
@@ -278,7 +320,7 @@ async fn subreddit(sub: &str) -> Result<Subreddit, String> {
 				title: esc!(&res, "title"),
 				description: esc!(&res, "public_description"),
 				info: rewrite_urls(&val(&res, "description_html").replace("\\", "")),
-				moderators: moderators_list(sub).await?,
+				moderators: moderators_list(sub, quarantined).await?,
 				icon: format_url(&icon),
 				members: format_num(members),
 				active: format_num(active),

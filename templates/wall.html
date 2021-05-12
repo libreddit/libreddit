@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}{{ msg }}{% endblock %}
+{% block sortstyle %}{% endblock %}
+{% block content %}
+	<div id="wall">
+		<h1>{{ title }}</h1>
+                <br>
+		<p>{{ msg }}</p>
+                <form action="/r/{{ sub }}?redir={{ url }}" method="POST">
+			<input id="save" type="submit" value="Continue">
+                </form>
+	</div>
+{% endblock %}

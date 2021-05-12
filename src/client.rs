@@ -60,7 +60,7 @@ async fn stream(url: &str, req: &Request<Body>) -> Result<Response<Body>, String
 		.map_err(|e| e.to_string())
 }
 
-fn request(url: String) -> Boxed<Result<Response<Body>, String>> {
+fn request(url: String, quarantine: bool) -> Boxed<Result<Response<Body>, String>> {
 	// Prepare the HTTPS connector.
 	let https = hyper_rustls::HttpsConnector::with_native_roots();
 
@@ -75,7 +75,7 @@ fn request(url: String) -> Boxed<Result<Response<Body>, String>> {
 		.header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8")
 		.header("Accept-Language", "en-US,en;q=0.5")
 		.header("Connection", "keep-alive")
-		.header("Cookie", "_options=%7B%22pref_quarantine_optin%22%3A%20true%7D")
+		.header("Cookie", if quarantine { "_options=%7B%22pref_quarantine_optin%22%3A%20true%7D" } else { "" })
 		.body(Body::empty());
 
 	async move {
@@ -90,6 +90,7 @@ fn request(url: String) -> Boxed<Result<Response<Body>, String>> {
 								.map(|val| val.to_str().unwrap_or_default())
 								.unwrap_or_default()
 								.to_string(),
+							quarantine,
 						)
 						.await
 					} else {
@@ -106,7 +107,7 @@ fn request(url: String) -> Boxed<Result<Response<Body>, String>> {
 
 // Make a request to a Reddit API and parse the JSON response
 #[cached(size = 100, time = 30, result = true)]
-pub async fn json(path: String) -> Result<Value, String> {
+pub async fn json(path: String, quarantine: bool) -> Result<Value, String> {
 	// Build Reddit url from path
 	let url = format!("https://www.reddit.com{}", path);
 
@@ -117,7 +118,7 @@ pub async fn json(path: String) -> Result<Value, String> {
 	};
 
 	// Fetch the url...
-	match request(url.clone()).await {
+	match request(url.clone(), quarantine).await {
 		Ok(response) => {
 			// asynchronously aggregate the chunks of the body
 			match hyper::body::aggregate(response).await {

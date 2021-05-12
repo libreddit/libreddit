@@ -217,12 +217,12 @@ pub struct Post {
 
 impl Post {
 	// Fetch posts of a user or subreddit and return a vector of posts and the "after" value
-	pub async fn fetch(path: &str, fallback_title: String) -> Result<(Vec<Self>, String), String> {
+	pub async fn fetch(path: &str, fallback_title: String, quarantine: bool) -> Result<(Vec<Self>, String), String> {
 		let res;
 		let post_list;
 
 		// Send a request to the url
-		match json(path.to_string()).await {
+		match json(path.to_string(), quarantine).await {
 			// If success, receive JSON in response
 			Ok(response) => {
 				res = response;
@@ -432,7 +432,7 @@ pub fn cookie(req: &Request<Body>, name: &str) -> String {
 // Detect and redirect in the event of a random subreddit
 pub async fn catch_random(sub: &str, additional: &str) -> Result<Response<Body>, String> {
 	if (sub == "random" || sub == "randnsfw") && !sub.contains('+') {
-		let new_sub = json(format!("/r/{}/about.json?raw_json=1", sub)).await?["data"]["display_name"]
+		let new_sub = json(format!("/r/{}/about.json?raw_json=1", sub), false).await?["data"]["display_name"]
 			.as_str()
 			.unwrap_or_default()
 			.to_string();

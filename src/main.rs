@@ -194,7 +194,10 @@ async fn main() {
 	app.at("/settings/update").get(|r| settings::update(r).boxed());
 
 	// Subreddit services
-	app.at("/r/:sub").get(|r| subreddit::community(r).boxed());
+	app
+		.at("/r/:sub")
+		.get(|r| subreddit::community(r).boxed())
+		.post(|r| subreddit::add_quarantine_exception(r).boxed());
 
 	app
 		.at("/r/u_:name")
