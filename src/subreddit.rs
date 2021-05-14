@@ -44,7 +44,6 @@ pub async fn community(req: Request<Body>) -> Result<Response<Body>, String> {
 	let root = req.uri().path() == "/";
 	let subscribed = cookie(&req, "subscriptions");
 	let front_page = cookie(&req, "front_page");
-	let quarantined: bool = cookie(&req, "quarantine_exception").parse().unwrap_or(false) || root;
 	let post_sort = req.cookie("post_sort").map_or_else(|| "hot".to_string(), |c| c.value().to_string());
 	let sort = req.param("sort").unwrap_or_else(|| req.param("id").unwrap_or(post_sort));
 
@@ -57,6 +56,7 @@ pub async fn community(req: Request<Body>) -> Result<Response<Body>, String> {
 	} else {
 		front_page.to_owned()
 	});
+	let quarantined = can_access_quarantine(&req, &sub) || root;
 
 	// Handle random subreddits
 	if let Ok(random) = catch_random(&sub, "").await {
@@ -127,11 +127,13 @@ pub fn quarantine(req: Request<Body>, sub: String) -> Result<Response<Body>, Str
 
 pub async fn add_quarantine_exception(req: Request<Body>) -> Result<Response<Body>, String> {
 	let subreddit = req.uri();
-	let redir = subreddit.to_string().split("?redir=").last().unwrap_or_else(|| subreddit.path()).to_string();
-	let mut res = redirect(redir);
+	let redir: Vec<String> = subreddit.to_string().split("?redir=").into_iter().map(|s| s.to_string()).collect();
+	let subreddit: String = redir.first().ok_or("Invalid URL")?.chars().skip(3).collect();
+	let redir = redir.last().ok_or("Invalid URL")?;
+	let mut res = redirect(redir.to_owned());
 	res.insert_cookie(
-		Cookie::build("quarantine_exception", "true")
-			.path(subreddit.path())
+		Cookie::build(&format!("allow_quaran_{}", subreddit.to_lowercase()), "true")
+			.path("/")
 			.http_only(true)
 			.expires(cookie::Expiration::Session)
 			.finish(),
@@ -139,10 +141,14 @@ pub async fn add_quarantine_exception(req: Request<Body>) -> Result<Response<Bod
 	Ok(res)
 }
 
+pub fn can_access_quarantine(req: &Request<Body>, sub: &str) -> bool {
+	// Determine if the subreddit can be accessed
+	cookie(&req, &format!("allow_quaran_{}", sub.to_lowercase())).parse().unwrap_or(false)
+}
+
 // Sub or unsub by setting subscription cookie using response "Set-Cookie" header
 pub async fn subscriptions(req: Request<Body>) -> Result<Response<Body>, String> {
 	let sub = req.param("sub").unwrap_or_default();
-	let quarantined: bool = cookie(&req, "quarantine_exception").parse().unwrap_or(false);
 	// Handle random subreddits
 	if sub == "random" || sub == "randnsfw" {
 		return Err("Can't subscribe to random subreddit!".to_string());
@@ -154,7 +160,7 @@ pub async fn subscriptions(req: Request<Body>) -> Result<Response<Body>, String>
 	let mut sub_list = Preferences::new(req).subscriptions;
 
 	// Retrieve list of posts for these subreddits to extract display names
-	let display = json(format!("/r/{}/hot.json?raw_json=1", sub), quarantined).await?;
+	let display = json(format!("/r/{}/hot.json?raw_json=1", sub), true).await?;
 	let display_lookup: Vec<(String, &str)> = display["data"]["children"]
 		.as_array()
 		.unwrap()
@@ -175,7 +181,7 @@ pub async fn subscriptions(req: Request<Body>) -> Result<Response<Body>, String>
 		} else {
 			// This subreddit display name isn't known, retrieve it
 			let path: String = format!("/r/{}/about.json?raw_json=1", part);
-			display = json(path, quarantined).await?;
+			display = json(path, true).await?;
 			display["data"]["display_name"].as_str().ok_or_else(|| "Failed to query subreddit name".to_string())?
 		};
 
@@ -220,7 +226,7 @@ pub async fn subscriptions(req: Request<Body>) -> Result<Response<Body>, String>
 
 pub async fn wiki(req: Request<Body>) -> Result<Response<Body>, String> {
 	let sub = req.param("sub").unwrap_or_else(|| "reddit.com".to_string());
-	let quarantined: bool = cookie(&req, "quarantine_exception").parse().unwrap_or(false);
+	let quarantined = can_access_quarantine(&req, &sub);
 	// Handle random subreddits
 	if let Ok(random) = catch_random(&sub, "/wiki").await {
 		return Ok(random);
@@ -236,13 +242,19 @@ pub async fn wiki(req: Request<Body>) -> Result<Response<Body>, String> {
 			page,
 			prefs: Preferences::new(req),
 		}),
-		Err(msg) => error(req, msg).await,
+		Err(msg) => {
+			if msg == "quarantined" {
+				quarantine(req, sub)
+			} else {
+				error(req, msg).await
+			}
+		}
 	}
 }
 
 pub async fn sidebar(req: Request<Body>) -> Result<Response<Body>, String> {
 	let sub = req.param("sub").unwrap_or_else(|| "reddit.com".to_string());
-	let quarantined: bool = cookie(&req, "quarantine_exception").parse().unwrap_or(false);
+	let quarantined = can_access_quarantine(&req, &sub);
 	// Handle random subreddits
 	if let Ok(random) = catch_random(&sub, "/about/sidebar").await {
 		return Ok(random);
@@ -264,7 +276,13 @@ pub async fn sidebar(req: Request<Body>) -> Result<Response<Body>, String> {
 			page: "Sidebar".to_string(),
 			prefs: Preferences::new(req),
 		}),
-		Err(msg) => error(req, msg).await,
+		Err(msg) => {
+			if msg == "quarantined" {
+				quarantine(req, sub)
+			} else {
+				error(req, msg).await
+			}
+		}
 	}
 }
 

@@ -2,7 +2,7 @@
 use crate::client::json;
 use crate::esc;
 use crate::server::RequestExt;
-use crate::subreddit::quarantine;
+use crate::subreddit::{can_access_quarantine, quarantine};
 use crate::utils::{cookie, error, format_num, format_url, param, rewrite_urls, template, time, val, Author, Comment, Flags, Flair, FlairPart, Media, Post, Preferences};
 use hyper::{Body, Request, Response};
 
@@ -24,7 +24,8 @@ struct PostTemplate {
 pub async fn item(req: Request<Body>) -> Result<Response<Body>, String> {
 	// Build Reddit API path
 	let mut path: String = format!("{}.json?{}&raw_json=1", req.uri().path(), req.uri().query().unwrap_or_default());
-	let quarantined: bool = cookie(&req, "quarantine_exception").parse().unwrap_or(false);
+	let sub = req.param("sub").unwrap_or_default();
+	let quarantined = can_access_quarantine(&req, &sub);
 
 	// Set sort to sort query parameter
 	let mut sort: String = param(&path, "sort");

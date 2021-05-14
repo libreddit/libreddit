@@ -1,6 +1,10 @@
 // CRATES
 use crate::utils::{catch_random, cookie, error, format_num, format_url, param, template, val, Post, Preferences};
-use crate::{client::json, subreddit::quarantine, RequestExt};
+use crate::{
+	client::json,
+	subreddit::{can_access_quarantine, quarantine},
+	RequestExt,
+};
 use askama::Template;
 use hyper::{Body, Request, Response};
 
@@ -39,7 +43,7 @@ pub async fn find(req: Request<Body>) -> Result<Response<Body>, String> {
 	let nsfw_results = if cookie(&req, "show_nsfw") == "on" { "&include_over_18=on" } else { "" };
 	let path = format!("{}.json?{}{}", req.uri().path(), req.uri().query().unwrap_or_default(), nsfw_results);
 	let sub = req.param("sub").unwrap_or_default();
-	let quarantined: bool = cookie(&req, "quarantine_exception").parse().unwrap_or(false);
+	let quarantined = can_access_quarantine(&req, &sub);
 	// Handle random subreddits
 	if let Ok(random) = catch_random(&sub, "/find").await {
 		return Ok(random);
