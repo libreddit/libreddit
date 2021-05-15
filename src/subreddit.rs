@@ -114,16 +114,19 @@ pub async fn subscriptions(req: Request<Body>) -> Result<Response<Body>, String>
 	let mut sub_list = Preferences::new(req).subscriptions;
 
 	// Retrieve list of posts for these subreddits to extract display names
-	let display = json(format!("/r/{}/hot.json?raw_json=1", sub)).await?;
-	let display_lookup: Vec<(String, &str)> = display["data"]["children"]
+	let posts = json(format!("/r/{}/hot.json?raw_json=1", sub)).await?;
+	let display_lookup: Vec<(String, &str)> = posts["data"]["children"]
 		.as_array()
-		.unwrap()
-		.iter()
-		.map(|post| {
-			let display_name = post["data"]["subreddit"].as_str().unwrap();
-			(display_name.to_lowercase(), display_name)
+		.map(|list| {
+			list
+				.iter()
+				.map(|post| {
+					let display_name = post["data"]["subreddit"].as_str().unwrap_or_default();
+					(display_name.to_lowercase(), display_name)
+				})
+				.collect::<Vec<_>>()
 		})
-		.collect();
+		.unwrap_or_default();
 
 	// Find each subreddit name (separated by '+') in sub parameter
 	for part in sub.split('+') {
@@ -275,7 +278,7 @@ async fn subreddit(sub: &str) -> Result<Subreddit, String> {
 			let active: i64 = res["data"]["accounts_active"].as_u64().unwrap_or_default() as i64;
 
 			// Fetch subreddit icon either from the community_icon or icon_img value
-			let community_icon: &str = res["data"]["community_icon"].as_str().unwrap();
+			let community_icon: &str = res["data"]["community_icon"].as_str().unwrap_or_default();
 			let icon = if community_icon.is_empty() { val(&res, "icon_img") } else { community_icon.to_string() };
 
 			let sub = Subreddit {
