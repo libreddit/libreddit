@@ -1,5 +1,5 @@
 // CRATES
-use crate::utils::{catch_random, cookie, error, format_num, format_url, param, setting, template, val, Post, Preferences};
+use crate::utils::{catch_random, error, format_num, format_url, param, setting, template, val, Post, Preferences};
 use crate::{
 	client::json,
 	subreddit::{can_access_quarantine, quarantine},

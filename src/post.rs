@@ -3,7 +3,7 @@ use crate::client::json;
 use crate::esc;
 use crate::server::RequestExt;
 use crate::subreddit::{can_access_quarantine, quarantine};
-use crate::utils::{cookie, error, format_num, format_url, param, rewrite_urls, setting, template, time, val, Author, Comment, Flags, Flair, FlairPart, Media, Post, Preferences};
+use crate::utils::{error, format_num, format_url, param, rewrite_urls, setting, template, time, val, Author, Comment, Flags, Flair, FlairPart, Media, Post, Preferences};
 
 use hyper::{Body, Request, Response};
 

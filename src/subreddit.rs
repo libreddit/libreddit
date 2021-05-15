@@ -127,7 +127,7 @@ pub fn quarantine(req: Request<Body>, sub: String) -> Result<Response<Body>, Str
 
 pub async fn add_quarantine_exception(req: Request<Body>) -> Result<Response<Body>, String> {
 	let subreddit = req.uri();
-	let redir: Vec<String> = subreddit.to_string().split("?redir=").into_iter().map(|s| s.to_string()).collect();
+	let redir: Vec<String> = subreddit.to_string().split("?redir=").into_iter().map(std::string::ToString::to_string).collect();
 	let subreddit: String = redir.first().ok_or("Invalid URL")?.chars().skip(3).collect();
 	let redir = redir.last().ok_or("Invalid URL")?;
 	let mut res = redirect(redir.to_owned());
@@ -143,7 +143,7 @@ pub async fn add_quarantine_exception(req: Request<Body>) -> Result<Response<Bod
 
 pub fn can_access_quarantine(req: &Request<Body>, sub: &str) -> bool {
 	// Determine if the subreddit can be accessed
-	cookie(&req, &format!("allow_quaran_{}", sub.to_lowercase())).parse().unwrap_or(false)
+	setting(&req, &format!("allow_quaran_{}", sub.to_lowercase())).parse().unwrap_or(false)
 }
 
 // Sub or unsub by setting subscription cookie using response "Set-Cookie" header
