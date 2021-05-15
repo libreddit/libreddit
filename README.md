@@ -194,6 +194,32 @@ Once installed, deploy Libreddit to `0.0.0.0:8080` by running:
 libreddit
 ```
 
+## Change Default Settings
+
+Assign a default value for each setting by passing environment variables to Libreddit in the format `LIBREDDIT_DEFAULT_{X}`. Replace `{X}` with the setting name (see list below) in capital letters.
+
+| Name                  | Possible values                                                                        | Default value |
+|-----------------------|----------------------------------------------------------------------------------------|---------------|
+| theme                 | ["system", "light", "dark", "black", "dracula", "nord", "laserwave", "violet", "gold"] | system        |
+| front_page            | ["default", "popular", "all"]                                                          | default       |
+| layout                | ["card", "clean", "compact"]                                                           | card          |
+| wide                  | ["on", "off"]                                                                          | off           |
+| comment_sort          | ["hot", "new", "top", "rising", "controversial"]                                       | hot           |
+| post_sort             | ["confidence", "top", "new", "controversial", "old"]                                   | confidence    |
+| show_nsfw             | ["on", "off"]                                                                          | off           |
+| use_hls               | ["on", "off"]                                                                          | off           |
+| hide_hls_notification | ["on", "off"]                                                                          | off           |
+
+### Examples
+
+```bash
+LIBREDDIT_DEFAULT_SHOW_NSFW=on libreddit
+```
+
+```bash
+LIBREDDIT_DEFAULT_WIDE=on LIBREDDIT_DEFAULT_THEME=dark libreddit -r
+```
+
 ## Proxying using NGINX
 
 **NOTE** If you're [proxying Libreddit through a NGINX Reverse Proxy](https://github.com/spikecodes/libreddit/issues/122#issuecomment-782226853), add

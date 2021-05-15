@@ -397,16 +397,16 @@ impl Preferences {
 	// Build preferences from cookies
 	pub fn new(req: Request<Body>) -> Self {
 		Self {
-			theme: cookie(&req, "theme"),
-			front_page: cookie(&req, "front_page"),
-			layout: cookie(&req, "layout"),
-			wide: cookie(&req, "wide"),
-			show_nsfw: cookie(&req, "show_nsfw"),
-			use_hls: cookie(&req, "use_hls"),
-			hide_hls_notification: cookie(&req, "hide_hls_notification"),
-			comment_sort: cookie(&req, "comment_sort"),
-			post_sort: cookie(&req, "post_sort"),
-			subscriptions: cookie(&req, "subscriptions").split('+').map(String::from).filter(|s| !s.is_empty()).collect(),
+			theme: setting(&req, "theme"),
+			front_page: setting(&req, "front_page"),
+			layout: setting(&req, "layout"),
+			wide: setting(&req, "wide"),
+			show_nsfw: setting(&req, "show_nsfw"),
+			use_hls: setting(&req, "use_hls"),
+			hide_hls_notification: setting(&req, "hide_hls_notification"),
+			comment_sort: setting(&req, "comment_sort"),
+			post_sort: setting(&req, "post_sort"),
+			subscriptions: setting(&req, "subscriptions").split('+').map(String::from).filter(|s| !s.is_empty()).collect(),
 		}
 	}
 }
@@ -423,10 +423,21 @@ pub fn param(path: &str, value: &str) -> String {
 	}
 }
 
-// Parse a cookie value from request
-pub fn cookie(req: &Request<Body>, name: &str) -> String {
-	let cookie = req.cookie(name).unwrap_or_else(|| Cookie::named(name));
-	cookie.value().to_string()
+// Retrieve the value of a setting by name
+pub fn setting(req: &Request<Body>, name: &str) -> String {
+	// Parse a cookie value from request
+	req
+		.cookie(name)
+		.unwrap_or_else(|| {
+			// If there is no cookie for this setting, try receiving a default from an environment variable
+			if let Ok(default) = std::env::var(format!("LIBREDDIT_DEFAULT_{}", name.to_uppercase())) {
+				Cookie::new(name, default)
+			} else {
+				Cookie::named(name)
+			}
+		})
+		.value()
+		.to_string()
 }
 
 // Detect and redirect in the event of a random subreddit
@@ -436,9 +447,9 @@ pub async fn catch_random(sub: &str, additional: &str) -> Result<Response<Body>,
 			.as_str()
 			.unwrap_or_default()
 			.to_string();
-		return Ok(redirect(format!("/r/{}{}", new_sub, additional)));
+		Ok(redirect(format!("/r/{}{}", new_sub, additional)))
 	} else {
-		return Err("No redirect needed".to_string());
+		Err("No redirect needed".to_string())
 	}
 }
 

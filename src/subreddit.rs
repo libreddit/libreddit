@@ -1,6 +1,6 @@
 // CRATES
 use crate::esc;
-use crate::utils::{catch_random, cookie, error, format_num, format_url, param, redirect, rewrite_urls, template, val, Post, Preferences, Subreddit};
+use crate::utils::{catch_random, error, format_num, format_url, param, redirect, rewrite_urls, setting, template, val, Post, Preferences, Subreddit};
 use crate::{client::json, server::ResponseExt, RequestExt};
 use askama::Template;
 use cookie::Cookie;
@@ -42,8 +42,8 @@ struct WallTemplate {
 pub async fn community(req: Request<Body>) -> Result<Response<Body>, String> {
 	// Build Reddit API path
 	let root = req.uri().path() == "/";
-	let subscribed = cookie(&req, "subscriptions");
-	let front_page = cookie(&req, "front_page");
+	let subscribed = setting(&req, "subscriptions");
+	let front_page = setting(&req, "front_page");
 	let post_sort = req.cookie("post_sort").map_or_else(|| "hot".to_string(), |c| c.value().to_string());
 	let sort = req.param("sort").unwrap_or_else(|| req.param("id").unwrap_or(post_sort));
 
@@ -303,17 +303,22 @@ async fn moderators_list(sub: &str, quarantined: bool) -> Result<Vec<String>, St
 
 	// Retrieve response
 	let response = json(path, quarantined).await?["data"]["children"].clone();
-	Ok(if let Some(response) = response.as_array() {
+	Ok(
 		// Traverse json tree and format into list of strings
 		response
+			.as_array()
+			.unwrap_or(&Vec::new())
 			.iter()
-			.map(|m| m["name"].as_str().unwrap_or(""))
-			.filter(|m| !m.is_empty())
-			.map(std::string::ToString::to_string)
-			.collect::<Vec<_>>()
-	} else {
-		vec![]
-	})
+			.filter_map(|moderator| {
+				let name = moderator["name"].as_str().unwrap_or_default();
+				if name.is_empty() {
+					None
+				} else {
+					Some(name.to_string())
+				}
+			})
+			.collect::<Vec<_>>(),
+	)
 }
 
 // SUBREDDIT
