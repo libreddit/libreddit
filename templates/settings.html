@@ -33,6 +33,7 @@
 			</div>
 			<div id="wide">
 				<label for="wide">Wide UI:</label>
+				<input type="hidden" value="off" name="wide">
 				<input type="checkbox" name="wide" {% if prefs.wide == "on" %}checked{% endif %}>
 			</div>
 			<p>Content</p>
@@ -50,14 +51,17 @@
 			</div>
 			<div id="show_nsfw">
 				<label for="show_nsfw">Show NSFW posts:</label>
+				<input type="hidden" value="off" name="show_nsfw">
 				<input type="checkbox" name="show_nsfw" {% if prefs.show_nsfw == "on" %}checked{% endif %}>
 			</div>
 			<div id="use_hls">
 				<label for="use_hls">Use HLS for videos</label>
+				<input type="hidden" value="off" name="use_hls">
 				<input type="checkbox" name="use_hls" {% if prefs.use_hls == "on" %}checked{% endif %}>
 			</div>
 			<div id="hide_hls_notification">
 				<label for="hide_hls_notification">Hide notification about possible HLS usage</label>
+				<input type="hidden" value="off" name="hide_hls_notification">
 				<input type="checkbox" name="hide_hls_notification" {% if prefs.hide_hls_notification == "on" %}checked{% endif %}>
 			</div>
 			<input id="save" type="submit" value="Save">
