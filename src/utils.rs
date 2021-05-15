@@ -528,7 +528,7 @@ pub fn rewrite_urls(input_text: &str) -> String {
 	match Regex::new(r"https://external-preview\.redd\.it(.*)[^?]") {
 		Ok(re) => {
 			if re.is_match(&text1) {
-				re.replace_all(&text1, format_url(re.find(&text1).unwrap().as_str())).to_string()
+				re.replace_all(&text1, format_url(re.find(&text1).map(|x| x.as_str()).unwrap_or_default())).to_string()
 			} else {
 				text1
 			}
