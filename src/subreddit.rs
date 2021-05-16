@@ -97,8 +97,8 @@ pub async fn community(req: Request<Body>) -> Result<Response<Body>, String> {
 			template(SubredditTemplate {
 				sub,
 				posts,
-				sort: (sort, param(&path, "t")),
-				ends: (param(&path, "after"), after),
+				sort: (sort, param(&path, "t").unwrap_or_default()),
+				ends: (param(&path, "after").unwrap_or_default(), after),
 				prefs: Preferences::new(req),
 				url,
 			})
@@ -113,23 +113,26 @@ pub async fn community(req: Request<Body>) -> Result<Response<Body>, String> {
 }
 
 pub fn quarantine(req: Request<Body>, sub: String) -> Result<Response<Body>, String> {
-	let body = WallTemplate {
+	let wall = WallTemplate {
 		title: format!("r/{} is quarantined", sub),
 		msg: "Please click the button below to continue to this subreddit.".to_string(),
 		url: req.uri().to_string(),
 		sub,
 		prefs: Preferences::new(req),
-	}
-	.render()
-	.unwrap_or_default();
-	Ok(Response::builder().status(403).header("content-type", "text/html").body(body.into()).unwrap_or_default())
+	};
+
+	Ok(
+		Response::builder()
+			.status(403)
+			.header("content-type", "text/html")
+			.body(wall.render().unwrap_or_default().into())
+			.unwrap_or_default(),
+	)
 }
 
 pub async fn add_quarantine_exception(req: Request<Body>) -> Result<Response<Body>, String> {
-	let subreddit = req.uri();
-	let redir: Vec<String> = subreddit.to_string().split("?redir=").into_iter().map(std::string::ToString::to_string).collect();
-	let subreddit: String = redir.first().ok_or("Invalid URL")?.chars().skip(3).collect();
-	let redir = redir.last().ok_or("Invalid URL")?;
+	let subreddit = req.param("sub").ok_or("Invalid URL")?;
+	let redir = param(&format!("?{}", req.uri().query().unwrap_or_default()), "redir").ok_or("Invalid URL")?;
 	let mut res = redirect(redir.to_owned());
 	res.insert_cookie(
 		Cookie::build(&format!("allow_quaran_{}", subreddit.to_lowercase()), "true")
@@ -143,7 +146,7 @@ pub async fn add_quarantine_exception(req: Request<Body>) -> Result<Response<Bod
 
 pub fn can_access_quarantine(req: &Request<Body>, sub: &str) -> bool {
 	// Determine if the subreddit can be accessed
-	setting(&req, &format!("allow_quaran_{}", sub.to_lowercase())).parse().unwrap_or(false)
+	setting(&req, &format!("allow_quaran_{}", sub.to_lowercase())).parse().unwrap_or_default()
 }
 
 // Sub or unsub by setting subscription cookie using response "Set-Cookie" header
@@ -202,11 +205,9 @@ pub async fn subscriptions(req: Request<Body>) -> Result<Response<Body>, String>
 
 	// Redirect back to subreddit
 	// check for redirect parameter if unsubscribing from outside sidebar
-	let redirect_path = param(&format!("/?{}", query), "redirect");
-	let path = if redirect_path.is_empty() {
-		format!("/r/{}", sub)
-	} else {
-		format!("/{}/", redirect_path)
+	let path = match param(&format!("?{}", query), "redirect") {
+		Some(redirect_path) => format!("/{}/", redirect_path),
+		None => format!("/r/{}", sub)
 	};
 
 	let mut res = redirect(path);

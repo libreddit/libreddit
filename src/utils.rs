@@ -416,11 +416,16 @@ impl Preferences {
 //
 
 // Grab a query parameter from a url
-pub fn param(path: &str, value: &str) -> String {
-	match Url::parse(format!("https://libredd.it/{}", path).as_str()) {
-		Ok(url) => url.query_pairs().into_owned().collect::<HashMap<_, _>>().get(value).unwrap_or(&String::new()).to_owned(),
-		_ => String::new(),
-	}
+pub fn param(path: &str, value: &str) -> Option<String> {
+	Some(
+		Url::parse(format!("https://libredd.it/{}", path).as_str())
+			.ok()?
+			.query_pairs()
+			.into_owned()
+			.collect::<HashMap<_, _>>()
+			.get(value)?
+			.to_owned(),
+	)
 }
 
 // Retrieve the value of a setting by name

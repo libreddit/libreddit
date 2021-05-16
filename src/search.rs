@@ -48,18 +48,13 @@ pub async fn find(req: Request<Body>) -> Result<Response<Body>, String> {
 	if let Ok(random) = catch_random(&sub, "/find").await {
 		return Ok(random);
 	}
-	let query = param(&path, "q");
+	let query = param(&path, "q").unwrap_or_default();
 
-	let sort = if param(&path, "sort").is_empty() {
-		"relevance".to_string()
-	} else {
-		param(&path, "sort")
-	};
+	let sort = param(&path, "sort").unwrap_or("relevance".to_string());
 
-	let subreddits = if param(&path, "restrict_sr").is_empty() {
-		search_subreddits(&query).await
-	} else {
-		Vec::new()
+	let subreddits = match param(&path, "restrict_sr") {
+		None => search_subreddits(&query).await,
+		Some(_) => Vec::new()
 	};
 
 	let url = String::from(req.uri().path_and_query().map_or("", |val| val.as_str()));
@@ -72,10 +67,10 @@ pub async fn find(req: Request<Body>) -> Result<Response<Body>, String> {
 			params: SearchParams {
 				q: query.replace('"', "&quot;"),
 				sort,
-				t: param(&path, "t"),
-				before: param(&path, "after"),
+				t: param(&path, "t").unwrap_or_default(),
+				before: param(&path, "after").unwrap_or_default(),
 				after,
-				restrict_sr: param(&path, "restrict_sr"),
+				restrict_sr: param(&path, "restrict_sr").unwrap_or_default(),
 			},
 			prefs: Preferences::new(req),
 			url,

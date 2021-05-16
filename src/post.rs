@@ -29,16 +29,18 @@ pub async fn item(req: Request<Body>) -> Result<Response<Body>, String> {
 	let quarantined = can_access_quarantine(&req, &sub);
 
 	// Set sort to sort query parameter
-	let mut sort: String = param(&path, "sort");
+	let sort = param(&path, "sort").unwrap_or_else(|| {
+		// Grab default comment sort method from Cookies
+		let default_sort = setting(&req, "comment_sort");
 
-	// Grab default comment sort method from Cookies
-	let default_sort = setting(&req, "comment_sort");
-
-	// If there's no sort query but there's a default sort, set sort to default_sort
-	if sort.is_empty() && !default_sort.is_empty() {
-		sort = default_sort;
-		path = format!("{}.json?{}&sort={}&raw_json=1", req.uri().path(), req.uri().query().unwrap_or_default(), sort);
-	}
+		// If there's no sort query but there's a default sort, set sort to default_sort
+		if !default_sort.is_empty() {
+			path = format!("{}.json?{}&sort={}&raw_json=1", req.uri().path(), req.uri().query().unwrap_or_default(), default_sort);
+			default_sort
+		} else {
+			String::new()
+		}
+	});
 
 	// Log the post ID being fetched in debug mode
 	#[cfg(debug_assertions)]
