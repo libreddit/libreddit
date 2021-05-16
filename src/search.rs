@@ -50,11 +50,11 @@ pub async fn find(req: Request<Body>) -> Result<Response<Body>, String> {
 	}
 	let query = param(&path, "q").unwrap_or_default();
 
-	let sort = param(&path, "sort").unwrap_or("relevance".to_string());
+	let sort = param(&path, "sort").unwrap_or_else(|| "relevance".to_string());
 
 	let subreddits = match param(&path, "restrict_sr") {
 		None => search_subreddits(&query).await,
-		Some(_) => Vec::new()
+		Some(_) => Vec::new(),
 	};
 
 	let url = String::from(req.uri().path_and_query().map_or("", |val| val.as_str()));

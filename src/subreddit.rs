@@ -133,7 +133,7 @@ pub fn quarantine(req: Request<Body>, sub: String) -> Result<Response<Body>, Str
 pub async fn add_quarantine_exception(req: Request<Body>) -> Result<Response<Body>, String> {
 	let subreddit = req.param("sub").ok_or("Invalid URL")?;
 	let redir = param(&format!("?{}", req.uri().query().unwrap_or_default()), "redir").ok_or("Invalid URL")?;
-	let mut res = redirect(redir.to_owned());
+	let mut res = redirect(redir);
 	res.insert_cookie(
 		Cookie::build(&format!("allow_quaran_{}", subreddit.to_lowercase()), "true")
 			.path("/")
@@ -205,9 +205,10 @@ pub async fn subscriptions(req: Request<Body>) -> Result<Response<Body>, String>
 
 	// Redirect back to subreddit
 	// check for redirect parameter if unsubscribing from outside sidebar
-	let path = match param(&format!("?{}", query), "redirect") {
-		Some(redirect_path) => format!("/{}/", redirect_path),
-		None => format!("/r/{}", sub)
+	let path = if let Some(redirect_path) = param(&format!("?{}", query), "redirect") {
+		format!("/{}/", redirect_path)
+	} else {
+		format!("/r/{}", sub)
 	};
 
 	let mut res = redirect(path);

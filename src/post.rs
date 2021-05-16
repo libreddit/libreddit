@@ -34,11 +34,11 @@ pub async fn item(req: Request<Body>) -> Result<Response<Body>, String> {
 		let default_sort = setting(&req, "comment_sort");
 
 		// If there's no sort query but there's a default sort, set sort to default_sort
-		if !default_sort.is_empty() {
+		if default_sort.is_empty() {
+			String::new()
+		} else {
 			path = format!("{}.json?{}&sort={}&raw_json=1", req.uri().path(), req.uri().query().unwrap_or_default(), default_sort);
 			default_sort
-		} else {
-			String::new()
 		}
 	});
 
