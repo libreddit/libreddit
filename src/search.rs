@@ -1,6 +1,10 @@
 // CRATES
 use crate::utils::{catch_random, error, format_num, format_url, param, setting, template, val, Post, Preferences};
-use crate::{client::json, RequestExt};
+use crate::{
+	client::json,
+	subreddit::{can_access_quarantine, quarantine},
+	RequestExt,
+};
 use askama::Template;
 use hyper::{Body, Request, Response};
 
@@ -39,27 +43,23 @@ pub async fn find(req: Request<Body>) -> Result<Response<Body>, String> {
 	let nsfw_results = if setting(&req, "show_nsfw") == "on" { "&include_over_18=on" } else { "" };
 	let path = format!("{}.json?{}{}", req.uri().path(), req.uri().query().unwrap_or_default(), nsfw_results);
 	let sub = req.param("sub").unwrap_or_default();
+	let quarantined = can_access_quarantine(&req, &sub);
 	// Handle random subreddits
 	if let Ok(random) = catch_random(&sub, "/find").await {
 		return Ok(random);
 	}
-	let query = param(&path, "q");
+	let query = param(&path, "q").unwrap_or_default();
 
-	let sort = if param(&path, "sort").is_empty() {
-		"relevance".to_string()
-	} else {
-		param(&path, "sort")
-	};
+	let sort = param(&path, "sort").unwrap_or("relevance".to_string());
 
-	let subreddits = if param(&path, "restrict_sr").is_empty() {
-		search_subreddits(&query).await
-	} else {
-		Vec::new()
+	let subreddits = match param(&path, "restrict_sr") {
+		None => search_subreddits(&query).await,
+		Some(_) => Vec::new()
 	};
 
 	let url = String::from(req.uri().path_and_query().map_or("", |val| val.as_str()));
 
-	match Post::fetch(&path, String::new()).await {
+	match Post::fetch(&path, String::new(), quarantined).await {
 		Ok((posts, after)) => template(SearchTemplate {
 			posts,
 			subreddits,
@@ -67,15 +67,22 @@ pub async fn find(req: Request<Body>) -> Result<Response<Body>, String> {
 			params: SearchParams {
 				q: query.replace('"', "&quot;"),
 				sort,
-				t: param(&path, "t"),
-				before: param(&path, "after"),
+				t: param(&path, "t").unwrap_or_default(),
+				before: param(&path, "after").unwrap_or_default(),
 				after,
-				restrict_sr: param(&path, "restrict_sr"),
+				restrict_sr: param(&path, "restrict_sr").unwrap_or_default(),
 			},
 			prefs: Preferences::new(req),
 			url,
 		}),
-		Err(msg) => error(req, msg).await,
+		Err(msg) => {
+			if msg == "quarantined" {
+				let sub = req.param("sub").unwrap_or_default();
+				quarantine(req, sub)
+			} else {
+				error(req, msg).await
+			}
+		}
 	}
 }
 
@@ -83,7 +90,7 @@ async fn search_subreddits(q: &str) -> Vec<Subreddit> {
 	let subreddit_search_path = format!("/subreddits/search.json?q={}&limit=3", q.replace(' ', "+"));
 
 	// Send a request to the url
-	match json(subreddit_search_path).await {
+	match json(subreddit_search_path, false).await {
 		// If success, receive JSON in response
 		Ok(response) => {
 			match response["data"]["children"].as_array() {

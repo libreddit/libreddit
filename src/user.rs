@@ -29,11 +29,11 @@ pub async fn profile(req: Request<Body>) -> Result<Response<Body>, String> {
 	);
 
 	// Retrieve other variables from Libreddit request
-	let sort = param(&path, "sort");
+	let sort = param(&path, "sort").unwrap_or_default();
 	let username = req.param("name").unwrap_or_default();
 
 	// Request user posts/comments from Reddit
-	let posts = Post::fetch(&path, "Comment".to_string()).await;
+	let posts = Post::fetch(&path, "Comment".to_string(), false).await;
 	let url = String::from(req.uri().path_and_query().map_or("", |val| val.as_str()));
 
 	match posts {
@@ -44,8 +44,8 @@ pub async fn profile(req: Request<Body>) -> Result<Response<Body>, String> {
 			template(UserTemplate {
 				user,
 				posts,
-				sort: (sort, param(&path, "t")),
-				ends: (param(&path, "after"), after),
+				sort: (sort, param(&path, "t").unwrap_or_default()),
+				ends: (param(&path, "after").unwrap_or_default(), after),
 				prefs: Preferences::new(req),
 				url,
 			})
@@ -61,7 +61,7 @@ async fn user(name: &str) -> Result<User, String> {
 	let path: String = format!("/user/{}/about.json?raw_json=1", name);
 
 	// Send a request to the url
-	match json(path).await {
+	match json(path, false).await {
 		// If success, receive JSON in response
 		Ok(res) => {
 			// Grab creation date as unix timestamp

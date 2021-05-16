@@ -2,7 +2,9 @@
 use crate::client::json;
 use crate::esc;
 use crate::server::RequestExt;
+use crate::subreddit::{can_access_quarantine, quarantine};
 use crate::utils::{error, format_num, format_url, param, rewrite_urls, setting, template, time, val, Author, Comment, Flags, Flair, FlairPart, Media, Post, Preferences};
+
 use hyper::{Body, Request, Response};
 
 use async_recursion::async_recursion;
@@ -23,18 +25,22 @@ struct PostTemplate {
 pub async fn item(req: Request<Body>) -> Result<Response<Body>, String> {
 	// Build Reddit API path
 	let mut path: String = format!("{}.json?{}&raw_json=1", req.uri().path(), req.uri().query().unwrap_or_default());
+	let sub = req.param("sub").unwrap_or_default();
+	let quarantined = can_access_quarantine(&req, &sub);
 
 	// Set sort to sort query parameter
-	let mut sort: String = param(&path, "sort");
+	let sort = param(&path, "sort").unwrap_or_else(|| {
+		// Grab default comment sort method from Cookies
+		let default_sort = setting(&req, "comment_sort");
 
-	// Grab default comment sort method from Cookies
-	let default_sort = setting(&req, "comment_sort");
-
-	// If there's no sort query but there's a default sort, set sort to default_sort
-	if sort.is_empty() && !default_sort.is_empty() {
-		sort = default_sort;
-		path = format!("{}.json?{}&sort={}&raw_json=1", req.uri().path(), req.uri().query().unwrap_or_default(), sort);
-	}
+		// If there's no sort query but there's a default sort, set sort to default_sort
+		if !default_sort.is_empty() {
+			path = format!("{}.json?{}&sort={}&raw_json=1", req.uri().path(), req.uri().query().unwrap_or_default(), default_sort);
+			default_sort
+		} else {
+			String::new()
+		}
+	});
 
 	// Log the post ID being fetched in debug mode
 	#[cfg(debug_assertions)]
@@ -44,7 +50,7 @@ pub async fn item(req: Request<Body>) -> Result<Response<Body>, String> {
 	let highlighted_comment = &req.param("comment_id").unwrap_or_default();
 
 	// Send a request to the url, receive JSON in response
-	match json(path).await {
+	match json(path, quarantined).await {
 		// Otherwise, grab the JSON output from the request
 		Ok(res) => {
 			// Parse the JSON into Post and Comment structs
@@ -61,7 +67,14 @@ pub async fn item(req: Request<Body>) -> Result<Response<Body>, String> {
 			})
 		}
 		// If the Reddit API returns an error, exit and send error page to user
-		Err(msg) => error(req, msg).await,
+		Err(msg) => {
+			if msg == "quarantined" {
+				let sub = req.param("sub").unwrap_or_default();
+				quarantine(req, sub)
+			} else {
+				error(req, msg).await
+			}
+		}
 	}
 }
 
