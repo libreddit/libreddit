@@ -57,7 +57,7 @@
 
 {% macro render_hls_notification(redirect_url) -%}
 {% if post.post_type == "video" && !post.media.alt_url.is_empty() && prefs.hide_hls_notification != "on" %}
-<div class="post_notification"><p><a href="/settings/update/?use_hls=on&redirect={{ redirect_url }}">Enable HSL</a> to view with audio, or <a href="/settings/update/?hide_hls_notification=on&redirect={{ redirect_url }}">disable this notification</a></p></div>
+<div class="post_notification"><p><a href="/settings/update/?use_hls=on&redirect={{ redirect_url }}">Enable HLS</a> to view with audio, or <a href="/settings/update/?hide_hls_notification=on&redirect={{ redirect_url }}">disable this notification</a></p></div>
 {% endif %}
 {%- endmacro %}
 
