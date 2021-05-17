@@ -7,16 +7,16 @@ use std::{result::Result, str::FromStr};
 use crate::server::RequestExt;
 
 pub async fn proxy(req: Request<Body>, format: &str) -> Result<Response<Body>, String> {
-	let mut url = format.to_string();
+	let mut url = format!("{}?{}", format, req.uri().query().unwrap_or_default());
 
 	for (name, value) in req.params().iter() {
 		url = url.replace(&format!("{{{}}}", name), value);
 	}
 
-	stream(&url).await
+	stream(&url, &req).await
 }
 
-async fn stream(url: &str) -> Result<Response<Body>, String> {
+async fn stream(url: &str, req: &Request<Body>) -> Result<Response<Body>, String> {
 	// First parameter is target URL (mandatory).
 	let url = Uri::from_str(url).map_err(|_| "Couldn't parse URL".to_string())?;
 
@@ -26,8 +26,20 @@ async fn stream(url: &str) -> Result<Response<Body>, String> {
 	// Build the hyper client from the HTTPS connector.
 	let client: client::Client<_, hyper::Body> = client::Client::builder().build(https);
 
+	let mut builder = Request::get(url);
+
+	// Copy useful headers from original request
+	let headers = req.headers();
+	for &key in &["Range", "If-Modified-Since", "Cache-Control"] {
+		if let Some(value) = headers.get(key) {
+			builder = builder.header(key, value);
+		}
+	}
+
+	let stream_request = builder.body(Body::default()).expect("stream");
+
 	client
-		.get(url)
+		.request(stream_request)
 		.await
 		.map(|mut res| {
 			let mut rm = |key: &str| res.headers_mut().remove(key);
@@ -40,13 +52,15 @@ async fn stream(url: &str) -> Result<Response<Body>, String> {
 			rm("x-cdn-client-region");
 			rm("x-cdn-name");
 			rm("x-cdn-server-region");
+			rm("x-reddit-cdn");
+			rm("x-reddit-video-features");
 
 			res
 		})
 		.map_err(|e| e.to_string())
 }
 
-fn request(url: String) -> Boxed<Result<Response<Body>, String>> {
+fn request(url: String, quarantine: bool) -> Boxed<Result<Response<Body>, String>> {
 	// Prepare the HTTPS connector.
 	let https = hyper_rustls::HttpsConnector::with_native_roots();
 
@@ -61,6 +75,7 @@ fn request(url: String) -> Boxed<Result<Response<Body>, String>> {
 		.header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8")
 		.header("Accept-Language", "en-US,en;q=0.5")
 		.header("Connection", "keep-alive")
+		.header("Cookie", if quarantine { "_options=%7B%22pref_quarantine_optin%22%3A%20true%7D" } else { "" })
 		.body(Body::empty());
 
 	async move {
@@ -75,6 +90,7 @@ fn request(url: String) -> Boxed<Result<Response<Body>, String>> {
 								.map(|val| val.to_str().unwrap_or_default())
 								.unwrap_or_default()
 								.to_string(),
+							quarantine,
 						)
 						.await
 					} else {
@@ -91,7 +107,7 @@ fn request(url: String) -> Boxed<Result<Response<Body>, String>> {
 
 // Make a request to a Reddit API and parse the JSON response
 #[cached(size = 100, time = 30, result = true)]
-pub async fn json(path: String) -> Result<Value, String> {
+pub async fn json(path: String, quarantine: bool) -> Result<Value, String> {
 	// Build Reddit url from path
 	let url = format!("https://www.reddit.com{}", path);
 
@@ -102,7 +118,7 @@ pub async fn json(path: String) -> Result<Value, String> {
 	};
 
 	// Fetch the url...
-	match request(url.clone()).await {
+	match request(url.clone(), quarantine).await {
 		Ok(response) => {
 			// asynchronously aggregate the chunks of the body
 			match hyper::body::aggregate(response).await {
@@ -134,6 +150,6 @@ pub async fn json(path: String) -> Result<Value, String> {
 				Err(e) => err("Failed receiving body from Reddit", e.to_string()),
 			}
 		}
-		Err(e) => err("Couldn't send request to Reddit", e.to_string()),
+		Err(e) => err("Couldn't send request to Reddit", e),
 	}
 }

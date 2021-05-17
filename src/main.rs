@@ -6,7 +6,8 @@
 	clippy::match_wildcard_for_single_variants,
 	clippy::cast_possible_truncation,
 	clippy::similar_names,
-	clippy::cast_possible_wrap
+	clippy::cast_possible_wrap,
+	clippy::find_map
 )]
 
 // Reference local files
@@ -138,7 +139,7 @@ async fn main() {
 		"Referrer-Policy" => "no-referrer",
 		"X-Content-Type-Options" => "nosniff",
 		"X-Frame-Options" => "DENY",
-		"Content-Security-Policy" => "default-src 'none'; manifest-src 'self'; media-src 'self'; style-src 'self' 'unsafe-inline'; base-uri 'none'; img-src 'self' data:; form-action 'self'; frame-ancestors 'none';"
+		"Content-Security-Policy" => "default-src 'none'; script-src 'self' blob:; manifest-src 'self'; media-src 'self' data: blob: about:; style-src 'self' 'unsafe-inline'; base-uri 'none'; img-src 'self' data:; form-action 'self'; frame-ancestors 'none'; connect-src 'self'; worker-src blob:;"
 	};
 
 	if let Some(expire_time) = hsts {
@@ -157,13 +158,20 @@ async fn main() {
 	app.at("/logo.png").get(|_| pwa_logo().boxed());
 	app.at("/touch-icon-iphone.png").get(|_| iphone_logo().boxed());
 	app.at("/apple-touch-icon.png").get(|_| iphone_logo().boxed());
+	app
+		.at("/playHLSVideo.js")
+		.get(|_| resource(include_str!("../static/playHLSVideo.js"), "text/javascript", false).boxed());
+	app
+		.at("/hls.min.js")
+		.get(|_| resource(include_str!("../static/hls.min.js"), "text/javascript", false).boxed());
 
 	// Proxy media through Libreddit
 	app.at("/vid/:id/:size").get(|r| proxy(r, "https://v.redd.it/{id}/DASH_{size}").boxed());
-	app.at("/img/*path").get(|r| proxy(r, "https://i.redd.it/{path}").boxed());
+	app.at("/hls/:id/*path").get(|r| proxy(r, "https://v.redd.it/{id}/{path}").boxed());
+	app.at("/img/:id").get(|r| proxy(r, "https://i.redd.it/{id}").boxed());
 	app.at("/thumb/:point/:id").get(|r| proxy(r, "https://{point}.thumbs.redditmedia.com/{id}").boxed());
 	app.at("/emoji/:id/:name").get(|r| proxy(r, "https://emoji.redditmedia.com/{id}/{name}").boxed());
-	app.at("/preview/:loc/:id/:query").get(|r| proxy(r, "https://{loc}view.redd.it/{id}?{query}").boxed());
+	app.at("/preview/:loc/:id").get(|r| proxy(r, "https://{loc}view.redd.it/{id}").boxed());
 	app.at("/style/*path").get(|r| proxy(r, "https://styles.redditmedia.com/{path}").boxed());
 	app.at("/static/*path").get(|r| proxy(r, "https://www.redditstatic.com/{path}").boxed());
 
@@ -183,9 +191,13 @@ async fn main() {
 	// Configure settings
 	app.at("/settings").get(|r| settings::get(r).boxed()).post(|r| settings::set(r).boxed());
 	app.at("/settings/restore").get(|r| settings::restore(r).boxed());
+	app.at("/settings/update").get(|r| settings::update(r).boxed());
 
 	// Subreddit services
-	app.at("/r/:sub").get(|r| subreddit::community(r).boxed());
+	app
+		.at("/r/:sub")
+		.get(|r| subreddit::community(r).boxed())
+		.post(|r| subreddit::add_quarantine_exception(r).boxed());
 
 	app
 		.at("/r/u_:name")
@@ -204,10 +216,10 @@ async fn main() {
 		.at("/r/:sub/w")
 		.get(|r| async move { Ok(redirect(format!("/r/{}/wiki", r.param("sub").unwrap_or_default()))) }.boxed());
 	app
-		.at("/r/:sub/w/:page")
+		.at("/r/:sub/w/*page")
 		.get(|r| async move { Ok(redirect(format!("/r/{}/wiki/{}", r.param("sub").unwrap_or_default(), r.param("wiki").unwrap_or_default()))) }.boxed());
 	app.at("/r/:sub/wiki").get(|r| subreddit::wiki(r).boxed());
-	app.at("/r/:sub/wiki/:page").get(|r| subreddit::wiki(r).boxed());
+	app.at("/r/:sub/wiki/*page").get(|r| subreddit::wiki(r).boxed());
 
 	app.at("/r/:sub/about/sidebar").get(|r| subreddit::sidebar(r).boxed());
 
@@ -222,10 +234,10 @@ async fn main() {
 	// View Reddit wiki
 	app.at("/w").get(|_| async { Ok(redirect("/wiki".to_string())) }.boxed());
 	app
-		.at("/w/:page")
+		.at("/w/*page")
 		.get(|r| async move { Ok(redirect(format!("/wiki/{}", r.param("page").unwrap_or_default()))) }.boxed());
 	app.at("/wiki").get(|r| subreddit::wiki(r).boxed());
-	app.at("/wiki/:page").get(|r| subreddit::wiki(r).boxed());
+	app.at("/wiki/*page").get(|r| subreddit::wiki(r).boxed());
 
 	// Search all of Reddit
 	app.at("/search").get(|r| search::find(r).boxed());

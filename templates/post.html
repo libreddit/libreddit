@@ -77,7 +77,17 @@
 				</svg>
 			</a>
 			{% else if post.post_type == "video" || post.post_type == "gif" %}
+			{% if prefs.use_hls == "on" && !post.media.alt_url.is_empty() %}
+			<script src="/hls.min.js"></script>
+			<video class="post_media_video short hls_autoplay" width="{{ post.media.width }}" height="{{ post.media.height }}" poster="{{ post.media.poster }}" controls preload="none">
+				<source src="{{ post.media.alt_url }}" type="application/vnd.apple.mpegurl" />
+				<source src="{{ post.media.url }}" type="video/mp4" />
+			</video>
+			<script src="/playHLSVideo.js"></script>
+			{% else %}
 			<video class="post_media_video" src="{{ post.media.url }}" controls autoplay loop><a href={{ post.media.url }}>Video</a></video>
+			{% call utils::render_hls_notification(post.permalink[1..]) %}
+			{% endif %}
 			{% else if post.post_type == "gallery" %}
 			<div class="gallery">
 			{% for image in post.gallery -%}
@@ -86,14 +96,14 @@
 					<figcaption>
 						<p>{{ image.caption }}</p>
 						{% if image.outbound_url.len() > 0 %}
-						<p><a class="outbound_url" href="{{ image.outbound_url }}">{{ image.outbound_url }}</a>
+						<p><a class="outbound_url" href="{{ image.outbound_url }}" rel="nofollow">{{ image.outbound_url }}</a>
 						{% endif %}
 					</figcaption>
 				</figure>
 			{%- endfor %}
 			</div>			
 			{% else if post.post_type == "link" %}
-			<a id="post_url" href="{{ post.media.url }}">{{ post.media.url }}</a>
+			<a id="post_url" href="{{ post.media.url }}" rel="nofollow">{{ post.media.url }}</a>
 			{% endif %}
 
 			<!-- POST BODY -->
@@ -102,7 +112,7 @@
 			<div class="post_footer">
 				<ul id="post_links">
 					<li><a href="/{{ post.id }}">permalink</a></li>
-					<li><a href="https://reddit.com/{{ post.id }}">reddit</a></li>
+					<li><a href="https://reddit.com/{{ post.id }}" rel="nofollow">reddit</a></li>
 				</ul>
 				<p>{{ post.upvote_ratio }}% Upvoted</p>
 			</div>

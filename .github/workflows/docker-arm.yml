@@ -1,4 +1,4 @@
-name: Docker Multi-Architecture Build
+name: Docker ARM Build
 
 on:
   push:
@@ -30,7 +30,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: .
-          file: ./Dockerfile
-          platforms: linux/amd64,linux/arm64
+          file: ./Dockerfile.arm
+          platforms: linux/arm64
           push: true
-          tags: spikecodes/libreddit:latest
+          tags: spikecodes/libreddit:arm

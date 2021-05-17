@@ -55,10 +55,22 @@
 {% endif %}
 {%- endmacro %}
 
+{% macro render_hls_notification(redirect_url) -%}
+{% if post.post_type == "video" && !post.media.alt_url.is_empty() && prefs.hide_hls_notification != "on" %}
+<div class="post_notification"><p><a href="/settings/update/?use_hls=on&redirect={{ redirect_url }}">Enable HLS</a> to view with audio, or <a href="/settings/update/?hide_hls_notification=on&redirect={{ redirect_url }}">disable this notification</a></p></div>
+{% endif %}
+{%- endmacro %}
+
 {% macro post_in_list(post) -%}
-<div class="post {% if post.flags.stickied %}stickied{% endif %}">	
+<div class="post {% if post.flags.stickied %}stickied{% endif %}" id="{{ post.id }}">
 	<p class="post_header">
-		<a class="post_subreddit" href="/r/{{ post.community }}">r/{{ post.community }}</a>
+		{% let community -%}
+		{% if post.community.starts_with("u_") -%}
+			{% let community = format!("u/{}", &post.community[2..]) -%}
+		{% else -%}
+			{% let community = format!("r/{}", post.community) -%}
+		{% endif -%}
+		<a class="post_subreddit" href="/{{ community }}">{{ community }}</a>
 		<span class="dot">&bull;</span>
 		<a class="post_author" href="/u/{{ post.author.name }}">u/{{ post.author.name }}</a>
 		<span class="dot">&bull;</span>
@@ -68,7 +80,8 @@
 		{% if post.flair.flair_parts.len() > 0 %}
 			<a href="/r/{{ post.community }}/search?q=flair_name%3A%22{{ post.flair.text }}%22&restrict_sr=on"
 				class="post_flair"
-				style="color:{{ post.flair.foreground_color }}; background:{{ post.flair.background_color }};">{% call render_flair(post.flair.flair_parts) %}</a>
+				style="color:{{ post.flair.foreground_color }}; background:{{ post.flair.background_color }};"
+				dir="ltr">{% call render_flair(post.flair.flair_parts) %}</a>
 		{% endif %}
 		<a href="{{ post.permalink }}">{{ post.title }}</a>{% if post.flags.nsfw %} <small class="nsfw">NSFW</small>{% endif %}
 	</p>
@@ -88,9 +101,17 @@
 	{% else if (prefs.layout.is_empty() || prefs.layout == "card") && post.post_type == "gif" %}
 	<video class="post_media_video short" src="{{ post.media.url }}" width="{{ post.media.width }}" height="{{ post.media.height }}" controls loop autoplay><a href={{ post.media.url }}>Video</a></video>
 	{% else if (prefs.layout.is_empty() || prefs.layout == "card") && post.post_type == "video" %}
+	{% if prefs.use_hls == "on" && !post.media.alt_url.is_empty() %}
+	<video class="post_media_video short" width="{{ post.media.width }}" height="{{ post.media.height }}" poster="{{ post.media.poster }}" controls preload="none">
+		<source src="{{ post.media.alt_url }}" type="application/vnd.apple.mpegurl" />
+		<source src="{{ post.media.url }}" type="video/mp4" />
+	</video>
+	{% else %}
 	<video class="post_media_video short" src="{{ post.media.url }}" width="{{ post.media.width }}" height="{{ post.media.height }}" poster="{{ post.media.poster }}" preload="none" controls autoplay><a href={{ post.media.url }}>Video</a></video>
+	{% call render_hls_notification(format!("{}%23{}", &self.url[1..].replace("&", "%26"), post.id)) %}
+	{% endif %}
 	{% else if post.post_type != "self" %}
-	<a class="post_thumbnail {% if post.thumbnail.url.is_empty() %}no_thumbnail{% endif %}" href="{% if post.post_type == "link" %}{{ post.media.url }}{% else %}{{ post.permalink }}{% endif %}">
+	<a class="post_thumbnail {% if post.thumbnail.url.is_empty() %}no_thumbnail{% endif %}" href="{% if post.post_type == "link" %}{{ post.media.url }}{% else %}{{ post.permalink }}{% endif %}" rel="nofollow">
 		{% if post.thumbnail.url.is_empty() %}
 		<svg viewBox="0 0 100 106" width="140" height="53" xmlns="http://www.w3.org/2000/svg">
 			<title>Thumbnail</title>

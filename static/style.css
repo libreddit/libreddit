@@ -65,6 +65,75 @@
 	--shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
+/* Dracula theme setting */
+.dracula {
+	--accent: #bd93f9;
+	--green: #50fa7b;
+	--text: #f8f8f2;
+	--foreground: #3d4051;
+	--background: #282a36;
+	--outside: #44475a;
+	--post: #44475a;
+	--panel-border: 2px solid #44475a;
+	--highlighted: #4e5267;
+	--shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Nord theme setting */
+.nord {
+	--accent: #8fbcbb; 
+	--green: #a3be8c;
+	--text: #eceff4;
+	--foreground: #3b4252;
+	--background: #2e3440;
+	--outside: #434c5e;
+	--post: #434c5e;
+	--panel-border: 2px solid #4c566a;
+	--highlighted: #3b4252;
+	--shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Laserwave theme setting */
+.laserwave {
+	--accent: #eb64b9;
+	--green: #74dfc4;
+	--text: #e0dfe1;
+	--foreground: #302a36;
+	--background: #27212e;
+	--outside: #3e3647;
+	--post: #3e3647;
+	--panel-border: 2px solid #2f2738;
+	--highlighted: #302a36;
+	--shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Violet theme setting */
+.violet {
+	--accent: #7c71dd;
+	--green: #5cff85;
+	--text: white;
+	--foreground: #1F2347;
+	--background: #12152b;
+	--outside: #181c3a;
+	--post: #181c3a;
+	--panel-border: 1px solid #1F2347;
+	--highlighted: #1F2347;
+	--shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+/* Gold theme setting */
+.gold {
+	--accent: #f2aa4c;
+	--green: #5cff85;
+	--text: white;
+	--foreground: #234;
+	--background: #101820;
+	--outside: #1b2936;
+	--post: #1b2936;
+	--panel-border: 0px solid black;
+	--highlighted: #234;
+	--shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+}
 
 /* General */
 
@@ -281,7 +350,7 @@ aside {
 
 /* Subscriptions */
 
-#sub_subscription {
+#sub_subscription, #user_subscription {
 	margin-top: 20px;
 }
 
@@ -595,6 +664,7 @@ a.search_subreddit:hover {
 			"post_score post_title  post_thumbnail" 1fr
 			"post_score post_media  post_thumbnail" auto
 			"post_score post_body   post_thumbnail" auto
+			"post_score post_notification post_thumbnail" auto
 			"post_score post_footer post_thumbnail" auto
 			/ minmax(40px, auto) minmax(0, 1fr) fit-content(min(20%, 152px));
 }
@@ -635,6 +705,17 @@ a.search_subreddit:hover {
 	line-height: 1.5;
 	margin: 5px 15px;
 	grid-area: post_title;
+}
+
+.post_notification {
+	grid-area: post_notification;
+	margin: 5px 15px;
+	text-align: center;
+	font-size: 12px;
+}
+
+.post_notification a {
+	text-decoration: underline;
 }
 
 .post_flair {
@@ -1103,6 +1184,8 @@ input[type="submit"] {
 
 .md table {
 	margin: 5px;
+	display: block;
+	overflow-x: auto;
 }
 
 .md code {
@@ -1185,6 +1268,7 @@ td, th {
 				"post_title  post_title  post_thumbnail" 1fr
 				"post_media  post_media  post_thumbnail" auto
 				"post_body   post_body   post_thumbnail" auto
+				"post_notification post_notification post_thumbnail" auto
 				"post_score  post_footer post_thumbnail" auto
 				/ auto 1fr fit-content(min(20%, 152px));
 	}

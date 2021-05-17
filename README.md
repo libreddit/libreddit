@@ -21,20 +21,6 @@
 
 ---
 
-## Jump to...
-- [About](#about)
-  - [Teddit Comparison](#how-does-it-compare-to-teddit)
-- [Comparison](#comparison)
-- [Installation](#installation)
-  - [Cargo](#1-cargo)
-  - [Docker](#2-docker)
-  - [AUR](#3-aur)
-  - [GitHub Releases](#4-github-releases)
-  - [Replit](#5-replit)
-- [Deployment](#deployment)
-
----
-
 # Instances
 
 Feel free to [open an issue](https://github.com/spikecodes/libreddit/issues/new) to have your [selfhosted instance](#deployment) listed here!
@@ -45,15 +31,19 @@ Feel free to [open an issue](https://github.com/spikecodes/libreddit/issues/new)
 | [libreddit.spike.codes](https://libreddit.spike.codes) (official) | 🇺🇸 US |  |
 | [libreddit.dothq.co](https://libreddit.dothq.co) | 🇺🇸 US |  |
 | [libreddit.kavin.rocks](https://libreddit.kavin.rocks) | 🇮🇳 IN | ✅ |
-| [libreddit.himiko.cloud](https://libreddit.himiko.cloud) | 🇫🇮 FI |  |
 | [libreddit.bcow.xyz](https://libreddit.bcow.xyz) | 🇺🇸 US |  |
 | [libreddit.40two.app](https://libreddit.40two.app) | 🇳🇱 NL |  |
 | [reddit.invak.id](https://reddit.invak.id) | 🇧🇬 BG |  |
 | [reddit.phii.me](https://reddit.phii.me) | 🇺🇸 US |  |
+| [lr.riverside.rocks](https://lr.riverside.rocks) | 🇺🇸 US |  |
+| [libreddit.silkky.cloud](https://libreddit.silkky.cloud) | 🇫🇮 FI |  |
+| [libreddit.database.red](https://libreddit.database.red) | 🇺🇸 US | ✅ |
+| [libreddit.exonip.de](https://libreddit.exonip.de) | 🇩🇪 DE  |  |
+| [libreddit.domain.glass](https://libreddit.domain.glass) | 🇺🇸 US | ✅ |
 | [spjmllawtheisznfs7uryhxumin26ssv2draj7oope3ok3wuhy43eoyd.onion](http://spjmllawtheisznfs7uryhxumin26ssv2draj7oope3ok3wuhy43eoyd.onion) | 🇮🇳 IN  |  |
 | [fwhhsbrbltmrct5hshrnqlqygqvcgmnek3cnka55zj4y7nuus5muwyyd.onion](http://fwhhsbrbltmrct5hshrnqlqygqvcgmnek3cnka55zj4y7nuus5muwyyd.onion) | 🇩🇪 DE  |  |
-| [libreddit.himiko7xl2skojc6odi7hykl626gt4qki3vxdbv33u2u3af76d6k32ad.onion](http://libreddit.himiko7xl2skojc6odi7hykl626gt4qki3vxdbv33u2u3af76d6k32ad.onion) | 🇫🇮 FI |  |
 | [dflv6yjt7il3n3tggf4qhcmkzbti2ppytqx3o7pjrzwgntutpewscyid.onion](http://dflv6yjt7il3n3tggf4qhcmkzbti2ppytqx3o7pjrzwgntutpewscyid.onion/) | 🇺🇸 US |  |
+| [kphht2jcflojtqte4b4kyx7p2ahagv4debjj32nre67dxz7y57seqwyd.onion](http://kphht2jcflojtqte4b4kyx7p2ahagv4debjj32nre67dxz7y57seqwyd.onion/) | 🇳🇱 NL |  |
 
 A checkmark in the "Cloudflare" category here refers to the use of the reverse proxy, [Cloudflare](https://cloudflare). The checkmark will not be listed for a site which uses Cloudflare DNS but rather the proxying service which grants Cloudflare the ability to monitor traffic to the website.
 
@@ -81,7 +71,7 @@ Teddit is another awesome open source project designed to provide an alternative
 
 If you are looking to compare, the biggest differences I have noticed are:
 - Libreddit is themed around Reddit's redesign whereas Teddit appears to stick much closer to Reddit's old design. This may suit some users better as design is always subjective.
-- Libreddit is written in [Rust](https://www.rust-lang.org) for speed and memory safety. It uses [Actix Web](https://actix.rs), which was [benchmarked as the fastest web server for single queries](https://www.techempower.com/benchmarks/#hw=ph&test=db).
+- Libreddit is written in [Rust](https://www.rust-lang.org) for speed and memory safety. It uses [Hyper](https://hyper.rs), a speedy and lightweight HTTP server/client implementation.
 
 ---
 
@@ -170,6 +160,8 @@ docker pull spikecodes/libreddit
 docker run -d --name libreddit -p 80:8080 spikecodes/libreddit
 ```
 
+To deploy on `arm64` platforms, simply replace `spikecodes/libreddit` in the commands above with `spikecodes/libreddit:arm`.
+
 ## 3) AUR
 
 For ArchLinux users, Libreddit is available from the AUR as [`libreddit-git`](https://aur.archlinux.org/packages/libreddit-git).
@@ -200,6 +192,32 @@ Once installed, deploy Libreddit to `0.0.0.0:8080` by running:
 
 ```
 libreddit
+```
+
+## Change Default Settings
+
+Assign a default value for each setting by passing environment variables to Libreddit in the format `LIBREDDIT_DEFAULT_{X}`. Replace `{X}` with the setting name (see list below) in capital letters.
+
+| Name                  | Possible values                                                                        | Default value |
+|-----------------------|----------------------------------------------------------------------------------------|---------------|
+| theme                 | ["system", "light", "dark", "black", "dracula", "nord", "laserwave", "violet", "gold"] | system        |
+| front_page            | ["default", "popular", "all"]                                                          | default       |
+| layout                | ["card", "clean", "compact"]                                                           | card          |
+| wide                  | ["on", "off"]                                                                          | off           |
+| comment_sort          | ["hot", "new", "top", "rising", "controversial"]                                       | hot           |
+| post_sort             | ["confidence", "top", "new", "controversial", "old"]                                   | confidence    |
+| show_nsfw             | ["on", "off"]                                                                          | off           |
+| use_hls               | ["on", "off"]                                                                          | off           |
+| hide_hls_notification | ["on", "off"]                                                                          | off           |
+
+### Examples
+
+```bash
+LIBREDDIT_DEFAULT_SHOW_NSFW=on libreddit
+```
+
+```bash
+LIBREDDIT_DEFAULT_WIDE=on LIBREDDIT_DEFAULT_THEME=dark libreddit -r
 ```
 
 ## Proxying using NGINX

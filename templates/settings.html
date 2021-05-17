@@ -15,7 +15,7 @@
 			<div id="theme">
 				<label for="theme">Theme:</label>
 				<select name="theme"> 
-					{% call utils::options(prefs.theme, ["system", "light", "dark", "black"], "system") %}
+					{% call utils::options(prefs.theme, ["system", "light", "dark", "black", "dracula", "nord", "laserwave", "violet", "gold"], "system") %}
 				</select>
 			</div>
 			<p>Interface</p>
@@ -33,9 +33,16 @@
 			</div>
 			<div id="wide">
 				<label for="wide">Wide UI:</label>
+				<input type="hidden" value="off" name="wide">
 				<input type="checkbox" name="wide" {% if prefs.wide == "on" %}checked{% endif %}>
 			</div>
 			<p>Content</p>
+			<div id="post_sort">
+				<label for="post_sort" title="Applies only to subreddit feeds">Default subreddit post sort:</label>
+				<select name="post_sort"> 
+					{% call utils::options(prefs.post_sort, ["hot", "new", "top", "rising", "controversial"], "hot") %}
+				</select>
+			</div>
 			<div id="comment_sort">
 				<label for="comment_sort">Default comment sort:</label>
 				<select name="comment_sort"> 
@@ -44,17 +51,28 @@
 			</div>
 			<div id="show_nsfw">
 				<label for="show_nsfw">Show NSFW posts:</label>
+				<input type="hidden" value="off" name="show_nsfw">
 				<input type="checkbox" name="show_nsfw" {% if prefs.show_nsfw == "on" %}checked{% endif %}>
+			</div>
+			<div id="use_hls">
+				<label for="use_hls">Use HLS for videos</label>
+				<input type="hidden" value="off" name="use_hls">
+				<input type="checkbox" name="use_hls" {% if prefs.use_hls == "on" %}checked{% endif %}>
+			</div>
+			<div id="hide_hls_notification">
+				<label for="hide_hls_notification">Hide notification about possible HLS usage</label>
+				<input type="hidden" value="off" name="hide_hls_notification">
+				<input type="checkbox" name="hide_hls_notification" {% if prefs.hide_hls_notification == "on" %}checked{% endif %}>
 			</div>
 			<input id="save" type="submit" value="Save">
 		</div>
 	</form>
 	{% if prefs.subscriptions.len() > 0 %}
 		<div class="prefs" id="settings_subs">
-			<p>Subscribed Subreddits</p>
+			<p>Subscribed Feeds</p>
 			{% for sub in prefs.subscriptions %}
 			<div>
-				<span>{{ sub }}</span>
+				<span>{% if sub.starts_with("u_") -%}{{ format!("u/{}", &sub[2..]) }}{% else -%}{{ format!("r/{}", sub) }}{% endif -%}</span>
 				<form action="/r/{{ sub }}/unsubscribe/?redirect=settings" method="POST">
 						<button class="unsubscribe">Unsubscribe</button>
 				</form>
@@ -62,10 +80,10 @@
 			{% endfor %}
 		</div>
 	{% endif %}
-	
+
 	<div id="settings_note">
 		<p><b>Note:</b> settings and subscriptions are saved in browser cookies. Clearing your cookies will reset them.</p><br>
-		<p>You can restore your current settings and subscriptions after clearing your cookies using <a href="/settings/restore/?theme={{ prefs.theme }}&front_page={{ prefs.front_page }}&layout={{ prefs.layout }}&wide={{ prefs.wide }}&comment_sort={{ prefs.comment_sort }}&show_nsfw={{ prefs.show_nsfw }}&subscriptions={{ prefs.subscriptions.join("%2B") }}">this link</a>.</p>
+		<p>You can restore your current settings and subscriptions after clearing your cookies using <a href="/settings/restore/?theme={{ prefs.theme }}&front_page={{ prefs.front_page }}&layout={{ prefs.layout }}&wide={{ prefs.wide }}&comment_sort={{ prefs.comment_sort }}&show_nsfw={{ prefs.show_nsfw }}&use_hls={{ prefs.use_hls }}&hide_hls_notification={{ prefs.hide_hls_notification }}&subscriptions={{ prefs.subscriptions.join("%2B") }}">this link</a>.</p>
 	</div>
 </div>
 

@@ -1,6 +1,6 @@
 // CRATES
 use crate::esc;
-use crate::utils::{cookie, error, format_num, format_url, param, redirect, rewrite_urls, template, val, Post, Preferences, Subreddit};
+use crate::utils::{catch_random, error, format_num, format_url, param, redirect, rewrite_urls, setting, template, val, Post, Preferences, Subreddit};
 use crate::{client::json, server::ResponseExt, RequestExt};
 use askama::Template;
 use cookie::Cookie;
@@ -16,6 +16,7 @@ struct SubredditTemplate {
 	sort: (String, String),
 	ends: (String, String),
 	prefs: Preferences,
+	url: String,
 }
 
 #[derive(Template)]
@@ -27,14 +28,26 @@ struct WikiTemplate {
 	prefs: Preferences,
 }
 
+#[derive(Template)]
+#[template(path = "wall.html", escape = "none")]
+struct WallTemplate {
+	title: String,
+	sub: String,
+	msg: String,
+	prefs: Preferences,
+	url: String,
+}
+
 // SERVICES
 pub async fn community(req: Request<Body>) -> Result<Response<Body>, String> {
 	// Build Reddit API path
-	let subscribed = cookie(&req, "subscriptions");
-	let front_page = cookie(&req, "front_page");
-	let sort = req.param("sort").unwrap_or_else(|| req.param("id").unwrap_or("hot".to_string()));
+	let root = req.uri().path() == "/";
+	let subscribed = setting(&req, "subscriptions");
+	let front_page = setting(&req, "front_page");
+	let post_sort = req.cookie("post_sort").map_or_else(|| "hot".to_string(), |c| c.value().to_string());
+	let sort = req.param("sort").unwrap_or_else(|| req.param("id").unwrap_or(post_sort));
 
-	let sub = req.param("sub").map(String::from).unwrap_or(if front_page == "default" || front_page.is_empty() {
+	let sub = req.param("sub").unwrap_or(if front_page == "default" || front_page.is_empty() {
 		if subscribed.is_empty() {
 			"popular".to_string()
 		} else {
@@ -43,19 +56,29 @@ pub async fn community(req: Request<Body>) -> Result<Response<Body>, String> {
 	} else {
 		front_page.to_owned()
 	});
+	let quarantined = can_access_quarantine(&req, &sub) || root;
+
+	// Handle random subreddits
+	if let Ok(random) = catch_random(&sub, "").await {
+		return Ok(random);
+	}
+
+	if req.param("sub").is_some() && sub.starts_with("u_") {
+		return Ok(redirect(["/user/", &sub[2..]].concat()));
+	}
 
 	let path = format!("/r/{}/{}.json?{}&raw_json=1", sub, sort, req.uri().query().unwrap_or_default());
 
-	match Post::fetch(&path, String::new()).await {
+	match Post::fetch(&path, String::new(), quarantined).await {
 		Ok((posts, after)) => {
 			// If you can get subreddit posts, also request subreddit metadata
 			let sub = if !sub.contains('+') && sub != subscribed && sub != "popular" && sub != "all" {
 				// Regular subreddit
-				subreddit(&sub).await.unwrap_or_default()
+				subreddit(&sub, quarantined).await.unwrap_or_default()
 			} else if sub == subscribed {
 				// Subscription feed
 				if req.uri().path().starts_with("/r/") {
-					subreddit(&sub).await.unwrap_or_default()
+					subreddit(&sub, quarantined).await.unwrap_or_default()
 				} else {
 					Subreddit::default()
 				}
@@ -69,16 +92,19 @@ pub async fn community(req: Request<Body>) -> Result<Response<Body>, String> {
 				Subreddit::default()
 			};
 
+			let url = String::from(req.uri().path_and_query().map_or("", |val| val.as_str()));
+
 			template(SubredditTemplate {
 				sub,
 				posts,
-				sort: (sort, param(&path, "t")),
-				ends: (param(&path, "after"), after),
+				sort: (sort, param(&path, "t").unwrap_or_default()),
+				ends: (param(&path, "after").unwrap_or_default(), after),
 				prefs: Preferences::new(req),
+				url,
 			})
 		}
 		Err(msg) => match msg.as_str() {
-			"quarantined" => error(req, format!("r/{} has been quarantined by Reddit", sub)).await,
+			"quarantined" => quarantine(req, sub),
 			"private" => error(req, format!("r/{} is a private community", sub)).await,
 			"banned" => error(req, format!("r/{} has been banned from Reddit", sub)).await,
 			_ => error(req, msg).await,
@@ -86,16 +112,85 @@ pub async fn community(req: Request<Body>) -> Result<Response<Body>, String> {
 	}
 }
 
+pub fn quarantine(req: Request<Body>, sub: String) -> Result<Response<Body>, String> {
+	let wall = WallTemplate {
+		title: format!("r/{} is quarantined", sub),
+		msg: "Please click the button below to continue to this subreddit.".to_string(),
+		url: req.uri().to_string(),
+		sub,
+		prefs: Preferences::new(req),
+	};
+
+	Ok(
+		Response::builder()
+			.status(403)
+			.header("content-type", "text/html")
+			.body(wall.render().unwrap_or_default().into())
+			.unwrap_or_default(),
+	)
+}
+
+pub async fn add_quarantine_exception(req: Request<Body>) -> Result<Response<Body>, String> {
+	let subreddit = req.param("sub").ok_or("Invalid URL")?;
+	let redir = param(&format!("?{}", req.uri().query().unwrap_or_default()), "redir").ok_or("Invalid URL")?;
+	let mut res = redirect(redir);
+	res.insert_cookie(
+		Cookie::build(&format!("allow_quaran_{}", subreddit.to_lowercase()), "true")
+			.path("/")
+			.http_only(true)
+			.expires(cookie::Expiration::Session)
+			.finish(),
+	);
+	Ok(res)
+}
+
+pub fn can_access_quarantine(req: &Request<Body>, sub: &str) -> bool {
+	// Determine if the subreddit can be accessed
+	setting(&req, &format!("allow_quaran_{}", sub.to_lowercase())).parse().unwrap_or_default()
+}
+
 // Sub or unsub by setting subscription cookie using response "Set-Cookie" header
 pub async fn subscriptions(req: Request<Body>) -> Result<Response<Body>, String> {
-	let sub = req.param("sub").unwrap_or_default().to_string();
+	let sub = req.param("sub").unwrap_or_default();
+	// Handle random subreddits
+	if sub == "random" || sub == "randnsfw" {
+		return Err("Can't subscribe to random subreddit!".to_string());
+	}
+
 	let query = req.uri().query().unwrap_or_default().to_string();
 	let action: Vec<String> = req.uri().path().split('/').map(String::from).collect();
 
 	let mut sub_list = Preferences::new(req).subscriptions;
 
+	// Retrieve list of posts for these subreddits to extract display names
+	let posts = json(format!("/r/{}/hot.json?raw_json=1", sub), true).await?;
+	let display_lookup: Vec<(String, &str)> = posts["data"]["children"]
+		.as_array()
+		.map(|list| {
+			list
+				.iter()
+				.map(|post| {
+					let display_name = post["data"]["subreddit"].as_str().unwrap_or_default();
+					(display_name.to_lowercase(), display_name)
+				})
+				.collect::<Vec<_>>()
+		})
+		.unwrap_or_default();
+
 	// Find each subreddit name (separated by '+') in sub parameter
 	for part in sub.split('+') {
+		// Retrieve display name for the subreddit
+		let display;
+		let part = if let Some(&(_, display)) = display_lookup.iter().find(|x| x.0 == part.to_lowercase()) {
+			// This is already known, doesn't require seperate request
+			display
+		} else {
+			// This subreddit display name isn't known, retrieve it
+			let path: String = format!("/r/{}/about.json?raw_json=1", part);
+			display = json(path, true).await?;
+			display["data"]["display_name"].as_str().ok_or_else(|| "Failed to query subreddit name".to_string())?
+		};
+
 		// Modify sub list based on action
 		if action.contains(&"subscribe".to_string()) && !sub_list.contains(&part.to_owned()) {
 			// Add each sub name to the subscribed list
@@ -110,11 +205,10 @@ pub async fn subscriptions(req: Request<Body>) -> Result<Response<Body>, String>
 
 	// Redirect back to subreddit
 	// check for redirect parameter if unsubscribing from outside sidebar
-	let redirect_path = param(&format!("/?{}", query), "redirect");
-	let path = if redirect_path.is_empty() {
-		format!("/r/{}", sub)
-	} else {
+	let path = if let Some(redirect_path) = param(&format!("?{}", query), "redirect") {
 		format!("/{}/", redirect_path)
+	} else {
+		format!("/r/{}", sub)
 	};
 
 	let mut res = redirect(path);
@@ -136,47 +230,109 @@ pub async fn subscriptions(req: Request<Body>) -> Result<Response<Body>, String>
 }
 
 pub async fn wiki(req: Request<Body>) -> Result<Response<Body>, String> {
-	let sub = req.param("sub").unwrap_or("reddit.com".to_string());
-	let page = req.param("page").unwrap_or("index".to_string());
+	let sub = req.param("sub").unwrap_or_else(|| "reddit.com".to_string());
+	let quarantined = can_access_quarantine(&req, &sub);
+	// Handle random subreddits
+	if let Ok(random) = catch_random(&sub, "/wiki").await {
+		return Ok(random);
+	}
+
+	let page = req.param("page").unwrap_or_else(|| "index".to_string());
 	let path: String = format!("/r/{}/wiki/{}.json?raw_json=1", sub, page);
 
-	match json(path).await {
+	match json(path, quarantined).await {
 		Ok(response) => template(WikiTemplate {
 			sub,
-			wiki: rewrite_urls(response["data"]["content_html"].as_str().unwrap_or_default()),
+			wiki: rewrite_urls(response["data"]["content_html"].as_str().unwrap_or("<h3>Wiki not found</h3>")),
 			page,
 			prefs: Preferences::new(req),
 		}),
-		Err(msg) => error(req, msg).await,
+		Err(msg) => {
+			if msg == "quarantined" {
+				quarantine(req, sub)
+			} else {
+				error(req, msg).await
+			}
+		}
 	}
 }
 
 pub async fn sidebar(req: Request<Body>) -> Result<Response<Body>, String> {
-	let sub = req.param("sub").unwrap_or("reddit.com".to_string());
+	let sub = req.param("sub").unwrap_or_else(|| "reddit.com".to_string());
+	let quarantined = can_access_quarantine(&req, &sub);
+	// Handle random subreddits
+	if let Ok(random) = catch_random(&sub, "/about/sidebar").await {
+		return Ok(random);
+	}
 
 	// Build the Reddit JSON API url
 	let path: String = format!("/r/{}/about.json?raw_json=1", sub);
 
 	// Send a request to the url
-	match json(path).await {
+	match json(path, quarantined).await {
 		// If success, receive JSON in response
 		Ok(response) => template(WikiTemplate {
+			wiki: format!(
+				"{}<hr><h1>Moderators</h1><br><ul>{}</ul>",
+				rewrite_urls(&val(&response, "description_html").replace("\\", "")),
+				moderators(&sub, quarantined).await?.join(""),
+			),
 			sub,
-			wiki: rewrite_urls(&val(&response, "description_html").replace("\\", "")),
 			page: "Sidebar".to_string(),
 			prefs: Preferences::new(req),
 		}),
-		Err(msg) => error(req, msg).await,
+		Err(msg) => {
+			if msg == "quarantined" {
+				quarantine(req, sub)
+			} else {
+				error(req, msg).await
+			}
+		}
 	}
 }
 
+pub async fn moderators(sub: &str, quarantined: bool) -> Result<Vec<String>, String> {
+	// Retrieve and format the html for the moderators list
+	Ok(
+		moderators_list(sub, quarantined)
+			.await?
+			.iter()
+			.map(|m| format!("<li><a style=\"color: var(--accent)\" href=\"/u/{name}\">{name}</a></li>", name = m))
+			.collect(),
+	)
+}
+
+async fn moderators_list(sub: &str, quarantined: bool) -> Result<Vec<String>, String> {
+	// Build the moderator list URL
+	let path: String = format!("/r/{}/about/moderators.json?raw_json=1", sub);
+
+	// Retrieve response
+	let response = json(path, quarantined).await?["data"]["children"].clone();
+	Ok(
+		// Traverse json tree and format into list of strings
+		response
+			.as_array()
+			.unwrap_or(&Vec::new())
+			.iter()
+			.filter_map(|moderator| {
+				let name = moderator["name"].as_str().unwrap_or_default();
+				if name.is_empty() {
+					None
+				} else {
+					Some(name.to_string())
+				}
+			})
+			.collect::<Vec<_>>(),
+	)
+}
+
 // SUBREDDIT
-async fn subreddit(sub: &str) -> Result<Subreddit, String> {
+async fn subreddit(sub: &str, quarantined: bool) -> Result<Subreddit, String> {
 	// Build the Reddit JSON API url
 	let path: String = format!("/r/{}/about.json?raw_json=1", sub);
 
 	// Send a request to the url
-	match json(path).await {
+	match json(path, quarantined).await {
 		// If success, receive JSON in response
 		Ok(res) => {
 			// Metadata regarding the subreddit
@@ -184,7 +340,7 @@ async fn subreddit(sub: &str) -> Result<Subreddit, String> {
 			let active: i64 = res["data"]["accounts_active"].as_u64().unwrap_or_default() as i64;
 
 			// Fetch subreddit icon either from the community_icon or icon_img value
-			let community_icon: &str = res["data"]["community_icon"].as_str().map_or("", |s| s.split('?').collect::<Vec<&str>>()[0]);
+			let community_icon: &str = res["data"]["community_icon"].as_str().unwrap_or_default();
 			let icon = if community_icon.is_empty() { val(&res, "icon_img") } else { community_icon.to_string() };
 
 			let sub = Subreddit {
@@ -192,6 +348,7 @@ async fn subreddit(sub: &str) -> Result<Subreddit, String> {
 				title: esc!(&res, "title"),
 				description: esc!(&res, "public_description"),
 				info: rewrite_urls(&val(&res, "description_html").replace("\\", "")),
+				moderators: moderators_list(sub, quarantined).await?,
 				icon: format_url(&icon),
 				members: format_num(members),
 				active: format_num(active),

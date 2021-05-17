@@ -52,6 +52,10 @@
 			{% call utils::post_in_list(post) %}
 			{% endif %}
 			{% endfor %}
+			{% if prefs.use_hls == "on" %}
+			<script src="/hls.min.js"></script>
+			<script src="/playHLSVideo.js"></script>
+			{% endif %}
 			</div>
 
 			<footer>
@@ -99,7 +103,17 @@
 			</div>
 			<details class="panel" id="sidebar">
 				<summary id="sidebar_label">Sidebar</summary>
-				<div id="sidebar_contents">{{ sub.info }}</div>
+				<div id="sidebar_contents">
+                                  {{ sub.info }}
+                                  <hr>
+                                  <h2>Moderators</h2>
+                                  <br>
+                                  <ul>
+                                  {% for moderator in sub.moderators %}
+                                  <li><a style="color: var(--accent)" href="/u/{{ moderator }}">{{ moderator }}</a></li>
+                                  {% endfor %}
+                                  </ul>
+                                </div>
 			</details>
 		</aside>
 		{% endif %}

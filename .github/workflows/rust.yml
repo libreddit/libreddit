@@ -21,9 +21,35 @@ jobs:
 
       - name: Build
         run: cargo build --release
-
+      
       - uses: actions/upload-artifact@v2.2.1
         name: Upload a Build Artifact
         with:
           name: libreddit
           path: target/release/libreddit
+        
+      - name: Versions
+        id: version
+        run: |
+          echo "::set-output name=version::$(cargo metadata --format-version 1 --no-deps | jq .packages[0].version -r | sed 's/^/v/')"
+          echo "::set-output name=tag::$(git describe --tags)"
+          
+      - name: Calculate SHA512 checksum
+        run: sha512sum target/release/libreddit > libreddit.sha512
+        
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        if: github.base_ref != 'master'
+        with:
+          tag_name: ${{ steps.version.outputs.version }}
+          name: ${{ steps.version.outputs.version }} - NAME
+          draft: true
+          files: |
+            target/release/libreddit
+            libreddit.sha512
+          body: |
+            - ${{ github.event.head_commit.message }} ${{ github.sha }} 
+
+            See full list of changes [here](https://github.com/spikecodes/libreddit/compare/${{ steps.version.outputs.tag }}...${{ steps.version.outputs.version }}).
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
