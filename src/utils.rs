@@ -252,7 +252,7 @@ impl Post {
 			// Determine the type of media along with the media URL
 			let (post_type, media, gallery) = Media::parse(&data).await;
 			let mut awards = Awards::new();
-			
+
 			awards.parse(&data["all_awardings"]).await;
 
 			posts.push(Self {
@@ -313,7 +313,7 @@ impl Post {
 				created,
 				comments: format_num(data["num_comments"].as_i64().unwrap_or_default()),
 				gallery,
-				awards
+				awards,
 			});
 		}
 
@@ -342,7 +342,6 @@ pub struct Comment {
 	pub awards: Awards,
 }
 
-
 #[derive(Default, Clone)]
 pub struct Award {
 	pub name: String,
@@ -368,9 +367,7 @@ impl std::ops::Deref for Awards {
 
 impl std::fmt::Display for Awards {
 	fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-		self.iter().fold(Ok(()), |result, award| {
-			result.and_then(|_| writeln!(f, "{}", award))
-		})
+		self.iter().fold(Ok(()), |result, award| result.and_then(|_| writeln!(f, "{}", award)))
 	}
 }
 
@@ -381,22 +378,15 @@ impl Awards {
 	}
 
 	pub async fn parse(&mut self, items: &Value) -> &mut Self {
-
 		if let Some(array_items) = items.as_array() {
 			for item in array_items.iter() {
 				let name = item["name"].as_str().unwrap_or_default().to_string();
 				let icon_url = format_url(&item["icon_url"].as_str().unwrap_or_default().to_string());
 				let description = item["description"].as_str().unwrap_or_default().to_string();
-				
-				self.0.push(
-					Award {
-						name,
-						icon_url,
-						description,
-					}
-				)
+
+				self.0.push(Award { name, icon_url, description })
 			}
-			
+
 			self
 		} else {
 			self
