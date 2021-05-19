@@ -66,6 +66,16 @@ async fn favicon() -> Result<Response<Body>, String> {
 	)
 }
 
+async fn font() -> Result<Response<Body>, String> {
+	Ok(
+		Response::builder()
+			.status(200)
+			.header("content-type", "font/woff2")
+			.body(include_bytes!("../static/Inter.var.woff2").as_ref().into())
+			.unwrap_or_default(),
+	)
+}
+
 async fn resource(body: &str, content_type: &str, cache: bool) -> Result<Response<Body>, String> {
 	let mut res = Response::builder()
 		.status(200)
@@ -139,7 +149,7 @@ async fn main() {
 		"Referrer-Policy" => "no-referrer",
 		"X-Content-Type-Options" => "nosniff",
 		"X-Frame-Options" => "DENY",
-		"Content-Security-Policy" => "default-src 'none'; script-src 'self' blob:; manifest-src 'self'; media-src 'self' data: blob: about:; style-src 'self' 'unsafe-inline'; base-uri 'none'; img-src 'self' data:; form-action 'self'; frame-ancestors 'none'; connect-src 'self'; worker-src blob:;"
+		"Content-Security-Policy" => "default-src 'none'; font-src 'self'; script-src 'self' blob:; manifest-src 'self'; media-src 'self' data: blob: about:; style-src 'self' 'unsafe-inline'; base-uri 'none'; img-src 'self' data:; form-action 'self'; frame-ancestors 'none'; connect-src 'self'; worker-src blob:;"
 	};
 
 	if let Some(expire_time) = hsts {
@@ -156,6 +166,7 @@ async fn main() {
 	app.at("/robots.txt").get(|_| resource("User-agent: *\nAllow: /", "text/plain", true).boxed());
 	app.at("/favicon.ico").get(|_| favicon().boxed());
 	app.at("/logo.png").get(|_| pwa_logo().boxed());
+	app.at("/Inter.var.woff2").get(|_| font().boxed());
 	app.at("/touch-icon-iphone.png").get(|_| iphone_logo().boxed());
 	app.at("/apple-touch-icon.png").get(|_| iphone_logo().boxed());
 	app
