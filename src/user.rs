@@ -61,27 +61,22 @@ async fn user(name: &str) -> Result<User, String> {
 	let path: String = format!("/user/{}/about.json?raw_json=1", name);
 
 	// Send a request to the url
-	match json(path, false).await {
-		// If success, receive JSON in response
-		Ok(res) => {
-			// Grab creation date as unix timestamp
-			let created: i64 = res["data"]["created"].as_f64().unwrap_or(0.0).round() as i64;
+	json(path, false).await.map(|res| {
+		// Grab creation date as unix timestamp
+		let created: i64 = res["data"]["created"].as_f64().unwrap_or(0.0).round() as i64;
 
-			// Closure used to parse JSON from Reddit APIs
-			let about = |item| res["data"]["subreddit"][item].as_str().unwrap_or_default().to_string();
+		// Closure used to parse JSON from Reddit APIs
+		let about = |item| res["data"]["subreddit"][item].as_str().unwrap_or_default().to_string();
 
-			// Parse the JSON output into a User struct
-			Ok(User {
-				name: name.to_string(),
-				title: esc!(about("title")),
-				icon: format_url(&about("icon_img")),
-				karma: res["data"]["total_karma"].as_i64().unwrap_or(0),
-				created: OffsetDateTime::from_unix_timestamp(created).format("%b %d '%y"),
-				banner: esc!(about("banner_img")),
-				description: about("public_description"),
-			})
+		// Parse the JSON output into a User struct
+		User {
+			name: name.to_string(),
+			title: esc!(about("title")),
+			icon: format_url(&about("icon_img")),
+			karma: res["data"]["total_karma"].as_i64().unwrap_or(0),
+			created: OffsetDateTime::from_unix_timestamp(created).format("%b %d '%y"),
+			banner: esc!(about("banner_img")),
+			description: about("public_description"),
 		}
-		// If the Reddit API returns an error, exit this function
-		Err(msg) => return Err(msg),
-	}
+	})
 }

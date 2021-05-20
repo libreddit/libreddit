@@ -69,29 +69,31 @@ impl RequestExt for Request<Body> {
 	}
 
 	fn cookies(&self) -> Vec<Cookie> {
-		let mut cookies = Vec::new();
-		if let Some(header) = self.headers().get("Cookie") {
-			for cookie in header.to_str().unwrap_or_default().split("; ") {
-				cookies.push(Cookie::parse(cookie).unwrap_or_else(|_| Cookie::named("")));
-			}
-		}
-		cookies
+		self.headers().get("Cookie").map_or(Vec::new(), |header| {
+			header
+				.to_str()
+				.unwrap_or_default()
+				.split("; ")
+				.map(|cookie| Cookie::parse(cookie).unwrap_or_else(|_| Cookie::named("")))
+				.collect()
+		})
 	}
 
 	fn cookie(&self, name: &str) -> Option<Cookie> {
-		self.cookies().iter().find(|c| c.name() == name).map(std::borrow::ToOwned::to_owned)
+		self.cookies().into_iter().find(|c| c.name() == name)
 	}
 }
 
 impl ResponseExt for Response<Body> {
 	fn cookies(&self) -> Vec<Cookie> {
-		let mut cookies = Vec::new();
-		for header in self.headers().get_all("Cookie") {
-			if let Ok(cookie) = Cookie::parse(header.to_str().unwrap_or_default()) {
-				cookies.push(cookie);
-			}
-		}
-		cookies
+		self.headers().get("Cookie").map_or(Vec::new(), |header| {
+			header
+				.to_str()
+				.unwrap_or_default()
+				.split("; ")
+				.map(|cookie| Cookie::parse(cookie).unwrap_or_else(|_| Cookie::named("")))
+				.collect()
+		})
 	}
 
 	fn insert_cookie(&mut self, cookie: Cookie) {
@@ -144,6 +146,7 @@ impl Server {
 
 	pub fn listen(self, addr: String) -> Boxed<Result<(), hyper::Error>> {
 		let make_svc = make_service_fn(move |_conn| {
+			// For correct borrowing, these values need to be borrowed
 			let router = self.router.clone();
 			let default_headers = self.default_headers.clone();
 
@@ -159,7 +162,7 @@ impl Server {
 					let mut path = req.uri().path().replace("//", "/");
 
 					// Remove trailing slashes
-					if path.ends_with('/') && path != "/" {
+					if path != "/" && path.ends_with('/') {
 						path.pop();
 					}
 
@@ -198,17 +201,15 @@ impl Server {
 			}
 		});
 
+		// Build SocketAddr from provided address
 		let address = &addr.parse().unwrap_or_else(|_| panic!("Cannot parse {} as address (example format: 0.0.0.0:8080)", addr));
 
-		let server = HyperServer::bind(address).serve(make_svc);
+		// Bind server to address specified above. Gracefully shut down if CTRL+C is pressed
+		let server = HyperServer::bind(address).serve(make_svc).with_graceful_shutdown(async {
+			// Wait for the CTRL+C signal
+			tokio::signal::ctrl_c().await.expect("Failed to install CTRL+C signal handler")
+		});
 
-		let graceful = server.with_graceful_shutdown(shutdown_signal());
-
-		graceful.boxed()
+		server.boxed()
 	}
-}
-
-async fn shutdown_signal() {
-	// Wait for the CTRL+C signal
-	tokio::signal::ctrl_c().await.expect("Failed to install CTRL+C signal handler");
 }

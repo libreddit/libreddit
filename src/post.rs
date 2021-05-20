@@ -7,8 +7,6 @@ use crate::utils::{error, format_num, format_url, param, rewrite_urls, setting, 
 
 use hyper::{Body, Request, Response};
 
-use async_recursion::async_recursion;
-
 use askama::Template;
 
 // STRUCTS
@@ -52,10 +50,10 @@ pub async fn item(req: Request<Body>) -> Result<Response<Body>, String> {
 	// Send a request to the url, receive JSON in response
 	match json(path, quarantined).await {
 		// Otherwise, grab the JSON output from the request
-		Ok(res) => {
+		Ok(response) => {
 			// Parse the JSON into Post and Comment structs
-			let post = parse_post(&res[0]).await;
-			let comments = parse_comments(&res[1], &post.permalink, &post.author.name, highlighted_comment).await;
+			let post = parse_post(&response[0]).await;
+			let comments = parse_comments(&response[1], &post.permalink, &post.author.name, highlighted_comment);
 
 			// Use the Post and Comment structs to generate a website to show users
 			template(PostTemplate {
@@ -151,79 +149,71 @@ async fn parse_post(json: &serde_json::Value) -> Post {
 }
 
 // COMMENTS
-#[async_recursion]
-async fn parse_comments(json: &serde_json::Value, post_link: &str, post_author: &str, highlighted_comment: &str) -> Vec<Comment> {
-	// Separate the comment JSON into a Vector of comments
-	let comment_data = match json["data"]["children"].as_array() {
-		Some(f) => f.to_owned(),
-		None => Vec::new(),
-	};
-
-	let mut comments: Vec<Comment> = Vec::new();
+fn parse_comments(json: &serde_json::Value, post_link: &str, post_author: &str, highlighted_comment: &str) -> Vec<Comment> {
+	// Parse the comment JSON into a Vector of Comments
+	let comments = json["data"]["children"].as_array().map_or(Vec::new(), std::borrow::ToOwned::to_owned);
 
 	// For each comment, retrieve the values to build a Comment object
-	for comment in comment_data {
-		let kind = comment["kind"].as_str().unwrap_or_default().to_string();
-		let data = &comment["data"];
-
-		let unix_time = data["created_utc"].as_f64().unwrap_or_default();
-		let (rel_time, created) = time(unix_time);
-
-		let edited = match data["edited"].as_f64() {
-			Some(stamp) => time(stamp),
-			None => (String::new(), String::new()),
-		};
-
-		let score = data["score"].as_i64().unwrap_or(0);
-		let body = rewrite_urls(&val(&comment, "body_html"));
-
-		// If this comment contains replies, handle those too
-		let replies: Vec<Comment> = if data["replies"].is_object() {
-			parse_comments(&data["replies"], post_link, post_author, highlighted_comment).await
-		} else {
-			Vec::new()
-		};
-
-		let parent_kind_and_id = val(&comment, "parent_id");
-		let parent_info = parent_kind_and_id.split('_').collect::<Vec<&str>>();
-
-		let id = val(&comment, "id");
-		let highlighted = id == highlighted_comment;
-
-		comments.push(Comment {
-			id,
-			kind,
-			parent_id: parent_info[1].to_string(),
-			parent_kind: parent_info[0].to_string(),
-			post_link: post_link.to_string(),
-			post_author: post_author.to_string(),
-			body,
-			author: Author {
-				name: val(&comment, "author"),
-				flair: Flair {
-					flair_parts: FlairPart::parse(
-						data["author_flair_type"].as_str().unwrap_or_default(),
-						data["author_flair_richtext"].as_array(),
-						data["author_flair_text"].as_str(),
-					),
-					text: esc!(&comment, "link_flair_text"),
-					background_color: val(&comment, "author_flair_background_color"),
-					foreground_color: val(&comment, "author_flair_text_color"),
-				},
-				distinguished: val(&comment, "distinguished"),
-			},
-			score: if data["score_hidden"].as_bool().unwrap_or_default() {
-				("\u{2022}".to_string(), "Hidden".to_string())
-			} else {
-				format_num(score)
-			},
-			rel_time,
-			created,
-			edited,
-			replies,
-			highlighted,
-		});
-	}
-
 	comments
+		.into_iter()
+		.map(|comment| {
+			let kind = comment["kind"].as_str().unwrap_or_default().to_string();
+			let data = &comment["data"];
+
+			let unix_time = data["created_utc"].as_f64().unwrap_or_default();
+			let (rel_time, created) = time(unix_time);
+
+			let edited = data["edited"].as_f64().map_or((String::new(), String::new()), time);
+
+			let score = data["score"].as_i64().unwrap_or(0);
+			let body = rewrite_urls(&val(&comment, "body_html"));
+
+			// If this comment contains replies, handle those too
+			let replies: Vec<Comment> = if data["replies"].is_object() {
+				parse_comments(&data["replies"], post_link, post_author, highlighted_comment)
+			} else {
+				Vec::new()
+			};
+
+			let parent_kind_and_id = val(&comment, "parent_id");
+			let parent_info = parent_kind_and_id.split('_').collect::<Vec<&str>>();
+
+			let id = val(&comment, "id");
+			let highlighted = id == highlighted_comment;
+
+			Comment {
+				id,
+				kind,
+				parent_id: parent_info[1].to_string(),
+				parent_kind: parent_info[0].to_string(),
+				post_link: post_link.to_string(),
+				post_author: post_author.to_string(),
+				body,
+				author: Author {
+					name: val(&comment, "author"),
+					flair: Flair {
+						flair_parts: FlairPart::parse(
+							data["author_flair_type"].as_str().unwrap_or_default(),
+							data["author_flair_richtext"].as_array(),
+							data["author_flair_text"].as_str(),
+						),
+						text: esc!(&comment, "link_flair_text"),
+						background_color: val(&comment, "author_flair_background_color"),
+						foreground_color: val(&comment, "author_flair_text_color"),
+					},
+					distinguished: val(&comment, "distinguished"),
+				},
+				score: if data["score_hidden"].as_bool().unwrap_or_default() {
+					("\u{2022}".to_string(), "Hidden".to_string())
+				} else {
+					format_num(score)
+				},
+				rel_time,
+				created,
+				edited,
+				replies,
+				highlighted,
+			}
+		})
+		.collect()
 }

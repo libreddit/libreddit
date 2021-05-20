@@ -9,7 +9,9 @@ use crate::server::RequestExt;
 pub async fn proxy(req: Request<Body>, format: &str) -> Result<Response<Body>, String> {
 	let mut url = format!("{}?{}", format, req.uri().query().unwrap_or_default());
 
+	// For each parameter in request
 	for (name, value) in req.params().iter() {
+		// Fill the parameter value in the url
 		url = url.replace(&format!("{{{}}}", name), value);
 	}
 
@@ -29,14 +31,13 @@ async fn stream(url: &str, req: &Request<Body>) -> Result<Response<Body>, String
 	let mut builder = Request::get(url);
 
 	// Copy useful headers from original request
-	let headers = req.headers();
 	for &key in &["Range", "If-Modified-Since", "Cache-Control"] {
-		if let Some(value) = headers.get(key) {
+		if let Some(value) = req.headers().get(key) {
 			builder = builder.header(key, value);
 		}
 	}
 
-	let stream_request = builder.body(Body::default()).expect("stream");
+	let stream_request = builder.body(Body::empty()).map_err(|_| "Couldn't build empty body in stream".to_string())?;
 
 	client
 		.request(stream_request)
@@ -64,9 +65,10 @@ fn request(url: String, quarantine: bool) -> Boxed<Result<Response<Body>, String
 	// Prepare the HTTPS connector.
 	let https = hyper_rustls::HttpsConnector::with_native_roots();
 
-	// Build the hyper client from the HTTPS connector.
+	// Construct the hyper client from the HTTPS connector.
 	let client: client::Client<_, hyper::Body> = client::Client::builder().build(https);
 
+	// Build request
 	let builder = Request::builder()
 		.method("GET")
 		.uri(&url)

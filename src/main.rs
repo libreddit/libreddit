@@ -1,14 +1,7 @@
 // Global specifiers
 #![forbid(unsafe_code)]
 #![warn(clippy::pedantic, clippy::all)]
-#![allow(
-	clippy::needless_pass_by_value,
-	clippy::match_wildcard_for_single_variants,
-	clippy::cast_possible_truncation,
-	clippy::similar_names,
-	clippy::cast_possible_wrap,
-	clippy::find_map
-)]
+#![allow(clippy::needless_pass_by_value, clippy::cast_possible_truncation, clippy::cast_possible_wrap, clippy::find_map)]
 
 // Reference local files
 mod post;
@@ -137,7 +130,7 @@ async fn main() {
 	let port = matches.value_of("port").unwrap_or("8080");
 	let hsts = matches.value_of("hsts");
 
-	let listener = format!("{}:{}", address, port);
+	let listener = [address, ":", port].concat();
 
 	println!("Starting Libreddit...");
 

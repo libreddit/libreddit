@@ -43,12 +43,12 @@ pub async fn set(req: Request<Body>) -> Result<Response<Body>, String> {
 	let (parts, mut body) = req.into_parts();
 
 	// Grab existing cookies
-	let mut cookies = Vec::new();
-	for header in parts.headers.get_all("Cookie") {
-		if let Ok(cookie) = Cookie::parse(header.to_str().unwrap_or_default()) {
-			cookies.push(cookie);
-		}
-	}
+	let _cookies: Vec<Cookie> = parts
+		.headers
+		.get_all("Cookie")
+		.iter()
+		.filter_map(|header| Cookie::parse(header.to_str().unwrap_or_default()).ok())
+		.collect();
 
 	// Aggregate the body...
 	// let whole_body = hyper::body::aggregate(req).await.map_err(|e| e.to_string())?;
@@ -62,22 +62,22 @@ pub async fn set(req: Request<Body>) -> Result<Response<Body>, String> {
 
 	let form = url::form_urlencoded::parse(&body_bytes).collect::<HashMap<_, _>>();
 
-	let mut res = redirect("/settings".to_string());
+	let mut response = redirect("/settings".to_string());
 
 	for &name in &PREFS {
 		match form.get(name) {
-			Some(value) => res.insert_cookie(
+			Some(value) => response.insert_cookie(
 				Cookie::build(name.to_owned(), value.to_owned())
 					.path("/")
 					.http_only(true)
 					.expires(OffsetDateTime::now_utc() + Duration::weeks(52))
 					.finish(),
 			),
-			None => res.remove_cookie(name.to_string()),
+			None => response.remove_cookie(name.to_string()),
 		};
 	}
 
-	Ok(res)
+	Ok(response)
 }
 
 fn set_cookies_method(req: Request<Body>, remove_cookies: bool) -> Response<Body> {
@@ -85,12 +85,12 @@ fn set_cookies_method(req: Request<Body>, remove_cookies: bool) -> Response<Body
 	let (parts, _) = req.into_parts();
 
 	// Grab existing cookies
-	let mut cookies = Vec::new();
-	for header in parts.headers.get_all("Cookie") {
-		if let Ok(cookie) = Cookie::parse(header.to_str().unwrap_or_default()) {
-			cookies.push(cookie);
-		}
-	}
+	let _cookies: Vec<Cookie> = parts
+		.headers
+		.get_all("Cookie")
+		.iter()
+		.filter_map(|header| Cookie::parse(header.to_str().unwrap_or_default()).ok())
+		.collect();
 
 	let query = parts.uri.query().unwrap_or_default().as_bytes();
 
@@ -101,11 +101,11 @@ fn set_cookies_method(req: Request<Body>, remove_cookies: bool) -> Response<Body
 		None => "/".to_string(),
 	};
 
-	let mut res = redirect(path);
+	let mut response = redirect(path);
 
 	for name in [PREFS.to_vec(), vec!["subscriptions"]].concat() {
 		match form.get(name) {
-			Some(value) => res.insert_cookie(
+			Some(value) => response.insert_cookie(
 				Cookie::build(name.to_owned(), value.to_owned())
 					.path("/")
 					.http_only(true)
@@ -114,13 +114,13 @@ fn set_cookies_method(req: Request<Body>, remove_cookies: bool) -> Response<Body
 			),
 			None => {
 				if remove_cookies {
-					res.remove_cookie(name.to_string())
+					response.remove_cookie(name.to_string())
 				}
 			}
 		};
 	}
 
-	res
+	response
 }
 
 // Set cookies using response "Set-Cookie" header
