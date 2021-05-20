@@ -103,7 +103,7 @@ fn set_cookies_method(req: Request<Body>, remove_cookies: bool) -> Response<Body
 
 	let mut res = redirect(path);
 
-	for &name in &PREFS {
+	for name in [PREFS.to_vec(), vec!["subscriptions"]].concat() {
 		match form.get(name) {
 			Some(value) => res.insert_cookie(
 				Cookie::build(name.to_owned(), value.to_owned())

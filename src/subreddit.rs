@@ -199,7 +199,7 @@ pub async fn subscriptions(req: Request<Body>) -> Result<Response<Body>, String>
 			sub_list.sort_by_key(|a| a.to_lowercase())
 		} else if action.contains(&"unsubscribe".to_string()) {
 			// Remove sub name from subscribed list
-			sub_list.retain(|s| s != part);
+			sub_list.retain(|s| s.to_lowercase() != part.to_lowercase());
 		}
 	}
 
