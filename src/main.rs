@@ -91,6 +91,13 @@ async fn main() {
 		.version(env!("CARGO_PKG_VERSION"))
 		.about("Private front-end for Reddit written in Rust ")
 		.arg(
+			Arg::with_name("redirect-https")
+				.short("r")
+				.long("redirect-https")
+				.help("Redirect all HTTP requests to HTTPS (no longer functional)")
+				.takes_value(false),
+		)
+		.arg(
 			Arg::with_name("address")
 				.short("a")
 				.long("address")
@@ -107,13 +114,6 @@ async fn main() {
 				.help("Port to listen on")
 				.default_value("8080")
 				.takes_value(true),
-		)
-		.arg(
-			Arg::with_name("redirect-https")
-				.short("r")
-				.long("redirect-https")
-				.help("Redirect all HTTP requests to HTTPS (no longer functional)")
-				.takes_value(false),
 		)
 		.arg(
 			Arg::with_name("hsts")

@@ -156,7 +156,7 @@ html, body, div, h1, h2, h3, h4, h5, h6, ul, ol, dl, li, dt, dd, p, blockquote,
 pre, form, fieldset, table, th, td, select, input {
 	margin: 0;
 	color: var(--text);
-	font-family: "Inter";
+	font-family: "Inter", sans-serif;
 }
 
 body {
@@ -1195,7 +1195,7 @@ input[type="submit"] {
 }
 
 .md code {
-	font-family: monospace;
+	font-family: monospace, sans-serif;
 	font-size: 14px;
 }
 
