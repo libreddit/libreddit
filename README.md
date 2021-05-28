@@ -198,17 +198,17 @@ libreddit
 
 Assign a default value for each setting by passing environment variables to Libreddit in the format `LIBREDDIT_DEFAULT_{X}`. Replace `{X}` with the setting name (see list below) in capital letters.
 
-| Name                  | Possible values                                                                        | Default value |
-|-----------------------|----------------------------------------------------------------------------------------|---------------|
-| theme                 | ["system", "light", "dark", "black", "dracula", "nord", "laserwave", "violet", "gold"] | system        |
-| front_page            | ["default", "popular", "all"]                                                          | default       |
-| layout                | ["card", "clean", "compact"]                                                           | card          |
-| wide                  | ["on", "off"]                                                                          | off           |
-| comment_sort          | ["hot", "new", "top", "rising", "controversial"]                                       | hot           |
-| post_sort             | ["confidence", "top", "new", "controversial", "old"]                                   | confidence    |
-| show_nsfw             | ["on", "off"]                                                                          | off           |
-| use_hls               | ["on", "off"]                                                                          | off           |
-| hide_hls_notification | ["on", "off"]                                                                          | off           |
+| Name                    | Possible values                                                                          | Default value |
+|-------------------------|------------------------------------------------------------------------------------------|---------------|
+| `THEME`                 | `["system", "light", "dark", "black", "dracula", "nord", "laserwave", "violet", "gold"]` | `system`      |
+| `FRONT_PAGE`            | `["default", "popular", "all"]`                                                          | `default`     |
+| `LAYOUT`                | `["card", "clean", "compact"]`                                                           | `card`        |
+| `WIDE`                  | `["on", "off"]`                                                                          | `off`         |
+| `COMMENT_SORT`          | `["hot", "new", "top", "rising", "controversial"]`                                       | `hot`         |
+| `POST_SORT`             | `["confidence", "top", "new", "controversial", "old"]`                                   | `confidence`  |
+| `SHOW_NSFW`             | `["on", "off"]`                                                                          | `off`         |
+| `USE_HLS`               | `["on", "off"]`                                                                          | `off`         |
+| `HIDE_HLS_NOTIFICATION` | `["on", "off"]`                                                                          | `off`         |
 
 ### Examples
 
@@ -227,6 +227,25 @@ LIBREDDIT_DEFAULT_WIDE=on LIBREDDIT_DEFAULT_THEME=dark libreddit -r
 proxy_http_version 1.1;
 ```
 to your NGINX configuration file above your `proxy_pass` line.
+
+## SystemD
+
+You can use the SystemD service available in `contrib/libreddit.service`
+(install it on `/etc/systemd/system/libreddit.service`).
+
+That service can be optionally configured in terms of environment variables by
+creating a file in `/etc/libreddit.conf`. Use the `contrib/libreddit.conf` as a
+template. You can also add the `LIBREDDIT_DEFAULT__{X}` settings explained
+above.
+
+When "Proxying using NGINX" where the proxy is on the same machine, you should
+guarantee nginx waits for this service to start. Edit
+`/etc/systemd/system/libreddit.service.d/reverse-proxy.conf`:
+
+```conf
+[Unit]
+Before=nginx.service
+```
 
 ## Building
 
