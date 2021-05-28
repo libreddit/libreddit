@@ -968,6 +968,7 @@ a.search_subreddit:hover {
 	font-weight: normal;
 	padding: 5px 5px;
 	margin: 5px 0;
+	overflow: auto;
 }
 
 .comment_body.highlighted {
