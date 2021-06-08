@@ -1,14 +1,7 @@
 // Global specifiers
 #![forbid(unsafe_code)]
 #![warn(clippy::pedantic, clippy::all)]
-#![allow(
-	clippy::needless_pass_by_value,
-	clippy::match_wildcard_for_single_variants,
-	clippy::cast_possible_truncation,
-	clippy::similar_names,
-	clippy::cast_possible_wrap,
-	clippy::find_map
-)]
+#![allow(clippy::needless_pass_by_value, clippy::cast_possible_truncation, clippy::cast_possible_wrap, clippy::find_map)]
 
 // Reference local files
 mod post;
@@ -66,6 +59,16 @@ async fn favicon() -> Result<Response<Body>, String> {
 	)
 }
 
+async fn font() -> Result<Response<Body>, String> {
+	Ok(
+		Response::builder()
+			.status(200)
+			.header("content-type", "font/woff2")
+			.body(include_bytes!("../static/Inter.var.woff2").as_ref().into())
+			.unwrap_or_default(),
+	)
+}
+
 async fn resource(body: &str, content_type: &str, cache: bool) -> Result<Response<Body>, String> {
 	let mut res = Response::builder()
 		.status(200)
@@ -88,6 +91,13 @@ async fn main() {
 		.version(env!("CARGO_PKG_VERSION"))
 		.about("Private front-end for Reddit written in Rust ")
 		.arg(
+			Arg::with_name("redirect-https")
+				.short("r")
+				.long("redirect-https")
+				.help("Redirect all HTTP requests to HTTPS (no longer functional)")
+				.takes_value(false),
+		)
+		.arg(
 			Arg::with_name("address")
 				.short("a")
 				.long("address")
@@ -106,13 +116,6 @@ async fn main() {
 				.takes_value(true),
 		)
 		.arg(
-			Arg::with_name("redirect-https")
-				.short("r")
-				.long("redirect-https")
-				.help("Redirect all HTTP requests to HTTPS (no longer functional)")
-				.takes_value(false),
-		)
-		.arg(
 			Arg::with_name("hsts")
 				.short("H")
 				.long("hsts")
@@ -127,7 +130,7 @@ async fn main() {
 	let port = matches.value_of("port").unwrap_or("8080");
 	let hsts = matches.value_of("hsts");
 
-	let listener = format!("{}:{}", address, port);
+	let listener = [address, ":", port].concat();
 
 	println!("Starting Libreddit...");
 
@@ -139,7 +142,7 @@ async fn main() {
 		"Referrer-Policy" => "no-referrer",
 		"X-Content-Type-Options" => "nosniff",
 		"X-Frame-Options" => "DENY",
-		"Content-Security-Policy" => "default-src 'none'; script-src 'self' blob:; manifest-src 'self'; media-src 'self' data: blob: about:; style-src 'self' 'unsafe-inline'; base-uri 'none'; img-src 'self' data:; form-action 'self'; frame-ancestors 'none'; connect-src 'self'; worker-src blob:;"
+		"Content-Security-Policy" => "default-src 'none'; font-src 'self'; script-src 'self' blob:; manifest-src 'self'; media-src 'self' data: blob: about:; style-src 'self' 'unsafe-inline'; base-uri 'none'; img-src 'self' data:; form-action 'self'; frame-ancestors 'none'; connect-src 'self'; worker-src blob:;"
 	};
 
 	if let Some(expire_time) = hsts {
@@ -156,6 +159,7 @@ async fn main() {
 	app.at("/robots.txt").get(|_| resource("User-agent: *\nAllow: /", "text/plain", true).boxed());
 	app.at("/favicon.ico").get(|_| favicon().boxed());
 	app.at("/logo.png").get(|_| pwa_logo().boxed());
+	app.at("/Inter.var.woff2").get(|_| font().boxed());
 	app.at("/touch-icon-iphone.png").get(|_| iphone_logo().boxed());
 	app.at("/apple-touch-icon.png").get(|_| iphone_logo().boxed());
 	app

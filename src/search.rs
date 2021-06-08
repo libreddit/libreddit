@@ -52,10 +52,8 @@ pub async fn find(req: Request<Body>) -> Result<Response<Body>, String> {
 
 	let sort = param(&path, "sort").unwrap_or_else(|| "relevance".to_string());
 
-	let subreddits = match param(&path, "restrict_sr") {
-		None => search_subreddits(&query).await,
-		Some(_) => Vec::new(),
-	};
+	// If search is not restricted to this subreddit, show other subreddits in search results
+	let subreddits = param(&path, "restrict_sr").map_or(search_subreddits(&query).await, |_| Vec::new());
 
 	let url = String::from(req.uri().path_and_query().map_or("", |val| val.as_str()));
 
@@ -90,35 +88,25 @@ async fn search_subreddits(q: &str) -> Vec<Subreddit> {
 	let subreddit_search_path = format!("/subreddits/search.json?q={}&limit=3", q.replace(' ', "+"));
 
 	// Send a request to the url
-	match json(subreddit_search_path, false).await {
-		// If success, receive JSON in response
-		Ok(response) => {
-			match response["data"]["children"].as_array() {
-				// For each subreddit from subreddit list
-				Some(list) => list
-					.iter()
-					.map(|subreddit| {
-						// Fetch subreddit icon either from the community_icon or icon_img value
-						let community_icon: &str = subreddit["data"]["community_icon"].as_str().map_or("", |s| s.split('?').collect::<Vec<&str>>()[0]);
-						let icon = if community_icon.is_empty() {
-							val(&subreddit, "icon_img")
-						} else {
-							community_icon.to_string()
-						};
+	json(subreddit_search_path, false).await.unwrap_or_default()["data"]["children"]
+		.as_array()
+		.map(ToOwned::to_owned)
+		.unwrap_or_default()
+		.iter()
+		.map(|subreddit| {
+			// For each subreddit from subreddit list
+			// Fetch subreddit icon either from the community_icon or icon_img value
+			let icon = subreddit["data"]["community_icon"]
+				.as_str()
+				.map_or_else(|| val(&subreddit, "icon_img"), ToString::to_string);
 
-						Subreddit {
-							name: val(subreddit, "display_name_prefixed"),
-							url: val(subreddit, "url"),
-							icon: format_url(&icon),
-							description: val(subreddit, "public_description"),
-							subscribers: format_num(subreddit["data"]["subscribers"].as_f64().unwrap_or_default() as i64),
-						}
-					})
-					.collect::<Vec<Subreddit>>(),
-				_ => Vec::new(),
+			Subreddit {
+				name: val(subreddit, "display_name_prefixed"),
+				url: val(subreddit, "url"),
+				icon: format_url(&icon),
+				description: val(subreddit, "public_description"),
+				subscribers: format_num(subreddit["data"]["subscribers"].as_f64().unwrap_or_default() as i64),
 			}
-		}
-		// If the Reddit API returns an error, exit this function
-		_ => Vec::new(),
-	}
+		})
+		.collect::<Vec<Subreddit>>()
 }

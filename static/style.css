@@ -6,6 +6,12 @@
 	--admin: #ea0027;
 }
 
+@font-face {
+	font-family: 'Inter';
+	src: url('/Inter.var.woff2') format('woff2-variations');
+	font-style: normal;
+}
+
 /* Automatic theme selection */
 :root, .dark{
 	/* Default & fallback theme (dark) */
@@ -150,7 +156,7 @@ html, body, div, h1, h2, h3, h4, h5, h6, ul, ol, dl, li, dt, dd, p, blockquote,
 pre, form, fieldset, table, th, td, select, input {
 	margin: 0;
 	color: var(--text);
-	font-family: sans-serif;
+	font-family: "Inter", sans-serif;
 }
 
 body {
@@ -962,6 +968,7 @@ a.search_subreddit:hover {
 	font-weight: normal;
 	padding: 5px 5px;
 	margin: 5px 0;
+	overflow: auto;
 }
 
 .comment_body.highlighted {
@@ -1189,7 +1196,7 @@ input[type="submit"] {
 }
 
 .md code {
-	font-family: monospace;
+	font-family: monospace, sans-serif;
 	font-size: 14px;
 }
 

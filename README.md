@@ -40,10 +40,11 @@ Feel free to [open an issue](https://github.com/spikecodes/libreddit/issues/new)
 | [libreddit.database.red](https://libreddit.database.red) | 🇺🇸 US | ✅ |
 | [libreddit.exonip.de](https://libreddit.exonip.de) | 🇩🇪 DE  |  |
 | [libreddit.domain.glass](https://libreddit.domain.glass) | 🇺🇸 US | ✅ |
+| [libreddit.trevorthalacker.com](https://libreddit.trevorthalacker.com) | 🇺🇸 US | ✅ |
 | [spjmllawtheisznfs7uryhxumin26ssv2draj7oope3ok3wuhy43eoyd.onion](http://spjmllawtheisznfs7uryhxumin26ssv2draj7oope3ok3wuhy43eoyd.onion) | 🇮🇳 IN  |  |
 | [fwhhsbrbltmrct5hshrnqlqygqvcgmnek3cnka55zj4y7nuus5muwyyd.onion](http://fwhhsbrbltmrct5hshrnqlqygqvcgmnek3cnka55zj4y7nuus5muwyyd.onion) | 🇩🇪 DE  |  |
-| [dflv6yjt7il3n3tggf4qhcmkzbti2ppytqx3o7pjrzwgntutpewscyid.onion](http://dflv6yjt7il3n3tggf4qhcmkzbti2ppytqx3o7pjrzwgntutpewscyid.onion/) | 🇺🇸 US |  |
-| [kphht2jcflojtqte4b4kyx7p2ahagv4debjj32nre67dxz7y57seqwyd.onion](http://kphht2jcflojtqte4b4kyx7p2ahagv4debjj32nre67dxz7y57seqwyd.onion/) | 🇳🇱 NL |  |
+| [dflv6yjt7il3n3tggf4qhcmkzbti2ppytqx3o7pjrzwgntutpewscyid.onion](http://dflv6yjt7il3n3tggf4qhcmkzbti2ppytqx3o7pjrzwgntutpewscyid.onion) | 🇺🇸 US |  |
+| [kphht2jcflojtqte4b4kyx7p2ahagv4debjj32nre67dxz7y57seqwyd.onion](http://kphht2jcflojtqte4b4kyx7p2ahagv4debjj32nre67dxz7y57seqwyd.onion) | 🇳🇱 NL |  |
 
 A checkmark in the "Cloudflare" category here refers to the use of the reverse proxy, [Cloudflare](https://cloudflare). The checkmark will not be listed for a site which uses Cloudflare DNS but rather the proxying service which grants Cloudflare the ability to monitor traffic to the website.
 
@@ -198,17 +199,17 @@ libreddit
 
 Assign a default value for each setting by passing environment variables to Libreddit in the format `LIBREDDIT_DEFAULT_{X}`. Replace `{X}` with the setting name (see list below) in capital letters.
 
-| Name                  | Possible values                                                                        | Default value |
-|-----------------------|----------------------------------------------------------------------------------------|---------------|
-| theme                 | ["system", "light", "dark", "black", "dracula", "nord", "laserwave", "violet", "gold"] | system        |
-| front_page            | ["default", "popular", "all"]                                                          | default       |
-| layout                | ["card", "clean", "compact"]                                                           | card          |
-| wide                  | ["on", "off"]                                                                          | off           |
-| comment_sort          | ["hot", "new", "top", "rising", "controversial"]                                       | hot           |
-| post_sort             | ["confidence", "top", "new", "controversial", "old"]                                   | confidence    |
-| show_nsfw             | ["on", "off"]                                                                          | off           |
-| use_hls               | ["on", "off"]                                                                          | off           |
-| hide_hls_notification | ["on", "off"]                                                                          | off           |
+| Name                    | Possible values                                                                          | Default value |
+|-------------------------|------------------------------------------------------------------------------------------|---------------|
+| `THEME`                 | `["system", "light", "dark", "black", "dracula", "nord", "laserwave", "violet", "gold"]` | `system`      |
+| `FRONT_PAGE`            | `["default", "popular", "all"]`                                                          | `default`     |
+| `LAYOUT`                | `["card", "clean", "compact"]`                                                           | `card`        |
+| `WIDE`                  | `["on", "off"]`                                                                          | `off`         |
+| `COMMENT_SORT`          | `["hot", "new", "top", "rising", "controversial"]`                                       | `hot`         |
+| `POST_SORT`             | `["confidence", "top", "new", "controversial", "old"]`                                   | `confidence`  |
+| `SHOW_NSFW`             | `["on", "off"]`                                                                          | `off`         |
+| `USE_HLS`               | `["on", "off"]`                                                                          | `off`         |
+| `HIDE_HLS_NOTIFICATION` | `["on", "off"]`                                                                          | `off`         |
 
 ### Examples
 
@@ -227,6 +228,25 @@ LIBREDDIT_DEFAULT_WIDE=on LIBREDDIT_DEFAULT_THEME=dark libreddit -r
 proxy_http_version 1.1;
 ```
 to your NGINX configuration file above your `proxy_pass` line.
+
+## SystemD
+
+You can use the SystemD service available in `contrib/libreddit.service`
+(install it on `/etc/systemd/system/libreddit.service`).
+
+That service can be optionally configured in terms of environment variables by
+creating a file in `/etc/libreddit.conf`. Use the `contrib/libreddit.conf` as a
+template. You can also add the `LIBREDDIT_DEFAULT__{X}` settings explained
+above.
+
+When "Proxying using NGINX" where the proxy is on the same machine, you should
+guarantee nginx waits for this service to start. Edit
+`/etc/systemd/system/libreddit.service.d/reverse-proxy.conf`:
+
+```conf
+[Unit]
+Before=nginx.service
+```
 
 ## Building
 
