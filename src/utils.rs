@@ -253,7 +253,7 @@ impl Post {
 			let (post_type, media, gallery) = Media::parse(&data).await;
 			let mut awards = Awards::new();
 
-			awards.parse(&data["all_awardings"]).await;
+			awards.parse(&data["all_awardings"]);
 
 			posts.push(Self {
 				id: val(post, "id"),
@@ -377,7 +377,7 @@ impl Awards {
 		Self(awards)
 	}
 
-	pub async fn parse(&mut self, items: &Value) -> &mut Self {
+	pub fn parse(&mut self, items: &Value) -> &mut Self {
 		if let Some(array_items) = items.as_array() {
 			for item in array_items.iter() {
 				let name = item["name"].as_str().unwrap_or_default().to_string();
@@ -521,83 +521,71 @@ pub fn format_url(url: &str) -> String {
 	if url.is_empty() || url == "self" || url == "default" || url == "nsfw" || url == "spoiler" {
 		String::new()
 	} else {
-		match Url::parse(url) {
-			Ok(parsed) => {
-				let domain = parsed.domain().unwrap_or_default();
+		Url::parse(url).map_or(String::new(), |parsed| {
+			let domain = parsed.domain().unwrap_or_default();
 
-				let capture = |regex: &str, format: &str, segments: i16| {
-					Regex::new(regex)
-						.map(|re| match re.captures(url) {
-							Some(caps) => match segments {
-								1 => [format, &caps[1]].join(""),
-								2 => [format, &caps[1], "/", &caps[2]].join(""),
-								_ => String::new(),
-							},
-							None => String::new(),
-						})
-						.unwrap_or_default()
+			let capture = |regex: &str, format: &str, segments: i16| {
+				Regex::new(regex).map_or(String::new(), |re| {
+					re.captures(url).map_or(String::new(), |caps| match segments {
+						1 => [format, &caps[1]].join(""),
+						2 => [format, &caps[1], "/", &caps[2]].join(""),
+						_ => String::new(),
+					})
+				})
+			};
+
+			macro_rules! chain {
+				() => {
+					{
+						String::new()
+					}
 				};
 
-				macro_rules! chain {
-					() => {
-						{
-							String::new()
+				( $first_fn:expr, $($other_fns:expr), *) => {
+					{
+						let result = $first_fn;
+						if result.is_empty() {
+							chain!($($other_fns,)*)
 						}
-					};
-
-					( $first_fn:expr, $($other_fns:expr), *) => {
+						else
 						{
-							let result = $first_fn;
-							if result.is_empty() {
-								chain!($($other_fns,)*)
-							}
-							else
-							{
-								result
-							}
+							result
 						}
-					};
-				}
-
-				match domain {
-					"v.redd.it" => chain!(
-						capture(r"https://v\.redd\.it/(.*)/DASH_([0-9]{2,4}(\.mp4|$))", "/vid/", 2),
-						capture(r"https://v\.redd\.it/(.+)/(HLSPlaylist\.m3u8.*)$", "/hls/", 2)
-					),
-					"i.redd.it" => capture(r"https://i\.redd\.it/(.*)", "/img/", 1),
-					"a.thumbs.redditmedia.com" => capture(r"https://a\.thumbs\.redditmedia\.com/(.*)", "/thumb/a/", 1),
-					"b.thumbs.redditmedia.com" => capture(r"https://b\.thumbs\.redditmedia\.com/(.*)", "/thumb/b/", 1),
-					"emoji.redditmedia.com" => capture(r"https://emoji\.redditmedia\.com/(.*)/(.*)", "/emoji/", 2),
-					"preview.redd.it" => capture(r"https://preview\.redd\.it/(.*)", "/preview/pre/", 1),
-					"external-preview.redd.it" => capture(r"https://external\-preview\.redd\.it/(.*)", "/preview/external-pre/", 1),
-					"styles.redditmedia.com" => capture(r"https://styles\.redditmedia\.com/(.*)", "/style/", 1),
-					"www.redditstatic.com" => capture(r"https://www\.redditstatic\.com/(.*)", "/static/", 1),
-					_ => String::new(),
-				}
+					}
+				};
 			}
-			Err(_) => String::new(),
-		}
+
+			match domain {
+				"v.redd.it" => chain!(
+					capture(r"https://v\.redd\.it/(.*)/DASH_([0-9]{2,4}(\.mp4|$))", "/vid/", 2),
+					capture(r"https://v\.redd\.it/(.+)/(HLSPlaylist\.m3u8.*)$", "/hls/", 2)
+				),
+				"i.redd.it" => capture(r"https://i\.redd\.it/(.*)", "/img/", 1),
+				"a.thumbs.redditmedia.com" => capture(r"https://a\.thumbs\.redditmedia\.com/(.*)", "/thumb/a/", 1),
+				"b.thumbs.redditmedia.com" => capture(r"https://b\.thumbs\.redditmedia\.com/(.*)", "/thumb/b/", 1),
+				"emoji.redditmedia.com" => capture(r"https://emoji\.redditmedia\.com/(.*)/(.*)", "/emoji/", 2),
+				"preview.redd.it" => capture(r"https://preview\.redd\.it/(.*)", "/preview/pre/", 1),
+				"external-preview.redd.it" => capture(r"https://external\-preview\.redd\.it/(.*)", "/preview/external-pre/", 1),
+				"styles.redditmedia.com" => capture(r"https://styles\.redditmedia\.com/(.*)", "/style/", 1),
+				"www.redditstatic.com" => capture(r"https://www\.redditstatic\.com/(.*)", "/static/", 1),
+				_ => String::new(),
+			}
+		})
 	}
 }
 
 // Rewrite Reddit links to Libreddit in body of text
 pub fn rewrite_urls(input_text: &str) -> String {
-	let text1 = match Regex::new(r#"href="(https|http|)://(www.|old.|np.|amp.|)(reddit).(com)/"#) {
-		Ok(re) => re.replace_all(input_text, r#"href="/"#).to_string(),
-		Err(_) => String::new(),
-	};
+	let text1 = Regex::new(r#"href="(https|http|)://(www.|old.|np.|amp.|)(reddit).(com)/"#).map_or(String::new(), |re| re.replace_all(input_text, r#"href="/"#).to_string());
 
 	// Rewrite external media previews to Libreddit
-	match Regex::new(r"https://external-preview\.redd\.it(.*)[^?]") {
-		Ok(re) => {
-			if re.is_match(&text1) {
-				re.replace_all(&text1, format_url(re.find(&text1).map(|x| x.as_str()).unwrap_or_default())).to_string()
-			} else {
-				text1
-			}
+	Regex::new(r"https://external-preview\.redd\.it(.*)[^?]").map_or(String::new(), |re| {
+		if re.is_match(&text1) {
+			re.replace_all(&text1, format_url(re.find(&text1).map(|x| x.as_str()).unwrap_or_default())).to_string()
+		} else {
+			text1
 		}
-		Err(_) => String::new(),
-	}
+	})
 }
 
 // Append `m` and `k` for millions and thousands respectively

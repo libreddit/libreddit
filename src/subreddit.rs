@@ -133,15 +133,15 @@ pub fn quarantine(req: Request<Body>, sub: String) -> Result<Response<Body>, Str
 pub async fn add_quarantine_exception(req: Request<Body>) -> Result<Response<Body>, String> {
 	let subreddit = req.param("sub").ok_or("Invalid URL")?;
 	let redir = param(&format!("?{}", req.uri().query().unwrap_or_default()), "redir").ok_or("Invalid URL")?;
-	let mut res = redirect(redir);
-	res.insert_cookie(
+	let mut response = redirect(redir);
+	response.insert_cookie(
 		Cookie::build(&format!("allow_quaran_{}", subreddit.to_lowercase()), "true")
 			.path("/")
 			.http_only(true)
 			.expires(cookie::Expiration::Session)
 			.finish(),
 	);
-	Ok(res)
+	Ok(response)
 }
 
 pub fn can_access_quarantine(req: &Request<Body>, sub: &str) -> bool {
@@ -199,7 +199,7 @@ pub async fn subscriptions(req: Request<Body>) -> Result<Response<Body>, String>
 			sub_list.sort_by_key(|a| a.to_lowercase())
 		} else if action.contains(&"unsubscribe".to_string()) {
 			// Remove sub name from subscribed list
-			sub_list.retain(|s| s != part);
+			sub_list.retain(|s| s.to_lowercase() != part.to_lowercase());
 		}
 	}
 
@@ -211,13 +211,13 @@ pub async fn subscriptions(req: Request<Body>) -> Result<Response<Body>, String>
 		format!("/r/{}", sub)
 	};
 
-	let mut res = redirect(path);
+	let mut response = redirect(path);
 
 	// Delete cookie if empty, else set
 	if sub_list.is_empty() {
-		res.remove_cookie("subscriptions".to_string());
+		response.remove_cookie("subscriptions".to_string());
 	} else {
-		res.insert_cookie(
+		response.insert_cookie(
 			Cookie::build("subscriptions", sub_list.join("+"))
 				.path("/")
 				.http_only(true)
@@ -226,7 +226,7 @@ pub async fn subscriptions(req: Request<Body>) -> Result<Response<Body>, String>
 		);
 	}
 
-	Ok(res)
+	Ok(response)
 }
 
 pub async fn wiki(req: Request<Body>) -> Result<Response<Body>, String> {
@@ -260,6 +260,7 @@ pub async fn wiki(req: Request<Body>) -> Result<Response<Body>, String> {
 pub async fn sidebar(req: Request<Body>) -> Result<Response<Body>, String> {
 	let sub = req.param("sub").unwrap_or_else(|| "reddit.com".to_string());
 	let quarantined = can_access_quarantine(&req, &sub);
+
 	// Handle random subreddits
 	if let Ok(random) = catch_random(&sub, "/about/sidebar").await {
 		return Ok(random);
@@ -307,10 +308,9 @@ async fn moderators_list(sub: &str, quarantined: bool) -> Result<Vec<String>, St
 	let path: String = format!("/r/{}/about/moderators.json?raw_json=1", sub);
 
 	// Retrieve response
-	let response = json(path, quarantined).await?["data"]["children"].clone();
-	Ok(
+	json(path, quarantined).await.map(|response| {
 		// Traverse json tree and format into list of strings
-		response
+		response["data"]["children"]
 			.as_array()
 			.unwrap_or(&Vec::new())
 			.iter()
@@ -322,8 +322,8 @@ async fn moderators_list(sub: &str, quarantined: bool) -> Result<Vec<String>, St
 					Some(name.to_string())
 				}
 			})
-			.collect::<Vec<_>>(),
-	)
+			.collect::<Vec<_>>()
+	})
 }
 
 // SUBREDDIT
@@ -332,32 +332,25 @@ async fn subreddit(sub: &str, quarantined: bool) -> Result<Subreddit, String> {
 	let path: String = format!("/r/{}/about.json?raw_json=1", sub);
 
 	// Send a request to the url
-	match json(path, quarantined).await {
-		// If success, receive JSON in response
-		Ok(res) => {
-			// Metadata regarding the subreddit
-			let members: i64 = res["data"]["subscribers"].as_u64().unwrap_or_default() as i64;
-			let active: i64 = res["data"]["accounts_active"].as_u64().unwrap_or_default() as i64;
+	let res = json(path, quarantined).await?;
 
-			// Fetch subreddit icon either from the community_icon or icon_img value
-			let community_icon: &str = res["data"]["community_icon"].as_str().unwrap_or_default();
-			let icon = if community_icon.is_empty() { val(&res, "icon_img") } else { community_icon.to_string() };
+	// Metadata regarding the subreddit
+	let members: i64 = res["data"]["subscribers"].as_u64().unwrap_or_default() as i64;
+	let active: i64 = res["data"]["accounts_active"].as_u64().unwrap_or_default() as i64;
 
-			let sub = Subreddit {
-				name: esc!(&res, "display_name"),
-				title: esc!(&res, "title"),
-				description: esc!(&res, "public_description"),
-				info: rewrite_urls(&val(&res, "description_html").replace("\\", "")),
-				moderators: moderators_list(sub, quarantined).await?,
-				icon: format_url(&icon),
-				members: format_num(members),
-				active: format_num(active),
-				wiki: res["data"]["wiki_enabled"].as_bool().unwrap_or_default(),
-			};
+	// Fetch subreddit icon either from the community_icon or icon_img value
+	let community_icon: &str = res["data"]["community_icon"].as_str().unwrap_or_default();
+	let icon = if community_icon.is_empty() { val(&res, "icon_img") } else { community_icon.to_string() };
 
-			Ok(sub)
-		}
-		// If the Reddit API returns an error, exit this function
-		Err(msg) => return Err(msg),
-	}
+	Ok(Subreddit {
+		name: esc!(&res, "display_name"),
+		title: esc!(&res, "title"),
+		description: esc!(&res, "public_description"),
+		info: rewrite_urls(&val(&res, "description_html").replace("\\", "")),
+		moderators: moderators_list(sub, quarantined).await?,
+		icon: format_url(&icon),
+		members: format_num(members),
+		active: format_num(active),
+		wiki: res["data"]["wiki_enabled"].as_bool().unwrap_or_default(),
+	})
 }
