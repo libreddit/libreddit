@@ -253,7 +253,7 @@ impl Post {
 			let (post_type, media, gallery) = Media::parse(&data).await;
 			let mut awards = Awards::new();
 
-			awards.parse(&data["all_awardings"]).await;
+			awards.parse(&data["all_awardings"]);
 
 			posts.push(Self {
 				id: val(post, "id"),
@@ -377,7 +377,7 @@ impl Awards {
 		Self(awards)
 	}
 
-	pub async fn parse(&mut self, items: &Value) -> &mut Self {
+	pub fn parse(&mut self, items: &Value) -> &mut Self {
 		if let Some(array_items) = items.as_array() {
 			for item in array_items.iter() {
 				let name = item["name"].as_str().unwrap_or_default().to_string();
