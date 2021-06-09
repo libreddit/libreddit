@@ -10,6 +10,7 @@ use serde_json::Value;
 use std::collections::HashMap;
 use time::{Duration, OffsetDateTime};
 use url::Url;
+use std::str::FromStr;
 
 // Post flair with content, background color and foreground color
 pub struct Flair {
@@ -347,6 +348,7 @@ pub struct Award {
 	pub name: String,
 	pub icon_url: String,
 	pub description: String,
+	pub count: i64,
 }
 
 impl std::fmt::Display for Award {
@@ -383,8 +385,9 @@ impl Awards {
 				let name = item["name"].as_str().unwrap_or_default().to_string();
 				let icon_url = format_url(&item["icon_url"].as_str().unwrap_or_default().to_string());
 				let description = item["description"].as_str().unwrap_or_default().to_string();
+				let count: i64 =  i64::from_str(&item["count"].to_string()).unwrap_or(1);
 
-				self.0.push(Award { name, icon_url, description })
+				self.0.push(Award { name, icon_url, description, count })
 			}
 
 			self
