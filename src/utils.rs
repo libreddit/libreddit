@@ -253,7 +253,7 @@ impl Post {
 
 			posts.push(Self {
 				id: val(post, "id"),
-				title: esc!(if title.is_empty() { fallback_title.to_owned() } else { title }),
+				title: esc!(if title.is_empty() { fallback_title.clone() } else { title }),
 				community: val(post, "subreddit"),
 				body: rewrite_urls(&val(post, "body_html")),
 				author: Author {
@@ -362,7 +362,7 @@ pub struct Subreddit {
 	pub title: String,
 	pub description: String,
 	pub info: String,
-	pub moderators: Vec<String>,
+	// pub moderators: Vec<String>,
 	pub icon: String,
 	pub members: (String, String),
 	pub active: (String, String),
@@ -424,7 +424,7 @@ pub fn param(path: &str, value: &str) -> Option<String> {
 			.into_owned()
 			.collect::<HashMap<_, _>>()
 			.get(value)?
-			.to_owned(),
+			.clone(),
 	)
 }
 
