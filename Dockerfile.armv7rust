@@ -3,13 +3,17 @@
 ####################################################################################################
 FROM --platform=$BUILDPLATFORM rust:slim AS builder
 
-# Old - Potentially useful links with information
-# https://github.com/briansmith/ring/issues/1171#issuecomment-830840950
-# https://github.com/JakeWharton/NormallyClosed/blob/a21e4de89ef90417a99cadf75c2b6297eda35735/Dockerfile
+ENV CARGO_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABIHF_LINKER=/usr/bin/arm-linux-gnueabihf-gcc
 
-# Below taken from: https://medium.com/swlh/compiling-rust-for-raspberry-pi-arm-922b55dbb050
+# Potentially useful links with information
+# https://github.com/briansmith/ring/issues/1171#issuecomment-830840950
+# https://jakewharton.com/cross-compiling-static-rust-binaries-in-docker-for-raspberry-pi/
+# https://github.com/JakeWharton/NormallyClosed/blob/a21e4de89ef90417a99cadf75c2b6297eda35735/Dockerfile
+# https://medium.com/swlh/compiling-rust-for-raspberry-pi-arm-922b55dbb050
+# https://github.com/rust-lang/cargo/issues/1109#issuecomment-386830362
+
 RUN rustup target add armv7-unknown-linux-gnueabihf
-RUN apt-get update && apt-get -y install gcc-arm-linux-gnueabihf
+RUN apt-get update && apt-get -y install gcc-arm-linux-gnueabihf binutils-arm-linux-gnueabihf
 
 WORKDIR /libreddit
 
