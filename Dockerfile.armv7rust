@@ -3,7 +3,9 @@
 ####################################################################################################
 FROM --platform=$BUILDPLATFORM rust:slim AS builder
 
-ENV CARGO_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABIHF_LINKER=/usr/bin/arm-linux-gnueabihf-gcc
+#ENV CARGO_TARGET_ARMV7_UNKNOWN_LINUX_MUSLEABIHF_LINKER=/usr/bin/arm-linux-gnueabihf-ld
+ENV CARGO_TARGET_ARMV7_UNKNOWN_LINUX_MUSLEABIHF_LINKER=arm-linux-gnueabihf-gcc
+ENV CC_armv7_unknown_linux_musleabihf=arm-linux-gnueabihf-gcc
 
 # Potentially useful links with information
 # https://github.com/briansmith/ring/issues/1171#issuecomment-830840950
@@ -12,14 +14,15 @@ ENV CARGO_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABIHF_LINKER=/usr/bin/arm-linux-gnueabi
 # https://medium.com/swlh/compiling-rust-for-raspberry-pi-arm-922b55dbb050
 # https://github.com/rust-lang/cargo/issues/1109#issuecomment-386830362
 
-RUN rustup target add armv7-unknown-linux-gnueabihf
-RUN apt-get update && apt-get -y install gcc-arm-linux-gnueabihf binutils-arm-linux-gnueabihf
+RUN apt-get update && apt-get -y install gcc-arm-linux-gnueabihf binutils-arm-linux-gnueabihf musl-tools
+
+RUN rustup target add armv7-unknown-linux-musleabihf
 
 WORKDIR /libreddit
 
 COPY . .
 
-RUN cargo build --target armv7-unknown-linux-gnueabihf --release
+RUN cargo build --target armv7-unknown-linux-musleabihf --release
 
 ####################################################################################################
 ## Final image
@@ -31,7 +34,7 @@ COPY --from=builder /usr/share/ca-certificates /usr/share/ca-certificates
 COPY --from=builder /etc/ssl/certs /etc/ssl/certs
 
 # Copy our build
-COPY --from=builder /libreddit/target/armv7-unknown-linux-gnueabihf/release/libreddit /usr/local/bin/libreddit
+COPY --from=builder /libreddit/target/armv7-unknown-linux-musleabihf/release/libreddit /usr/local/bin/libreddit
 
 # Use an unprivileged user.
 RUN adduser --home /nonexistent --no-create-home --disabled-password libreddit
