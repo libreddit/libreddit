@@ -1,6 +1,6 @@
 # Libreddit
 
-> An alternative private front-end to Reddit 
+> An alternative private front-end to Reddit
 
 ![screenshot](https://i.ibb.co/QYbqTQt/libreddit-rust.png)
 
@@ -164,6 +164,8 @@ docker run -d --name libreddit -p 80:8080 spikecodes/libreddit
 ```
 
 To deploy on `arm64` platforms, simply replace `spikecodes/libreddit` in the commands above with `spikecodes/libreddit:arm`.
+
+To deploy on `armv7` platforms, simply replace `spikecodes/libreddit` in the commands above with `spikecodes/libreddit:armv7`.
 
 ## 3) AUR
 
