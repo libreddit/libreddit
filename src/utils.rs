@@ -518,7 +518,7 @@ pub fn format_url(url: &str) -> String {
 
 // Rewrite Reddit links to Libreddit in body of text
 pub fn rewrite_urls(input_text: &str) -> String {
-	let text1 = Regex::new(r#"href="(https|http|)://(www.|old.|np.|amp.|)(reddit).(com)/"#).map_or(String::new(), |re| re.replace_all(input_text, r#"href="/"#).to_string());
+	let text1 = Regex::new(r#"href="(https|http|)://(www.|old.|np.|amp.|)(reddit.com|redd.it)/"#).map_or(String::new(), |re| re.replace_all(input_text, r#"href="/"#).to_string());
 
 	// Rewrite external media previews to Libreddit
 	Regex::new(r"https://external-preview\.redd\.it(.*)[^?]").map_or(String::new(), |re| {
