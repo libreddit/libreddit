@@ -44,12 +44,15 @@
 				<span class="dot">&bull;</span>
 				<span class="created" title="{{ post.created }}">{{ post.rel_time }}</span>
 				{% if post.awards.len() > 0 %}
+				<span class="dot">&bull;</span>
+				<span class="awards">
 					{% for award in post.awards.clone() %}
-					<span>	
-					<img alt="{{ award.icon_url }}" src="{{ award.icon_url }}" width="16" height="16"/>
-					<a>{{ award.count }}</a>
+					<span>
+					<img alt="{{ award.icon_url }}" src="{{ award.icon_url }}" width="16" height="16" class="awards_image"/>
 					</span>
+					<span>{{ award.count }}</snap>
 					{% endfor %}
+				</span>
 				{% endif %}
 			</p>
 			<p class="post_title">

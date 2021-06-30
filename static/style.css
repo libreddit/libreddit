@@ -734,6 +734,17 @@ a.search_subreddit:hover {
 	font-weight: bold;
 }
 
+.awards {
+	background-color: var(--background);
+	border-radius: 5px;
+	margin:auto;
+	padding: 5px;
+}
+
+.awards_image {
+	vertical-align: middle;
+}
+
 .author_flair:empty, .post_flair:empty {
 	display: none;
 }
