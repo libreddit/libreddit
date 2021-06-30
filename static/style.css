@@ -743,6 +743,8 @@ a.search_subreddit:hover {
 
 .awards_image {
 	vertical-align: middle;
+	width: 16px;
+	height: 16px;
 }
 
 .author_flair:empty, .post_flair:empty {
