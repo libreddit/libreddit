@@ -42,6 +42,7 @@ Feel free to [open an issue](https://github.com/spikecodes/libreddit/issues/new)
 | [libreddit.domain.glass](https://libreddit.domain.glass) | 🇺🇸 US | ✅ |
 | [libreddit.trevorthalacker.com](https://libreddit.trevorthalacker.com) | 🇺🇸 US | ✅ |
 | [reddit.artemislena.eu](https://reddit.artemislena.eu) | 🇩🇪 DE  |  |
+| [reddit.git-bruh.duckdns.org](https://reddit.git-bruh.duckdns.org) | 🇩🇪 DE  |  |
 | [r.nf](https://r.nf) | 🇩🇪 DE  | ✅ |
 | [libreddit.cyberhost.uk](https://libreddit.cyberhost.uk) | 🇫🇮 FI |  |
 | [libreddit.awesomehub.io](https://libreddit.awesomehub.io) | 🇫🇮 FI |  |
