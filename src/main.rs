@@ -251,7 +251,7 @@ async fn main() {
 
 	app.at("/:id").get(|req: Request<Body>| match req.param("id").as_deref() {
 		// Sort front page
-		Some("best") | Some("hot") | Some("new") | Some("top") | Some("rising") | Some("controversial") => subreddit::community(req).boxed(),
+		Some("best" | "hot" | "new" | "top" | "rising" | "controversial") => subreddit::community(req).boxed(),
 		// Short link for post
 		Some(id) if id.len() > 4 && id.len() < 7 => post::item(req).boxed(),
 		// Error message for unknown pages
