@@ -1,7 +1,7 @@
 // Global specifiers
 #![forbid(unsafe_code)]
 #![warn(clippy::pedantic, clippy::all)]
-#![allow(clippy::needless_pass_by_value, clippy::cast_possible_truncation, clippy::cast_possible_wrap, clippy::manual_find_map)]
+#![allow(clippy::needless_pass_by_value, clippy::cast_possible_truncation, clippy::cast_possible_wrap, clippy::manual_find_map, clippy::unused_async)]
 
 // Reference local files
 mod post;
