@@ -4,6 +4,7 @@
 use crate::{client::json, esc, server::RequestExt};
 use askama::Template;
 use cookie::Cookie;
+use html_escape::encode_text;
 use hyper::{Body, Request, Response};
 use regex::Regex;
 use serde_json::Value;
@@ -39,7 +40,7 @@ impl FlairPart {
 						Self {
 							flair_part_type: value("e").to_string(),
 							value: match value("e") {
-								"text" => value("t").to_string(),
+								"text" => encode_text(value("t")).to_string(),
 								"emoji" => format_url(value("u")),
 								_ => String::new(),
 							},
