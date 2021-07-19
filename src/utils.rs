@@ -39,7 +39,7 @@ impl FlairPart {
 						Self {
 							flair_part_type: value("e").to_string(),
 							value: match value("e") {
-								"text" => value("t").to_string(),
+								"text" => esc!(value("t")).to_string(),
 								"emoji" => format_url(value("u")),
 								_ => String::new(),
 							},
@@ -568,26 +568,16 @@ pub fn val(j: &Value, k: &str) -> String {
 	j["data"][k].as_str().unwrap_or_default().to_string()
 }
 
+// Escape < and > to accurately render HTML
 #[macro_export]
 macro_rules! esc {
 	($f:expr) => {
-		$f.replace('<', "&lt;").replace('>', "&gt;")
+		$f.replace('&', "&amp;").replace('<', "&lt;").replace('>', "&gt;")
 	};
 	($j:expr, $k:expr) => {
 		$j["data"][$k].as_str().unwrap_or_default().to_string().replace('<', "&lt;").replace('>', "&gt;")
 	};
 }
-
-// Escape < and > to accurately render HTML
-// pub fn esc(j: &Value, k: &str) -> String {
-// 	val(j,k)
-// 		// .replace('&', "&amp;")
-// 		.replace('<', "&lt;")
-// 		.replace('>', "&gt;")
-// 		// .replace('"', "&quot;")
-// 		// .replace('\'', "&#x27;")
-// 		// .replace('/', "&#x2f;")
-// }
 
 //
 // NETWORKING
