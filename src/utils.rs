@@ -39,7 +39,7 @@ impl FlairPart {
 						Self {
 							flair_part_type: value("e").to_string(),
 							value: match value("e") {
-								"text" => esc!(value("t")).to_string(),
+								"text" => esc!(value("t")),
 								"emoji" => format_url(value("u")),
 								_ => String::new(),
 							},
@@ -52,7 +52,7 @@ impl FlairPart {
 			"text" => match text_flair {
 				Some(text) => vec![Self {
 					flair_part_type: "text".to_string(),
-					value: text.to_string(),
+					value: esc!(text),
 				}],
 				None => Vec::new(),
 			},
