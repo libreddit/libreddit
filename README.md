@@ -44,7 +44,6 @@ Feel free to [open an issue](https://github.com/spikecodes/libreddit/issues/new)
 | [reddit.artemislena.eu](https://reddit.artemislena.eu) | 🇩🇪 DE  |  |
 | [reddit.git-bruh.duckdns.org](https://reddit.git-bruh.duckdns.org) | 🇩🇪 DE  |  |
 | [r.nf](https://r.nf) | 🇩🇪 DE  | ✅ |
-| [libreddit.cyberhost.uk](https://libreddit.cyberhost.uk) | 🇫🇮 FI |  |
 | [libreddit.awesomehub.io](https://libreddit.awesomehub.io) | 🇫🇮 FI |  |
 | [spjmllawtheisznfs7uryhxumin26ssv2draj7oope3ok3wuhy43eoyd.onion](http://spjmllawtheisznfs7uryhxumin26ssv2draj7oope3ok3wuhy43eoyd.onion) | 🇮🇳 IN  |  |
 | [fwhhsbrbltmrct5hshrnqlqygqvcgmnek3cnka55zj4y7nuus5muwyyd.onion](http://fwhhsbrbltmrct5hshrnqlqygqvcgmnek3cnka55zj4y7nuus5muwyyd.onion) | 🇩🇪 DE  |  |
