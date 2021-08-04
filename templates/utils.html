@@ -108,7 +108,7 @@
 	</video>
 	{% else %}
 	<video class="post_media_video short" src="{{ post.media.url }}" width="{{ post.media.width }}" height="{{ post.media.height }}" poster="{{ post.media.poster }}" preload="none" controls autoplay><a href={{ post.media.url }}>Video</a></video>
-	{% call render_hls_notification(format!("{}%23{}", &self.url[1..].replace("&", "%26"), post.id)) %}
+	{% call render_hls_notification(format!("{}%23{}", &self.url[1..].replace("&", "%26").replace("+", "%2B"), post.id)) %}
 	{% endif %}
 	{% else if post.post_type != "self" %}
 	<a class="post_thumbnail {% if post.thumbnail.url.is_empty() %}no_thumbnail{% endif %}" href="{% if post.post_type == "link" %}{{ post.media.url }}{% else %}{{ post.permalink }}{% endif %}" rel="nofollow">
