@@ -122,6 +122,8 @@ pub async fn json(path: String, quarantine: bool) -> Result<Value, String> {
 	// Fetch the url...
 	match request(url.clone(), quarantine).await {
 		Ok(response) => {
+			let status = response.status();
+
 			// asynchronously aggregate the chunks of the body
 			match hyper::body::aggregate(response).await {
 				Ok(body) => {
@@ -146,7 +148,13 @@ pub async fn json(path: String, quarantine: bool) -> Result<Value, String> {
 								Ok(json)
 							}
 						}
-						Err(e) => err("Failed to parse page JSON data", e.to_string()),
+						Err(e) => {
+							if status.is_server_error() {
+								Err("Reddit is having issues, check if there's an outage".to_string())
+							} else {
+								err("Failed to parse page JSON data", e.to_string())
+							}
+						}
 					}
 				}
 				Err(e) => err("Failed receiving body from Reddit", e.to_string()),
