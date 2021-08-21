@@ -40,6 +40,7 @@ Feel free to [open an issue](https://github.com/spikecodes/libreddit/issues/new)
 | [libreddit.database.red](https://libreddit.database.red) | 🇺🇸 US | ✅ |
 | [libreddit.exonip.de](https://libreddit.exonip.de) | 🇩🇪 DE  |  |
 | [libreddit.domain.glass](https://libreddit.domain.glass) | 🇺🇸 US | ✅ |
+| [libreddit.sugoma.tk](https://libreddit.sugoma.tk) | 🇺🇸 US | |
 | [libreddit.trevorthalacker.com](https://libreddit.trevorthalacker.com) | 🇺🇸 US | ✅ |
 | [reddit.artemislena.eu](https://reddit.artemislena.eu) | 🇩🇪 DE  |  |
 | [reddit.git-bruh.duckdns.org](https://reddit.git-bruh.duckdns.org) | 🇩🇪 DE  |  |
