@@ -63,7 +63,7 @@
 					xmlns="http://www.w3.org/2000/svg">
 						<image width="100%" height="100%" href="{{ post.media.url }}"/>
 						<desc>
-							<img alt="Post image" src="{{ post.media.url }}"/>
+							<img loading="lazy" alt="Post image" src="{{ post.media.url }}"/>
 						</desc>
 				</svg>
 			</a>
@@ -83,7 +83,7 @@
 			<div class="gallery">
 			{% for image in post.gallery -%}
 				<figure>
-					<a href="{{ image.url }}" ><img alt="Gallery image" src="{{ image.url }}"/></a>
+					<a href="{{ image.url }}" ><img loading="lazy" alt="Gallery image" src="{{ image.url }}"/></a>
 					<figcaption>
 						<p>{{ image.caption }}</p>
 						{% if image.outbound_url.len() > 0 %}

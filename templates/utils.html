@@ -94,7 +94,7 @@
 			xmlns="http://www.w3.org/2000/svg">
 				<image width="100%" height="100%" href="{{ post.media.url }}"/>
 				<desc>
-					<img alt="Post image" src="{{ post.media.url }}"/>
+					<img loading="lazy" alt="Post image" src="{{ post.media.url }}"/>
 				</desc>
 		</svg>
 	</a>
@@ -121,7 +121,7 @@
 		<svg width="{{ post.thumbnail.width }}px" height="{{ post.thumbnail.height }}px" xmlns="http://www.w3.org/2000/svg">
 			<image  width="100%" height="100%" href="{{ post.thumbnail.url }}"/>
 			<desc>
-				<img alt="Thumbnail" src="{{ post.thumbnail.url }}"/>
+				<img loading="lazy" alt="Thumbnail" src="{{ post.thumbnail.url }}"/>
 			</desc>
 		</svg>
 		{% endif %}
