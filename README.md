@@ -240,9 +240,9 @@ proxy_http_version 1.1;
 ```
 to your NGINX configuration file above your `proxy_pass` line.
 
-## SystemD
+## systemd
 
-You can use the SystemD service available in `contrib/libreddit.service`
+You can use the systemd service available in `contrib/libreddit.service`
 (install it on `/etc/systemd/system/libreddit.service`).
 
 That service can be optionally configured in terms of environment variables by
