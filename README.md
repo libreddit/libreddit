@@ -50,6 +50,7 @@ Feel free to [open an issue](https://github.com/spikecodes/libreddit/issues/new)
 | [lr.mint.lgbt](https://lr.mint.lgbt) | 🇨🇦 CA |  |
 | [libreddit.alefvanoon.xyz](https://libreddit.alefvanoon.xyz) | 🇺🇸 US | ✅ |
 | [libreddit.igna.rocks](https://libreddit.igna.rocks) | 🇺🇸 US | |
+| [libreddit.autarkic.org](https://libreddit.autarkic.org) | 🇺🇸 US | |
 | [spjmllawtheisznfs7uryhxumin26ssv2draj7oope3ok3wuhy43eoyd.onion](http://spjmllawtheisznfs7uryhxumin26ssv2draj7oope3ok3wuhy43eoyd.onion) | 🇮🇳 IN  |  |
 | [fwhhsbrbltmrct5hshrnqlqygqvcgmnek3cnka55zj4y7nuus5muwyyd.onion](http://fwhhsbrbltmrct5hshrnqlqygqvcgmnek3cnka55zj4y7nuus5muwyyd.onion) | 🇩🇪 DE  |  |
 | [dflv6yjt7il3n3tggf4qhcmkzbti2ppytqx3o7pjrzwgntutpewscyid.onion](http://dflv6yjt7il3n3tggf4qhcmkzbti2ppytqx3o7pjrzwgntutpewscyid.onion) | 🇺🇸 US |  |
