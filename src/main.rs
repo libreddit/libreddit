@@ -1,7 +1,13 @@
 // Global specifiers
 #![forbid(unsafe_code)]
 #![warn(clippy::pedantic, clippy::all)]
-#![allow(clippy::needless_pass_by_value, clippy::cast_possible_truncation, clippy::cast_possible_wrap, clippy::manual_find_map, clippy::unused_async)]
+#![allow(
+	clippy::needless_pass_by_value,
+	clippy::cast_possible_truncation,
+	clippy::cast_possible_wrap,
+	clippy::manual_find_map,
+	clippy::unused_async
+)]
 
 // Reference local files
 mod post;
@@ -156,7 +162,9 @@ async fn main() {
 	app
 		.at("/manifest.json")
 		.get(|_| resource(include_str!("../static/manifest.json"), "application/json", false).boxed());
-	app.at("/robots.txt").get(|_| resource("User-agent: *\nDisallow: /u/\nDisallow: /user/", "text/plain", true).boxed());
+	app
+		.at("/robots.txt")
+		.get(|_| resource("User-agent: *\nDisallow: /u/\nDisallow: /user/", "text/plain", true).boxed());
 	app.at("/favicon.ico").get(|_| favicon().boxed());
 	app.at("/logo.png").get(|_| pwa_logo().boxed());
 	app.at("/Inter.var.woff2").get(|_| font().boxed());

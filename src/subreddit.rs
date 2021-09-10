@@ -146,7 +146,7 @@ pub async fn add_quarantine_exception(req: Request<Body>) -> Result<Response<Bod
 
 pub fn can_access_quarantine(req: &Request<Body>, sub: &str) -> bool {
 	// Determine if the subreddit can be accessed
-	setting(&req, &format!("allow_quaran_{}", sub.to_lowercase())).parse().unwrap_or_default()
+	setting(req, &format!("allow_quaran_{}", sub.to_lowercase())).parse().unwrap_or_default()
 }
 
 // Sub or unsub by setting subscription cookie using response "Set-Cookie" header
@@ -196,7 +196,7 @@ pub async fn subscriptions(req: Request<Body>) -> Result<Response<Body>, String>
 			// Add each sub name to the subscribed list
 			sub_list.push(part.to_owned());
 			// Reorder sub names alphabettically
-			sub_list.sort_by_key(|a| a.to_lowercase())
+			sub_list.sort_by_key(|a| a.to_lowercase());
 		} else if action.contains(&"unsubscribe".to_string()) {
 			// Remove sub name from subscribed list
 			sub_list.retain(|s| s.to_lowercase() != part.to_lowercase());

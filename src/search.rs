@@ -1,5 +1,5 @@
 // CRATES
-use crate::utils::{catch_random, error, format_num, format_url, param, setting, template, val, Post, Preferences};
+use crate::utils::{catch_random, error, format_num, format_url, param, redirect, setting, template, val, Post, Preferences};
 use crate::{
 	client::json,
 	subreddit::{can_access_quarantine, quarantine},
@@ -42,13 +42,18 @@ struct SearchTemplate {
 pub async fn find(req: Request<Body>) -> Result<Response<Body>, String> {
 	let nsfw_results = if setting(&req, "show_nsfw") == "on" { "&include_over_18=on" } else { "" };
 	let path = format!("{}.json?{}{}", req.uri().path(), req.uri().query().unwrap_or_default(), nsfw_results);
+	let query = param(&path, "q").unwrap_or_default();
+
+	if query.is_empty() {
+		return Ok(redirect("/".to_string()));
+	}
+
 	let sub = req.param("sub").unwrap_or_default();
 	let quarantined = can_access_quarantine(&req, &sub);
 	// Handle random subreddits
 	if let Ok(random) = catch_random(&sub, "/find").await {
 		return Ok(random);
 	}
-	let query = param(&path, "q").unwrap_or_default();
 
 	let sort = param(&path, "sort").unwrap_or_else(|| "relevance".to_string());
 
@@ -98,7 +103,7 @@ async fn search_subreddits(q: &str) -> Vec<Subreddit> {
 			// Fetch subreddit icon either from the community_icon or icon_img value
 			let icon = subreddit["data"]["community_icon"]
 				.as_str()
-				.map_or_else(|| val(&subreddit, "icon_img"), ToString::to_string);
+				.map_or_else(|| val(subreddit, "icon_img"), ToString::to_string);
 
 			Subreddit {
 				name: val(subreddit, "display_name_prefixed"),
