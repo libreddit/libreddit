@@ -11,6 +11,8 @@ env:
 
 jobs:
   build:
+    permissions:
+      contents: write
     runs-on: ubuntu-18.04
 
     steps:
