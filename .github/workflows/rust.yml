@@ -12,7 +12,7 @@ env:
 jobs:
   build:
     permissions:
-      contents: write
+      contents: read
     runs-on: ubuntu-18.04
 
     steps:
