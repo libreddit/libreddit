@@ -1,0 +1,42 @@
+{
+  "name": "Libreddit",
+  "description": "Private front-end for Reddit",
+  "buildpacks": [
+    {
+      "url": "https://github.com/emk/heroku-buildpack-rust"
+    },
+    {
+      "url": "emk/rust"
+    }
+  ],
+  "stack": "container",
+  "env": {
+    "LIBREDDIT_DEFAULT_THEME": {
+      "required": false
+    },
+    "LIBREDDIT_DEFAULT_FRONT_PAGE": {
+      "required": false
+    },
+    "LIBREDDIT_DEFAULT_LAYOUT": {
+      "required": false
+    },
+    "LIBREDDIT_DEFAULT_WIDE": {
+      "required": false
+    },
+    "LIBREDDIT_DEFAULT_COMMENT_SORT": {
+      "required": false
+    },
+    "LIBREDDIT_DEFAULT_POST_SORT": {
+      "required": false
+    },
+    "LIBREDDIT_DEFAULT_SHOW_NSFW": {
+      "required": false
+    },
+    "LIBREDDIT_USE_HLS": {
+      "required": false
+    },
+    "LIBREDDIT_HIDE_HLS_NOTIFICATION": {
+      "required": false
+    }
+  }
+}
