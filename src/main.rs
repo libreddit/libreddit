@@ -133,10 +133,11 @@ async fn main() {
 		.get_matches();
 
 	let address = matches.value_of("address").unwrap_or("0.0.0.0");
-	let port = matches.value_of("port").unwrap_or("8080");
+	let port = std::env::var("PORT")
+        .unwrap_or_else(|_| matches.value_of("port").unwrap_or("8080").to_string());
 	let hsts = matches.value_of("hsts");
 
-	let listener = [address, ":", port].concat();
+	let listener = [address, ":", &port].concat();
 
 	println!("Starting Libreddit...");
 
