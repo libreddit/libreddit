@@ -199,6 +199,10 @@ If you're on Linux and none of these methods work for you, you can grab a Linux 
 
 In the web preview (defaults to top right), you should see your instance hosted where you can assign a [custom domain](https://docs.replit.com/repls/web-hosting#custom-domains).
 
+## 6) Heroku
+
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/spikecodes/libreddit)
+
 ---
 
 # Deployment
