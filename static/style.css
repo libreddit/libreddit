@@ -1027,6 +1027,10 @@ a.search_subreddit:hover {
 	background: var(--foreground);
 }
 
+summary.comment_data {
+    cursor: pointer;
+}
+
 .moderator, .admin { opacity: 1; }
 .op, .moderator, .admin { font-weight: bold; }
 
