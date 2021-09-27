@@ -36,7 +36,7 @@ Feel free to [open an issue](https://github.com/spikecodes/libreddit/issues/new)
 | [reddit.invak.id](https://reddit.invak.id) | 🇧🇬 BG |  |
 | [reddit.phii.me](https://reddit.phii.me) | 🇺🇸 US |  |
 | [lr.riverside.rocks](https://lr.riverside.rocks) | 🇺🇸 US |  |
-| [libreddit.silkky.cloud](https://libreddit.silkky.cloud) | 🇫🇮 FI |  |
+| [libreddit.silkky.cloud](https://libreddit.silkky.cloud) | 🇫🇮 FI | ✅ |
 | [libreddit.database.red](https://libreddit.database.red) | 🇺🇸 US | ✅ |
 | [libreddit.exonip.de](https://libreddit.exonip.de) | 🇩🇪 DE  |  |
 | [libreddit.domain.glass](https://libreddit.domain.glass) | 🇺🇸 US | ✅ |
