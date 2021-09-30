@@ -24,6 +24,7 @@
 	--post: #161616;
 	--panel-border: 1px solid #333;
 	--highlighted: #333;
+	--visited: #aaa;
 	--shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
 }
 
@@ -39,6 +40,7 @@
 		--post: #eee;
 		--panel-border: 1px solid #ccc;
 		--highlighted: white;
+		--visited: #555;
 		--shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 	}
 }
@@ -54,6 +56,7 @@
 	--post: #eee;
 	--panel-border: 1px solid #ccc;
 	--highlighted: white;
+	--visited: #555;
 	--shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
@@ -68,6 +71,7 @@
 	--post: black;
 	--panel-border: 2px solid #0f0f0f;
 	--highlighted: #0f0f0f;
+	--visited: #aaa;
 	--shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
@@ -78,10 +82,11 @@
 	--text: #f8f8f2;
 	--foreground: #3d4051;
 	--background: #282a36;
-	--outside: #44475a;
-	--post: #44475a;
+	--outside: #393c4d;
+	--post: #333544;
 	--panel-border: 2px solid #44475a;
 	--highlighted: #4e5267;
+	--visited: #969692;
 	--shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
@@ -96,6 +101,7 @@
 	--post: #434c5e;
 	--panel-border: 2px solid #4c566a;
 	--highlighted: #3b4252;
+	--visited: #a3a5aa;
 	--shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
@@ -110,6 +116,7 @@
 	--post: #3e3647;
 	--panel-border: 2px solid #2f2738;
 	--highlighted: #302a36;
+	--visited: #91889b;
 	--shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
@@ -124,6 +131,7 @@
 	--post: #181c3a;
 	--panel-border: 1px solid #1F2347;
 	--highlighted: #1F2347;
+	--visited: #aaa;
 	--shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
 }
 
@@ -138,6 +146,7 @@
 	--post: #1b2936;
 	--panel-border: 0px solid black;
 	--highlighted: #234;
+	--visited: #aaa;
 	--shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
 }
 
@@ -713,6 +722,10 @@ a.search_subreddit:hover {
 	grid-area: post_title;
 }
 
+.post:not(.highlighted) .post_title a:visited {
+	color: var(--visited);
+}
+
 .post_notification {
 	grid-area: post_notification;
 	margin: 5px 15px;
@@ -1050,6 +1063,10 @@ a.search_subreddit:hover {
 	width: 2px;
 	height: 100%;
 	background: var(--foreground);
+}
+
+summary.comment_data {
+    cursor: pointer;
 }
 
 .moderator, .admin { opacity: 1; }

@@ -1,6 +1,6 @@
 # Libreddit
 
-> An alternative private front-end to Reddit 
+> An alternative private front-end to Reddit
 
 ![screenshot](https://i.ibb.co/QYbqTQt/libreddit-rust.png)
 
@@ -36,15 +36,27 @@ Feel free to [open an issue](https://github.com/spikecodes/libreddit/issues/new)
 | [reddit.invak.id](https://reddit.invak.id) | 🇧🇬 BG |  |
 | [reddit.phii.me](https://reddit.phii.me) | 🇺🇸 US |  |
 | [lr.riverside.rocks](https://lr.riverside.rocks) | 🇺🇸 US |  |
-| [libreddit.silkky.cloud](https://libreddit.silkky.cloud) | 🇫🇮 FI |  |
+| [libreddit.silkky.cloud](https://libreddit.silkky.cloud) | 🇫🇮 FI | ✅ |
 | [libreddit.database.red](https://libreddit.database.red) | 🇺🇸 US | ✅ |
 | [libreddit.exonip.de](https://libreddit.exonip.de) | 🇩🇪 DE  |  |
 | [libreddit.domain.glass](https://libreddit.domain.glass) | 🇺🇸 US | ✅ |
+| [libreddit.sugoma.tk](https://libreddit.sugoma.tk) | 🇺🇸 US | |
 | [libreddit.trevorthalacker.com](https://libreddit.trevorthalacker.com) | 🇺🇸 US | ✅ |
+| [reddit.artemislena.eu](https://reddit.artemislena.eu) | 🇩🇪 DE  |  |
+| [r.nf](https://r.nf) | 🇩🇪 DE  | ✅ |
+| [libreddit.awesomehub.io](https://libreddit.awesomehub.io) | 🇫🇮 FI |  |
+| [libreddit.some-things.org](https://libreddit.some-things.org) | 🇨🇭 CH |  |
+| [reddit.stuehieyr.com](https://reddit.stuehieyr.com) | 🇩🇪 DE  |  |
+| [lr.mint.lgbt](https://lr.mint.lgbt) | 🇨🇦 CA |  |
+| [libreddit.alefvanoon.xyz](https://libreddit.alefvanoon.xyz) | 🇺🇸 US | ✅ |
+| [libreddit.igna.rocks](https://libreddit.igna.rocks) | 🇺🇸 US | |
+| [libreddit.autarkic.org](https://libreddit.autarkic.org) | 🇺🇸 US | |
+| [libreddit.flux.industries](https://libreddit.flux.industries) | 🇩🇪 DE  | ✅ |
 | [spjmllawtheisznfs7uryhxumin26ssv2draj7oope3ok3wuhy43eoyd.onion](http://spjmllawtheisznfs7uryhxumin26ssv2draj7oope3ok3wuhy43eoyd.onion) | 🇮🇳 IN  |  |
 | [fwhhsbrbltmrct5hshrnqlqygqvcgmnek3cnka55zj4y7nuus5muwyyd.onion](http://fwhhsbrbltmrct5hshrnqlqygqvcgmnek3cnka55zj4y7nuus5muwyyd.onion) | 🇩🇪 DE  |  |
 | [dflv6yjt7il3n3tggf4qhcmkzbti2ppytqx3o7pjrzwgntutpewscyid.onion](http://dflv6yjt7il3n3tggf4qhcmkzbti2ppytqx3o7pjrzwgntutpewscyid.onion) | 🇺🇸 US |  |
 | [kphht2jcflojtqte4b4kyx7p2ahagv4debjj32nre67dxz7y57seqwyd.onion](http://kphht2jcflojtqte4b4kyx7p2ahagv4debjj32nre67dxz7y57seqwyd.onion) | 🇳🇱 NL |  |
+| [inytumdgnri7xsqtvpntjevaelxtgbjqkuqhtf6txxhwbll2fwqtakqd.onion](http://inytumdgnri7xsqtvpntjevaelxtgbjqkuqhtf6txxhwbll2fwqtakqd.onion) | 🇨🇭 CH |  |
 
 A checkmark in the "Cloudflare" category here refers to the use of the reverse proxy, [Cloudflare](https://cloudflare). The checkmark will not be listed for a site which uses Cloudflare DNS but rather the proxying service which grants Cloudflare the ability to monitor traffic to the website.
 
@@ -163,6 +175,8 @@ docker run -d --name libreddit -p 80:8080 spikecodes/libreddit
 
 To deploy on `arm64` platforms, simply replace `spikecodes/libreddit` in the commands above with `spikecodes/libreddit:arm`.
 
+To deploy on `armv7` platforms, simply replace `spikecodes/libreddit` in the commands above with `spikecodes/libreddit:armv7`.
+
 ## 3) AUR
 
 For ArchLinux users, Libreddit is available from the AUR as [`libreddit-git`](https://aur.archlinux.org/packages/libreddit-git).
@@ -184,6 +198,10 @@ If you're on Linux and none of these methods work for you, you can grab a Linux 
 3. Hit the run button to download the latest Libreddit version and start it
 
 In the web preview (defaults to top right), you should see your instance hosted where you can assign a [custom domain](https://docs.replit.com/repls/web-hosting#custom-domains).
+
+## 6) Heroku
+
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/spikecodes/libreddit)
 
 ---
 
@@ -229,9 +247,9 @@ proxy_http_version 1.1;
 ```
 to your NGINX configuration file above your `proxy_pass` line.
 
-## SystemD
+## systemd
 
-You can use the SystemD service available in `contrib/libreddit.service`
+You can use the systemd service available in `contrib/libreddit.service`
 (install it on `/etc/systemd/system/libreddit.service`).
 
 That service can be optionally configured in terms of environment variables by

@@ -53,7 +53,7 @@ pub trait ResponseExt {
 
 impl RequestExt for Request<Body> {
 	fn params(&self) -> Params {
-		self.extensions().get::<Params>().unwrap_or(&Params::new()).to_owned()
+		self.extensions().get::<Params>().unwrap_or(&Params::new()).clone()
 		// self.extensions()
 		// 	.get::<RequestMeta>()
 		// 	.and_then(|meta| meta.route_params())
@@ -171,7 +171,7 @@ impl Server {
 						// If a route was configured for this path
 						Ok(found) => {
 							let mut parammed = req;
-							parammed.set_params(found.params().to_owned());
+							parammed.set_params(found.params().clone());
 
 							// Run the route's function
 							let func = (found.handler().to_owned().to_owned())(parammed);
@@ -207,7 +207,7 @@ impl Server {
 		// Bind server to address specified above. Gracefully shut down if CTRL+C is pressed
 		let server = HyperServer::bind(address).serve(make_svc).with_graceful_shutdown(async {
 			// Wait for the CTRL+C signal
-			tokio::signal::ctrl_c().await.expect("Failed to install CTRL+C signal handler")
+			tokio::signal::ctrl_c().await.expect("Failed to install CTRL+C signal handler");
 		});
 
 		server.boxed()

@@ -40,7 +40,7 @@ impl FlairPart {
 						Self {
 							flair_part_type: value("e").to_string(),
 							value: match value("e") {
-								"text" => value("t").to_string(),
+								"text" => esc!(value("t")),
 								"emoji" => format_url(value("u")),
 								_ => String::new(),
 							},
@@ -53,7 +53,7 @@ impl FlairPart {
 			"text" => match text_flair {
 				Some(text) => vec![Self {
 					flair_part_type: "text".to_string(),
-					value: text.to_string(),
+					value: esc!(text),
 				}],
 				None => Vec::new(),
 			},
@@ -256,9 +256,9 @@ impl Post {
 
 			awards.parse(&data["all_awardings"]);
 
-			posts.push(Self {
+      posts.push(Self {
 				id: val(post, "id"),
-				title: esc!(if title.is_empty() { fallback_title.to_owned() } else { title }),
+				title: esc!(if title.is_empty() { fallback_title.clone() } else { title }),
 				community: val(post, "subreddit"),
 				body: rewrite_urls(&val(post, "body_html")),
 				author: Author {
@@ -423,7 +423,7 @@ pub struct Subreddit {
 	pub title: String,
 	pub description: String,
 	pub info: String,
-	pub moderators: Vec<String>,
+	// pub moderators: Vec<String>,
 	pub icon: String,
 	pub members: (String, String),
 	pub active: (String, String),
@@ -485,7 +485,7 @@ pub fn param(path: &str, value: &str) -> Option<String> {
 			.into_owned()
 			.collect::<HashMap<_, _>>()
 			.get(value)?
-			.to_owned(),
+			.clone(),
 	)
 }
 
@@ -579,7 +579,8 @@ pub fn format_url(url: &str) -> String {
 
 // Rewrite Reddit links to Libreddit in body of text
 pub fn rewrite_urls(input_text: &str) -> String {
-	let text1 = Regex::new(r#"href="(https|http|)://(www.|old.|np.|amp.|)(reddit).(com)/"#).map_or(String::new(), |re| re.replace_all(input_text, r#"href="/"#).to_string());
+	let text1 =
+		Regex::new(r#"href="(https|http|)://(www\.|old\.|np\.|amp\.|)(reddit\.com|redd\.it)/"#).map_or(String::new(), |re| re.replace_all(input_text, r#"href="/"#).to_string());
 
 	// Rewrite external media previews to Libreddit
 	Regex::new(r"https://external-preview\.redd\.it(.*)[^?]").map_or(String::new(), |re| {
@@ -629,26 +630,16 @@ pub fn val(j: &Value, k: &str) -> String {
 	j["data"][k].as_str().unwrap_or_default().to_string()
 }
 
+// Escape < and > to accurately render HTML
 #[macro_export]
 macro_rules! esc {
 	($f:expr) => {
-		$f.replace('<', "&lt;").replace('>', "&gt;")
+		$f.replace('&', "&amp;").replace('<', "&lt;").replace('>', "&gt;")
 	};
 	($j:expr, $k:expr) => {
 		$j["data"][$k].as_str().unwrap_or_default().to_string().replace('<', "&lt;").replace('>', "&gt;")
 	};
 }
-
-// Escape < and > to accurately render HTML
-// pub fn esc(j: &Value, k: &str) -> String {
-// 	val(j,k)
-// 		// .replace('&', "&amp;")
-// 		.replace('<', "&lt;")
-// 		.replace('>', "&gt;")
-// 		// .replace('"', "&quot;")
-// 		// .replace('\'', "&#x27;")
-// 		// .replace('/', "&#x2f;")
-// }
 
 //
 // NETWORKING

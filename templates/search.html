@@ -34,7 +34,7 @@
 		<div id="search_subreddits">
 			{% for subreddit in subreddits %}
 			<a href="{{ subreddit.url }}" class="search_subreddit">
-				<div class="search_subreddit_left">{% if subreddit.icon != "" %}<img src="{{ subreddit.icon }}" alt="r/{{ subreddit.name }} icon">{% endif %}</div>
+				<div class="search_subreddit_left">{% if subreddit.icon != "" %}<img loading="lazy" src="{{ subreddit.icon }}" alt="r/{{ subreddit.name }} icon">{% endif %}</div>
 				<div class="search_subreddit_right">
 					<p class="search_subreddit_header"> 
 						<span class="search_subreddit_name">{{ subreddit.name }}</span>
@@ -68,6 +68,10 @@
 			</div>
 		{% endif %}
 		{% endfor %}
+		{% if prefs.use_hls == "on" %}
+		<script src="/hls.min.js"></script>
+		<script src="/playHLSVideo.js"></script>
+		{% endif %}
 
 		<footer>
 			{% if params.before != "" %}

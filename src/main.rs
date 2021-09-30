@@ -1,7 +1,13 @@
 // Global specifiers
 #![forbid(unsafe_code)]
 #![warn(clippy::pedantic, clippy::all)]
-#![allow(clippy::needless_pass_by_value, clippy::cast_possible_truncation, clippy::cast_possible_wrap, clippy::find_map)]
+#![allow(
+	clippy::needless_pass_by_value,
+	clippy::cast_possible_truncation,
+	clippy::cast_possible_wrap,
+	clippy::manual_find_map,
+	clippy::unused_async
+)]
 
 // Reference local files
 mod post;
@@ -127,10 +133,11 @@ async fn main() {
 		.get_matches();
 
 	let address = matches.value_of("address").unwrap_or("0.0.0.0");
-	let port = matches.value_of("port").unwrap_or("8080");
+	let port = std::env::var("PORT")
+        .unwrap_or_else(|_| matches.value_of("port").unwrap_or("8080").to_string());
 	let hsts = matches.value_of("hsts");
 
-	let listener = [address, ":", port].concat();
+	let listener = [address, ":", &port].concat();
 
 	println!("Starting Libreddit...");
 
@@ -156,7 +163,9 @@ async fn main() {
 	app
 		.at("/manifest.json")
 		.get(|_| resource(include_str!("../static/manifest.json"), "application/json", false).boxed());
-	app.at("/robots.txt").get(|_| resource("User-agent: *\nAllow: /", "text/plain", true).boxed());
+	app
+		.at("/robots.txt")
+		.get(|_| resource("User-agent: *\nDisallow: /u/\nDisallow: /user/", "text/plain", true).boxed());
 	app.at("/favicon.ico").get(|_| favicon().boxed());
 	app.at("/logo.png").get(|_| pwa_logo().boxed());
 	app.at("/Inter.var.woff2").get(|_| font().boxed());
@@ -251,7 +260,7 @@ async fn main() {
 
 	app.at("/:id").get(|req: Request<Body>| match req.param("id").as_deref() {
 		// Sort front page
-		Some("best") | Some("hot") | Some("new") | Some("top") | Some("rising") | Some("controversial") => subreddit::community(req).boxed(),
+		Some("best" | "hot" | "new" | "top" | "rising" | "controversial") => subreddit::community(req).boxed(),
 		// Short link for post
 		Some(id) if id.len() > 4 && id.len() < 7 => post::item(req).boxed(),
 		// Error message for unknown pages

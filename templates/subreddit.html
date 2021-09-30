@@ -78,7 +78,7 @@
 				</div>
 				{% endif %}
 				<div id="sub_meta">
-					<img id="sub_icon" src="{{ sub.icon }}" alt="Icon for r/{{ sub.name }}">
+					<img loading="lazy" id="sub_icon" src="{{ sub.icon }}" alt="Icon for r/{{ sub.name }}">
 					<p id="sub_title">{{ sub.title }}</p>
 					<p id="sub_name">r/{{ sub.name }}</p>
 					<p id="sub_description">{{ sub.description }}</p>
@@ -105,14 +105,14 @@
 				<summary id="sidebar_label">Sidebar</summary>
 				<div id="sidebar_contents">
                                   {{ sub.info }}
-                                  <hr>
+                                  {# <hr>
                                   <h2>Moderators</h2>
                                   <br>
                                   <ul>
                                   {% for moderator in sub.moderators %}
                                   <li><a style="color: var(--accent)" href="/u/{{ moderator }}">{{ moderator }}</a></li>
                                   {% endfor %}
-                                  </ul>
+                                  </ul> #}
                                 </div>
 			</details>
 		</aside>

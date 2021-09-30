@@ -49,8 +49,11 @@
 				</details>
 			</div>
 			{% endif %}
-
 			{% endfor %}
+			{% if prefs.use_hls == "on" %}
+			<script src="/hls.min.js"></script>
+			<script src="/playHLSVideo.js"></script>
+			{% endif %}
 			</div>
 
 			<footer>
@@ -65,7 +68,7 @@
 		</div>
 		<aside>
 			<div class="panel" id="user">
-				<img id="user_icon" src="{{ user.icon }}" alt="User icon">
+				<img loading="lazy" id="user_icon" src="{{ user.icon }}" alt="User icon">
 				<p id="user_title">{{ user.title }}</p>
 				<p id="user_name">u/{{ user.name }}</p>
 				<div id="user_description">{{ user.description }}</div>

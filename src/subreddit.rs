@@ -51,10 +51,10 @@ pub async fn community(req: Request<Body>) -> Result<Response<Body>, String> {
 		if subscribed.is_empty() {
 			"popular".to_string()
 		} else {
-			subscribed.to_owned()
+			subscribed.clone()
 		}
 	} else {
-		front_page.to_owned()
+		front_page.clone()
 	});
 	let quarantined = can_access_quarantine(&req, &sub) || root;
 
@@ -146,7 +146,7 @@ pub async fn add_quarantine_exception(req: Request<Body>) -> Result<Response<Bod
 
 pub fn can_access_quarantine(req: &Request<Body>, sub: &str) -> bool {
 	// Determine if the subreddit can be accessed
-	setting(&req, &format!("allow_quaran_{}", sub.to_lowercase())).parse().unwrap_or_default()
+	setting(req, &format!("allow_quaran_{}", sub.to_lowercase())).parse().unwrap_or_default()
 }
 
 // Sub or unsub by setting subscription cookie using response "Set-Cookie" header
@@ -196,7 +196,7 @@ pub async fn subscriptions(req: Request<Body>) -> Result<Response<Body>, String>
 			// Add each sub name to the subscribed list
 			sub_list.push(part.to_owned());
 			// Reorder sub names alphabettically
-			sub_list.sort_by_key(|a| a.to_lowercase())
+			sub_list.sort_by_key(|a| a.to_lowercase());
 		} else if action.contains(&"unsubscribe".to_string()) {
 			// Remove sub name from subscribed list
 			sub_list.retain(|s| s.to_lowercase() != part.to_lowercase());
@@ -273,11 +273,12 @@ pub async fn sidebar(req: Request<Body>) -> Result<Response<Body>, String> {
 	match json(path, quarantined).await {
 		// If success, receive JSON in response
 		Ok(response) => template(WikiTemplate {
-			wiki: format!(
-				"{}<hr><h1>Moderators</h1><br><ul>{}</ul>",
-				rewrite_urls(&val(&response, "description_html").replace("\\", "")),
-				moderators(&sub, quarantined).await?.join(""),
-			),
+			wiki: rewrite_urls(&val(&response, "description_html").replace("\\", "")),
+			// wiki: format!(
+			// 	"{}<hr><h1>Moderators</h1><br><ul>{}</ul>",
+			// 	rewrite_urls(&val(&response, "description_html").replace("\\", "")),
+			// 	moderators(&sub, quarantined).await.unwrap_or(vec!["Could not fetch moderators".to_string()]).join(""),
+			// ),
 			sub,
 			page: "Sidebar".to_string(),
 			prefs: Preferences::new(req),
@@ -292,39 +293,39 @@ pub async fn sidebar(req: Request<Body>) -> Result<Response<Body>, String> {
 	}
 }
 
-pub async fn moderators(sub: &str, quarantined: bool) -> Result<Vec<String>, String> {
-	// Retrieve and format the html for the moderators list
-	Ok(
-		moderators_list(sub, quarantined)
-			.await?
-			.iter()
-			.map(|m| format!("<li><a style=\"color: var(--accent)\" href=\"/u/{name}\">{name}</a></li>", name = m))
-			.collect(),
-	)
-}
+// pub async fn moderators(sub: &str, quarantined: bool) -> Result<Vec<String>, String> {
+// 	// Retrieve and format the html for the moderators list
+// 	Ok(
+// 		moderators_list(sub, quarantined)
+// 			.await?
+// 			.iter()
+// 			.map(|m| format!("<li><a style=\"color: var(--accent)\" href=\"/u/{name}\">{name}</a></li>", name = m))
+// 			.collect(),
+// 	)
+// }
 
-async fn moderators_list(sub: &str, quarantined: bool) -> Result<Vec<String>, String> {
-	// Build the moderator list URL
-	let path: String = format!("/r/{}/about/moderators.json?raw_json=1", sub);
+// async fn moderators_list(sub: &str, quarantined: bool) -> Result<Vec<String>, String> {
+// 	// Build the moderator list URL
+// 	let path: String = format!("/r/{}/about/moderators.json?raw_json=1", sub);
 
-	// Retrieve response
-	json(path, quarantined).await.map(|response| {
-		// Traverse json tree and format into list of strings
-		response["data"]["children"]
-			.as_array()
-			.unwrap_or(&Vec::new())
-			.iter()
-			.filter_map(|moderator| {
-				let name = moderator["name"].as_str().unwrap_or_default();
-				if name.is_empty() {
-					None
-				} else {
-					Some(name.to_string())
-				}
-			})
-			.collect::<Vec<_>>()
-	})
-}
+// 	// Retrieve response
+// 	json(path, quarantined).await.map(|response| {
+// 		// Traverse json tree and format into list of strings
+// 		response["data"]["children"]
+// 			.as_array()
+// 			.unwrap_or(&Vec::new())
+// 			.iter()
+// 			.filter_map(|moderator| {
+// 				let name = moderator["name"].as_str().unwrap_or_default();
+// 				if name.is_empty() {
+// 					None
+// 				} else {
+// 					Some(name.to_string())
+// 				}
+// 			})
+// 			.collect::<Vec<_>>()
+// 	})
+// }
 
 // SUBREDDIT
 async fn subreddit(sub: &str, quarantined: bool) -> Result<Subreddit, String> {
@@ -347,7 +348,7 @@ async fn subreddit(sub: &str, quarantined: bool) -> Result<Subreddit, String> {
 		title: esc!(&res, "title"),
 		description: esc!(&res, "public_description"),
 		info: rewrite_urls(&val(&res, "description_html").replace("\\", "")),
-		moderators: moderators_list(sub, quarantined).await?,
+		// moderators: moderators_list(sub, quarantined).await.unwrap_or_default(),
 		icon: format_url(&icon),
 		members: format_num(members),
 		active: format_num(active),
