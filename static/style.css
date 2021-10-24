@@ -227,6 +227,11 @@ nav #libreddit {
 
 #settings_link {
 	opacity: 0.8;
+	margin-left: 5px;
+}
+
+#reddit_link {
+	opacity: 0.8;
 }
 
 #code {

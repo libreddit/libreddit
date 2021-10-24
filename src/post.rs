@@ -18,6 +18,7 @@ struct PostTemplate {
 	sort: String,
 	prefs: Preferences,
 	single_thread: bool,
+	url: String,
 }
 
 pub async fn item(req: Request<Body>) -> Result<Response<Body>, String> {
@@ -54,6 +55,7 @@ pub async fn item(req: Request<Body>) -> Result<Response<Body>, String> {
 			// Parse the JSON into Post and Comment structs
 			let post = parse_post(&response[0]).await;
 			let comments = parse_comments(&response[1], &post.permalink, &post.author.name, highlighted_comment);
+			let url = req.uri().to_string();
 
 			// Use the Post and Comment structs to generate a website to show users
 			template(PostTemplate {
@@ -62,6 +64,7 @@ pub async fn item(req: Request<Body>) -> Result<Response<Body>, String> {
 				sort,
 				prefs: Preferences::new(req),
 				single_thread,
+				url: url,
 			})
 		}
 		// If the Reddit API returns an error, exit and send error page to user

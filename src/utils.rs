@@ -341,6 +341,7 @@ pub struct Comment {
 pub struct ErrorTemplate {
 	pub msg: String,
 	pub prefs: Preferences,
+	pub url: String,
 }
 
 #[derive(Default)]
@@ -604,9 +605,11 @@ pub fn redirect(path: String) -> Response<Body> {
 }
 
 pub async fn error(req: Request<Body>, msg: String) -> Result<Response<Body>, String> {
+	let url = req.uri().to_string();
 	let body = ErrorTemplate {
 		msg,
 		prefs: Preferences::new(req),
+		url: url,
 	}
 	.render()
 	.unwrap_or_default();
