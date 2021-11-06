@@ -29,7 +29,7 @@ Feel free to [open an issue](https://github.com/spikecodes/libreddit/issues/new)
 |-|-|-|
 | [libredd.it](https://libredd.it) (official) | 🇺🇸 US |  |
 | [libreddit.spike.codes](https://libreddit.spike.codes) (official) | 🇺🇸 US |  |
-| [libreddit.dothq.co](https://libreddit.dothq.co) | 🇺🇸 US |  |
+| [libreddit.dothq.co](https://libreddit.dothq.co) | 🇩🇪 DE | ✅ |
 | [libreddit.kavin.rocks](https://libreddit.kavin.rocks) | 🇮🇳 IN | ✅ |
 | [libreddit.40two.app](https://libreddit.40two.app) | 🇳🇱 NL |  |
 | [reddit.invak.id](https://reddit.invak.id) | 🇧🇬 BG |  |
