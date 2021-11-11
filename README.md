@@ -60,6 +60,8 @@ Feel free to [open an issue](https://github.com/spikecodes/libreddit/issues/new)
 | [kphht2jcflojtqte4b4kyx7p2ahagv4debjj32nre67dxz7y57seqwyd.onion](http://kphht2jcflojtqte4b4kyx7p2ahagv4debjj32nre67dxz7y57seqwyd.onion) | 🇳🇱 NL |  |
 | [inytumdgnri7xsqtvpntjevaelxtgbjqkuqhtf6txxhwbll2fwqtakqd.onion](http://inytumdgnri7xsqtvpntjevaelxtgbjqkuqhtf6txxhwbll2fwqtakqd.onion) | 🇨🇭 CH |  |
 | [liredejj74h5xjqr2dylnl5howb2bpikfowqoveub55ru27x43357iid.onion](http://liredejj74h5xjqr2dylnl5howb2bpikfowqoveub55ru27x43357iid.onion) | 🇩🇪 DE |  |
+| [kzhfp3nvb4qp575vy23ccbrgfocezjtl5dx66uthgrhu7nscu6rcwjyd.onion](http://kzhfp3nvb4qp575vy23ccbrgfocezjtl5dx66uthgrhu7nscu6rcwjyd.onion) | 🇺🇸 US |  |
+
 
 A checkmark in the "Cloudflare" category here refers to the use of the reverse proxy, [Cloudflare](https://cloudflare). The checkmark will not be listed for a site which uses Cloudflare DNS but rather the proxying service which grants Cloudflare the ability to monitor traffic to the website.
 
