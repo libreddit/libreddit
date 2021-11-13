@@ -1,13 +1,14 @@
+use std::{pin::Pin, result::Result};
+
 use cookie::Cookie;
-use futures_lite::{future::Boxed, Future, FutureExt};
+use futures_lite::{Future, future::Boxed, FutureExt};
 use hyper::{
 	header::HeaderValue,
-	service::{make_service_fn, service_fn},
 	HeaderMap,
+	service::{make_service_fn, service_fn},
 };
 use hyper::{Body, Method, Request, Response, Server as HyperServer};
 use route_recognizer::{Params, Router};
-use std::{pin::Pin, result::Result};
 use time::Duration;
 
 type BoxResponse = Pin<Box<dyn Future<Output = Result<Response<Body>, String>> + Send>>;

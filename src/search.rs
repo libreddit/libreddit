@@ -1,12 +1,12 @@
-// CRATES
-use crate::utils::{catch_random, error, format_num, format_url, param, redirect, setting, template, val, Post, Preferences};
-use crate::{
-	client::json,
-	subreddit::{can_access_quarantine, quarantine},
-	RequestExt,
-};
 use askama::Template;
 use hyper::{Body, Request, Response};
+
+use crate::{
+	client::json,
+	RequestExt,
+	subreddit::{can_access_quarantine, quarantine},
+};
+use crate::utils::{catch_random, error, format_num, format_url, param, Post, Preferences, redirect, setting, template, val};
 
 // STRUCTS
 struct SearchParams {

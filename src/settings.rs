@@ -1,13 +1,13 @@
 use std::collections::HashMap;
 
-// CRATES
-use crate::server::ResponseExt;
-use crate::utils::{redirect, template, Preferences};
 use askama::Template;
 use cookie::Cookie;
 use futures_lite::StreamExt;
 use hyper::{Body, Request, Response};
 use time::{Duration, OffsetDateTime};
+
+use crate::server::ResponseExt;
+use crate::utils::{Preferences, redirect, template};
 
 // STRUCTS
 #[derive(Template)]
@@ -109,7 +109,7 @@ fn set_cookies_method(req: Request<Body>, remove_cookies: bool) -> Response<Body
 
 	let mut response = redirect(path);
 
-	for name in [PREFS.to_vec(), vec!["subscriptions"]].concat() {
+	for name in [PREFS.to_vec(), vec!["subscriptions", "filters"]].concat() {
 		match form.get(name) {
 			Some(value) => response.insert_cookie(
 				Cookie::build(name.to_owned(), value.clone())

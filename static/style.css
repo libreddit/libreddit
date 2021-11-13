@@ -372,7 +372,7 @@ aside {
 	margin-bottom: 20px;
 }
 
-#user_details, #sub_details {
+#user_details, #sub_details, #sub_actions, #user_actions {
 	display: grid;
 	grid-template-columns: repeat(2, 1fr);
 	grid-column-gap: 20px;
@@ -384,7 +384,7 @@ aside {
 
 /* Subscriptions */
 
-#sub_subscription, #user_subscription {
+#sub_subscription, #user_subscription, #user_filter, #sub_filter {
 	margin-top: 20px;
 }
 
@@ -392,18 +392,18 @@ aside {
 	margin-bottom: 20px;
 }
 
-.subscribe, .unsubscribe {
+.subscribe, .unsubscribe, .filter, .unfilter {
 	padding: 10px 20px;
 	border-radius: 5px;
 	cursor: pointer;
 }
 
-.subscribe {
+.subscribe, .filter {
 	color: var(--foreground);
 	background-color: var(--accent);
 }
 
-.unsubscribe { 
+.unsubscribe, .unfilter {
 	color: var(--text);
 	background-color: var(--highlighted);
 }
@@ -1053,6 +1053,15 @@ a.search_subreddit:hover {
 .comment_body a {
 	text-decoration: underline;
 	color: var(--accent);
+}
+
+.comment_body_filtered {
+	opacity: 0.4;
+	font-weight: normal;
+	font-style: italic;
+	padding: 5px 5px;
+	margin: 5px 0;
+	overflow: auto;
 }
 
 .deeper_replies {

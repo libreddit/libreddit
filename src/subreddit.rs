@@ -1,11 +1,11 @@
-// CRATES
-use crate::esc;
-use crate::utils::{catch_random, error, format_num, format_url, param, redirect, rewrite_urls, setting, template, val, Post, Preferences, Subreddit};
-use crate::{client::json, server::ResponseExt, RequestExt};
 use askama::Template;
 use cookie::Cookie;
 use hyper::{Body, Request, Response};
 use time::{Duration, OffsetDateTime};
+
+use crate::{client::json, RequestExt, server::ResponseExt};
+use crate::esc;
+use crate::utils::{catch_random, error, filter_posts, format_num, format_url, get_filters, param, Post, Preferences, redirect, rewrite_urls, setting, Subreddit, template, val};
 
 // STRUCTS
 #[derive(Template)]
@@ -17,6 +17,9 @@ struct SubredditTemplate {
 	ends: (String, String),
 	prefs: Preferences,
 	url: String,
+	/// Whether all fetched posts are filtered (to differentiate between no posts fetched in the first place,
+	/// and all fetched posts being filtered).
+	is_filtered: bool,
 }
 
 #[derive(Template)]
@@ -71,7 +74,7 @@ pub async fn community(req: Request<Body>) -> Result<Response<Body>, String> {
 	let path = format!("/r/{}/{}.json?{}&raw_json=1", sub, sort, req.uri().query().unwrap_or_default());
 
 	match Post::fetch(&path, String::new(), quarantined).await {
-		Ok((posts, after)) => {
+		Ok((mut posts, after)) => {
 			// If you can get subreddit posts, also request subreddit metadata
 			let sub = if !sub.contains('+') && sub != subscribed && sub != "popular" && sub != "all" {
 				// Regular subreddit
@@ -94,6 +97,7 @@ pub async fn community(req: Request<Body>) -> Result<Response<Body>, String> {
 			};
 
 			let url = String::from(req.uri().path_and_query().map_or("", |val| val.as_str()));
+			let is_filtered = filter_posts(&mut posts, &get_filters(&req));
 
 			template(SubredditTemplate {
 				sub,
@@ -102,6 +106,7 @@ pub async fn community(req: Request<Body>) -> Result<Response<Body>, String> {
 				ends: (param(&path, "after").unwrap_or_default(), after),
 				prefs: Preferences::new(req),
 				url,
+				is_filtered,
 			})
 		}
 		Err(msg) => match msg.as_str() {
@@ -161,7 +166,9 @@ pub async fn subscriptions(req: Request<Body>) -> Result<Response<Body>, String>
 	let query = req.uri().query().unwrap_or_default().to_string();
 	let action: Vec<String> = req.uri().path().split('/').map(String::from).collect();
 
-	let mut sub_list = Preferences::new(req).subscriptions;
+	let preferences = Preferences::new(req);
+	let mut subscriptions = preferences.subscriptions;
+	let mut filters = preferences.filters;
 
 	// Retrieve list of posts for these subreddits to extract display names
 	let posts = json(format!("/r/{}/hot.json?raw_json=1", sub), true).await?;
@@ -182,8 +189,10 @@ pub async fn subscriptions(req: Request<Body>) -> Result<Response<Body>, String>
 	for part in sub.split('+') {
 		// Retrieve display name for the subreddit
 		let display;
-		let part = if let Some(&(_, display)) = display_lookup.iter().find(|x| x.0 == part.to_lowercase()) {
-			// This is already known, doesn't require seperate request
+		let part = if part.starts_with("u_") {
+			part
+		} else if let Some(&(_, display)) = display_lookup.iter().find(|x| x.0 == part.to_lowercase()) {
+			// This is already known, doesn't require separate request
 			display
 		} else {
 			// This subreddit display name isn't known, retrieve it
@@ -193,14 +202,16 @@ pub async fn subscriptions(req: Request<Body>) -> Result<Response<Body>, String>
 		};
 
 		// Modify sub list based on action
-		if action.contains(&"subscribe".to_string()) && !sub_list.contains(&part.to_owned()) {
+		if action.contains(&"subscribe".to_string()) && !subscriptions.contains(&part.to_owned()) {
 			// Add each sub name to the subscribed list
-			sub_list.push(part.to_owned());
-			// Reorder sub names alphabettically
-			sub_list.sort_by_key(|a| a.to_lowercase());
+			subscriptions.push(part.to_owned());
+			filters.retain(|s| s.to_lowercase() != part.to_lowercase());
+			// Reorder sub names alphabetically
+			subscriptions.sort_by_key(|a| a.to_lowercase());
+			filters.sort_by_key(|a| a.to_lowercase());
 		} else if action.contains(&"unsubscribe".to_string()) {
 			// Remove sub name from subscribed list
-			sub_list.retain(|s| s.to_lowercase() != part.to_lowercase());
+			subscriptions.retain(|s| s.to_lowercase() != part.to_lowercase());
 		}
 	}
 
@@ -215,11 +226,118 @@ pub async fn subscriptions(req: Request<Body>) -> Result<Response<Body>, String>
 	let mut response = redirect(path);
 
 	// Delete cookie if empty, else set
-	if sub_list.is_empty() {
+	if subscriptions.is_empty() {
 		response.remove_cookie("subscriptions".to_string());
 	} else {
 		response.insert_cookie(
-			Cookie::build("subscriptions", sub_list.join("+"))
+			Cookie::build("subscriptions", subscriptions.join("+"))
+				.path("/")
+				.http_only(true)
+				.expires(OffsetDateTime::now_utc() + Duration::weeks(52))
+				.finish(),
+		);
+	}
+	if filters.is_empty() {
+		response.remove_cookie("filters".to_string());
+	} else {
+		response.insert_cookie(
+			Cookie::build("filters", filters.join("+"))
+				.path("/")
+				.http_only(true)
+				.expires(OffsetDateTime::now_utc() + Duration::weeks(52))
+				.finish(),
+		);
+	}
+
+	Ok(response)
+}
+
+pub async fn filters(req: Request<Body>) -> Result<Response<Body>, String> {
+	let sub = req.param("sub").unwrap_or_default();
+	// Handle random subreddits
+	if sub == "random" || sub == "randnsfw" {
+		return Err("Can't filter random subreddit!".to_string());
+	}
+
+	let query = req.uri().query().unwrap_or_default().to_string();
+	let action: Vec<String> = req.uri().path().split('/').map(String::from).collect();
+
+	let preferences = Preferences::new(req);
+	let mut subscriptions = preferences.subscriptions;
+	let mut filters = preferences.filters;
+
+	// Retrieve list of posts for these subreddits to extract display names
+	let posts = json(format!("/r/{}/hot.json?raw_json=1", sub), true).await?;
+	let display_lookup: Vec<(String, &str)> = posts["data"]["children"]
+		.as_array()
+		.map(|list| {
+			list
+				.iter()
+				.map(|post| {
+					let display_name = post["data"]["subreddit"].as_str().unwrap_or_default();
+					(display_name.to_lowercase(), display_name)
+				})
+				.collect::<Vec<_>>()
+		})
+		.unwrap_or_default();
+
+	// Find each subreddit name (separated by '+') in sub parameter
+	for part in sub.split('+') {
+		// Retrieve display name for the subreddit
+		let display;
+		let part= if part.starts_with("u_") {
+			part
+		} else if let Some(&(_, display)) = display_lookup.iter().find(|x| x.0 == part.to_lowercase()) {
+			// This is already known, doesn't require separate request
+			display
+		} else {
+			// This subreddit display name isn't known, retrieve it
+			let path: String = format!("/r/{}/about.json?raw_json=1", part);
+			display = json(path, true).await?;
+			display["data"]["display_name"].as_str().ok_or_else(|| "Failed to query subreddit name".to_string())?
+		};
+
+		// Modify filtered list based on action
+		if action.contains(&"filter".to_string()) && !filters.contains(&part.to_owned()) {
+			// Add each sub name to the filtered list
+			filters.push(part.to_owned());
+			subscriptions.retain(|s| s.to_lowercase() != part.to_lowercase());
+			// Reorder sub names alphabetically
+			filters.sort_by_key(|a| a.to_lowercase());
+			subscriptions.sort_by_key(|a| a.to_lowercase());
+		} else if action.contains(&"unfilter".to_string()) {
+			// Remove sub name from filtered list
+			filters.retain(|s| s.to_lowercase() != part.to_lowercase());
+		}
+	}
+
+	// Redirect back to subreddit
+	// check for redirect parameter if filtering from outside sidebar
+	let path = if let Some(redirect_path) = param(&format!("?{}", query), "redirect") {
+		format!("/{}/", redirect_path)
+	} else {
+		format!("/r/{}", sub)
+	};
+
+	let mut response = redirect(path);
+
+	// Delete cookie if empty, else set
+	if filters.is_empty() {
+		response.remove_cookie("filters".to_string());
+	} else {
+		response.insert_cookie(
+			Cookie::build("filters", filters.join("+"))
+				.path("/")
+				.http_only(true)
+				.expires(OffsetDateTime::now_utc() + Duration::weeks(52))
+				.finish(),
+		);
+	}
+	if subscriptions.is_empty() {
+		response.remove_cookie("subscriptions".to_string());
+	} else {
+		response.insert_cookie(
+			Cookie::build("subscriptions", subscriptions.join("+"))
 				.path("/")
 				.http_only(true)
 				.expires(OffsetDateTime::now_utc() + Duration::weeks(52))

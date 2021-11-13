@@ -17,6 +17,7 @@
 
 {% block body %}
 	<main>
+		{% if !is_filtered || sub.name == "" || sub.name.contains("+") %}
 		<div id="column_one">
 			<form id="sort">
 				<div id="sort_options">
@@ -45,18 +46,24 @@
 				</form>
 			{% endif %}
 
-			<div id="posts">
-			{% for post in posts %}
-			{% if !(post.flags.nsfw && prefs.show_nsfw != "on") %}
-			<hr class="sep" />
-			{% call utils::post_in_list(post) %}
+			{% if !is_filtered %}
+				<div id="posts">
+				{% for post in posts %}
+					{% if !(post.flags.nsfw && prefs.show_nsfw != "on") %}
+						<hr class="sep" />
+						{% call utils::post_in_list(post) %}
+					{% endif %}
+				{% endfor %}
+				{% if prefs.use_hls == "on" %}
+					<script src="/hls.min.js"></script>
+					<script src="/playHLSVideo.js"></script>
+				{% endif %}
+				</div>
+			{% else %}
+				{% if sub.name == "" || sub.name.contains("+") %}
+					<center>(All content on this page has been filtered)</center>
+				{% endif %}
 			{% endif %}
-			{% endfor %}
-			{% if prefs.use_hls == "on" %}
-			<script src="/hls.min.js"></script>
-			<script src="/playHLSVideo.js"></script>
-			{% endif %}
-			</div>
 
 			<footer>
 				{% if ends.0 != "" %}
@@ -68,8 +75,12 @@
 				{% endif %}
 			</footer>
 		</div>
+		{% endif %}
 		{% if sub.name != "" && !sub.name.contains("+") %}
 		<aside>
+			{% if is_filtered %}
+			<center>(Content from r/{{ sub.name }} has been filtered)</center>
+			{% endif %}
 			<div class="panel" id="subreddit">
 				{% if sub.wiki %}
 				<div id="top">
@@ -88,16 +99,29 @@
 						<div title="{{ sub.members.1 }}">{{ sub.members.0 }}</div>
 						<div title="{{ sub.active.1 }}">{{ sub.active.0 }}</div>
 					</div>
-					<div id="sub_subscription">
-						{% if prefs.subscriptions.contains(sub.name) %}
-							<form action="/r/{{ sub.name }}/unsubscribe" method="POST">
-								<button class="unsubscribe">Unsubscribe</button>
+					<div id="sub_actions">
+						<div id="sub_subscription">
+							{% if prefs.subscriptions.contains(sub.name) %}
+								<form action="/r/{{ sub.name }}/unsubscribe" method="POST">
+									<button class="unsubscribe">Unsubscribe</button>
+								</form>
+							{% else %}
+								<form action="/r/{{ sub.name }}/subscribe" method="POST">
+									<button class="subscribe">Subscribe</button>
+								</form>
+							{% endif %}
+						</div>
+						<div id="sub_filter">
+							{% if prefs.filters.contains(sub.name) %}
+								<form action="/r/{{ sub.name }}/unfilter" method="POST">
+									<button class="unfilter">Unfilter</button>
+								</form>
+							{% else %}
+							<form action="/r/{{ sub.name }}/filter" method="POST">
+								<button class="filter">Filter</button>
 							</form>
-						{% else %}
-							<form action="/r/{{ sub.name }}/subscribe" method="POST">
-								<button class="subscribe">Subscribe</button>
-							</form>
-						{% endif %}
+							{% endif %}
+						</div>
 					</div>
 				</div>
 			</div>

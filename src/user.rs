@@ -1,11 +1,11 @@
-// CRATES
-use crate::client::json;
-use crate::esc;
-use crate::server::RequestExt;
-use crate::utils::{error, format_url, param, template, Post, Preferences, User};
 use askama::Template;
 use hyper::{Body, Request, Response};
 use time::OffsetDateTime;
+
+use crate::client::json;
+use crate::esc;
+use crate::server::RequestExt;
+use crate::utils::{error, filter_posts, format_url, get_filters, param, Post, Preferences, template, User};
 
 // STRUCTS
 #[derive(Template)]
@@ -17,6 +17,9 @@ struct UserTemplate {
 	ends: (String, String),
 	prefs: Preferences,
 	url: String,
+	/// Whether all fetched posts are filtered (to differentiate between no posts fetched in the first place,
+	/// and all fetched posts being filtered).
+	is_filtered: bool,
 }
 
 // FUNCTIONS
@@ -37,9 +40,10 @@ pub async fn profile(req: Request<Body>) -> Result<Response<Body>, String> {
 	let url = String::from(req.uri().path_and_query().map_or("", |val| val.as_str()));
 
 	match posts {
-		Ok((posts, after)) => {
+		Ok((mut posts, after)) => {
 			// If you can get user posts, also request user data
 			let user = user(&username).await.unwrap_or_default();
+			let is_filtered = filter_posts(&mut posts, &get_filters(&req));
 
 			template(UserTemplate {
 				user,
@@ -48,6 +52,7 @@ pub async fn profile(req: Request<Body>) -> Result<Response<Body>, String> {
 				ends: (param(&path, "after").unwrap_or_default(), after),
 				prefs: Preferences::new(req),
 				url,
+				is_filtered,
 			})
 		}
 		// If there is an error show error page

@@ -7,7 +7,7 @@ use cookie::Cookie;
 use hyper::{Body, Request, Response};
 use regex::Regex;
 use serde_json::Value;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::str::FromStr;
 use time::{Duration, OffsetDateTime};
 use url::Url;
@@ -346,6 +346,7 @@ pub struct Comment {
 	pub highlighted: bool,
 	pub awards: Awards,
 	pub collapsed: bool,
+	pub is_filtered: bool,
 }
 
 #[derive(Default, Clone)]
@@ -458,6 +459,7 @@ pub struct Preferences {
 	pub comment_sort: String,
 	pub post_sort: String,
 	pub subscriptions: Vec<String>,
+	pub filters: Vec<String>,
 }
 
 impl Preferences {
@@ -475,7 +477,29 @@ impl Preferences {
 			comment_sort: setting(&req, "comment_sort"),
 			post_sort: setting(&req, "post_sort"),
 			subscriptions: setting(&req, "subscriptions").split('+').map(String::from).filter(|s| !s.is_empty()).collect(),
+			filters: setting(&req, "filters").split('+').map(String::from).filter(|s| !s.is_empty()).collect(),
 		}
+	}
+}
+
+/// Gets a `HashSet` of filters from the cookie in the given `Request`.
+pub fn get_filters(req: &Request<Body>) -> HashSet<String> {
+	setting(&req, "filters")
+		.split('+')
+		.map(String::from)
+		.filter(|s| !s.is_empty())
+		.collect::<HashSet<String>>()
+}
+
+/// Filters a `Vec<Post>` by the given `HashSet` of filters (each filter being a subreddit name or a user name). If a
+/// `Post`'s subreddit or author is found in the filters, it is removed. Returns `true` if _all_ posts were filtered
+/// out, or `false` otherwise.
+pub fn filter_posts(posts: &mut Vec<Post>, filters: &HashSet<String>) -> bool {
+	if posts.is_empty() {
+		false
+	} else {
+		posts.retain(|p| !filters.contains(&p.community) && !filters.contains(&["u_", &p.author.name].concat()));
+		posts.is_empty()
 	}
 }
 
