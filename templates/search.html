@@ -54,7 +54,9 @@
 			{% endif %}
 		</div>
 		{% endif %}
-		{% if params.typed != "sr_user" %}
+		{% if is_filtered %}
+			<center>(All content on this page has been filtered)</center>
+		{% else if params.typed != "sr_user" %}
 			{% for post in posts %}
 				{% if post.flags.nsfw && prefs.show_nsfw != "on" %}
 				{% else if !post.title.is_empty() %}
