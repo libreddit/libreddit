@@ -73,7 +73,7 @@ pub async fn community(req: Request<Body>) -> Result<Response<Body>, String> {
 
 	let path = format!("/r/{}/{}.json?{}&raw_json=1", sub, sort, req.uri().query().unwrap_or_default());
 
-	match Post::fetch(&path, String::new(), quarantined).await {
+	match Post::fetch(&path, quarantined).await {
 		Ok((mut posts, after)) => {
 			// If you can get subreddit posts, also request subreddit metadata
 			let sub = if !sub.contains('+') && sub != subscribed && sub != "popular" && sub != "all" {

@@ -65,7 +65,7 @@ pub async fn find(req: Request<Body>) -> Result<Response<Body>, String> {
 
 	let url = String::from(req.uri().path_and_query().map_or("", |val| val.as_str()));
 
-	match Post::fetch(&path, String::new(), quarantined).await {
+	match Post::fetch(&path, quarantined).await {
 		Ok((posts, after)) => template(SearchTemplate {
 			posts,
 			subreddits,

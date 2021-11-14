@@ -36,7 +36,7 @@ pub async fn profile(req: Request<Body>) -> Result<Response<Body>, String> {
 	let username = req.param("name").unwrap_or_default();
 
 	// Request user posts/comments from Reddit
-	let posts = Post::fetch(&path, "Comment".to_string(), false).await;
+	let posts = Post::fetch(&path, false).await;
 	let url = String::from(req.uri().path_and_query().map_or("", |val| val.as_str()));
 
 	match posts {

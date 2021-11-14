@@ -219,7 +219,7 @@ pub struct Post {
 
 impl Post {
 	// Fetch posts of a user or subreddit and return a vector of posts and the "after" value
-	pub async fn fetch(path: &str, fallback_title: String, quarantine: bool) -> Result<(Vec<Self>, String), String> {
+	pub async fn fetch(path: &str, quarantine: bool) -> Result<(Vec<Self>, String), String> {
 		let res;
 		let post_list;
 
@@ -262,7 +262,7 @@ impl Post {
 
 			posts.push(Self {
 				id: val(post, "id"),
-				title: esc!(if title.is_empty() { fallback_title.clone() } else { title }),
+				title,
 				community: val(post, "subreddit"),
 				body,
 				author: Author {
