@@ -17,9 +17,11 @@ struct SubredditTemplate {
 	ends: (String, String),
 	prefs: Preferences,
 	url: String,
+	/// Whether the subreddit itself is filtered.
+	is_filtered: bool,
 	/// Whether all fetched posts are filtered (to differentiate between no posts fetched in the first place,
 	/// and all fetched posts being filtered).
-	is_filtered: bool,
+	all_posts_filtered: bool,
 }
 
 #[derive(Template)]
@@ -51,7 +53,7 @@ pub async fn community(req: Request<Body>) -> Result<Response<Body>, String> {
 	let post_sort = req.cookie("post_sort").map_or_else(|| "hot".to_string(), |c| c.value().to_string());
 	let sort = req.param("sort").unwrap_or_else(|| req.param("id").unwrap_or(post_sort));
 
-	let sub = req.param("sub").unwrap_or(if front_page == "default" || front_page.is_empty() {
+	let sub_name = req.param("sub").unwrap_or(if front_page == "default" || front_page.is_empty() {
 		if subscribed.is_empty() {
 			"popular".to_string()
 		} else {
@@ -60,61 +62,77 @@ pub async fn community(req: Request<Body>) -> Result<Response<Body>, String> {
 	} else {
 		front_page.clone()
 	});
-	let quarantined = can_access_quarantine(&req, &sub) || root;
+	let quarantined = can_access_quarantine(&req, &sub_name) || root;
 
 	// Handle random subreddits
-	if let Ok(random) = catch_random(&sub, "").await {
+	if let Ok(random) = catch_random(&sub_name, "").await {
 		return Ok(random);
 	}
 
-	if req.param("sub").is_some() && sub.starts_with("u_") {
-		return Ok(redirect(["/user/", &sub[2..]].concat()));
+	if req.param("sub").is_some() && sub_name.starts_with("u_") {
+		return Ok(redirect(["/user/", &sub_name[2..]].concat()));
 	}
 
-	let path = format!("/r/{}/{}.json?{}&raw_json=1", sub, sort, req.uri().query().unwrap_or_default());
-
-	match Post::fetch(&path, quarantined).await {
-		Ok((mut posts, after)) => {
-			// If you can get subreddit posts, also request subreddit metadata
-			let sub = if !sub.contains('+') && sub != subscribed && sub != "popular" && sub != "all" {
-				// Regular subreddit
-				subreddit(&sub, quarantined).await.unwrap_or_default()
-			} else if sub == subscribed {
-				// Subscription feed
-				if req.uri().path().starts_with("/r/") {
-					subreddit(&sub, quarantined).await.unwrap_or_default()
-				} else {
-					Subreddit::default()
-				}
-			} else if sub.contains('+') {
-				// Multireddit
-				Subreddit {
-					name: sub,
-					..Subreddit::default()
-				}
-			} else {
-				Subreddit::default()
-			};
-
-			let url = String::from(req.uri().path_and_query().map_or("", |val| val.as_str()));
-			let is_filtered = filter_posts(&mut posts, &get_filters(&req));
-
-			template(SubredditTemplate {
-				sub,
-				posts,
-				sort: (sort, param(&path, "t").unwrap_or_default()),
-				ends: (param(&path, "after").unwrap_or_default(), after),
-				prefs: Preferences::new(req),
-				url,
-				is_filtered,
-			})
+	// Request subreddit metadata
+	let sub = if !sub_name.contains('+') && sub_name != subscribed && sub_name != "popular" && sub_name != "all" {
+		// Regular subreddit
+		subreddit(&sub_name, quarantined).await.unwrap_or_default()
+	} else if sub_name == subscribed {
+		// Subscription feed
+		if req.uri().path().starts_with("/r/") {
+			subreddit(&sub_name, quarantined).await.unwrap_or_default()
+		} else {
+			Subreddit::default()
 		}
-		Err(msg) => match msg.as_str() {
-			"quarantined" => quarantine(req, sub),
-			"private" => error(req, format!("r/{} is a private community", sub)).await,
-			"banned" => error(req, format!("r/{} has been banned from Reddit", sub)).await,
-			_ => error(req, msg).await,
-		},
+	} else if sub_name.contains('+') {
+		// Multireddit
+		Subreddit {
+			name: sub_name.clone(),
+			..Subreddit::default()
+		}
+	} else {
+		Subreddit::default()
+	};
+
+	let path = format!("/r/{}/{}.json?{}&raw_json=1", sub_name.clone(), sort, req.uri().query().unwrap_or_default());
+	let url = String::from(req.uri().path_and_query().map_or("", |val| val.as_str()));
+	let filters = get_filters(&req);
+
+	// If all requested subs are filtered, we don't need to fetch posts.
+	if sub_name.split("+").all(|s| filters.contains(s)) {
+		template(SubredditTemplate {
+			sub,
+			posts: Vec::new(),
+			sort: (sort, param(&path, "t").unwrap_or_default()),
+			ends: (param(&path, "after").unwrap_or_default(), "".to_string()),
+			prefs: Preferences::new(req),
+			url,
+			is_filtered: true,
+			all_posts_filtered: false,
+		})
+	} else {
+		match Post::fetch(&path, quarantined).await {
+			Ok((mut posts, after)) => {
+				let all_posts_filtered = filter_posts(&mut posts, &filters);
+
+				template(SubredditTemplate {
+					sub,
+					posts,
+					sort: (sort, param(&path, "t").unwrap_or_default()),
+					ends: (param(&path, "after").unwrap_or_default(), after),
+					prefs: Preferences::new(req),
+					url,
+					is_filtered: false,
+					all_posts_filtered,
+				})
+			}
+			Err(msg) => match msg.as_str() {
+				"quarantined" => quarantine(req, sub_name),
+				"private" => error(req, format!("r/{} is a private community", sub_name)).await,
+				"banned" => error(req, format!("r/{} has been banned from Reddit", sub_name)).await,
+				_ => error(req, msg).await,
+			},
+		}
 	}
 }
 

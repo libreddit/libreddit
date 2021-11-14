@@ -17,7 +17,7 @@
 
 {% block body %}
 	<main>
-		{% if !is_filtered || sub.name == "" || sub.name.contains("+") %}
+		{% if !is_filtered %}
 		<div id="column_one">
 			<form id="sort">
 				<div id="sort_options">
@@ -46,23 +46,21 @@
 				</form>
 			{% endif %}
 
-			{% if !is_filtered %}
-				<div id="posts">
-				{% for post in posts %}
-					{% if !(post.flags.nsfw && prefs.show_nsfw != "on") %}
-						<hr class="sep" />
-						{% call utils::post_in_list(post) %}
-					{% endif %}
-				{% endfor %}
-				{% if prefs.use_hls == "on" %}
-					<script src="/hls.min.js"></script>
-					<script src="/playHLSVideo.js"></script>
-				{% endif %}
-				</div>
+			{% if all_posts_filtered %}
+				 <center>(All content on this page has been filtered)</center>
 			{% else %}
-				{% if sub.name == "" || sub.name.contains("+") %}
-					<center>(All content on this page has been filtered)</center>
-				{% endif %}
+				<div id="posts">
+					{% for post in posts %}
+						{% if !(post.flags.nsfw && prefs.show_nsfw != "on") %}
+							<hr class="sep" />
+							{% call utils::post_in_list(post) %}
+						{% endif %}
+					{% endfor %}
+					{% if prefs.use_hls == "on" %}
+						<script src="/hls.min.js"></script>
+						<script src="/playHLSVideo.js"></script>
+					{% endif %}
+				</div>
 			{% endif %}
 
 			<footer>
@@ -76,11 +74,12 @@
 			</footer>
 		</div>
 		{% endif %}
-		{% if sub.name != "" && !sub.name.contains("+") %}
+		{% if is_filtered || (sub.name != "" && !sub.name.contains("+")) %}
 		<aside>
 			{% if is_filtered %}
-			<center>(Content from r/{{ sub.name }} has been filtered)</center>
+				<center>(Content from r/{{ sub.name }} has been filtered)</center>
 			{% endif %}
+			{% if sub.name != "" && !sub.name.contains("+") %}
 			<div class="panel" id="subreddit">
 				{% if sub.wiki %}
 				<div id="top">
@@ -139,6 +138,7 @@
 					</ul> #}
 				</div>
 			</details>
+			{% endif %}
 		</aside>
 		{% endif %}
 	</main>

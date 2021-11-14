@@ -30,7 +30,8 @@
 					</svg>
 				</button>
 		</form>
-		
+
+		{% if !is_filtered %}
 		{% if subreddits.len() > 0 || params.typed == "sr_user" %}
 		<div id="search_subreddits">
 			{% if params.typed == "sr_user" %}
@@ -54,8 +55,11 @@
 			{% endif %}
 		</div>
 		{% endif %}
-		{% if is_filtered %}
+		{% endif %}
+		{% if all_posts_filtered %}
 			<center>(All content on this page has been filtered)</center>
+		{% else if is_filtered %}
+			<center>(Content from r/{{ sub }} has been filtered)</center>
 		{% else if params.typed != "sr_user" %}
 			{% for post in posts %}
 				{% if post.flags.nsfw && prefs.show_nsfw != "on" %}

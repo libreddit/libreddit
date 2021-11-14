@@ -37,9 +37,11 @@ struct SearchTemplate {
 	params: SearchParams,
 	prefs: Preferences,
 	url: String,
+	/// Whether the subreddit itself is filtered.
+	is_filtered: bool,
 	/// Whether all fetched posts are filtered (to differentiate between no posts fetched in the first place,
 	/// and all fetched posts being filtered).
-	is_filtered: bool,
+	all_posts_filtered: bool,
 }
 
 // SERVICES
@@ -75,34 +77,57 @@ pub async fn find(req: Request<Body>) -> Result<Response<Body>, String> {
 
 	let url = String::from(req.uri().path_and_query().map_or("", |val| val.as_str()));
 
-	match Post::fetch(&path, quarantined).await {
-		Ok((mut posts, after)) => {
-			let is_filtered = filter_posts(&mut posts, &filters);
+	// If all requested subs are filtered, we don't need to fetch posts.
+	if sub.split("+").all(|s| filters.contains(s)) {
+		template(SearchTemplate {
+			posts: Vec::new(),
+			subreddits,
+			sub,
+			params: SearchParams {
+				q: query.replace('"', "&quot;"),
+				sort,
+				t: param(&path, "t").unwrap_or_default(),
+				before: param(&path, "after").unwrap_or_default(),
+				after: "".to_string(),
+				restrict_sr: restrict_sr.unwrap_or_default(),
+				typed,
+			},
+			prefs: Preferences::new(req),
+			url,
+			is_filtered: true,
+			all_posts_filtered: false,
+		})
+	} else {
+		match Post::fetch(&path, quarantined).await {
+			Ok((mut posts, after)) => {
+				let all_posts_filtered = filter_posts(&mut posts, &filters);
 
-			template(SearchTemplate {
-				posts,
-				subreddits,
-				sub,
-				params: SearchParams {
-					q: query.replace('"', "&quot;"),
-					sort,
-					t: param(&path, "t").unwrap_or_default(),
-					before: param(&path, "after").unwrap_or_default(),
-					after,
-					restrict_sr: param(&path, "restrict_sr").unwrap_or_default(),
-					typed,
-				},
-				prefs: Preferences::new(req),
-				url,
-				is_filtered,
-			})
-		},
-		Err(msg) => {
-			if msg == "quarantined" {
-				let sub = req.param("sub").unwrap_or_default();
-				quarantine(req, sub)
-			} else {
-				error(req, msg).await
+				template(SearchTemplate {
+					posts,
+					subreddits,
+					sub,
+					params: SearchParams {
+						q: query.replace('"', "&quot;"),
+						sort,
+						t: param(&path, "t").unwrap_or_default(),
+						before: param(&path, "after").unwrap_or_default(),
+						after,
+						restrict_sr: param(&path, "restrict_sr").unwrap_or_default(),
+						typed,
+					},
+					prefs: Preferences::new(req),
+					url,
+					is_filtered: false,
+					all_posts_filtered,
+				})
+			},
+			Err(msg) => {
+				if msg == "quarantined" {
+					let sub = req.param("sub").unwrap_or_default();
+					quarantine(req, sub)
+				} else {
+					error(req, msg).await
+				}
 			}
 		}
 	}
