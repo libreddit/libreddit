@@ -109,7 +109,7 @@ async fn search_subreddits(q: &str, typed: &str) -> Vec<Subreddit> {
 			let icon = subreddit["data"]["community_icon"].as_str().map_or_else(|| val(subreddit, "icon_img"), ToString::to_string);
 
 			Subreddit {
-				name: val(subreddit, "display_name_prefixed"),
+				name: val(subreddit, "display_name"),
 				url: val(subreddit, "url"),
 				icon: format_url(&icon),
 				description: val(subreddit, "public_description"),

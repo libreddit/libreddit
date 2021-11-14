@@ -41,7 +41,7 @@
 				<div class="search_subreddit_left">{% if subreddit.icon != "" %}<img loading="lazy" src="{{ subreddit.icon }}" alt="r/{{ subreddit.name }} icon">{% endif %}</div>
 				<div class="search_subreddit_right">
 					<p class="search_subreddit_header"> 
-						<span class="search_subreddit_name">{{ subreddit.name }}</span>
+						<span class="search_subreddit_name">r/{{ subreddit.name }}</span>
 						<span class="dot">&bull;</span>
 						<span class="search_subreddit_members" title="{{ subreddit.subscribers.1 }} Members">{{ subreddit.subscribers.0 }} Members</span>
 					</p>
