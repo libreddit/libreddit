@@ -248,7 +248,7 @@ pub async fn wiki(req: Request<Body>) -> Result<Response<Body>, String> {
 			wiki: rewrite_urls(response["data"]["content_html"].as_str().unwrap_or("<h3>Wiki not found</h3>")),
 			page,
 			prefs: Preferences::new(req),
-			url: url,
+			url,
 		}),
 		Err(msg) => {
 			if msg == "quarantined" {
@@ -286,7 +286,7 @@ pub async fn sidebar(req: Request<Body>) -> Result<Response<Body>, String> {
 			sub,
 			page: "Sidebar".to_string(),
 			prefs: Preferences::new(req),
-			url: url,
+			url,
 		}),
 		Err(msg) => {
 			if msg == "quarantined" {

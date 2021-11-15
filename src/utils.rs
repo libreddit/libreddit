@@ -611,7 +611,7 @@ pub async fn error(req: Request<Body>, msg: String) -> Result<Response<Body>, St
 	let body = ErrorTemplate {
 		msg,
 		prefs: Preferences::new(req),
-		url: url,
+		url,
 	}
 	.render()
 	.unwrap_or_default();

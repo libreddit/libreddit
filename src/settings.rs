@@ -39,7 +39,7 @@ pub async fn get(req: Request<Body>) -> Result<Response<Body>, String> {
 	let url = req.uri().to_string();
 	template(SettingsTemplate {
 		prefs: Preferences::new(req),
-		url: url,
+		url,
 	})
 }
 
