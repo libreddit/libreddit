@@ -227,10 +227,15 @@ nav #libreddit {
 
 #settings_link {
 	opacity: 0.8;
+	margin-left: 10px;
+}
+
+#reddit_link {
+	opacity: 0.8;
 }
 
 #code {
-	margin-left: 5px;
+	margin-left: 10px;
 }
 
 main {
