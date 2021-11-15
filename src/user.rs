@@ -70,7 +70,7 @@ async fn user(name: &str) -> Result<User, String> {
 
 		// Parse the JSON output into a User struct
 		User {
-			name: name.to_string(),
+			name: res["data"]["name"].as_str().unwrap_or(name).to_owned(),
 			title: esc!(about("title")),
 			icon: format_url(&about("icon_img")),
 			karma: res["data"]["total_karma"].as_i64().unwrap_or(0),
