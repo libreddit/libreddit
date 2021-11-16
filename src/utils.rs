@@ -539,7 +539,7 @@ pub fn setting(req: &Request<Body>, name: &str) -> String {
 
 // Detect and redirect in the event of a random subreddit
 pub async fn catch_random(sub: &str, additional: &str) -> Result<Response<Body>, String> {
-	if (sub == "random" || sub == "randnsfw") && !sub.contains('+') {
+	if sub == "random" || sub == "randnsfw" {
 		let new_sub = json(format!("/r/{}/about.json?raw_json=1", sub), false).await?["data"]["display_name"]
 			.as_str()
 			.unwrap_or_default()
