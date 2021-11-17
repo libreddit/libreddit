@@ -8,7 +8,7 @@
 		<p class="comment_score" title="{{ score.1 }}">{{ score.0 }}</p>
 		<div class="line"></div>
 	</div>
-	<details class="comment_right" open>
+	<details class="comment_right" {% if collapsed == false %}open{% endif %}>
 		<summary class="comment_data">
 			<a class="comment_author {{ author.distinguished }} {% if author.name == post_author %}op{% endif %}" href="/user/{{ author.name }}">u/{{ author.name }}</a>
 			{% if author.flair.flair_parts.len() > 0 %}

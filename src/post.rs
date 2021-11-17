@@ -184,6 +184,14 @@ fn parse_comments(json: &serde_json::Value, post_link: &str, post_author: &str, 
 			let id = val(&comment, "id");
 			let highlighted = id == highlighted_comment;
 
+			// Many subreddits have a default comment posted about the sub's rules etc.
+			// Many libreddit users do not wish to see this kind of comment by default.
+			// Reddit does not tell us which users are "bots", so a good heuristic is to
+			// collapse stickied moderator comments.
+			let is_moderator_comment = data["distinguished"].as_str().unwrap_or_default().to_string() == "moderator";
+			let is_stickied = data["stickied"].as_bool().unwrap_or_default();
+			let collapsed = is_moderator_comment && is_stickied;
+
 			Comment {
 				id,
 				kind,
@@ -216,6 +224,7 @@ fn parse_comments(json: &serde_json::Value, post_link: &str, post_author: &str, 
 				edited,
 				replies,
 				highlighted,
+				collapsed,
 			}
 		})
 		.collect()

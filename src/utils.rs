@@ -334,6 +334,7 @@ pub struct Comment {
 	pub edited: (String, String),
 	pub replies: Vec<Comment>,
 	pub highlighted: bool,
+	pub collapsed: bool,
 }
 
 #[derive(Template)]
