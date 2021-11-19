@@ -14,11 +14,12 @@ use time::{Duration, OffsetDateTime};
 #[template(path = "settings.html")]
 struct SettingsTemplate {
 	prefs: Preferences,
+	url: String,
 }
 
 // CONSTANTS
 
-const PREFS: [&str; 9] = [
+const PREFS: [&str; 10] = [
 	"theme",
 	"front_page",
 	"layout",
@@ -28,13 +29,18 @@ const PREFS: [&str; 9] = [
 	"show_nsfw",
 	"use_hls",
 	"hide_hls_notification",
+	"autoplay_videos",
 ];
 
 // FUNCTIONS
 
 // Retrieve cookies from request "Cookie" header
 pub async fn get(req: Request<Body>) -> Result<Response<Body>, String> {
-	template(SettingsTemplate { prefs: Preferences::new(req) })
+	let url = req.uri().to_string();
+	template(SettingsTemplate {
+		prefs: Preferences::new(req),
+		url,
+	})
 }
 
 // Set cookies using response "Set-Cookie" header

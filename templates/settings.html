@@ -54,6 +54,11 @@
 				<input type="hidden" value="off" name="show_nsfw">
 				<input type="checkbox" name="show_nsfw" {% if prefs.show_nsfw == "on" %}checked{% endif %}>
 			</div>
+			<div id="autoplay_videos">
+				<label for="autoplay_videos">Autoplay videos</label>
+				<input type="hidden" value="off" name="autoplay_videos">
+				<input type="checkbox" name="autoplay_videos" {% if prefs.autoplay_videos == "on" %}checked{% endif %}>
+			</div>
 			<div id="use_hls">
 				<label for="use_hls">Use HLS for videos</label>
 				<input type="hidden" value="off" name="use_hls">

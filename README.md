@@ -29,21 +29,20 @@ Feel free to [open an issue](https://github.com/spikecodes/libreddit/issues/new)
 |-|-|-|
 | [libredd.it](https://libredd.it) (official) | 🇺🇸 US |  |
 | [libreddit.spike.codes](https://libreddit.spike.codes) (official) | 🇺🇸 US |  |
-| [libreddit.dothq.co](https://libreddit.dothq.co) | 🇺🇸 US |  |
-| [libreddit.kavin.rocks](https://libreddit.kavin.rocks) | 🇮🇳 IN | ✅ |
-| [libreddit.bcow.xyz](https://libreddit.bcow.xyz) | 🇺🇸 US |  |
+| [libreddit.dothq.co](https://libreddit.dothq.co) | 🇩🇪 DE | ✅ |
+| [libreddit.kavin.rocks](https://libreddit.kavin.rocks) | 🇮🇳 IN |  |
 | [libreddit.40two.app](https://libreddit.40two.app) | 🇳🇱 NL |  |
 | [reddit.invak.id](https://reddit.invak.id) | 🇧🇬 BG |  |
 | [reddit.phii.me](https://reddit.phii.me) | 🇺🇸 US |  |
 | [lr.riverside.rocks](https://lr.riverside.rocks) | 🇺🇸 US |  |
 | [libreddit.silkky.cloud](https://libreddit.silkky.cloud) | 🇫🇮 FI | ✅ |
 | [libreddit.database.red](https://libreddit.database.red) | 🇺🇸 US | ✅ |
-| [libreddit.exonip.de](https://libreddit.exonip.de) | 🇩🇪 DE  |  |
+| [libreddit.exonip.de](https://libreddit.exonip.de) | 🇩🇪 DE |  |
 | [libreddit.domain.glass](https://libreddit.domain.glass) | 🇺🇸 US | ✅ |
 | [libreddit.sugoma.tk](https://libreddit.sugoma.tk) | 🇺🇸 US | |
 | [libreddit.trevorthalacker.com](https://libreddit.trevorthalacker.com) | 🇺🇸 US | ✅ |
-| [reddit.artemislena.eu](https://reddit.artemislena.eu) | 🇩🇪 DE  |  |
-| [r.nf](https://r.nf) | 🇩🇪 DE  | ✅ |
+| [reddit.artemislena.eu](https://reddit.artemislena.eu) | 🇩🇪 DE |  |
+| [r.nf](https://r.nf) | 🇩🇪 DE | ✅ |
 | [libreddit.awesomehub.io](https://libreddit.awesomehub.io) | 🇫🇮 FI |  |
 | [libreddit.some-things.org](https://libreddit.some-things.org) | 🇨🇭 CH |  |
 | [reddit.stuehieyr.com](https://reddit.stuehieyr.com) | 🇩🇪 DE  |  |
@@ -51,12 +50,18 @@ Feel free to [open an issue](https://github.com/spikecodes/libreddit/issues/new)
 | [libreddit.alefvanoon.xyz](https://libreddit.alefvanoon.xyz) | 🇺🇸 US | ✅ |
 | [libreddit.igna.rocks](https://libreddit.igna.rocks) | 🇺🇸 US | |
 | [libreddit.autarkic.org](https://libreddit.autarkic.org) | 🇺🇸 US | |
-| [libreddit.flux.industries](https://libreddit.flux.industries) | 🇩🇪 DE  | ✅ |
-| [spjmllawtheisznfs7uryhxumin26ssv2draj7oope3ok3wuhy43eoyd.onion](http://spjmllawtheisznfs7uryhxumin26ssv2draj7oope3ok3wuhy43eoyd.onion) | 🇮🇳 IN  |  |
-| [fwhhsbrbltmrct5hshrnqlqygqvcgmnek3cnka55zj4y7nuus5muwyyd.onion](http://fwhhsbrbltmrct5hshrnqlqygqvcgmnek3cnka55zj4y7nuus5muwyyd.onion) | 🇩🇪 DE  |  |
-| [dflv6yjt7il3n3tggf4qhcmkzbti2ppytqx3o7pjrzwgntutpewscyid.onion](http://dflv6yjt7il3n3tggf4qhcmkzbti2ppytqx3o7pjrzwgntutpewscyid.onion) | 🇺🇸 US |  |
+| [libreddit.flux.industries](https://libreddit.flux.industries) | 🇩🇪 DE | ✅ |
+| [libreddit.drivet.xyz](https://libreddit.drivet.xyz) | 🇫🇮 FI | ✅ |
+| [lr.oversold.host](https://lr.oversold.host) | 🇱🇺 LU | |
+| [libreddit.de](https://libreddit.de) | 🇩🇪 DE |  |
+| [libreddit.pussthecat.org](https://libreddit.pussthecat.org) | 🇩🇪 DE |  |
+| [spjmllawtheisznfs7uryhxumin26ssv2draj7oope3ok3wuhy43eoyd.onion](http://spjmllawtheisznfs7uryhxumin26ssv2draj7oope3ok3wuhy43eoyd.onion) | 🇮🇳 IN |  |
+| [fwhhsbrbltmrct5hshrnqlqygqvcgmnek3cnka55zj4y7nuus5muwyyd.onion](http://fwhhsbrbltmrct5hshrnqlqygqvcgmnek3cnka55zj4y7nuus5muwyyd.onion) | 🇩🇪 DE |  |
 | [kphht2jcflojtqte4b4kyx7p2ahagv4debjj32nre67dxz7y57seqwyd.onion](http://kphht2jcflojtqte4b4kyx7p2ahagv4debjj32nre67dxz7y57seqwyd.onion) | 🇳🇱 NL |  |
 | [inytumdgnri7xsqtvpntjevaelxtgbjqkuqhtf6txxhwbll2fwqtakqd.onion](http://inytumdgnri7xsqtvpntjevaelxtgbjqkuqhtf6txxhwbll2fwqtakqd.onion) | 🇨🇭 CH |  |
+| [liredejj74h5xjqr2dylnl5howb2bpikfowqoveub55ru27x43357iid.onion](http://liredejj74h5xjqr2dylnl5howb2bpikfowqoveub55ru27x43357iid.onion) | 🇩🇪 DE |  |
+| [kzhfp3nvb4qp575vy23ccbrgfocezjtl5dx66uthgrhu7nscu6rcwjyd.onion](http://kzhfp3nvb4qp575vy23ccbrgfocezjtl5dx66uthgrhu7nscu6rcwjyd.onion) | 🇺🇸 US |  |
+
 
 A checkmark in the "Cloudflare" category here refers to the use of the reverse proxy, [Cloudflare](https://cloudflare). The checkmark will not be listed for a site which uses Cloudflare DNS but rather the proxying service which grants Cloudflare the ability to monitor traffic to the website.
 

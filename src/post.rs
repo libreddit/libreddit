@@ -19,6 +19,7 @@ struct PostTemplate {
 	sort: String,
 	prefs: Preferences,
 	single_thread: bool,
+	url: String,
 }
 
 pub async fn item(req: Request<Body>) -> Result<Response<Body>, String> {
@@ -55,6 +56,7 @@ pub async fn item(req: Request<Body>) -> Result<Response<Body>, String> {
 			// Parse the JSON into Post and Comment structs
 			let post = parse_post(&response[0]).await;
 			let comments = parse_comments(&response[1], &post.permalink, &post.author.name, highlighted_comment);
+			let url = req.uri().to_string();
 
 			// Use the Post and Comment structs to generate a website to show users
 			template(PostTemplate {
@@ -63,6 +65,7 @@ pub async fn item(req: Request<Body>) -> Result<Response<Body>, String> {
 				sort,
 				prefs: Preferences::new(req),
 				single_thread,
+				url,
 			})
 		}
 		// If the Reddit API returns an error, exit and send error page to user
@@ -191,6 +194,14 @@ fn parse_comments(json: &serde_json::Value, post_link: &str, post_author: &str, 
 			let id = val(&comment, "id");
 			let highlighted = id == highlighted_comment;
 
+			// Many subreddits have a default comment posted about the sub's rules etc.
+			// Many libreddit users do not wish to see this kind of comment by default.
+			// Reddit does not tell us which users are "bots", so a good heuristic is to
+			// collapse stickied moderator comments.
+			let is_moderator_comment = data["distinguished"].as_str().unwrap_or_default() == "moderator";
+			let is_stickied = data["stickied"].as_bool().unwrap_or_default();
+			let collapsed = is_moderator_comment && is_stickied;
+
 			Comment {
 				id,
 				kind,
@@ -224,6 +235,7 @@ fn parse_comments(json: &serde_json::Value, post_link: &str, post_author: &str, 
 				replies,
 				highlighted,
 				awards,
+				collapsed,
 			}
 		})
 		.collect()

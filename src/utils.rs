@@ -341,6 +341,7 @@ pub struct Comment {
 	pub replies: Vec<Comment>,
 	pub highlighted: bool,
 	pub awards: Awards,
+  pub collapsed: bool,
 }
 
 #[derive(Default, Clone)]
@@ -402,6 +403,7 @@ impl Awards {
 pub struct ErrorTemplate {
 	pub msg: String,
 	pub prefs: Preferences,
+	pub url: String,
 }
 
 #[derive(Default)]
@@ -449,6 +451,7 @@ pub struct Preferences {
 	pub show_nsfw: String,
 	pub hide_hls_notification: String,
 	pub use_hls: String,
+	pub autoplay_videos: String,
 	pub comment_sort: String,
 	pub post_sort: String,
 	pub subscriptions: Vec<String>,
@@ -465,6 +468,7 @@ impl Preferences {
 			show_nsfw: setting(&req, "show_nsfw"),
 			use_hls: setting(&req, "use_hls"),
 			hide_hls_notification: setting(&req, "hide_hls_notification"),
+			autoplay_videos: setting(&req, "autoplay_videos"),
 			comment_sort: setting(&req, "comment_sort"),
 			post_sort: setting(&req, "post_sort"),
 			subscriptions: setting(&req, "subscriptions").split('+').map(String::from).filter(|s| !s.is_empty()).collect(),
@@ -665,9 +669,11 @@ pub fn redirect(path: String) -> Response<Body> {
 }
 
 pub async fn error(req: Request<Body>, msg: String) -> Result<Response<Body>, String> {
+	let url = req.uri().to_string();
 	let body = ErrorTemplate {
 		msg,
 		prefs: Preferences::new(req),
+		url,
 	}
 	.render()
 	.unwrap_or_default();
