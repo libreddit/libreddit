@@ -251,11 +251,20 @@ impl Post {
 			// Determine the type of media along with the media URL
 			let (post_type, media, gallery) = Media::parse(data).await;
 
+			// selftext is set for text posts when browsing a (sub)reddit.
+			// Do NOT use selftext_html, because we truncate this content
+			// in the template code, and using selftext_html might result
+			// in truncated html.
+			let mut body = rewrite_urls(&val(post, "selftext"));
+			if body == "" {
+				body = rewrite_urls(&val(post, "body_html"))
+			}
+
 			posts.push(Self {
 				id: val(post, "id"),
 				title: esc!(if title.is_empty() { fallback_title.clone() } else { title }),
 				community: val(post, "subreddit"),
-				body: rewrite_urls(&val(post, "body_html")),
+				body,
 				author: Author {
 					name: val(post, "author"),
 					flair: Flair {
