@@ -837,9 +837,14 @@ a.search_subreddit:hover {
 .post_body {
 	opacity: 0.9;
 	font-weight: normal;
-	margin: 5px 15px;
+	padding: 5px 15px;
 	grid-area: post_body;
 	width: calc(100% - 30px);
+}
+
+.post_preview {
+	mask-image: linear-gradient(180deg,#000 60%,transparent);
+	opacity: 0.8;
 }
 
 .post_footer {
