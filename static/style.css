@@ -838,7 +838,7 @@ a.search_subreddit:hover {
 .post_body {
 	opacity: 0.9;
 	font-weight: normal;
-	padding: 5px 15px;
+	padding: 5px 15px 5px 12px;
 	grid-area: post_body;
 	width: calc(100% - 30px);
 }
@@ -847,7 +847,7 @@ a.search_subreddit:hover {
 .post_preview {
 	mask-image: linear-gradient(180deg,#000 60%,transparent);
 	opacity: 0.8;
-	max-height: 500px;
+	max-height: 250px;
 }
 
 .post_footer {
