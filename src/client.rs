@@ -113,6 +113,9 @@ pub async fn json(path: String, quarantine: bool) -> Result<Value, String> {
 	// Build Reddit url from path
 	let url = format!("https://www.reddit.com{}", path);
 
+	#[cfg(debug_assertions)]
+	println!("{}", url);
+
 	// Closure to quickly build errors
 	let err = |msg: &str, e: String| -> Result<Value, String> {
 		// eprintln!("{} - {}: {}", url, msg, e);
