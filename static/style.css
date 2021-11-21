@@ -1084,6 +1084,10 @@ summary.comment_data {
 	margin: 2.5px 15px;
 }
 
+.compact .post_preview {
+	display: none;
+}
+
 .compact .post_media {
 	max-width: calc(100% - 30px);
 	margin: 2.5px auto;
