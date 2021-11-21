@@ -843,9 +843,11 @@ a.search_subreddit:hover {
 	width: calc(100% - 30px);
 }
 
+/* Used only for text post preview */
 .post_preview {
 	mask-image: linear-gradient(180deg,#000 60%,transparent);
 	opacity: 0.8;
+	max-height: 500px;
 }
 
 .post_footer {
@@ -1223,7 +1225,6 @@ input[type="submit"] {
 
 .md table {
 	margin: 5px;
-	display: block;
 	overflow-x: auto;
 }
 
