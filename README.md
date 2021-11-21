@@ -40,7 +40,7 @@ Feel free to [open an issue](https://github.com/spikecodes/libreddit/issues/new)
 | [libreddit.exonip.de](https://libreddit.exonip.de) | 🇩🇪 DE |  |
 | [libreddit.domain.glass](https://libreddit.domain.glass) | 🇺🇸 US | ✅ |
 | [libreddit.sugoma.tk](https://libreddit.sugoma.tk) | 🇺🇸 US | |
-| [libreddit.jamiethalacker.com](https://libreddit.jamiethalacker.com) | 🇺🇸 US | ✅ |
+| [libreddit.jamiethalacker.dev](https://libreddit.jamiethalacker.dev) | 🇺🇸 US | ✅ |
 | [reddit.artemislena.eu](https://reddit.artemislena.eu) | 🇩🇪 DE |  |
 | [r.nf](https://r.nf) | 🇩🇪 DE | ✅ |
 | [libreddit.awesomehub.io](https://libreddit.awesomehub.io) | 🇫🇮 FI |  |
