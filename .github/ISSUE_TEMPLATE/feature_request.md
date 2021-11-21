@@ -1,6 +1,6 @@
 ---
 name: 💡 Feature request
-about: Suggest an idea for this project
+about: Suggest a feature for Libreddit that is not found in Reddit
 title: ''
 labels: enhancement
 assignees: ''
