@@ -697,12 +697,12 @@ a.search_subreddit:hover {
 
 .post_score {
 	padding-top: 16px;
+	padding-left: 12px;
 	font-size: 13px;
 	font-weight: bold;
-	text-align: end;
 	color: var(--accent);
 	grid-area: post_score;
-	text-align: end;
+	text-align: center;
 	border-radius: 5px 0 0 5px;
 	transition: 0.2s background;
 }
@@ -712,7 +712,7 @@ a.search_subreddit:hover {
 } 
 
 .post_header {
-	margin: 15px 20px 5px 15px;
+	margin: 15px 20px 5px 12px;
 	grid-area: post_header;
 }
 
@@ -723,7 +723,7 @@ a.search_subreddit:hover {
 .post_title {
 	font-size: 16px;
 	line-height: 1.5;
-	margin: 5px 15px;
+	margin: 5px 15px 5px 12px;
 	grid-area: post_title;
 }
 
@@ -1070,7 +1070,7 @@ summary.comment_data {
 }
 
 .compact .post_header {
-	margin: 15px 15px 2.5px 15px;
+	margin: 15px 15px 2.5px 12px;
 	font-size: 14px;
 }
 
