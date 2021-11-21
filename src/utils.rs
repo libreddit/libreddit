@@ -256,11 +256,17 @@ impl Post {
 
 			awards.parse(&data["all_awardings"]);
 
-      posts.push(Self {
+			// selftext_html is set for text posts when browsing.
+			let mut body = rewrite_urls(&val(post, "selftext_html"));
+			if body == "" {
+				body = rewrite_urls(&val(post, "body_html"))
+			}
+
+			posts.push(Self {
 				id: val(post, "id"),
 				title: esc!(if title.is_empty() { fallback_title.clone() } else { title }),
 				community: val(post, "subreddit"),
-				body: rewrite_urls(&val(post, "body_html")),
+				body,
 				author: Author {
 					name: val(post, "author"),
 					flair: Flair {
@@ -596,12 +602,14 @@ pub fn rewrite_urls(input_text: &str) -> String {
 	})
 }
 
-// Append `m` and `k` for millions and thousands respectively
+// Format vote count to a string that will be displayed.
+// Append `m` and `k` for millions and thousands respectively, and
+// round to the nearest tenth.
 pub fn format_num(num: i64) -> (String, String) {
 	let truncated = if num >= 1_000_000 || num <= -1_000_000 {
-		format!("{}m", num / 1_000_000)
+		format!("{:.1}m", num as f64 / 1_000_000.0)
 	} else if num >= 1000 || num <= -1000 {
-		format!("{}k", num / 1_000)
+		format!("{:.1}k", num as f64 / 1_000.0)
 	} else {
 		num.to_string()
 	};
@@ -679,4 +687,33 @@ pub async fn error(req: Request<Body>, msg: String) -> Result<Response<Body>, St
 	.unwrap_or_default();
 
 	Ok(Response::builder().status(404).header("content-type", "text/html").body(body.into()).unwrap_or_default())
+}
+
+#[cfg(test)]
+mod tests {
+	use super::format_num;
+
+    #[test]
+    fn format_num_works() {
+        assert_eq!(
+			format_num(567),
+			("567".to_string(), "567".to_string())
+		);
+		assert_eq!(
+			format_num(1234),
+			("1.2k".to_string(), "1234".to_string())
+		);
+		assert_eq!(
+			format_num(1999),
+			("2.0k".to_string(), "1999".to_string())
+		);
+		assert_eq!(
+			format_num(1001),
+			("1.0k".to_string(), "1001".to_string())
+		);
+		assert_eq!(
+			format_num(1_999_999),
+			("2.0m".to_string(), "1999999".to_string())
+		);
+    }
 }

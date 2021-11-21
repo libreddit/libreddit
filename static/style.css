@@ -697,12 +697,12 @@ a.search_subreddit:hover {
 
 .post_score {
 	padding-top: 16px;
+	padding-left: 12px;
 	font-size: 13px;
 	font-weight: bold;
-	text-align: end;
 	color: var(--accent);
 	grid-area: post_score;
-	text-align: end;
+	text-align: center;
 	border-radius: 5px 0 0 5px;
 	transition: 0.2s background;
 }
@@ -712,7 +712,7 @@ a.search_subreddit:hover {
 } 
 
 .post_header {
-	margin: 15px 20px 5px 15px;
+	margin: 15px 20px 5px 12px;
 	grid-area: post_header;
 }
 
@@ -722,8 +722,9 @@ a.search_subreddit:hover {
 
 .post_title {
 	font-size: 16px;
+	font-weight: 500;
 	line-height: 1.5;
-	margin: 5px 15px;
+	margin: 5px 15px 5px 12px;
 	grid-area: post_title;
 }
 
@@ -875,9 +876,16 @@ a.search_subreddit:hover {
 .post_body {
 	opacity: 0.9;
 	font-weight: normal;
-	margin: 5px 15px;
+	padding: 5px 15px 5px 12px;
 	grid-area: post_body;
 	width: calc(100% - 30px);
+}
+
+/* Used only for text post preview */
+.post_preview {
+	mask-image: linear-gradient(180deg,#000 60%,transparent);
+	opacity: 0.8;
+	max-height: 250px;
 }
 
 .post_footer {
@@ -1108,12 +1116,16 @@ summary.comment_data {
 }
 
 .compact .post_header {
-	margin: 15px 15px 2.5px 15px;
+	margin: 15px 15px 2.5px 12px;
 	font-size: 14px;
 }
 
 .compact .post_title, .compact #post_url, .compact .post_body {
 	margin: 2.5px 15px;
+}
+
+.compact .post_preview {
+	display: none;
 }
 
 .compact .post_media {
@@ -1251,7 +1263,6 @@ input[type="submit"] {
 
 .md table {
 	margin: 5px;
-	display: block;
 	overflow-x: auto;
 }
 
