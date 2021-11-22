@@ -195,22 +195,12 @@ yay -S libreddit-git
 
 If you're on Linux and none of these methods work for you, you can grab a Linux binary from [the newest release](https://github.com/spikecodes/libreddit/releases/latest).
 
-## 5) Replit
+## 5) Replit/Heroku/Glitch
 
-**Note:** Replit is a free option but they are *not* private and will monitor server usage to prevent abuse. If you need a free and easy setup, this method may work best for you.
+**Note:** These are free hosting options but they are *not* private and will monitor server usage to prevent abuse. If you need a free and easy setup, this method may work best for you.
 
-1. Create a Replit account (see note above)
-2. Visit [the official Repl](https://replit.com/@spikethecoder/libreddit) and fork it
-3. Hit the run button to download the latest Libreddit version and start it
-
-In the web preview (defaults to top right), you should see your instance hosted where you can assign a [custom domain](https://docs.replit.com/repls/web-hosting#custom-domains).
-
-## 6) Heroku
-
+<a href="https://repl.it/github/spikecodes/libreddit"><img src="https://repl.it/badge/github/spikecodes/libreddit" alt="Run on Repl.it" height="32" /></a>
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/spikecodes/libreddit)
-
-## 7) Glitch
-
 [![Remix on Glitch](https://cdn.glitch.com/2703baf2-b643-4da7-ab91-7ee2a2d00b5b%2Fremix-button-v2.svg)](https://glitch.com/edit/#!/remix/libreddit)
 
 ---
