@@ -1145,6 +1145,10 @@ summary.comment_data {
 	margin-top: 10px;
 }
 
+.prefs > p {
+	font-weight: 500;
+}
+
 .prefs select {
 	border-radius: 5px;
 	box-shadow: var(--shadow);
@@ -1171,6 +1175,10 @@ input[type="submit"] {
 
 #settings_subs .unsubscribe {
 	margin-left: 30px;
+}
+
+#settings_subs a {
+	color: var(--accent);
 }
 
 /* Markdown */
