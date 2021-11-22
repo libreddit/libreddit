@@ -845,9 +845,11 @@ a.search_subreddit:hover {
 
 /* Used only for text post preview */
 .post_preview {
+	-webkit-mask-image: linear-gradient(180deg,#000 60%,transparent);;
 	mask-image: linear-gradient(180deg,#000 60%,transparent);
 	opacity: 0.8;
 	max-height: 250px;
+	overflow: hidden;
 }
 
 .post_footer {
