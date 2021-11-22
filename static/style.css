@@ -769,9 +769,9 @@ a.search_subreddit:hover {
 .tooltip {
 	position: relative;
 	display: inline-block;
-  }
+}
   
-  .tooltip .tooltiptext {
+.tooltip .tooltiptext {
 	visibility: hidden;
 	width: 120px;
 	background-color: black;
@@ -785,9 +785,9 @@ a.search_subreddit:hover {
 	bottom: 100%;
 	left: 50%;
 	margin-left: -60px;
-  }
+}
   
-  .tooltip:hover .tooltiptext {
+.tooltip:hover .tooltiptext {
 	visibility: visible;
 }
 
