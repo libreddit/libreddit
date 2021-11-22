@@ -971,7 +971,8 @@ a.search_subreddit:hover {
 	min-width: 40px;
 	border-radius: 5px;
 	padding: 10px 0;
-	font-size: 16px;
+	font-size: 14px;
+	font-weight: 600;
 }
 
 .comment_right {
