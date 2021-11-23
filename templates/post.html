@@ -71,7 +71,7 @@
 			{% else if post.post_type == "video" || post.post_type == "gif" %}
 			{% if prefs.use_hls == "on" && !post.media.alt_url.is_empty() %}
 			<script src="/hls.min.js"></script>
-			<video class="post_media_video short hls_autoplay" width="{{ post.media.width }}" height="{{ post.media.height }}" poster="{{ post.media.poster }}" preload="none" controls {% if prefs.autoplay_videos == "on" %}autoplay{% endif %}>
+			<video class="post_media_video short {% if prefs.autoplay_videos == "on" %}hls_autoplay{% endif %}" width="{{ post.media.width }}" height="{{ post.media.height }}" poster="{{ post.media.poster }}" preload="none" controls>
 				<source src="{{ post.media.alt_url }}" type="application/vnd.apple.mpegurl" />
 				<source src="{{ post.media.url }}" type="video/mp4" />
 			</video>
