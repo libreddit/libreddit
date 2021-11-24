@@ -658,6 +658,13 @@ a.search_subreddit:hover {
 	opacity: 0.5;
 }
 
+#more_subreddits {
+	justify-content: center;
+	color: var(--accent);
+	font-weight: 600;
+	text-align: center;
+}
+
 /* Post */
 
 .sep {
@@ -777,7 +784,7 @@ a.search_subreddit:hover {
 	font-weight: bold;
 }
 
-.post_media_image, .post .__NoScript_PlaceHolder__, .post_media_video, .gallery  {
+.post_media_image, .post .__NoScript_PlaceHolder__, .post_media_video, .gallery {
 	max-width: calc(100% - 40px);
 	grid-area: post_media;
 	margin: 15px auto 5px auto;
@@ -1044,7 +1051,7 @@ a.search_subreddit:hover {
 }
 
 summary.comment_data {
-    cursor: pointer;
+	cursor: pointer;
 }
 
 .moderator, .admin { opacity: 1; }

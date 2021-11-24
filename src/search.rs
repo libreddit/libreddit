@@ -16,6 +16,7 @@ struct SearchParams {
 	before: String,
 	after: String,
 	restrict_sr: String,
+	typed: String,
 }
 
 // STRUCTS
@@ -55,10 +56,12 @@ pub async fn find(req: Request<Body>) -> Result<Response<Body>, String> {
 		return Ok(random);
 	}
 
+	let typed = param(&path, "type").unwrap_or_default();
+
 	let sort = param(&path, "sort").unwrap_or_else(|| "relevance".to_string());
 
 	// If search is not restricted to this subreddit, show other subreddits in search results
-	let subreddits = param(&path, "restrict_sr").map_or(search_subreddits(&query).await, |_| Vec::new());
+	let subreddits = param(&path, "restrict_sr").map_or(search_subreddits(&query, &typed).await, |_| Vec::new());
 
 	let url = String::from(req.uri().path_and_query().map_or("", |val| val.as_str()));
 
@@ -74,6 +77,7 @@ pub async fn find(req: Request<Body>) -> Result<Response<Body>, String> {
 				before: param(&path, "after").unwrap_or_default(),
 				after,
 				restrict_sr: param(&path, "restrict_sr").unwrap_or_default(),
+				typed,
 			},
 			prefs: Preferences::new(req),
 			url,
@@ -89,8 +93,9 @@ pub async fn find(req: Request<Body>) -> Result<Response<Body>, String> {
 	}
 }
 
-async fn search_subreddits(q: &str) -> Vec<Subreddit> {
-	let subreddit_search_path = format!("/subreddits/search.json?q={}&limit=3", q.replace(' ', "+"));
+async fn search_subreddits(q: &str, typed: &str) -> Vec<Subreddit> {
+	let limit = if typed == "sr_user" { "50" } else { "3" };
+	let subreddit_search_path = format!("/subreddits/search.json?q={}&limit={}", q.replace(' ', "+"), limit);
 
 	// Send a request to the url
 	json(subreddit_search_path, false).await.unwrap_or_default()["data"]["children"]
@@ -101,9 +106,7 @@ async fn search_subreddits(q: &str) -> Vec<Subreddit> {
 		.map(|subreddit| {
 			// For each subreddit from subreddit list
 			// Fetch subreddit icon either from the community_icon or icon_img value
-			let icon = subreddit["data"]["community_icon"]
-				.as_str()
-				.map_or_else(|| val(subreddit, "icon_img"), ToString::to_string);
+			let icon = subreddit["data"]["community_icon"].as_str().map_or_else(|| val(subreddit, "icon_img"), ToString::to_string);
 
 			Subreddit {
 				name: val(subreddit, "display_name_prefixed"),
