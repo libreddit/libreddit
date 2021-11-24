@@ -60,7 +60,12 @@
 				<input type="checkbox" name="autoplay_videos" {% if prefs.autoplay_videos == "on" %}checked{% endif %}>
 			</div>
 			<div id="use_hls">
-				<label for="use_hls">Use HLS for videos</label>
+				<label for="use_hls">Use HLS for videos
+					<details id="feeds">
+						<summary>Why?</summary>
+						<div id="feed_list" class="helper">Reddit videos require JavaScript (via HLS.js) to be enabled to be played with audio. Therefore, this toggle lets you either use Libreddit JS-free or utilize this feature.</div>
+					</details>
+				</label>
 				<input type="hidden" value="off" name="use_hls">
 				<input type="checkbox" name="use_hls" {% if prefs.use_hls == "on" %}checked{% endif %}>
 			</div>

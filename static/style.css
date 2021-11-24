@@ -1191,6 +1191,12 @@ input[type="submit"] {
 	color: var(--accent);
 }
 
+.helper {
+	padding: 10px;
+	width: 250px;
+	background: var(--highlighted) !important;
+}
+
 /* Markdown */
 
 .md {
