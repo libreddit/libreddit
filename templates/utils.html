@@ -87,7 +87,7 @@
 	</p>
 	<!-- POST MEDIA/THUMBNAIL -->
 	{% if (prefs.layout.is_empty() || prefs.layout == "card") && post.post_type == "image" %}
-	<a href="{{ post.media.url }}" class="post_media_image {% if post.media.height /  post.media.width < 2 %}short{% endif %}" >
+	<a href="{{ post.media.url }}" class="post_media_image {% if post.media.height / post.media.width < 2 %}short{% endif %}" >
 		<svg
 			width="{{ post.media.width }}px" 
 			height="{{ post.media.height }}px" 
@@ -119,7 +119,7 @@
 		</svg>
 		{% else %}
 		<svg width="{{ post.thumbnail.width }}px" height="{{ post.thumbnail.height }}px" xmlns="http://www.w3.org/2000/svg">
-			<image  width="100%" height="100%" href="{{ post.thumbnail.url }}"/>
+			<image width="100%" height="100%" href="{{ post.thumbnail.url }}"/>
 			<desc>
 				<img loading="lazy" alt="Thumbnail" src="{{ post.thumbnail.url }}"/>
 			</desc>

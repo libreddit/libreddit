@@ -2,7 +2,7 @@
 
 {% if kind == "more" && parent_kind == "t1" %}
 <a class="deeper_replies" href="{{ post_link }}{{ parent_id }}">&rarr; More replies</a>
-{% else if kind == "t1"  %}
+{% else if kind == "t1" %}
 <div id="{{ id }}" class="comment">
 	<div class="comment_left">
 		<p class="comment_score" title="{{ score.1 }}">{{ score.0 }}</p>

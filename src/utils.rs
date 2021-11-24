@@ -632,27 +632,12 @@ pub async fn error(req: Request<Body>, msg: String) -> Result<Response<Body>, St
 mod tests {
 	use super::format_num;
 
-    #[test]
-    fn format_num_works() {
-        assert_eq!(
-			format_num(567),
-			("567".to_string(), "567".to_string())
-		);
-		assert_eq!(
-			format_num(1234),
-			("1.2k".to_string(), "1234".to_string())
-		);
-		assert_eq!(
-			format_num(1999),
-			("2.0k".to_string(), "1999".to_string())
-		);
-		assert_eq!(
-			format_num(1001),
-			("1.0k".to_string(), "1001".to_string())
-		);
-		assert_eq!(
-			format_num(1_999_999),
-			("2.0m".to_string(), "1999999".to_string())
-		);
-    }
+	#[test]
+	fn format_num_works() {
+		assert_eq!(format_num(567), ("567".to_string(), "567".to_string()));
+		assert_eq!(format_num(1234), ("1.2k".to_string(), "1234".to_string()));
+		assert_eq!(format_num(1999), ("2.0k".to_string(), "1999".to_string()));
+		assert_eq!(format_num(1001), ("1.0k".to_string(), "1001".to_string()));
+		assert_eq!(format_num(1_999_999), ("2.0m".to_string(), "1999999".to_string()));
+	}
 }
