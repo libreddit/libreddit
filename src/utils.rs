@@ -8,9 +8,9 @@ use hyper::{Body, Request, Response};
 use regex::Regex;
 use serde_json::Value;
 use std::collections::HashMap;
+use std::str::FromStr;
 use time::{Duration, OffsetDateTime};
 use url::Url;
-use std::str::FromStr;
 
 // Post flair with content, background color and foreground color
 pub struct Flair {
@@ -252,9 +252,7 @@ impl Post {
 
 			// Determine the type of media along with the media URL
 			let (post_type, media, gallery) = Media::parse(&data).await;
-			let mut awards = Awards::new();
-
-			awards.parse(&data["all_awardings"]);
+			let awards = Awards::parse(&data["all_awardings"]);
 
 			// selftext_html is set for text posts when browsing.
 			let mut body = rewrite_urls(&val(post, "selftext_html"));
@@ -347,7 +345,7 @@ pub struct Comment {
 	pub replies: Vec<Comment>,
 	pub highlighted: bool,
 	pub awards: Awards,
-  pub collapsed: bool,
+	pub collapsed: bool,
 }
 
 #[derive(Default, Clone)]
@@ -380,27 +378,26 @@ impl std::fmt::Display for Awards {
 	}
 }
 
+// Convert Reddit awards JSON to Awards struct
 impl Awards {
-	pub fn new() -> Self {
-		let awards: Vec<Award> = Vec::new();
-		Self(awards)
-	}
+	pub fn parse(items: &Value) -> Self {
+		let parsed = items.as_array().unwrap_or(&Vec::new()).iter().fold(Vec::new(), |mut awards, item| {
+			let name = item["name"].as_str().unwrap_or_default().to_string();
+			let icon_url = format_url(&item["icon_url"].as_str().unwrap_or_default().to_string());
+			let description = item["description"].as_str().unwrap_or_default().to_string();
+			let count: i64 = i64::from_str(&item["count"].to_string()).unwrap_or(1);
 
-	pub fn parse(&mut self, items: &Value) -> &mut Self {
-		if let Some(array_items) = items.as_array() {
-			for item in array_items.iter() {
-				let name = item["name"].as_str().unwrap_or_default().to_string();
-				let icon_url = format_url(&item["icon_url"].as_str().unwrap_or_default().to_string());
-				let description = item["description"].as_str().unwrap_or_default().to_string();
-				let count: i64 =  i64::from_str(&item["count"].to_string()).unwrap_or(1);
+			awards.push(Award {
+				name,
+				icon_url,
+				description,
+				count,
+			});
 
-				self.0.push(Award { name, icon_url, description, count })
-			}
+			awards
+		});
 
-			self
-		} else {
-			self
-		}
+		Self(parsed)
 	}
 }
 
@@ -693,27 +690,12 @@ pub async fn error(req: Request<Body>, msg: String) -> Result<Response<Body>, St
 mod tests {
 	use super::format_num;
 
-    #[test]
-    fn format_num_works() {
-        assert_eq!(
-			format_num(567),
-			("567".to_string(), "567".to_string())
-		);
-		assert_eq!(
-			format_num(1234),
-			("1.2k".to_string(), "1234".to_string())
-		);
-		assert_eq!(
-			format_num(1999),
-			("2.0k".to_string(), "1999".to_string())
-		);
-		assert_eq!(
-			format_num(1001),
-			("1.0k".to_string(), "1001".to_string())
-		);
-		assert_eq!(
-			format_num(1_999_999),
-			("2.0m".to_string(), "1999999".to_string())
-		);
-    }
+	#[test]
+	fn format_num_works() {
+		assert_eq!(format_num(567), ("567".to_string(), "567".to_string()));
+		assert_eq!(format_num(1234), ("1.2k".to_string(), "1234".to_string()));
+		assert_eq!(format_num(1999), ("2.0k".to_string(), "1999".to_string()));
+		assert_eq!(format_num(1001), ("1.0k".to_string(), "1001".to_string()));
+		assert_eq!(format_num(1_999_999), ("2.0m".to_string(), "1999999".to_string()));
+	}
 }

@@ -94,9 +94,7 @@ async fn parse_post(json: &serde_json::Value) -> Post {
 	// Determine the type of media along with the media URL
 	let (post_type, media, gallery) = Media::parse(&post["data"]).await;
 
-	let mut awards: Awards = Awards::new();
-
-	awards.parse(&post["data"]["all_awardings"]);
+	let awards: Awards = Awards::parse(&post["data"]["all_awardings"]);
 
 	// Build a post using data parsed from Reddit post API
 	Post {
@@ -184,9 +182,7 @@ fn parse_comments(json: &serde_json::Value, post_link: &str, post_author: &str, 
 				Vec::new()
 			};
 
-			let mut awards: Awards = Awards::new();
-
-			awards.parse(&data["all_awardings"]);
+			let awards: Awards = Awards::parse(&data["all_awardings"]);
 
 			let parent_kind_and_id = val(&comment, "parent_id");
 			let parent_info = parent_kind_and_id.split('_').collect::<Vec<&str>>();

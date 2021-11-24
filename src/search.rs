@@ -101,9 +101,7 @@ async fn search_subreddits(q: &str) -> Vec<Subreddit> {
 		.map(|subreddit| {
 			// For each subreddit from subreddit list
 			// Fetch subreddit icon either from the community_icon or icon_img value
-			let icon = subreddit["data"]["community_icon"]
-				.as_str()
-				.map_or_else(|| val(subreddit, "icon_img"), ToString::to_string);
+			let icon = subreddit["data"]["community_icon"].as_str().map_or_else(|| val(subreddit, "icon_img"), ToString::to_string);
 
 			Subreddit {
 				name: val(subreddit, "display_name_prefixed"),
