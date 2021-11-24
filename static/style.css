@@ -754,41 +754,19 @@ a.search_subreddit:hover {
 }
 
 .awards {
-	background-color: var(--background);
+	background-color: var(--foreground);
 	border-radius: 5px;
-	margin:auto;
+	margin: auto;
 	padding: 5px;
 }
 
-.awards_image {
-	vertical-align: middle;
-	width: 16px;
-	height: 16px;
-}
-
-.tooltip {
+.award {
 	position: relative;
 	display: inline-block;
 }
-  
-.tooltip .tooltiptext {
-	visibility: hidden;
-	width: 120px;
-	background-color: black;
-	color: #fff;
-	text-align: center;
-	border-radius: 6px;
-	padding: 5px 0;
-  
-	position: absolute;
-	z-index: 1;
-	bottom: 100%;
-	left: 50%;
-	margin-left: -60px;
-}
-  
-.tooltip:hover .tooltiptext {
-	visibility: visible;
+
+.award > img {
+	vertical-align: middle;
 }
 
 .author_flair:empty, .post_flair:empty {

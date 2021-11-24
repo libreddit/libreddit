@@ -77,8 +77,8 @@
 		<span class="created" title="{{ post.created }}">{{ post.rel_time }}</span>
 		{% if !post.awards.is_empty() %}
 			{% for award in post.awards.clone() %}
-			<span class="tooltip">
-				<img alt="{{ award.icon_url }}" src="{{ award.icon_url }}" width="16" height="16"/>
+			<span class="award" title="{{ award.name }}">
+				<img alt="{{ award.name }}" src="{{ award.icon_url }}" width="16" height="16"/>
 			</span>
 			{% endfor %}
 		{% endif %}
