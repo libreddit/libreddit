@@ -1,12 +1,12 @@
-use askama::Template;
-use hyper::{Body, Request, Response};
-
+// CRATES
+use crate::utils::{catch_random, error, format_num, format_url, param, redirect, setting, template, val, Post, Preferences, get_filters, filter_posts};
 use crate::{
 	client::json,
-	RequestExt,
 	subreddit::{can_access_quarantine, quarantine},
+	RequestExt,
 };
-use crate::utils::{catch_random, error, filter_posts, format_num, format_url, get_filters, param, Post, Preferences, redirect, setting, template, val};
+use askama::Template;
+use hyper::{Body, Request, Response};
 
 // STRUCTS
 struct SearchParams {
@@ -89,7 +89,7 @@ pub async fn find(req: Request<Body>) -> Result<Response<Body>, String> {
 				t: param(&path, "t").unwrap_or_default(),
 				before: param(&path, "after").unwrap_or_default(),
 				after: "".to_string(),
-				restrict_sr: restrict_sr.unwrap_or_default(),
+				restrict_sr: param(&path, "restrict_sr").unwrap_or_default(),
 				typed,
 			},
 			prefs: Preferences::new(req),

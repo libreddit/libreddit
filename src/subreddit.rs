@@ -1,11 +1,11 @@
+// CRATES
+use crate::esc;
+use crate::utils::{catch_random, error, format_num, format_url, param, redirect, rewrite_urls, setting, template, val, Post, Preferences, Subreddit, get_filters, filter_posts};
+use crate::{client::json, server::ResponseExt, RequestExt};
 use askama::Template;
 use cookie::Cookie;
 use hyper::{Body, Request, Response};
 use time::{Duration, OffsetDateTime};
-
-use crate::{client::json, RequestExt, server::ResponseExt};
-use crate::esc;
-use crate::utils::{catch_random, error, filter_posts, format_num, format_url, get_filters, param, Post, Preferences, redirect, rewrite_urls, setting, Subreddit, template, val};
 
 // STRUCTS
 #[derive(Template)]
@@ -185,7 +185,7 @@ pub async fn subscriptions(req: Request<Body>) -> Result<Response<Body>, String>
 	let action: Vec<String> = req.uri().path().split('/').map(String::from).collect();
 
 	let preferences = Preferences::new(req);
-	let mut subscriptions = preferences.subscriptions;
+	let mut sub_list = preferences.subscriptions;
 	let mut filters = preferences.filters;
 
 	// Retrieve list of posts for these subreddits to extract display names
@@ -220,16 +220,16 @@ pub async fn subscriptions(req: Request<Body>) -> Result<Response<Body>, String>
 		};
 
 		// Modify sub list based on action
-		if action.contains(&"subscribe".to_string()) && !subscriptions.contains(&part.to_owned()) {
+		if action.contains(&"subscribe".to_string()) && !sub_list.contains(&part.to_owned()) {
 			// Add each sub name to the subscribed list
-			subscriptions.push(part.to_owned());
+			sub_list.push(part.to_owned());
 			filters.retain(|s| s.to_lowercase() != part.to_lowercase());
 			// Reorder sub names alphabetically
-			subscriptions.sort_by_key(|a| a.to_lowercase());
+			sub_list.sort_by_key(|a| a.to_lowercase());
 			filters.sort_by_key(|a| a.to_lowercase());
 		} else if action.contains(&"unsubscribe".to_string()) {
 			// Remove sub name from subscribed list
-			subscriptions.retain(|s| s.to_lowercase() != part.to_lowercase());
+			sub_list.retain(|s| s.to_lowercase() != part.to_lowercase());
 		}
 	}
 
@@ -244,11 +244,11 @@ pub async fn subscriptions(req: Request<Body>) -> Result<Response<Body>, String>
 	let mut response = redirect(path);
 
 	// Delete cookie if empty, else set
-	if subscriptions.is_empty() {
+	if sub_list.is_empty() {
 		response.remove_cookie("subscriptions".to_string());
 	} else {
 		response.insert_cookie(
-			Cookie::build("subscriptions", subscriptions.join("+"))
+			Cookie::build("subscriptions", sub_list.join("+"))
 				.path("/")
 				.http_only(true)
 				.expires(OffsetDateTime::now_utc() + Duration::weeks(52))

@@ -1,13 +1,15 @@
-use std::collections::HashSet;
 // CRATES
 use crate::client::json;
 use crate::esc;
 use crate::server::RequestExt;
 use crate::subreddit::{can_access_quarantine, quarantine};
-use crate::utils::{error, format_num, format_url, param, rewrite_urls, setting, template, time, val, Author, Awards, Comment, Flags, Flair, FlairPart, Media, Post, Preferences, get_filters};
+use crate::utils::{
+	error, format_num, format_url, param, rewrite_urls, setting, template, time, val, Author, Awards, Comment, Flags, Flair, FlairPart, Media, Post, Preferences, get_filters,
+};
 use hyper::{Body, Request, Response};
 
 use askama::Template;
+use std::collections::HashSet;
 
 // STRUCTS
 #[derive(Template)]
@@ -54,8 +56,7 @@ pub async fn item(req: Request<Body>) -> Result<Response<Body>, String> {
 		Ok(response) => {
 			// Parse the JSON into Post and Comment structs
 			let post = parse_post(&response[0]).await;
-			let comments = parse_comments(&response[1], &post.permalink, &post.author.name,
-			                              highlighted_comment, &get_filters(&req));
+			let comments = parse_comments(&response[1], &post.permalink, &post.author.name, highlighted_comment, &get_filters(&req));
 			let url = req.uri().to_string();
 
 			// Use the Post and Comment structs to generate a website to show users
@@ -156,8 +157,7 @@ async fn parse_post(json: &serde_json::Value) -> Post {
 }
 
 // COMMENTS
-fn parse_comments(json: &serde_json::Value, post_link: &str, post_author: &str,
-				  highlighted_comment: &str, filters: &HashSet<String>) -> Vec<Comment> {
+fn parse_comments(json: &serde_json::Value, post_link: &str, post_author: &str, highlighted_comment: &str, filters: &HashSet<String>) -> Vec<Comment> {
 	// Parse the comment JSON into a Vector of Comments
 	let comments = json["data"]["children"].as_array().map_or(Vec::new(), std::borrow::ToOwned::to_owned);
 

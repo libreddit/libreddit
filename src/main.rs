@@ -9,14 +9,6 @@
 	clippy::unused_async
 )]
 
-use clap::{App as cli, Arg};
-use futures_lite::FutureExt;
-use hyper::{Body, header::HeaderValue, Request, Response};
-
-use client::proxy;
-use server::RequestExt;
-use utils::{error, redirect};
-
 // Reference local files
 mod post;
 mod search;
@@ -25,7 +17,17 @@ mod subreddit;
 mod user;
 mod utils;
 
+// Import Crates
+use clap::{App as cli, Arg};
+
+use futures_lite::FutureExt;
+use hyper::{header::HeaderValue, Body, Request, Response};
+
 mod client;
+use client::proxy;
+use server::RequestExt;
+use utils::{error, redirect};
+
 mod server;
 
 // Create Services

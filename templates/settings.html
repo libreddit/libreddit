@@ -97,7 +97,9 @@
 			<p>Filtered Feeds</p>
 			{% for sub in prefs.filters %}
 			<div>
-				<span><a href="/r/{{ sub }}">{% if sub.starts_with("u_") -%}{{ format!("u/{}", &sub[2..]) }}{% else -%}{{ format!("r/{}", sub) }}{% endif -%}</a></span>
+				{% let feed -%}
+				{% if sub.starts_with("u_") -%}{% let feed = format!("u/{}", &sub[2..]) -%}{% else -%}{% let feed = format!("r/{}", sub) -%}{% endif -%}
+				<a href="/{{ feed }}">{{ feed }}</a>
 				<form action="/r/{{ sub }}/unfilter/?redirect=settings" method="POST">
 					<button class="unfilter">Unfilter</button>
 				</form>

@@ -1235,6 +1235,14 @@ input[type="submit"] {
 	color: var(--accent);
 }
 
+#settings_filters .unsubscribe {
+	margin-left: 30px;
+}
+
+#settings_filters a {
+	color: var(--accent);
+}
+
 .helper {
 	padding: 10px;
 	width: 250px;

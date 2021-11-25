@@ -49,18 +49,18 @@
 			{% if all_posts_filtered %}
 				 <center>(All content on this page has been filtered)</center>
 			{% else %}
-				<div id="posts">
-					{% for post in posts %}
-						{% if !(post.flags.nsfw && prefs.show_nsfw != "on") %}
-							<hr class="sep" />
-							{% call utils::post_in_list(post) %}
-						{% endif %}
-					{% endfor %}
-					{% if prefs.use_hls == "on" %}
-						<script src="/hls.min.js"></script>
-						<script src="/playHLSVideo.js"></script>
-					{% endif %}
-				</div>
+			<div id="posts">
+			{% for post in posts %}
+			{% if !(post.flags.nsfw && prefs.show_nsfw != "on") %}
+			<hr class="sep" />
+			{% call utils::post_in_list(post) %}
+			{% endif %}
+			{% endfor %}
+			{% if prefs.use_hls == "on" %}
+			<script src="/hls.min.js"></script>
+			<script src="/playHLSVideo.js"></script>
+			{% endif %}
+			</div>
 			{% endif %}
 
 			<footer>

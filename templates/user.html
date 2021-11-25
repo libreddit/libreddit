@@ -32,32 +32,33 @@
 			{% if all_posts_filtered %}
 				 <center>(All content on this page has been filtered)</center>
 			{% else %}
-				<div id="posts">
-					{% for post in posts %}
-						{% if post.flags.nsfw && prefs.show_nsfw != "on" %}
-						{% else if !post.title.is_empty() %}
-							{% call utils::post_in_list(post) %}
-						{% else %}
-							<div class="comment">
-								<div class="comment_left">
-									<p class="comment_score" title="{{ post.score.1 }}">{{ post.score.0 }}</p>
-									<div class="line"></div>
-								</div>
-								<details class="comment_right" open>
-									<summary class="comment_data">
-										<a class="comment_link" href="{{ post.permalink }}">COMMENT</a>
-										<span class="created" title="{{ post.created }}">{{ post.rel_time }}</span>
-									</summary>
-									<p class="comment_body">{{ post.body }}</p>
-								</details>
-							</div>
-						{% endif %}
-					{% endfor %}
-					{% if prefs.use_hls == "on" %}
-						<script src="/hls.min.js"></script>
-						<script src="/playHLSVideo.js"></script>
-					{% endif %}
+			<div id="posts">
+			{% for post in posts %}
+
+			{% if post.flags.nsfw && prefs.show_nsfw != "on" %}
+			{% else if !post.title.is_empty() %}
+			{% call utils::post_in_list(post) %}
+			{% else %}
+			<div class="comment">
+				<div class="comment_left">
+					<p class="comment_score" title="{{ post.score.1 }}">{{ post.score.0 }}</p>
+					<div class="line"></div>
 				</div>
+				<details class="comment_right" open>
+					<summary class="comment_data">
+						<a class="comment_link" href="{{ post.permalink }}">COMMENT</a>
+						<span class="created" title="{{ post.created }}">{{ post.rel_time }}</span>
+					</summary>
+					<p class="comment_body">{{ post.body }}</p>
+				</details>
+			</div>
+			{% endif %}
+			{% endfor %}
+			{% if prefs.use_hls == "on" %}
+			<script src="/hls.min.js"></script>
+			<script src="/playHLSVideo.js"></script>
+			{% endif %}
+			</div>
 			{% endif %}
 
 			<footer>
@@ -87,17 +88,17 @@
 					<div>{{ user.created }}</div>
 				</div>
 				<div id="user_actions">
-					{% let name = ["u_", user.name.as_str()].join("") %}
-					<div id="user_subscription">
-						{% if prefs.subscriptions.contains(name) %}
-							<form action="/r/{{ name }}/unsubscribe" method="POST">
-								<button class="unsubscribe">Unfollow</button>
-							</form>
-						{% else %}
-							<form action="/r/{{ name }}/subscribe" method="POST">
-								<button class="subscribe">Follow</button>
-							</form>
-						{% endif %}
+				{% let name = ["u_", user.name.as_str()].join("") %}
+				<div id="user_subscription">
+					{% if prefs.subscriptions.contains(name) %}
+						<form action="/r/{{ name }}/unsubscribe" method="POST">
+							<button class="unsubscribe">Unfollow</button>
+						</form>
+					{% else %}
+						<form action="/r/{{ name }}/subscribe" method="POST">
+							<button class="subscribe">Follow</button>
+						</form>
+					{% endif %}
 					</div>
 					<div id="user_filter">
 						{% if prefs.filters.contains(name) %}
