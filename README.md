@@ -145,13 +145,13 @@ Results from Google Lighthouse ([Libreddit Report](https://lighthouse-dot-webdot
 
 For transparency, I hope to describe all the ways Libreddit handles user privacy.
 
-**Logging:** In production (when running the binary, hosting with docker, or using the official instances), Libreddit logs when Reddit is ratelimiting Libreddit and when Reddit's JSON responses can't be parsed. When debugging (running from source without `--release`), Libreddit logs post IDs and URL paths fetched to aid with troubleshooting.
+**Logging:** In production (when running the binary, hosting with docker, or using the official instances), Libreddit logs nothing. When debugging (running from source without `--release`), Libreddit logs post IDs fetched to aid with troubleshooting.
 
 **DNS:** Both official domains (`libredd.it` and `libreddit.spike.codes`) use Cloudflare as the DNS resolver. Though, the sites are not proxied through Cloudflare meaning Cloudflare doesn't have access to user traffic.
 
-**Cookies:** Libreddit uses optional cookies to store any configured settings in [the settings menu](https://libreddit.spike.codes/settings). This is not a cross-site cookie and the cookie holds no personal data, only a value of the possible layout.
+**Cookies:** Libreddit uses optional cookies to store any configured settings in [the settings menu](https://libreddit.spike.codes/settings). These are not cross-site cookies and the cookies hold no personal data.
 
-**Hosting:** The official instances are hosted on [Replit](https://replit.com/) which monitors usage to prevent abuse. I can understand if this invalidates certain users' threat models and therefore, selfhosting and browsing through Tor are welcomed.
+**Hosting:** The official instances are hosted on [Replit](https://replit.com/) which monitors usage to prevent abuse. I can understand if this invalidates certain users' threat models and therefore, selfhosting, using unofficial instances and browsing through Tor are welcomed.
 
 ---
 
