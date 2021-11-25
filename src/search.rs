@@ -1,5 +1,5 @@
 // CRATES
-use crate::utils::{catch_random, error, format_num, format_url, param, redirect, setting, template, val, Post, Preferences, get_filters, filter_posts};
+use crate::utils::{catch_random, error, filter_posts, format_num, format_url, get_filters, param, redirect, setting, template, val, Post, Preferences};
 use crate::{
 	client::json,
 	subreddit::{can_access_quarantine, quarantine},
@@ -120,7 +120,7 @@ pub async fn find(req: Request<Body>) -> Result<Response<Body>, String> {
 					is_filtered: false,
 					all_posts_filtered,
 				})
-			},
+			}
 			Err(msg) => {
 				if msg == "quarantined" {
 					let sub = req.param("sub").unwrap_or_default();

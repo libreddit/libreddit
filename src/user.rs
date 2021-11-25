@@ -2,7 +2,7 @@
 use crate::client::json;
 use crate::esc;
 use crate::server::RequestExt;
-use crate::utils::{error, format_url, param, template, Post, Preferences, User, get_filters, filter_posts};
+use crate::utils::{error, filter_posts, format_url, get_filters, param, template, Post, Preferences, User};
 use askama::Template;
 use hyper::{Body, Request, Response};
 use time::OffsetDateTime;

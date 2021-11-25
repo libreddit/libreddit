@@ -484,11 +484,7 @@ impl Preferences {
 
 /// Gets a `HashSet` of filters from the cookie in the given `Request`.
 pub fn get_filters(req: &Request<Body>) -> HashSet<String> {
-	setting(&req, "filters")
-		.split('+')
-		.map(String::from)
-		.filter(|s| !s.is_empty())
-		.collect::<HashSet<String>>()
+	setting(&req, "filters").split('+').map(String::from).filter(|s| !s.is_empty()).collect::<HashSet<String>>()
 }
 
 /// Filters a `Vec<Post>` by the given `HashSet` of filters (each filter being a subreddit name or a user name). If a
