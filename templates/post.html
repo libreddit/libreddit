@@ -49,8 +49,8 @@
 					{% for award in post.awards.clone() %}
 					<span class="award" title="{{ award.name }}">
 						<img alt="{{ award.name }}" src="{{ award.icon_url }}" width="16" height="16"/>
+						{{ award.count }}
 					</span>
-					<span>{{ award.count }}</snap>
 					{% endfor %}
 				</span>
 				{% endif %}
