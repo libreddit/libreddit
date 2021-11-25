@@ -272,7 +272,7 @@ main {
 #column_one {
 	max-width: 750px;
 	border-radius: 5px;
-	overflow: hidden;
+	overflow: inherit;
 }
 
 footer {
@@ -735,6 +735,7 @@ a.search_subreddit:hover {
 .post_header {
 	margin: 15px 20px 5px 12px;
 	grid-area: post_header;
+	line-height: 25px;
 }
 
 .post_subreddit {
@@ -772,6 +773,26 @@ a.search_subreddit:hover {
 	border-radius: 5px;
 	font-size: 12px;
 	font-weight: bold;
+}
+
+.awards {
+	background-color: var(--foreground);
+	border-radius: 5px;
+	margin: auto;
+	padding: 5px;
+}
+
+.awards .award {
+	margin-right: 2px;
+}
+
+.award {
+	position: relative;
+	display: inline-block;
+}
+
+.award > img {
+	vertical-align: middle;
 }
 
 .author_flair:empty, .post_flair:empty {
@@ -1102,7 +1123,7 @@ summary.comment_data {
 }
 
 .compact .post_header {
-	margin: 15px 15px 2.5px 12px;
+	margin: 11px 15px 2.5px 12px;
 	font-size: 14px;
 }
 

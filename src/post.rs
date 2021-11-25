@@ -3,8 +3,9 @@ use crate::client::json;
 use crate::esc;
 use crate::server::RequestExt;
 use crate::subreddit::{can_access_quarantine, quarantine};
-use crate::utils::{error, format_num, format_url, param, rewrite_urls, setting, template, time, val, Author, Comment, Flags, Flair, FlairPart, Media, Post, Preferences};
-
+use crate::utils::{
+	error, format_num, format_url, param, rewrite_urls, setting, template, time, val, Author, Awards, Comment, Flags, Flair, FlairPart, Media, Post, Preferences,
+};
 use hyper::{Body, Request, Response};
 
 use askama::Template;
@@ -93,6 +94,8 @@ async fn parse_post(json: &serde_json::Value) -> Post {
 	// Determine the type of media along with the media URL
 	let (post_type, media, gallery) = Media::parse(&post["data"]).await;
 
+	let awards: Awards = Awards::parse(&post["data"]["all_awardings"]);
+
 	// Build a post using data parsed from Reddit post API
 	Post {
 		id: val(post, "id"),
@@ -148,6 +151,7 @@ async fn parse_post(json: &serde_json::Value) -> Post {
 		created,
 		comments: format_num(post["data"]["num_comments"].as_i64().unwrap_or_default()),
 		gallery,
+		awards,
 	}
 }
 
@@ -177,6 +181,8 @@ fn parse_comments(json: &serde_json::Value, post_link: &str, post_author: &str, 
 			} else {
 				Vec::new()
 			};
+
+			let awards: Awards = Awards::parse(&data["all_awardings"]);
 
 			let parent_kind_and_id = val(&comment, "parent_id");
 			let parent_info = parent_kind_and_id.split('_').collect::<Vec<&str>>();
@@ -224,6 +230,7 @@ fn parse_comments(json: &serde_json::Value, post_link: &str, post_author: &str, 
 				edited,
 				replies,
 				highlighted,
+				awards,
 				collapsed,
 			}
 		})

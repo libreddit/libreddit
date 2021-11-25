@@ -8,6 +8,7 @@ use hyper::{Body, Request, Response};
 use regex::Regex;
 use serde_json::Value;
 use std::collections::HashMap;
+use std::str::FromStr;
 use time::{Duration, OffsetDateTime};
 use url::Url;
 
@@ -213,6 +214,7 @@ pub struct Post {
 	pub created: String,
 	pub comments: (String, String),
 	pub gallery: Vec<GalleryMedia>,
+	pub awards: Awards,
 }
 
 impl Post {
@@ -249,7 +251,8 @@ impl Post {
 			let title = esc!(post, "title");
 
 			// Determine the type of media along with the media URL
-			let (post_type, media, gallery) = Media::parse(data).await;
+			let (post_type, media, gallery) = Media::parse(&data).await;
+			let awards = Awards::parse(&data["all_awardings"]);
 
 			// selftext_html is set for text posts when browsing.
 			let mut body = rewrite_urls(&val(post, "selftext_html"));
@@ -315,6 +318,7 @@ impl Post {
 				created,
 				comments: format_num(data["num_comments"].as_i64().unwrap_or_default()),
 				gallery,
+				awards,
 			});
 		}
 
@@ -340,7 +344,61 @@ pub struct Comment {
 	pub edited: (String, String),
 	pub replies: Vec<Comment>,
 	pub highlighted: bool,
+	pub awards: Awards,
 	pub collapsed: bool,
+}
+
+#[derive(Default, Clone)]
+pub struct Award {
+	pub name: String,
+	pub icon_url: String,
+	pub description: String,
+	pub count: i64,
+}
+
+impl std::fmt::Display for Award {
+	fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+		write!(f, "{} {} {}", self.name, self.icon_url, self.description)
+	}
+}
+
+pub struct Awards(pub Vec<Award>);
+
+impl std::ops::Deref for Awards {
+	type Target = Vec<Award>;
+
+	fn deref(&self) -> &Self::Target {
+		&self.0
+	}
+}
+
+impl std::fmt::Display for Awards {
+	fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+		self.iter().fold(Ok(()), |result, award| result.and_then(|_| writeln!(f, "{}", award)))
+	}
+}
+
+// Convert Reddit awards JSON to Awards struct
+impl Awards {
+	pub fn parse(items: &Value) -> Self {
+		let parsed = items.as_array().unwrap_or(&Vec::new()).iter().fold(Vec::new(), |mut awards, item| {
+			let name = item["name"].as_str().unwrap_or_default().to_string();
+			let icon_url = format_url(&item["icon_url"].as_str().unwrap_or_default().to_string());
+			let description = item["description"].as_str().unwrap_or_default().to_string();
+			let count: i64 = i64::from_str(&item["count"].to_string()).unwrap_or(1);
+
+			awards.push(Award {
+				name,
+				icon_url,
+				description,
+				count,
+			});
+
+			awards
+		});
+
+		Self(parsed)
+	}
 }
 
 #[derive(Template)]
