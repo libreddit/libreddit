@@ -215,8 +215,10 @@ async fn main() {
 		.at("/r/u_:name")
 		.get(|r| async move { Ok(redirect(format!("/user/{}", r.param("name").unwrap_or_default()))) }.boxed());
 
-	app.at("/r/:sub/subscribe").post(|r| subreddit::subscriptions(r).boxed());
-	app.at("/r/:sub/unsubscribe").post(|r| subreddit::subscriptions(r).boxed());
+	app.at("/r/:sub/subscribe").post(|r| subreddit::subscriptions_filters(r).boxed());
+	app.at("/r/:sub/unsubscribe").post(|r| subreddit::subscriptions_filters(r).boxed());
+	app.at("/r/:sub/filter").post(|r| subreddit::subscriptions_filters(r).boxed());
+	app.at("/r/:sub/unfilter").post(|r| subreddit::subscriptions_filters(r).boxed());
 
 	app.at("/r/:sub/comments/:id").get(|r| post::item(r).boxed());
 	app.at("/r/:sub/comments/:id/:title").get(|r| post::item(r).boxed());

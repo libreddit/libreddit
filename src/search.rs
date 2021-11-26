@@ -1,5 +1,5 @@
 // CRATES
-use crate::utils::{catch_random, error, format_num, format_url, param, redirect, setting, template, val, Post, Preferences};
+use crate::utils::{catch_random, error, filter_posts, format_num, format_url, get_filters, param, redirect, setting, template, val, Post, Preferences};
 use crate::{
 	client::json,
 	subreddit::{can_access_quarantine, quarantine},
@@ -37,6 +37,11 @@ struct SearchTemplate {
 	params: SearchParams,
 	prefs: Preferences,
 	url: String,
+	/// Whether the subreddit itself is filtered.
+	is_filtered: bool,
+	/// Whether all fetched posts are filtered (to differentiate between no posts fetched in the first place,
+	/// and all fetched posts being filtered).
+	all_posts_filtered: bool,
 }
 
 // SERVICES
@@ -59,15 +64,23 @@ pub async fn find(req: Request<Body>) -> Result<Response<Body>, String> {
 	let typed = param(&path, "type").unwrap_or_default();
 
 	let sort = param(&path, "sort").unwrap_or_else(|| "relevance".to_string());
+	let filters = get_filters(&req);
 
 	// If search is not restricted to this subreddit, show other subreddits in search results
-	let subreddits = param(&path, "restrict_sr").map_or(search_subreddits(&query, &typed).await, |_| Vec::new());
+	let subreddits = if param(&path, "restrict_sr").is_none() {
+		let mut subreddits = search_subreddits(&query, &typed).await;
+		subreddits.retain(|s| !filters.contains(s.name.as_str()));
+		subreddits
+	} else {
+		Vec::new()
+	};
 
 	let url = String::from(req.uri().path_and_query().map_or("", |val| val.as_str()));
 
-	match Post::fetch(&path, String::new(), quarantined).await {
-		Ok((posts, after)) => template(SearchTemplate {
-			posts,
+	// If all requested subs are filtered, we don't need to fetch posts.
+	if sub.split("+").all(|s| filters.contains(s)) {
+		template(SearchTemplate {
+			posts: Vec::new(),
 			subreddits,
 			sub,
 			params: SearchParams {
@@ -75,19 +88,46 @@ pub async fn find(req: Request<Body>) -> Result<Response<Body>, String> {
 				sort,
 				t: param(&path, "t").unwrap_or_default(),
 				before: param(&path, "after").unwrap_or_default(),
-				after,
+				after: "".to_string(),
 				restrict_sr: param(&path, "restrict_sr").unwrap_or_default(),
 				typed,
 			},
 			prefs: Preferences::new(req),
 			url,
-		}),
-		Err(msg) => {
-			if msg == "quarantined" {
-				let sub = req.param("sub").unwrap_or_default();
-				quarantine(req, sub)
-			} else {
-				error(req, msg).await
+			is_filtered: true,
+			all_posts_filtered: false,
+		})
+	} else {
+		match Post::fetch(&path, quarantined).await {
+			Ok((mut posts, after)) => {
+				let all_posts_filtered = filter_posts(&mut posts, &filters);
+
+				template(SearchTemplate {
+					posts,
+					subreddits,
+					sub,
+					params: SearchParams {
+						q: query.replace('"', "&quot;"),
+						sort,
+						t: param(&path, "t").unwrap_or_default(),
+						before: param(&path, "after").unwrap_or_default(),
+						after,
+						restrict_sr: param(&path, "restrict_sr").unwrap_or_default(),
+						typed,
+					},
+					prefs: Preferences::new(req),
+					url,
+					is_filtered: false,
+					all_posts_filtered,
+				})
+			}
+			Err(msg) => {
+				if msg == "quarantined" {
+					let sub = req.param("sub").unwrap_or_default();
+					quarantine(req, sub)
+				} else {
+					error(req, msg).await
+				}
 			}
 		}
 	}
@@ -109,7 +149,7 @@ async fn search_subreddits(q: &str, typed: &str) -> Vec<Subreddit> {
 			let icon = subreddit["data"]["community_icon"].as_str().map_or_else(|| val(subreddit, "icon_img"), ToString::to_string);
 
 			Subreddit {
-				name: val(subreddit, "display_name_prefixed"),
+				name: val(subreddit, "display_name"),
 				url: val(subreddit, "url"),
 				icon: format_url(&icon),
 				description: val(subreddit, "public_description"),

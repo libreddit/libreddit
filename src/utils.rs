@@ -7,7 +7,7 @@ use cookie::Cookie;
 use hyper::{Body, Request, Response};
 use regex::Regex;
 use serde_json::Value;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::str::FromStr;
 use time::{Duration, OffsetDateTime};
 use url::Url;
@@ -219,7 +219,7 @@ pub struct Post {
 
 impl Post {
 	// Fetch posts of a user or subreddit and return a vector of posts and the "after" value
-	pub async fn fetch(path: &str, fallback_title: String, quarantine: bool) -> Result<(Vec<Self>, String), String> {
+	pub async fn fetch(path: &str, quarantine: bool) -> Result<(Vec<Self>, String), String> {
 		let res;
 		let post_list;
 
@@ -262,7 +262,7 @@ impl Post {
 
 			posts.push(Self {
 				id: val(post, "id"),
-				title: esc!(if title.is_empty() { fallback_title.clone() } else { title }),
+				title,
 				community: val(post, "subreddit"),
 				body,
 				author: Author {
@@ -346,6 +346,7 @@ pub struct Comment {
 	pub highlighted: bool,
 	pub awards: Awards,
 	pub collapsed: bool,
+	pub is_filtered: bool,
 }
 
 #[derive(Default, Clone)]
@@ -458,6 +459,7 @@ pub struct Preferences {
 	pub comment_sort: String,
 	pub post_sort: String,
 	pub subscriptions: Vec<String>,
+	pub filters: Vec<String>,
 }
 
 impl Preferences {
@@ -475,7 +477,25 @@ impl Preferences {
 			comment_sort: setting(&req, "comment_sort"),
 			post_sort: setting(&req, "post_sort"),
 			subscriptions: setting(&req, "subscriptions").split('+').map(String::from).filter(|s| !s.is_empty()).collect(),
+			filters: setting(&req, "filters").split('+').map(String::from).filter(|s| !s.is_empty()).collect(),
 		}
+	}
+}
+
+/// Gets a `HashSet` of filters from the cookie in the given `Request`.
+pub fn get_filters(req: &Request<Body>) -> HashSet<String> {
+	setting(&req, "filters").split('+').map(String::from).filter(|s| !s.is_empty()).collect::<HashSet<String>>()
+}
+
+/// Filters a `Vec<Post>` by the given `HashSet` of filters (each filter being a subreddit name or a user name). If a
+/// `Post`'s subreddit or author is found in the filters, it is removed. Returns `true` if _all_ posts were filtered
+/// out, or `false` otherwise.
+pub fn filter_posts(posts: &mut Vec<Post>, filters: &HashSet<String>) -> bool {
+	if posts.is_empty() {
+		false
+	} else {
+		posts.retain(|p| !filters.contains(&p.community) && !filters.contains(&["u_", &p.author.name].concat()));
+		posts.is_empty()
 	}
 }
 
@@ -515,7 +535,7 @@ pub fn setting(req: &Request<Body>, name: &str) -> String {
 
 // Detect and redirect in the event of a random subreddit
 pub async fn catch_random(sub: &str, additional: &str) -> Result<Response<Body>, String> {
-	if (sub == "random" || sub == "randnsfw") && !sub.contains('+') {
+	if sub == "random" || sub == "randnsfw" {
 		let new_sub = json(format!("/r/{}/about.json?raw_json=1", sub), false).await?["data"]["display_name"]
 			.as_str()
 			.unwrap_or_default()

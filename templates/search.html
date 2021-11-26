@@ -30,7 +30,8 @@
 					</svg>
 				</button>
 		</form>
-		
+
+		{% if !is_filtered %}
 		{% if subreddits.len() > 0 || params.typed == "sr_user" %}
 		<div id="search_subreddits">
 			{% if params.typed == "sr_user" %}
@@ -41,7 +42,7 @@
 				<div class="search_subreddit_left">{% if subreddit.icon != "" %}<img loading="lazy" src="{{ subreddit.icon }}" alt="r/{{ subreddit.name }} icon">{% endif %}</div>
 				<div class="search_subreddit_right">
 					<p class="search_subreddit_header"> 
-						<span class="search_subreddit_name">{{ subreddit.name }}</span>
+						<span class="search_subreddit_name">r/{{ subreddit.name }}</span>
 						<span class="dot">&bull;</span>
 						<span class="search_subreddit_members" title="{{ subreddit.subscribers.1 }} Members">{{ subreddit.subscribers.0 }} Members</span>
 					</p>
@@ -54,10 +55,15 @@
 			{% endif %}
 		</div>
 		{% endif %}
-		{% if params.typed != "sr_user" %}
+		{% endif %}
+		{% if all_posts_filtered %}
+			<center>(All content on this page has been filtered)</center>
+		{% else if is_filtered %}
+			<center>(Content from r/{{ sub }} has been filtered)</center>
+		{% else if params.typed != "sr_user" %}
 			{% for post in posts %}
 				{% if post.flags.nsfw && prefs.show_nsfw != "on" %}
-				{% else if post.title != "Comment" %}
+				{% else if !post.title.is_empty() %}
 					{% call utils::post_in_list(post) %}
 				{% else %}
 					<div class="comment">

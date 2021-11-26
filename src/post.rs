@@ -4,11 +4,12 @@ use crate::esc;
 use crate::server::RequestExt;
 use crate::subreddit::{can_access_quarantine, quarantine};
 use crate::utils::{
-	error, format_num, format_url, param, rewrite_urls, setting, template, time, val, Author, Awards, Comment, Flags, Flair, FlairPart, Media, Post, Preferences,
+	error, format_num, format_url, get_filters, param, rewrite_urls, setting, template, time, val, Author, Awards, Comment, Flags, Flair, FlairPart, Media, Post, Preferences,
 };
 use hyper::{Body, Request, Response};
 
 use askama::Template;
+use std::collections::HashSet;
 
 // STRUCTS
 #[derive(Template)]
@@ -55,7 +56,7 @@ pub async fn item(req: Request<Body>) -> Result<Response<Body>, String> {
 		Ok(response) => {
 			// Parse the JSON into Post and Comment structs
 			let post = parse_post(&response[0]).await;
-			let comments = parse_comments(&response[1], &post.permalink, &post.author.name, highlighted_comment);
+			let comments = parse_comments(&response[1], &post.permalink, &post.author.name, highlighted_comment, &get_filters(&req));
 			let url = req.uri().to_string();
 
 			// Use the Post and Comment structs to generate a website to show users
@@ -156,7 +157,7 @@ async fn parse_post(json: &serde_json::Value) -> Post {
 }
 
 // COMMENTS
-fn parse_comments(json: &serde_json::Value, post_link: &str, post_author: &str, highlighted_comment: &str) -> Vec<Comment> {
+fn parse_comments(json: &serde_json::Value, post_link: &str, post_author: &str, highlighted_comment: &str, filters: &HashSet<String>) -> Vec<Comment> {
 	// Parse the comment JSON into a Vector of Comments
 	let comments = json["data"]["children"].as_array().map_or(Vec::new(), std::borrow::ToOwned::to_owned);
 
@@ -177,7 +178,7 @@ fn parse_comments(json: &serde_json::Value, post_link: &str, post_author: &str, 
 
 			// If this comment contains replies, handle those too
 			let replies: Vec<Comment> = if data["replies"].is_object() {
-				parse_comments(&data["replies"], post_link, post_author, highlighted_comment)
+				parse_comments(&data["replies"], post_link, post_author, highlighted_comment, filters)
 			} else {
 				Vec::new()
 			};
@@ -190,13 +191,29 @@ fn parse_comments(json: &serde_json::Value, post_link: &str, post_author: &str, 
 			let id = val(&comment, "id");
 			let highlighted = id == highlighted_comment;
 
+			let author = Author {
+				name: val(&comment, "author"),
+				flair: Flair {
+					flair_parts: FlairPart::parse(
+						data["author_flair_type"].as_str().unwrap_or_default(),
+						data["author_flair_richtext"].as_array(),
+						data["author_flair_text"].as_str(),
+					),
+					text: esc!(&comment, "link_flair_text"),
+					background_color: val(&comment, "author_flair_background_color"),
+					foreground_color: val(&comment, "author_flair_text_color"),
+				},
+				distinguished: val(&comment, "distinguished"),
+			};
+			let is_filtered = filters.contains(&["u_", author.name.as_str()].concat());
+
 			// Many subreddits have a default comment posted about the sub's rules etc.
 			// Many libreddit users do not wish to see this kind of comment by default.
 			// Reddit does not tell us which users are "bots", so a good heuristic is to
 			// collapse stickied moderator comments.
 			let is_moderator_comment = data["distinguished"].as_str().unwrap_or_default() == "moderator";
 			let is_stickied = data["stickied"].as_bool().unwrap_or_default();
-			let collapsed = is_moderator_comment && is_stickied;
+			let collapsed = (is_moderator_comment && is_stickied) || is_filtered;
 
 			Comment {
 				id,
@@ -206,20 +223,7 @@ fn parse_comments(json: &serde_json::Value, post_link: &str, post_author: &str, 
 				post_link: post_link.to_string(),
 				post_author: post_author.to_string(),
 				body,
-				author: Author {
-					name: val(&comment, "author"),
-					flair: Flair {
-						flair_parts: FlairPart::parse(
-							data["author_flair_type"].as_str().unwrap_or_default(),
-							data["author_flair_richtext"].as_array(),
-							data["author_flair_text"].as_str(),
-						),
-						text: esc!(&comment, "link_flair_text"),
-						background_color: val(&comment, "author_flair_background_color"),
-						foreground_color: val(&comment, "author_flair_text_color"),
-					},
-					distinguished: val(&comment, "distinguished"),
-				},
+				author,
 				score: if data["score_hidden"].as_bool().unwrap_or_default() {
 					("\u{2022}".to_string(), "Hidden".to_string())
 				} else {
@@ -232,6 +236,7 @@ fn parse_comments(json: &serde_json::Value, post_link: &str, post_author: &str, 
 				highlighted,
 				awards,
 				collapsed,
+				is_filtered,
 			}
 		})
 		.collect()

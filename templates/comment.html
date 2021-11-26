@@ -8,7 +8,7 @@
 		<p class="comment_score" title="{{ score.1 }}">{{ score.0 }}</p>
 		<div class="line"></div>
 	</div>
-	<details class="comment_right" {% if collapsed == false %}open{% endif %}>
+	<details class="comment_right" {% if !collapsed || highlighted %}open{% endif %}>
 		<summary class="comment_data">
 			<a class="comment_author {{ author.distinguished }} {% if author.name == post_author %}op{% endif %}" href="/user/{{ author.name }}">u/{{ author.name }}</a>
 			{% if author.flair.flair_parts.len() > 0 %}
@@ -25,7 +25,11 @@
 			{% endfor %}
 			{% endif %}
 		</summary>
+		{% if is_filtered %}
+		<div class="comment_body_filtered {% if highlighted %}highlighted{% endif %}">(Filtered content)</div>
+		{% else %}
 		<div class="comment_body {% if highlighted %}highlighted{% endif %}">{{ body }}</div>
+		{% endif %}
 		<blockquote class="replies">{% for c in replies -%}{{ c.render().unwrap() }}{%- endfor %}
 		</blockquote>
 	</details>
