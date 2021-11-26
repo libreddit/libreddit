@@ -1042,7 +1042,7 @@ a.search_subreddit:hover {
 	overflow: auto;
 }
 
-.comment_body.highlighted {
+.comment_body.highlighted, .comment_body_filtered.highlighted {
 	background: var(--highlighted);
 }
 
