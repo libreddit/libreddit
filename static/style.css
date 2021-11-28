@@ -365,6 +365,7 @@ aside {
 #user_description, #sub_description {
 	margin: 0 15px;
 	text-align: left;
+	overflow-wrap: anywhere;
 }
 
 #user_name, #user_description:not(:empty), #user_icon,
