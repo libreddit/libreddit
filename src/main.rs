@@ -70,6 +70,7 @@ async fn font() -> Result<Response<Body>, String> {
 		Response::builder()
 			.status(200)
 			.header("content-type", "font/woff2")
+			.header("Cache-Control", "public, max-age=1209600, s-maxage=86400")
 			.body(include_bytes!("../static/Inter.var.woff2").as_ref().into())
 			.unwrap_or_default(),
 	)
@@ -183,6 +184,9 @@ async fn main() {
 	app.at("/img/*path").get(|r| proxy(r, "https://i.redd.it/{path}").boxed());
 	app.at("/thumb/:point/:id").get(|r| proxy(r, "https://{point}.thumbs.redditmedia.com/{id}").boxed());
 	app.at("/emoji/:id/:name").get(|r| proxy(r, "https://emoji.redditmedia.com/{id}/{name}").boxed());
+	app
+		.at("/preview/:loc/award_images/:fullname/:id")
+		.get(|r| proxy(r, "https://{loc}view.redd.it/award_images/{fullname}/{id}").boxed());
 	app.at("/preview/:loc/:id").get(|r| proxy(r, "https://{loc}view.redd.it/{id}").boxed());
 	app.at("/style/*path").get(|r| proxy(r, "https://styles.redditmedia.com/{path}").boxed());
 	app.at("/static/*path").get(|r| proxy(r, "https://www.redditstatic.com/{path}").boxed());

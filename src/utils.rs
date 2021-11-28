@@ -384,7 +384,7 @@ impl Awards {
 	pub fn parse(items: &Value) -> Self {
 		let parsed = items.as_array().unwrap_or(&Vec::new()).iter().fold(Vec::new(), |mut awards, item| {
 			let name = item["name"].as_str().unwrap_or_default().to_string();
-			let icon_url = format_url(&item["icon_url"].as_str().unwrap_or_default().to_string());
+			let icon_url = format_url(item["resized_icons"][0]["url"].as_str().unwrap_or_default());
 			let description = item["description"].as_str().unwrap_or_default().to_string();
 			let count: i64 = i64::from_str(&item["count"].to_string()).unwrap_or(1);
 

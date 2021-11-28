@@ -224,17 +224,17 @@ libreddit
 
 Assign a default value for each setting by passing environment variables to Libreddit in the format `LIBREDDIT_DEFAULT_{X}`. Replace `{X}` with the setting name (see list below) in capital letters.
 
-| Name                    | Possible values                                                                          | Default value |
-|-------------------------|------------------------------------------------------------------------------------------|---------------|
-| `THEME`                 | `["system", "light", "dark", "black", "dracula", "nord", "laserwave", "violet", "gold"]` | `system`      |
-| `FRONT_PAGE`            | `["default", "popular", "all"]`                                                          | `default`     |
-| `LAYOUT`                | `["card", "clean", "compact"]`                                                           | `card`        |
-| `WIDE`                  | `["on", "off"]`                                                                          | `off`         |
-| `COMMENT_SORT`          | `["hot", "new", "top", "rising", "controversial"]`                                       | `hot`         |
-| `POST_SORT`             | `["confidence", "top", "new", "controversial", "old"]`                                   | `confidence`  |
-| `SHOW_NSFW`             | `["on", "off"]`                                                                          | `off`         |
-| `USE_HLS`               | `["on", "off"]`                                                                          | `off`         |
-| `HIDE_HLS_NOTIFICATION` | `["on", "off"]`                                                                          | `off`         |
+| Name                    | Possible values                                                                                     | Default value |
+|-------------------------|-----------------------------------------------------------------------------------------------------|---------------|
+| `THEME`                 | `["system", "light", "dark", "black", "dracula", "nord", "laserwave", "violet", "gold", "rosebox"]` | `system`      |
+| `FRONT_PAGE`            | `["default", "popular", "all"]`                                                                     | `default`     |
+| `LAYOUT`                | `["card", "clean", "compact"]`                                                                      | `card`        |
+| `WIDE`                  | `["on", "off"]`                                                                                     | `off`         |
+| `COMMENT_SORT`          | `["hot", "new", "top", "rising", "controversial"]`                                                  | `hot`         |
+| `POST_SORT`             | `["confidence", "top", "new", "controversial", "old"]`                                              | `confidence`  |
+| `SHOW_NSFW`             | `["on", "off"]`                                                                                     | `off`         |
+| `USE_HLS`               | `["on", "off"]`                                                                                     | `off`         |
+| `HIDE_HLS_NOTIFICATION` | `["on", "off"]`                                                                                     | `off`         |
 
 ### Examples
 
