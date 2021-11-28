@@ -17,6 +17,7 @@
 				<label for="restrict_sr" class="search_label">in r/{{ sub }}</label>
 			</div>
 			{% endif %}
+			{% if params.typed == "sr_user" %}<input type="hidden" name="type" value="sr_user">{% endif %}
 			<select id="sort_options" name="sort" title="Sort results by">
 				{% call utils::options(params.sort, ["relevance", "hot", "top", "new", "comments"], "") %}
 			</select>{% if params.sort != "new" %}<select id="timeframe" name="t" title="Timeframe"> 
@@ -29,15 +30,19 @@
 					</svg>
 				</button>
 		</form>
-		
-		{% if subreddits.len() > 0 %}
+
+		{% if !is_filtered %}
+		{% if subreddits.len() > 0 || params.typed == "sr_user" %}
 		<div id="search_subreddits">
+			{% if params.typed == "sr_user" %}
+			<a href="?q={{ params.q }}&sort={{ params.sort }}&t={{ params.t }}" class="search_subreddit" id="more_subreddits">← Back to post/comment results</a>
+			{% endif %}
 			{% for subreddit in subreddits %}
 			<a href="{{ subreddit.url }}" class="search_subreddit">
 				<div class="search_subreddit_left">{% if subreddit.icon != "" %}<img loading="lazy" src="{{ subreddit.icon }}" alt="r/{{ subreddit.name }} icon">{% endif %}</div>
 				<div class="search_subreddit_right">
 					<p class="search_subreddit_header"> 
-						<span class="search_subreddit_name">{{ subreddit.name }}</span>
+						<span class="search_subreddit_name">r/{{ subreddit.name }}</span>
 						<span class="dot">&bull;</span>
 						<span class="search_subreddit_members" title="{{ subreddit.subscribers.1 }} Members">{{ subreddit.subscribers.0 }} Members</span>
 					</p>
@@ -45,34 +50,44 @@
 				</div>
 			</a>
 			{% endfor %}
+			{% if params.typed != "sr_user" %}
+			<a href="?q={{ params.q }}&sort={{ params.sort }}&t={{ params.t }}&type=sr_user" class="search_subreddit" id="more_subreddits">More subreddit results →</a>
+			{% endif %}
 		</div>
-		{%  endif %}
-		{% for post in posts %}
-
-		{% if post.flags.nsfw && prefs.show_nsfw != "on" %}
-		{% else if post.title != "Comment" %}
-		{% call utils::post_in_list(post) %}
-		{% else %}
-			<div class="comment">
-				<div class="comment_left">
-					<p class="comment_score" title="{{ post.score.1 }}">{{ post.score.0 }}</p>
-					<div class="line"></div>
-				</div>
-				<details class="comment_right" open>
-					<summary class="comment_data">
-						<a class="comment_link" href="{{ post.permalink }}">COMMENT</a>
-						<span class="created" title="{{ post.created }}">{{ post.rel_time }}</span>
-					</summary>
-					<p class="comment_body">{{ post.body }}</p>
-				</details>
-			</div>
 		{% endif %}
-		{% endfor %}
+		{% endif %}
+		{% if all_posts_filtered %}
+			<center>(All content on this page has been filtered)</center>
+		{% else if is_filtered %}
+			<center>(Content from r/{{ sub }} has been filtered)</center>
+		{% else if params.typed != "sr_user" %}
+			{% for post in posts %}
+				{% if post.flags.nsfw && prefs.show_nsfw != "on" %}
+				{% else if !post.title.is_empty() %}
+					{% call utils::post_in_list(post) %}
+				{% else %}
+					<div class="comment">
+						<div class="comment_left">
+							<p class="comment_score" title="{{ post.score.1 }}">{{ post.score.0 }}</p>
+							<div class="line"></div>
+						</div>
+						<details class="comment_right" open>
+							<summary class="comment_data">
+								<a class="comment_link" href="{{ post.permalink }}">COMMENT</a>
+								<span class="created" title="{{ post.created }}">{{ post.rel_time }}</span>
+							</summary>
+							<p class="comment_body">{{ post.body }}</p>
+						</details>
+					</div>
+				{% endif %}
+			{% endfor %}
+		{% endif %}
 		{% if prefs.use_hls == "on" %}
 		<script src="/hls.min.js"></script>
 		<script src="/playHLSVideo.js"></script>
 		{% endif %}
 
+		{% if params.typed != "sr_user" %}
 		<footer>
 			{% if params.before != "" %}
 			<a href="?q={{ params.q }}&restrict_sr={{ params.restrict_sr }}
@@ -86,5 +101,6 @@
 				&after={{ params.after }}">NEXT</a>
 			{% endif %}
 		</footer>
+		{% endif %}
 	</div>
 {% endblock %}

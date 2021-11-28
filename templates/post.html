@@ -43,6 +43,17 @@
 				{% endif %}
 				<span class="dot">&bull;</span>
 				<span class="created" title="{{ post.created }}">{{ post.rel_time }}</span>
+				{% if !post.awards.is_empty() %}
+				<span class="dot">&bull;</span>
+				<span class="awards">
+					{% for award in post.awards.clone() %}
+					<span class="award" title="{{ award.name }}">
+						<img alt="{{ award.name }}" src="{{ award.icon_url }}" width="16" height="16"/>
+						{{ award.count }}
+					</span>
+					{% endfor %}
+				</span>
+				{% endif %}
 			</p>
 			<p class="post_title">
 				<a href="{{ post.permalink }}">{{ post.title }}</a>
@@ -71,7 +82,7 @@
 			{% else if post.post_type == "video" || post.post_type == "gif" %}
 			{% if prefs.use_hls == "on" && !post.media.alt_url.is_empty() %}
 			<script src="/hls.min.js"></script>
-			<video class="post_media_video short hls_autoplay" width="{{ post.media.width }}" height="{{ post.media.height }}" poster="{{ post.media.poster }}" preload="none" controls {% if prefs.autoplay_videos == "on" %}autoplay{% endif %}>
+			<video class="post_media_video short {% if prefs.autoplay_videos == "on" %}hls_autoplay{% endif %}" width="{{ post.media.width }}" height="{{ post.media.height }}" poster="{{ post.media.poster }}" preload="none" controls>
 				<source src="{{ post.media.alt_url }}" type="application/vnd.apple.mpegurl" />
 				<source src="{{ post.media.url }}" type="video/mp4" />
 			</video>

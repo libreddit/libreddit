@@ -1,0 +1,2 @@
+run = "while true; do wget -O libreddit https://github.com/spikecodes/libreddit/releases/latest/download/libreddit;chmod +x libreddit;./libreddit -H 63115200;sleep 1;done"
+language = "bash"

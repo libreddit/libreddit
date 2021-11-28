@@ -15,9 +15,13 @@
 
 ---
 
-**BTC:** bc1qwyxjnafpu3gypcpgs025cw9wa7ryudtecmwa6y
+I appreciate any donations! Your support allows me to continue developing Libreddit.
 
-**XMR:** 45FJrEuFPtG2o7QZz2Nps77TbHD4sPqxViwbdyV9A6ktfHiWs47UngG5zXPcLoDXAc8taeuBgeNjfeprwgeXYXhN3C9tVSR
+**Liberapay:** <a href="https://liberapay.com/spike/donate"><img alt="Donate using Liberapay" src="https://liberapay.com/assets/widgets/donate.svg"></a>
+
+**Bitcoin:** [bc1qwyxjnafpu3gypcpgs025cw9wa7ryudtecmwa6y](bitcoin:bc1qwyxjnafpu3gypcpgs025cw9wa7ryudtecmwa6y)
+
+**Monero:** [45FJrEuFPtG2o7QZz2Nps77TbHD4sPqxViwbdyV9A6ktfHiWs47UngG5zXPcLoDXAc8taeuBgeNjfeprwgeXYXhN3C9tVSR](monero:45FJrEuFPtG2o7QZz2Nps77TbHD4sPqxViwbdyV9A6ktfHiWs47UngG5zXPcLoDXAc8taeuBgeNjfeprwgeXYXhN3C9tVSR)
 
 ---
 
@@ -56,12 +60,15 @@ Feel free to [open an issue](https://github.com/spikecodes/libreddit/issues/new)
 | [libreddit.de](https://libreddit.de) | 🇩🇪 DE |  |
 | [libreddit.pussthecat.org](https://libreddit.pussthecat.org) | 🇩🇪 DE |  |
 | [libreddit.mutahar.rocks](https://libreddit.mutahar.rocks) | 🇫🇷 FR |  |
+| [libreddit.northboot.xyz](https://libreddit.northboot.xyz) | 🇩🇪 DE |  |
+| [leddit.xyz](https://www.leddit.xyz) | 🇩🇪 DE |  |
 | [spjmllawtheisznfs7uryhxumin26ssv2draj7oope3ok3wuhy43eoyd.onion](http://spjmllawtheisznfs7uryhxumin26ssv2draj7oope3ok3wuhy43eoyd.onion) | 🇮🇳 IN |  |
 | [fwhhsbrbltmrct5hshrnqlqygqvcgmnek3cnka55zj4y7nuus5muwyyd.onion](http://fwhhsbrbltmrct5hshrnqlqygqvcgmnek3cnka55zj4y7nuus5muwyyd.onion) | 🇩🇪 DE |  |
 | [kphht2jcflojtqte4b4kyx7p2ahagv4debjj32nre67dxz7y57seqwyd.onion](http://kphht2jcflojtqte4b4kyx7p2ahagv4debjj32nre67dxz7y57seqwyd.onion) | 🇳🇱 NL |  |
 | [inytumdgnri7xsqtvpntjevaelxtgbjqkuqhtf6txxhwbll2fwqtakqd.onion](http://inytumdgnri7xsqtvpntjevaelxtgbjqkuqhtf6txxhwbll2fwqtakqd.onion) | 🇨🇭 CH |  |
 | [liredejj74h5xjqr2dylnl5howb2bpikfowqoveub55ru27x43357iid.onion](http://liredejj74h5xjqr2dylnl5howb2bpikfowqoveub55ru27x43357iid.onion) | 🇩🇪 DE |  |
 | [kzhfp3nvb4qp575vy23ccbrgfocezjtl5dx66uthgrhu7nscu6rcwjyd.onion](http://kzhfp3nvb4qp575vy23ccbrgfocezjtl5dx66uthgrhu7nscu6rcwjyd.onion) | 🇺🇸 US |  |
+| [ecue64ybzvn6vjzl37kcsnwt4ycmbsyf74nbttyg7rkc3t3qwnj7mcyd.onion](http://ecue64ybzvn6vjzl37kcsnwt4ycmbsyf74nbttyg7rkc3t3qwnj7mcyd.onion) | 🇩🇪 DE |  |
 
 
 A checkmark in the "Cloudflare" category here refers to the use of the reverse proxy, [Cloudflare](https://cloudflare). The checkmark will not be listed for a site which uses Cloudflare DNS but rather the proxying service which grants Cloudflare the ability to monitor traffic to the website.
@@ -145,13 +152,13 @@ Results from Google Lighthouse ([Libreddit Report](https://lighthouse-dot-webdot
 
 For transparency, I hope to describe all the ways Libreddit handles user privacy.
 
-**Logging:** In production (when running the binary, hosting with docker, or using the official instances), Libreddit logs when Reddit is ratelimiting Libreddit and when Reddit's JSON responses can't be parsed. When debugging (running from source without `--release`), Libreddit logs post IDs and URL paths fetched to aid with troubleshooting.
+**Logging:** In production (when running the binary, hosting with docker, or using the official instances), Libreddit logs nothing. When debugging (running from source without `--release`), Libreddit logs post IDs fetched to aid with troubleshooting.
 
 **DNS:** Both official domains (`libredd.it` and `libreddit.spike.codes`) use Cloudflare as the DNS resolver. Though, the sites are not proxied through Cloudflare meaning Cloudflare doesn't have access to user traffic.
 
-**Cookies:** Libreddit uses optional cookies to store any configured settings in [the settings menu](https://libreddit.spike.codes/settings). This is not a cross-site cookie and the cookie holds no personal data, only a value of the possible layout.
+**Cookies:** Libreddit uses optional cookies to store any configured settings in [the settings menu](https://libreddit.spike.codes/settings). These are not cross-site cookies and the cookies hold no personal data.
 
-**Hosting:** The official instances are hosted on [Replit](https://replit.com/) which monitors usage to prevent abuse. I can understand if this invalidates certain users' threat models and therefore, selfhosting and browsing through Tor are welcomed.
+**Hosting:** The official instances are hosted on [Replit](https://replit.com/) which monitors usage to prevent abuse. I can understand if this invalidates certain users' threat models and therefore, selfhosting, using unofficial instances and browsing through Tor are welcomed.
 
 ---
 
@@ -195,19 +202,13 @@ yay -S libreddit-git
 
 If you're on Linux and none of these methods work for you, you can grab a Linux binary from [the newest release](https://github.com/spikecodes/libreddit/releases/latest).
 
-## 5) Replit
+## 5) Replit/Heroku/Glitch
 
-**Note:** Replit is a free option but they are *not* private and will monitor server usage to prevent abuse. If you need a free and easy setup, this method may work best for you.
+**Note:** These are free hosting options but they are *not* private and will monitor server usage to prevent abuse. If you need a free and easy setup, this method may work best for you.
 
-1. Create a Replit account (see note above)
-2. Visit [the official Repl](https://replit.com/@spikethecoder/libreddit) and fork it
-3. Hit the run button to download the latest Libreddit version and start it
-
-In the web preview (defaults to top right), you should see your instance hosted where you can assign a [custom domain](https://docs.replit.com/repls/web-hosting#custom-domains).
-
-## 6) Heroku
-
+<a href="https://repl.it/github/spikecodes/libreddit"><img src="https://repl.it/badge/github/spikecodes/libreddit" alt="Run on Repl.it" height="32" /></a>
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/spikecodes/libreddit)
+[![Remix on Glitch](https://cdn.glitch.com/2703baf2-b643-4da7-ab91-7ee2a2d00b5b%2Fremix-button-v2.svg)](https://glitch.com/edit/#!/remix/libreddit)
 
 ---
 

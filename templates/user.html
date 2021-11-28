@@ -13,11 +13,12 @@
 
 {% block body %}
 	<main>
+		{% if !is_filtered %}
 		<div id="column_one">
 			<form id="sort">
-				<select name="sort"> 
+				<select name="sort">
 					{% call utils::options(sort.0, ["hot", "new", "top"], "") %}
-				</select>{% if sort.0 == "top" %}<select id="timeframe" name="t"> 
+				</select>{% if sort.0 == "top" %}<select id="timeframe" name="t">
 					{% call utils::options(sort.1, ["hour", "day", "week", "month", "year", "all"], "all") %}
 				</select>{% endif %}<button id="sort_submit" class="submit">
 					<svg width="15" viewBox="0 0 110 100" fill="none" stroke-width="10" stroke-linecap="round">
@@ -28,11 +29,14 @@
 				</button>
 			</form>
 
+			{% if all_posts_filtered %}
+				 <center>(All content on this page has been filtered)</center>
+			{% else %}
 			<div id="posts">
 			{% for post in posts %}
 
 			{% if post.flags.nsfw && prefs.show_nsfw != "on" %}
-			{% else if post.title != "Comment" %}
+			{% else if !post.title.is_empty() %}
 			{% call utils::post_in_list(post) %}
 			{% else %}
 			<div class="comment">
@@ -55,6 +59,7 @@
 			<script src="/playHLSVideo.js"></script>
 			{% endif %}
 			</div>
+			{% endif %}
 
 			<footer>
 				{% if ends.0 != "" %}
@@ -66,7 +71,11 @@
 				{% endif %}
 			</footer>
 		</div>
+		{% endif %}
 		<aside>
+			{% if is_filtered %}
+			<center>(Content from u/{{ user.name }} has been filtered)</center>
+			{% endif %}
 			<div class="panel" id="user">
 				<img loading="lazy" id="user_icon" src="{{ user.icon }}" alt="User icon">
 				<p id="user_title">{{ user.title }}</p>
@@ -78,17 +87,30 @@
 					<div>{{ user.karma }}</div>
 					<div>{{ user.created }}</div>
 				</div>
+				<div id="user_actions">
+				{% let name = ["u_", user.name.as_str()].join("") %}
 				<div id="user_subscription">
-					{% let name = ["u_", user.name.as_str()].join("") %}
 					{% if prefs.subscriptions.contains(name) %}
-						<form action="/r/u_{{ user.name }}/unsubscribe" method="POST">
+						<form action="/r/{{ name }}/unsubscribe" method="POST">
 							<button class="unsubscribe">Unfollow</button>
 						</form>
 					{% else %}
-						<form action="/r/u_{{ user.name }}/subscribe" method="POST">
+						<form action="/r/{{ name }}/subscribe" method="POST">
 							<button class="subscribe">Follow</button>
 						</form>
 					{% endif %}
+					</div>
+					<div id="user_filter">
+						{% if prefs.filters.contains(name) %}
+							<form action="/r/{{ name }}/unfilter" method="POST">
+								<button class="unfilter">Unfilter</button>
+							</form>
+						{% else %}
+							<form action="/r/{{ name }}/filter" method="POST">
+								<button class="filter">Filter</button>
+							</form>
+						{% endif %}
+					</div>
 				</div>
 			</div>
 		</aside>

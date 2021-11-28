@@ -1,6 +1,8 @@
 // CRATES
 use crate::esc;
-use crate::utils::{catch_random, error, format_num, format_url, param, redirect, rewrite_urls, setting, template, val, Post, Preferences, Subreddit};
+use crate::utils::{
+	catch_random, error, filter_posts, format_num, format_url, get_filters, param, redirect, rewrite_urls, setting, template, val, Post, Preferences, Subreddit,
+};
 use crate::{client::json, server::ResponseExt, RequestExt};
 use askama::Template;
 use cookie::Cookie;
@@ -17,6 +19,11 @@ struct SubredditTemplate {
 	ends: (String, String),
 	prefs: Preferences,
 	url: String,
+	/// Whether the subreddit itself is filtered.
+	is_filtered: bool,
+	/// Whether all fetched posts are filtered (to differentiate between no posts fetched in the first place,
+	/// and all fetched posts being filtered).
+	all_posts_filtered: bool,
 }
 
 #[derive(Template)]
@@ -48,7 +55,7 @@ pub async fn community(req: Request<Body>) -> Result<Response<Body>, String> {
 	let post_sort = req.cookie("post_sort").map_or_else(|| "hot".to_string(), |c| c.value().to_string());
 	let sort = req.param("sort").unwrap_or_else(|| req.param("id").unwrap_or(post_sort));
 
-	let sub = req.param("sub").unwrap_or(if front_page == "default" || front_page.is_empty() {
+	let sub_name = req.param("sub").unwrap_or(if front_page == "default" || front_page.is_empty() {
 		if subscribed.is_empty() {
 			"popular".to_string()
 		} else {
@@ -57,59 +64,77 @@ pub async fn community(req: Request<Body>) -> Result<Response<Body>, String> {
 	} else {
 		front_page.clone()
 	});
-	let quarantined = can_access_quarantine(&req, &sub) || root;
+	let quarantined = can_access_quarantine(&req, &sub_name) || root;
 
 	// Handle random subreddits
-	if let Ok(random) = catch_random(&sub, "").await {
+	if let Ok(random) = catch_random(&sub_name, "").await {
 		return Ok(random);
 	}
 
-	if req.param("sub").is_some() && sub.starts_with("u_") {
-		return Ok(redirect(["/user/", &sub[2..]].concat()));
+	if req.param("sub").is_some() && sub_name.starts_with("u_") {
+		return Ok(redirect(["/user/", &sub_name[2..]].concat()));
 	}
 
-	let path = format!("/r/{}/{}.json?{}&raw_json=1", sub, sort, req.uri().query().unwrap_or_default());
-
-	match Post::fetch(&path, String::new(), quarantined).await {
-		Ok((posts, after)) => {
-			// If you can get subreddit posts, also request subreddit metadata
-			let sub = if !sub.contains('+') && sub != subscribed && sub != "popular" && sub != "all" {
-				// Regular subreddit
-				subreddit(&sub, quarantined).await.unwrap_or_default()
-			} else if sub == subscribed {
-				// Subscription feed
-				if req.uri().path().starts_with("/r/") {
-					subreddit(&sub, quarantined).await.unwrap_or_default()
-				} else {
-					Subreddit::default()
-				}
-			} else if sub.contains('+') {
-				// Multireddit
-				Subreddit {
-					name: sub,
-					..Subreddit::default()
-				}
-			} else {
-				Subreddit::default()
-			};
-
-			let url = String::from(req.uri().path_and_query().map_or("", |val| val.as_str()));
-
-			template(SubredditTemplate {
-				sub,
-				posts,
-				sort: (sort, param(&path, "t").unwrap_or_default()),
-				ends: (param(&path, "after").unwrap_or_default(), after),
-				prefs: Preferences::new(req),
-				url,
-			})
+	// Request subreddit metadata
+	let sub = if !sub_name.contains('+') && sub_name != subscribed && sub_name != "popular" && sub_name != "all" {
+		// Regular subreddit
+		subreddit(&sub_name, quarantined).await.unwrap_or_default()
+	} else if sub_name == subscribed {
+		// Subscription feed
+		if req.uri().path().starts_with("/r/") {
+			subreddit(&sub_name, quarantined).await.unwrap_or_default()
+		} else {
+			Subreddit::default()
 		}
-		Err(msg) => match msg.as_str() {
-			"quarantined" => quarantine(req, sub),
-			"private" => error(req, format!("r/{} is a private community", sub)).await,
-			"banned" => error(req, format!("r/{} has been banned from Reddit", sub)).await,
-			_ => error(req, msg).await,
-		},
+	} else if sub_name.contains('+') {
+		// Multireddit
+		Subreddit {
+			name: sub_name.clone(),
+			..Subreddit::default()
+		}
+	} else {
+		Subreddit::default()
+	};
+
+	let path = format!("/r/{}/{}.json?{}&raw_json=1", sub_name.clone(), sort, req.uri().query().unwrap_or_default());
+	let url = String::from(req.uri().path_and_query().map_or("", |val| val.as_str()));
+	let filters = get_filters(&req);
+
+	// If all requested subs are filtered, we don't need to fetch posts.
+	if sub_name.split("+").all(|s| filters.contains(s)) {
+		template(SubredditTemplate {
+			sub,
+			posts: Vec::new(),
+			sort: (sort, param(&path, "t").unwrap_or_default()),
+			ends: (param(&path, "after").unwrap_or_default(), "".to_string()),
+			prefs: Preferences::new(req),
+			url,
+			is_filtered: true,
+			all_posts_filtered: false,
+		})
+	} else {
+		match Post::fetch(&path, quarantined).await {
+			Ok((mut posts, after)) => {
+				let all_posts_filtered = filter_posts(&mut posts, &filters);
+
+				template(SubredditTemplate {
+					sub,
+					posts,
+					sort: (sort, param(&path, "t").unwrap_or_default()),
+					ends: (param(&path, "after").unwrap_or_default(), after),
+					prefs: Preferences::new(req),
+					url,
+					is_filtered: false,
+					all_posts_filtered,
+				})
+			}
+			Err(msg) => match msg.as_str() {
+				"quarantined" => quarantine(req, sub_name),
+				"private" => error(req, format!("r/{} is a private community", sub_name)).await,
+				"banned" => error(req, format!("r/{} has been banned from Reddit", sub_name)).await,
+				_ => error(req, msg).await,
+			},
+		}
 	}
 }
 
@@ -150,18 +175,25 @@ pub fn can_access_quarantine(req: &Request<Body>, sub: &str) -> bool {
 	setting(req, &format!("allow_quaran_{}", sub.to_lowercase())).parse().unwrap_or_default()
 }
 
-// Sub or unsub by setting subscription cookie using response "Set-Cookie" header
-pub async fn subscriptions(req: Request<Body>) -> Result<Response<Body>, String> {
+// Sub, filter, unfilter, or unsub by setting subscription cookie using response "Set-Cookie" header
+pub async fn subscriptions_filters(req: Request<Body>) -> Result<Response<Body>, String> {
 	let sub = req.param("sub").unwrap_or_default();
+	let action: Vec<String> = req.uri().path().split('/').map(String::from).collect();
+
 	// Handle random subreddits
 	if sub == "random" || sub == "randnsfw" {
-		return Err("Can't subscribe to random subreddit!".to_string());
+		if action.contains(&"filter".to_string()) || action.contains(&"unfilter".to_string()) {
+			return Err("Can't filter random subreddit!".to_string());
+		} else {
+			return Err("Can't subscribe to random subreddit!".to_string());
+		}
 	}
 
 	let query = req.uri().query().unwrap_or_default().to_string();
-	let action: Vec<String> = req.uri().path().split('/').map(String::from).collect();
 
-	let mut sub_list = Preferences::new(req).subscriptions;
+	let preferences = Preferences::new(req);
+	let mut sub_list = preferences.subscriptions;
+	let mut filters = preferences.filters;
 
 	// Retrieve list of posts for these subreddits to extract display names
 	let posts = json(format!("/r/{}/hot.json?raw_json=1", sub), true).await?;
@@ -182,8 +214,10 @@ pub async fn subscriptions(req: Request<Body>) -> Result<Response<Body>, String>
 	for part in sub.split('+') {
 		// Retrieve display name for the subreddit
 		let display;
-		let part = if let Some(&(_, display)) = display_lookup.iter().find(|x| x.0 == part.to_lowercase()) {
-			// This is already known, doesn't require seperate request
+		let part = if part.starts_with("u_") {
+			part
+		} else if let Some(&(_, display)) = display_lookup.iter().find(|x| x.0 == part.to_lowercase()) {
+			// This is already known, doesn't require separate request
 			display
 		} else {
 			// This subreddit display name isn't known, retrieve it
@@ -196,16 +230,28 @@ pub async fn subscriptions(req: Request<Body>) -> Result<Response<Body>, String>
 		if action.contains(&"subscribe".to_string()) && !sub_list.contains(&part.to_owned()) {
 			// Add each sub name to the subscribed list
 			sub_list.push(part.to_owned());
-			// Reorder sub names alphabettically
+			filters.retain(|s| s.to_lowercase() != part.to_lowercase());
+			// Reorder sub names alphabetically
 			sub_list.sort_by_key(|a| a.to_lowercase());
+			filters.sort_by_key(|a| a.to_lowercase());
 		} else if action.contains(&"unsubscribe".to_string()) {
 			// Remove sub name from subscribed list
 			sub_list.retain(|s| s.to_lowercase() != part.to_lowercase());
+		} else if action.contains(&"filter".to_string()) && !filters.contains(&part.to_owned()) {
+			// Add each sub name to the filtered list
+			filters.push(part.to_owned());
+			sub_list.retain(|s| s.to_lowercase() != part.to_lowercase());
+			// Reorder sub names alphabetically
+			filters.sort_by_key(|a| a.to_lowercase());
+			sub_list.sort_by_key(|a| a.to_lowercase());
+		} else if action.contains(&"unfilter".to_string()) {
+			// Remove sub name from filtered list
+			filters.retain(|s| s.to_lowercase() != part.to_lowercase());
 		}
 	}
 
 	// Redirect back to subreddit
-	// check for redirect parameter if unsubscribing from outside sidebar
+	// check for redirect parameter if unsubscribing/unfiltering from outside sidebar
 	let path = if let Some(redirect_path) = param(&format!("?{}", query), "redirect") {
 		format!("/{}/", redirect_path)
 	} else {
@@ -220,6 +266,17 @@ pub async fn subscriptions(req: Request<Body>) -> Result<Response<Body>, String>
 	} else {
 		response.insert_cookie(
 			Cookie::build("subscriptions", sub_list.join("+"))
+				.path("/")
+				.http_only(true)
+				.expires(OffsetDateTime::now_utc() + Duration::weeks(52))
+				.finish(),
+		);
+	}
+	if filters.is_empty() {
+		response.remove_cookie("filters".to_string());
+	} else {
+		response.insert_cookie(
+			Cookie::build("filters", filters.join("+"))
 				.path("/")
 				.http_only(true)
 				.expires(OffsetDateTime::now_utc() + Duration::weeks(52))

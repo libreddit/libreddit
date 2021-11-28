@@ -23,7 +23,7 @@ async fn stream(url: &str, req: &Request<Body>) -> Result<Response<Body>, String
 	let url = Uri::from_str(url).map_err(|_| "Couldn't parse URL".to_string())?;
 
 	// Prepare the HTTPS connector.
-	let https = hyper_rustls::HttpsConnector::with_native_roots();
+	let https = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_only().enable_http1().build();
 
 	// Build the hyper client from the HTTPS connector.
 	let client: client::Client<_, hyper::Body> = client::Client::builder().build(https);
@@ -63,7 +63,7 @@ async fn stream(url: &str, req: &Request<Body>) -> Result<Response<Body>, String
 
 fn request(url: String, quarantine: bool) -> Boxed<Result<Response<Body>, String>> {
 	// Prepare the HTTPS connector.
-	let https = hyper_rustls::HttpsConnector::with_native_roots();
+	let https = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build();
 
 	// Construct the hyper client from the HTTPS connector.
 	let client: client::Client<_, hyper::Body> = client::Client::builder().build(https);

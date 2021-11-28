@@ -133,8 +133,7 @@ async fn main() {
 		.get_matches();
 
 	let address = matches.value_of("address").unwrap_or("0.0.0.0");
-	let port = std::env::var("PORT")
-        .unwrap_or_else(|_| matches.value_of("port").unwrap_or("8080").to_string());
+	let port = std::env::var("PORT").unwrap_or_else(|_| matches.value_of("port").unwrap_or("8080").to_string());
 	let hsts = matches.value_of("hsts");
 
 	let listener = [address, ":", &port].concat();
@@ -181,7 +180,7 @@ async fn main() {
 	// Proxy media through Libreddit
 	app.at("/vid/:id/:size").get(|r| proxy(r, "https://v.redd.it/{id}/DASH_{size}").boxed());
 	app.at("/hls/:id/*path").get(|r| proxy(r, "https://v.redd.it/{id}/{path}").boxed());
-	app.at("/img/:id").get(|r| proxy(r, "https://i.redd.it/{id}").boxed());
+	app.at("/img/*path").get(|r| proxy(r, "https://i.redd.it/{path}").boxed());
 	app.at("/thumb/:point/:id").get(|r| proxy(r, "https://{point}.thumbs.redditmedia.com/{id}").boxed());
 	app.at("/emoji/:id/:name").get(|r| proxy(r, "https://emoji.redditmedia.com/{id}/{name}").boxed());
 	app.at("/preview/:loc/:id").get(|r| proxy(r, "https://{loc}view.redd.it/{id}").boxed());
@@ -216,8 +215,10 @@ async fn main() {
 		.at("/r/u_:name")
 		.get(|r| async move { Ok(redirect(format!("/user/{}", r.param("name").unwrap_or_default()))) }.boxed());
 
-	app.at("/r/:sub/subscribe").post(|r| subreddit::subscriptions(r).boxed());
-	app.at("/r/:sub/unsubscribe").post(|r| subreddit::subscriptions(r).boxed());
+	app.at("/r/:sub/subscribe").post(|r| subreddit::subscriptions_filters(r).boxed());
+	app.at("/r/:sub/unsubscribe").post(|r| subreddit::subscriptions_filters(r).boxed());
+	app.at("/r/:sub/filter").post(|r| subreddit::subscriptions_filters(r).boxed());
+	app.at("/r/:sub/unfilter").post(|r| subreddit::subscriptions_filters(r).boxed());
 
 	app.at("/r/:sub/comments/:id").get(|r| post::item(r).boxed());
 	app.at("/r/:sub/comments/:id/:title").get(|r| post::item(r).boxed());

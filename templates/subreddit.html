@@ -17,6 +17,7 @@
 
 {% block body %}
 	<main>
+		{% if !is_filtered %}
 		<div id="column_one">
 			<form id="sort">
 				<div id="sort_options">
@@ -45,6 +46,9 @@
 				</form>
 			{% endif %}
 
+			{% if all_posts_filtered %}
+				 <center>(All content on this page has been filtered)</center>
+			{% else %}
 			<div id="posts">
 			{% for post in posts %}
 			{% if !(post.flags.nsfw && prefs.show_nsfw != "on") %}
@@ -57,6 +61,7 @@
 			<script src="/playHLSVideo.js"></script>
 			{% endif %}
 			</div>
+			{% endif %}
 
 			<footer>
 				{% if ends.0 != "" %}
@@ -68,8 +73,13 @@
 				{% endif %}
 			</footer>
 		</div>
-		{% if sub.name != "" && !sub.name.contains("+") %}
+		{% endif %}
+		{% if is_filtered || (sub.name != "" && !sub.name.contains("+")) %}
 		<aside>
+			{% if is_filtered %}
+				<center>(Content from r/{{ sub.name }} has been filtered)</center>
+			{% endif %}
+			{% if sub.name != "" && !sub.name.contains("+") %}
 			<div class="panel" id="subreddit">
 				{% if sub.wiki %}
 				<div id="top">
@@ -88,33 +98,47 @@
 						<div title="{{ sub.members.1 }}">{{ sub.members.0 }}</div>
 						<div title="{{ sub.active.1 }}">{{ sub.active.0 }}</div>
 					</div>
-					<div id="sub_subscription">
-						{% if prefs.subscriptions.contains(sub.name) %}
-							<form action="/r/{{ sub.name }}/unsubscribe" method="POST">
-								<button class="unsubscribe">Unsubscribe</button>
+					<div id="sub_actions">
+						<div id="sub_subscription">
+							{% if prefs.subscriptions.contains(sub.name) %}
+								<form action="/r/{{ sub.name }}/unsubscribe" method="POST">
+									<button class="unsubscribe">Unsubscribe</button>
+								</form>
+							{% else %}
+								<form action="/r/{{ sub.name }}/subscribe" method="POST">
+									<button class="subscribe">Subscribe</button>
+								</form>
+							{% endif %}
+						</div>
+						<div id="sub_filter">
+							{% if prefs.filters.contains(sub.name) %}
+								<form action="/r/{{ sub.name }}/unfilter" method="POST">
+									<button class="unfilter">Unfilter</button>
+								</form>
+							{% else %}
+							<form action="/r/{{ sub.name }}/filter" method="POST">
+								<button class="filter">Filter</button>
 							</form>
-						{% else %}
-							<form action="/r/{{ sub.name }}/subscribe" method="POST">
-								<button class="subscribe">Subscribe</button>
-							</form>
-						{% endif %}
+							{% endif %}
+						</div>
 					</div>
 				</div>
 			</div>
 			<details class="panel" id="sidebar">
 				<summary id="sidebar_label">Sidebar</summary>
 				<div id="sidebar_contents">
-                                  {{ sub.info }}
-                                  {# <hr>
-                                  <h2>Moderators</h2>
-                                  <br>
-                                  <ul>
-                                  {% for moderator in sub.moderators %}
-                                  <li><a style="color: var(--accent)" href="/u/{{ moderator }}">{{ moderator }}</a></li>
-                                  {% endfor %}
-                                  </ul> #}
-                                </div>
+					{{ sub.info }}
+					{# <hr>
+					<h2>Moderators</h2>
+					<br>
+					<ul>
+					{% for moderator in sub.moderators %}
+					<li><a style="color: var(--accent)" href="/u/{{ moderator }}">{{ moderator }}</a></li>
+					{% endfor %}
+					</ul> #}
+				</div>
 			</details>
+			{% endif %}
 		</aside>
 		{% endif %}
 	</main>
