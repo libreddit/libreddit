@@ -47,7 +47,7 @@ struct SearchTemplate {
 // SERVICES
 pub async fn find(req: Request<Body>) -> Result<Response<Body>, String> {
 	let nsfw_results = if setting(&req, "show_nsfw") == "on" { "&include_over_18=on" } else { "" };
-	let path = format!("{}.json?{}{}", req.uri().path(), req.uri().query().unwrap_or_default(), nsfw_results);
+	let path = format!("{}.json?{}{}&raw_json=1", req.uri().path(), req.uri().query().unwrap_or_default(), nsfw_results);
 	let query = param(&path, "q").unwrap_or_default();
 
 	if query.is_empty() {

@@ -465,6 +465,7 @@ aside {
 #wiki {
 	background: var(--foreground);
 	padding: 35px;
+	overflow-wrap: anywhere;
 }
 
 #top {

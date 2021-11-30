@@ -2,7 +2,7 @@ use cached::proc_macro::cached;
 use futures_lite::{future::Boxed, FutureExt};
 use hyper::{body::Buf, client, Body, Request, Response, Uri};
 use serde_json::Value;
-use std::{result::Result, str::FromStr};
+use std::result::Result;
 
 use crate::server::RequestExt;
 
@@ -20,7 +20,7 @@ pub async fn proxy(req: Request<Body>, format: &str) -> Result<Response<Body>, S
 
 async fn stream(url: &str, req: &Request<Body>) -> Result<Response<Body>, String> {
 	// First parameter is target URL (mandatory).
-	let url = Uri::from_str(url).map_err(|_| "Couldn't parse URL".to_string())?;
+	let uri = url.parse::<Uri>().map_err(|_| "Couldn't parse URL".to_string())?;
 
 	// Prepare the HTTPS connector.
 	let https = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_only().enable_http1().build();
@@ -28,7 +28,7 @@ async fn stream(url: &str, req: &Request<Body>) -> Result<Response<Body>, String
 	// Build the hyper client from the HTTPS connector.
 	let client: client::Client<_, hyper::Body> = client::Client::builder().build(https);
 
-	let mut builder = Request::get(url);
+	let mut builder = Request::get(uri);
 
 	// Copy useful headers from original request
 	for &key in &["Range", "If-Modified-Since", "Cache-Control"] {
@@ -89,7 +89,10 @@ fn request(url: String, quarantine: bool) -> Boxed<Result<Response<Body>, String
 							response
 								.headers()
 								.get("Location")
-								.map(|val| val.to_str().unwrap_or_default())
+								.map(|val| {
+									let new_url = val.to_str().unwrap_or_default();
+									format!("{}{}raw_json=1", new_url, if new_url.contains("?") { "&" } else { "?" })
+								})
 								.unwrap_or_default()
 								.to_string(),
 							quarantine,
