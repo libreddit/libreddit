@@ -74,6 +74,7 @@ pub struct Flags {
 	pub stickied: bool,
 }
 
+#[derive(Debug)]
 pub struct Media {
 	pub url: String,
 	pub alt_url: String,
@@ -86,28 +87,41 @@ impl Media {
 	pub async fn parse(data: &Value) -> (String, Self, Vec<GalleryMedia>) {
 		let mut gallery = Vec::new();
 
+		// Define the various known places that Reddit might put video URLs.
+		let data_preview = &data["preview"]["reddit_video_preview"];
+		let secure_media = &data["secure_media"]["reddit_video"];
+		let crosspost_parent_media = &data["crosspost_parent_list"][0]["secure_media"]["reddit_video"];
+
 		// If post is a video, return the video
-		let (post_type, url_val, alt_url_val) = if data["preview"]["reddit_video_preview"]["fallback_url"].is_string() {
-			// Return reddit video
+		let (post_type, url_val, alt_url_val) = if data_preview["fallback_url"].is_string() {
 			(
-				if data["preview"]["reddit_video_preview"]["is_gif"].as_bool().unwrap_or(false) {
+				if data_preview["is_gif"].as_bool().unwrap_or(false) {
 					"gif"
 				} else {
 					"video"
 				},
-				&data["preview"]["reddit_video_preview"]["fallback_url"],
-				Some(&data["preview"]["reddit_video_preview"]["hls_url"]),
+				&data_preview["fallback_url"],
+				Some(&data_preview["hls_url"]),
 			)
-		} else if data["secure_media"]["reddit_video"]["fallback_url"].is_string() {
-			// Return reddit video
+		} else if secure_media["fallback_url"].is_string() {
 			(
-				if data["preview"]["reddit_video_preview"]["is_gif"].as_bool().unwrap_or(false) {
+				if secure_media["is_gif"].as_bool().unwrap_or(false) {
 					"gif"
 				} else {
 					"video"
 				},
-				&data["secure_media"]["reddit_video"]["fallback_url"],
-				Some(&data["secure_media"]["reddit_video"]["hls_url"]),
+				&secure_media["fallback_url"],
+				Some(&secure_media["hls_url"]),
+			)
+		} else if crosspost_parent_media["fallback_url"].is_string() {
+			(
+				if crosspost_parent_media["is_gif"].as_bool().unwrap_or(false) {
+					"gif"
+				} else {
+					"video"
+				},
+				&crosspost_parent_media["fallback_url"],
+				Some(&crosspost_parent_media["hls_url"]),
 			)
 		} else if data["post_hint"].as_str().unwrap_or("") == "image" {
 			// Handle images, whether GIFs or pics
@@ -587,7 +601,7 @@ pub fn format_url(url: &str) -> String {
 
 			match domain {
 				"v.redd.it" => chain!(
-					capture(r"https://v\.redd\.it/(.*)/DASH_([0-9]{2,4}(\.mp4|$))", "/vid/", 2),
+					capture(r"https://v\.redd\.it/(.*)/DASH_([0-9]{2,4}(\.mp4|$|\?source=fallback))", "/vid/", 2),
 					capture(r"https://v\.redd\.it/(.+)/(HLSPlaylist\.m3u8.*)$", "/hls/", 2)
 				),
 				"i.redd.it" => capture(r"https://i\.redd\.it/(.*)", "/img/", 1),
