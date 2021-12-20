@@ -241,38 +241,3 @@ fn parse_comments(json: &serde_json::Value, post_link: &str, post_author: &str, 
 		})
 		.collect()
 }
-
-#[cfg(test)]
-mod tests {
-	use std::fs::File;
-	use super::parse_post;
-
-	#[tokio::test]
-	async fn parse_post_works() {
-		// https://www.reddit.com/r/antiwork/comments/qybiul.json?&sort=confidence&raw_json=1
-		let testdata = File::open("testdata/cross_post_parent_list.json")
-			.expect("error reading file");
-		let post_json: serde_json::Value = serde_json::from_reader(testdata)
-			.expect("error parsing JSON");
-
-		let post = parse_post(&post_json[0]).await;
-		println!("{:?}", post.media);
-
-		assert_eq!(
-			post.post_type,
-			"video"
-		);
-		assert_ne!(
-			post.media.url,
-			""
-		);
-		assert_ne!(
-			post.media.alt_url,
-			""
-		);
-		assert_ne!(
-			post.media.poster,
-			""
-		);
-    }
-}

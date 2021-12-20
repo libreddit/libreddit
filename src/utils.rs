@@ -723,7 +723,6 @@ pub async fn error(req: Request<Body>, msg: String) -> Result<Response<Body>, St
 #[cfg(test)]
 mod tests {
 	use super::format_num;
-	use super::format_url;
 
 	#[test]
 	fn format_num_works() {
@@ -733,16 +732,4 @@ mod tests {
 		assert_eq!(format_num(1001), ("1.0k".to_string(), "1001".to_string()));
 		assert_eq!(format_num(1_999_999), ("2.0m".to_string(), "1999999".to_string()));
 	}
-
-  #[test]
-	fn format_url_works() {
-		assert_eq!(
-			format_url("https://v.redd.it/test123/DASH_480?source=fallback"),
-			"/vid/test123/480?source=fallback"
-		);
-		assert_eq!(
-			format_url("https://v.redd.it/test123/DASH_720.mp4?source=fallback"),
-			"/vid/test123/720.mp4"
-		);
-  }
 }
