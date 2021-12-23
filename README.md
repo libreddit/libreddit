@@ -65,6 +65,7 @@ Feel free to [open an issue](https://github.com/spikecodes/libreddit/issues/new)
 | [lr.cowfee.moe](https://lr.cowfee.moe) | 🇺🇸 US |  |
 | [libreddit.hu](https://libreddit.hu) | 🇫🇮 FI | ✅ |
 | [libreddit.totaldarkness.net](https://libreddit.totaldarkness.net) | 🇨🇦 CA |  |
+| [libreddit.esmailelbob.xyz](https://libreddit.esmailelbob.xyz) | 🇪🇬 EG |  |
 | [spjmllawtheisznfs7uryhxumin26ssv2draj7oope3ok3wuhy43eoyd.onion](http://spjmllawtheisznfs7uryhxumin26ssv2draj7oope3ok3wuhy43eoyd.onion) | 🇮🇳 IN |  |
 | [fwhhsbrbltmrct5hshrnqlqygqvcgmnek3cnka55zj4y7nuus5muwyyd.onion](http://fwhhsbrbltmrct5hshrnqlqygqvcgmnek3cnka55zj4y7nuus5muwyyd.onion) | 🇩🇪 DE |  |
 | [kphht2jcflojtqte4b4kyx7p2ahagv4debjj32nre67dxz7y57seqwyd.onion](http://kphht2jcflojtqte4b4kyx7p2ahagv4debjj32nre67dxz7y57seqwyd.onion) | 🇳🇱 NL |  |
@@ -74,6 +75,7 @@ Feel free to [open an issue](https://github.com/spikecodes/libreddit/issues/new)
 | [ecue64ybzvn6vjzl37kcsnwt4ycmbsyf74nbttyg7rkc3t3qwnj7mcyd.onion](http://ecue64ybzvn6vjzl37kcsnwt4ycmbsyf74nbttyg7rkc3t3qwnj7mcyd.onion) | 🇩🇪 DE |  |
 | [ledditqo2mxfvlgobxnlhrkq4dh34jss6evfkdkb2thlvy6dn4f4gpyd.onion](http://ledditqo2mxfvlgobxnlhrkq4dh34jss6evfkdkb2thlvy6dn4f4gpyd.onion) | 🇺🇸 US |  |
 | [libredoxhxwnmsb6dvzzd35hmgzmawsq5i764es7witwhddvpc2razid.onion](http://libredoxhxwnmsb6dvzzd35hmgzmawsq5i764es7witwhddvpc2razid.onion) | 🇺🇸 US |  |
+| [libreddit.2syis2nnyytz6jnusnjurva4swlaizlnleiks5mjp46phuwjbdjqwgqd.onion](https://libreddit.2syis2nnyytz6jnusnjurva4swlaizlnleiks5mjp46phuwjbdjqwgqd.onion) | 🇪🇬 EG |  |
 
 
 A checkmark in the "Cloudflare" category here refers to the use of the reverse proxy, [Cloudflare](https://cloudflare). The checkmark will not be listed for a site which uses Cloudflare DNS but rather the proxying service which grants Cloudflare the ability to monitor traffic to the website.
