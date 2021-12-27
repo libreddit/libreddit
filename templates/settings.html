@@ -11,14 +11,14 @@
 	<div id="settings">
 	<form action="/settings" method="POST">
 		<div class="prefs">
-			<p>Appearance</p>
+			<legend>Appearance</legend>
 			<div id="theme">
 				<label for="theme">Theme:</label>
 				<select name="theme"> 
 					{% call utils::options(prefs.theme, ["system", "light", "dark", "black", "dracula", "nord", "laserwave", "violet", "gold", "rosebox"], "system") %}
 				</select>
 			</div>
-			<p>Interface</p>
+			<legend>Interface</legend>
 			<div id="front_page">
 				<label for="front_page">Front page:</label>
 				<select name="front_page"> 
@@ -36,7 +36,7 @@
 				<input type="hidden" value="off" name="wide">
 				<input type="checkbox" name="wide" {% if prefs.wide == "on" %}checked{% endif %}>
 			</div>
-			<p>Content</p>
+			<legend>Content</legend>
 			<div id="post_sort">
 				<label for="post_sort" title="Applies only to subreddit feeds">Default subreddit post sort:</label>
 				<select name="post_sort"> 
@@ -79,7 +79,7 @@
 	</form>
 	{% if prefs.subscriptions.len() > 0 %}
 		<div class="prefs" id="settings_subs">
-			<p>Subscribed Feeds</p>
+			<legend>Subscribed Feeds</legend>
 			{% for sub in prefs.subscriptions %}
 			<div>
 				{% let feed -%}
@@ -94,7 +94,7 @@
 	{% endif %}
 	{% if !prefs.filters.is_empty() %}
 		<div class="prefs" id="settings_filters">
-			<p>Filtered Feeds</p>
+			<legend>Filtered Feeds</legend>
 			{% for sub in prefs.filters %}
 			<div>
 				{% let feed -%}
