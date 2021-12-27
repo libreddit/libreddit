@@ -43,12 +43,13 @@ jobs:
         if: github.base_ref != 'master'
         with:
           tag_name: ${{ steps.version.outputs.version }}
-          name: ${{ steps.version.outputs.version }} - NAME
+          name: ${{ steps.version.outputs.version }} - ${{ github.event.head_commit.message }}
           draft: true
           files: |
             target/release/libreddit
             libreddit.sha512
           body: |
-            - ${{ github.event.head_commit.message }} ${{ github.sha }} 
+            - ${{ github.event.head_commit.message }} ${{ github.sha }}
+          generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}

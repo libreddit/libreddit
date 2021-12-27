@@ -96,31 +96,19 @@ impl Media {
 		// If post is a video, return the video
 		let (post_type, url_val, alt_url_val) = if data_preview["fallback_url"].is_string() {
 			(
-				if data_preview["is_gif"].as_bool().unwrap_or(false) {
-					"gif"
-				} else {
-					"video"
-				},
+				if data_preview["is_gif"].as_bool().unwrap_or(false) { "gif" } else { "video" },
 				&data_preview["fallback_url"],
 				Some(&data_preview["hls_url"]),
 			)
 		} else if secure_media["fallback_url"].is_string() {
 			(
-				if secure_media["is_gif"].as_bool().unwrap_or(false) {
-					"gif"
-				} else {
-					"video"
-				},
+				if secure_media["is_gif"].as_bool().unwrap_or(false) { "gif" } else { "video" },
 				&secure_media["fallback_url"],
 				Some(&secure_media["hls_url"]),
 			)
 		} else if crosspost_parent_media["fallback_url"].is_string() {
 			(
-				if crosspost_parent_media["is_gif"].as_bool().unwrap_or(false) {
-					"gif"
-				} else {
-					"video"
-				},
+				if crosspost_parent_media["is_gif"].as_bool().unwrap_or(false) { "gif" } else { "video" },
 				&crosspost_parent_media["fallback_url"],
 				Some(&crosspost_parent_media["hls_url"]),
 			)
