@@ -21,6 +21,7 @@ pub struct Flair {
 }
 
 // Part of flair, either emoji or text
+#[derive(Clone)]
 pub struct FlairPart {
 	pub flair_part_type: String,
 	pub value: String,
@@ -154,18 +155,12 @@ impl Media {
 
 		let source = &data["preview"]["images"][0]["source"];
 
-		let url = if post_type == "self" || post_type == "link" {
-			url_val.as_str().unwrap_or_default().to_string()
-		} else {
-			format_url(url_val.as_str().unwrap_or_default())
-		};
-
 		let alt_url = alt_url_val.map_or(String::new(), |val| format_url(val.as_str().unwrap_or_default()));
 
 		(
 			post_type.to_string(),
 			Self {
-				url,
+				url: format_url(url_val.as_str().unwrap_or_default()),
 				alt_url,
 				width: source["width"].as_i64().unwrap_or_default(),
 				height: source["height"].as_i64().unwrap_or_default(),
@@ -265,13 +260,13 @@ impl Post {
 			let title = esc!(post, "title");
 
 			// Determine the type of media along with the media URL
-			let (post_type, media, gallery) = Media::parse(&data).await;
+			let (post_type, media, gallery) = Media::parse(data).await;
 			let awards = Awards::parse(&data["all_awardings"]);
 
 			// selftext_html is set for text posts when browsing.
 			let mut body = rewrite_urls(&val(post, "selftext_html"));
-			if body == "" {
-				body = rewrite_urls(&val(post, "body_html"))
+			if body.is_empty() {
+				body = rewrite_urls(&val(post, "body_html"));
 			}
 
 			posts.push(Self {
@@ -498,7 +493,7 @@ impl Preferences {
 
 /// Gets a `HashSet` of filters from the cookie in the given `Request`.
 pub fn get_filters(req: &Request<Body>) -> HashSet<String> {
-	setting(&req, "filters").split('+').map(String::from).filter(|s| !s.is_empty()).collect::<HashSet<String>>()
+	setting(req, "filters").split('+').map(String::from).filter(|s| !s.is_empty()).collect::<HashSet<String>>()
 }
 
 /// Filters a `Vec<Post>` by the given `HashSet` of filters (each filter being a subreddit name or a user name). If a
@@ -600,6 +595,7 @@ pub fn format_url(url: &str) -> String {
 			}
 
 			match domain {
+				"www.reddit.com" => capture(r"https://www\.reddit\.com/(.*)", "/", 1),
 				"v.redd.it" => chain!(
 					capture(r"https://v\.redd\.it/(.*)/DASH_([0-9]{2,4}(\.mp4|$|\?source=fallback))", "/vid/", 2),
 					capture(r"https://v\.redd\.it/(.+)/(HLSPlaylist\.m3u8.*)$", "/hls/", 2)

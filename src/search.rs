@@ -78,7 +78,7 @@ pub async fn find(req: Request<Body>) -> Result<Response<Body>, String> {
 	let url = String::from(req.uri().path_and_query().map_or("", |val| val.as_str()));
 
 	// If all requested subs are filtered, we don't need to fetch posts.
-	if sub.split("+").all(|s| filters.contains(s)) {
+	if sub.split('+').all(|s| filters.contains(s)) {
 		template(SearchTemplate {
 			posts: Vec::new(),
 			subreddits,

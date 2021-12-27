@@ -101,7 +101,7 @@ pub async fn community(req: Request<Body>) -> Result<Response<Body>, String> {
 	let filters = get_filters(&req);
 
 	// If all requested subs are filtered, we don't need to fetch posts.
-	if sub_name.split("+").all(|s| filters.contains(s)) {
+	if sub_name.split('+').all(|s| filters.contains(s)) {
 		template(SubredditTemplate {
 			sub,
 			posts: Vec::new(),

@@ -91,7 +91,7 @@ fn request(url: String, quarantine: bool) -> Boxed<Result<Response<Body>, String
 								.get("Location")
 								.map(|val| {
 									let new_url = val.to_str().unwrap_or_default();
-									format!("{}{}raw_json=1", new_url, if new_url.contains("?") { "&" } else { "?" })
+									format!("{}{}raw_json=1", new_url, if new_url.contains('?') { "&" } else { "?" })
 								})
 								.unwrap_or_default()
 								.to_string(),

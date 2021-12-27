@@ -1,6 +1,6 @@
 {% macro options(current, values, default) -%}
 	{% for value in values %}
-		<option value="{{ value }}" {% if current == value || (current == "" && value == default) %}selected{% endif %}>
+		<option value="{{ value }}" {% if current == value.to_string() || (current == "" && value.to_string() == default.to_string()) %}selected{% endif %}>
 			{{ format!("{}{}", value.get(0..1).unwrap_or_default().to_uppercase(), value.get(1..).unwrap_or_default()) }}
 		</option>
 	{% endfor %}
@@ -8,7 +8,7 @@
 
 {% macro sort(root, methods, selected) -%}
 	{% for method in methods %}
-		<a {% if method == selected %}class="selected"{% endif %} href="{{ root }}/{{ method }}">
+		<a {% if method.to_string() == selected.to_string() %}class="selected"{% endif %} href="{{ root }}/{{ method }}">
 			{{ format!("{}{}", method.get(0..1).unwrap_or_default().to_uppercase(), method.get(1..).unwrap_or_default()) }}
 		</a>
 	{% endfor %}
@@ -34,7 +34,7 @@
 {%- endmacro %}
 
 {% macro render_flair(flair_parts) -%}
-	{% for flair_part in flair_parts %}{% if flair_part.flair_part_type == "emoji" %}<span class="emoji" style="background-image:url('{{ flair_part.value }}');"></span>{% else if flair_part.flair_part_type == "text" && !flair_part.value.is_empty() %}<span>{{ flair_part.value }}</span>{% endif %}{% endfor %}
+	{% for flair_part in flair_parts.clone() %}{% if flair_part.flair_part_type == "emoji" %}<span class="emoji" style="background-image:url('{{ flair_part.value }}');"></span>{% else if flair_part.flair_part_type == "text" && !flair_part.value.is_empty() %}<span>{{ flair_part.value }}</span>{% endif %}{% endfor %}
 {%- endmacro %}
 
 {% macro sub_list(current) -%}

@@ -64,22 +64,22 @@
 			{% endif %}
 
 			<footer>
-				{% if ends.0 != "" %}
+				{% if !ends.0.is_empty() %}
 				<a href="?sort={{ sort.0 }}&t={{ sort.1 }}&before={{ ends.0 }}">PREV</a>
 				{% endif %}
 
-				{% if ends.1 != "" %}
+				{% if !ends.1.is_empty() %}
 				<a href="?sort={{ sort.0 }}&t={{ sort.1 }}&after={{ ends.1 }}">NEXT</a>
 				{% endif %}
 			</footer>
 		</div>
 		{% endif %}
-		{% if is_filtered || (sub.name != "" && !sub.name.contains("+")) %}
+		{% if is_filtered || (!sub.name.is_empty() && !sub.name.contains("+")) %}
 		<aside>
 			{% if is_filtered %}
 				<center>(Content from r/{{ sub.name }} has been filtered)</center>
 			{% endif %}
-			{% if sub.name != "" && !sub.name.contains("+") %}
+			{% if !sub.name.is_empty() && !sub.name.contains("+") %}
 			<div class="panel" id="subreddit">
 				{% if sub.wiki %}
 				<div id="top">
