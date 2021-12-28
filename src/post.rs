@@ -105,8 +105,6 @@ async fn parse_post(json: &serde_json::Value) -> Post {
 		rewrite_urls(&val(post, "selftext_html")).replace("\\", "")
 	};
 
-	dbg!(val(post, "permalink"));
-
 	// Build a post using data parsed from Reddit post API
 	Post {
 		id: val(post, "id"),
