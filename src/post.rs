@@ -97,12 +97,22 @@ async fn parse_post(json: &serde_json::Value) -> Post {
 
 	let awards: Awards = Awards::parse(&post["data"]["all_awardings"]);
 
+	let permalink = val(post, "permalink");
+
+	let body = if val(post, "removed_by_category") == "moderator" {
+		format!("<div class=\"md\"><p>[removed] — <a href=\"https://www.reveddit.com{}\">view removed post</a></p></div>", permalink)
+	} else {
+		rewrite_urls(&val(post, "selftext_html")).replace("\\", "")
+	};
+
+	dbg!(val(post, "permalink"));
+
 	// Build a post using data parsed from Reddit post API
 	Post {
 		id: val(post, "id"),
 		title: esc!(post, "title"),
 		community: val(post, "subreddit"),
-		body: rewrite_urls(&val(post, "selftext_html")).replace("\\", ""),
+		body,
 		author: Author {
 			name: val(post, "author"),
 			flair: Flair {
@@ -117,7 +127,7 @@ async fn parse_post(json: &serde_json::Value) -> Post {
 			},
 			distinguished: val(post, "distinguished"),
 		},
-		permalink: val(post, "permalink"),
+		permalink,
 		score: format_num(score),
 		upvote_ratio: ratio as i64,
 		post_type,
@@ -174,7 +184,6 @@ fn parse_comments(json: &serde_json::Value, post_link: &str, post_author: &str, 
 			let edited = data["edited"].as_f64().map_or((String::new(), String::new()), time);
 
 			let score = data["score"].as_i64().unwrap_or(0);
-			let body = rewrite_urls(&val(&comment, "body_html"));
 
 			// If this comment contains replies, handle those too
 			let replies: Vec<Comment> = if data["replies"].is_object() {
@@ -190,6 +199,12 @@ fn parse_comments(json: &serde_json::Value, post_link: &str, post_author: &str, 
 
 			let id = val(&comment, "id");
 			let highlighted = id == highlighted_comment;
+
+			let body = if val(&comment, "author") == "[deleted]" && val(&comment, "body") == "[removed]" {
+				format!("<div class=\"md\"><p>[removed] — <a href=\"https://www.reveddit.com{}{}\">view removed comment</a></p></div>", post_link, id)
+			} else {
+				rewrite_urls(&val(&comment, "body_html")).to_string()
+			};
 
 			let author = Author {
 				name: val(&comment, "author"),
