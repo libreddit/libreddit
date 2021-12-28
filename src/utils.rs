@@ -596,7 +596,7 @@ pub fn format_url(url: &str) -> String {
 				"external-preview.redd.it" => capture(r"https://external\-preview\.redd\.it/(.*)", "/preview/external-pre/", 1),
 				"styles.redditmedia.com" => capture(r"https://styles\.redditmedia\.com/(.*)", "/style/", 1),
 				"www.redditstatic.com" => capture(r"https://www\.redditstatic\.com/(.*)", "/static/", 1),
-				_ => String::new(),
+				_ => url.to_string(),
 			}
 		})
 	}
