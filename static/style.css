@@ -876,7 +876,7 @@ a.search_subreddit:hover {
 
 #post_url {
 	color: var(--accent);
-	margin: 5px 15px;
+	margin: 5px 12px;
 	grid-area: post_media;
 }
 
@@ -903,7 +903,7 @@ a.search_subreddit:hover {
 	opacity: 0.5;
 	font-size: 14px;
 	grid-area: post_footer;
-	margin: 5px 20px 15px 15px;
+	margin: 5px 20px 15px 12px;
 }
 
 .post_comments {

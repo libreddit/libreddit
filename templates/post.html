@@ -56,7 +56,7 @@
 				{% endif %}
 			</p>
 			<p class="post_title">
-				<a href="{{ post.permalink }}">{{ post.title }}</a>
+				{{ post.title }}
 				{% if post.flair.flair_parts.len() > 0 %}
 					<a href="/r/{{ post.community }}/search?q=flair_name%3A%22{{ post.flair.text }}%22&restrict_sr=on"
 						class="post_flair"
