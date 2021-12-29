@@ -5,7 +5,7 @@ use crate::server::RequestExt;
 use crate::utils::{error, filter_posts, format_url, get_filters, param, template, Post, Preferences, User};
 use askama::Template;
 use hyper::{Body, Request, Response};
-use time::OffsetDateTime;
+use time::{OffsetDateTime, macros::format_description};
 
 // STRUCTS
 #[derive(Template)]
@@ -82,7 +82,8 @@ async fn user(name: &str) -> Result<User, String> {
 	// Send a request to the url
 	json(path, false).await.map(|res| {
 		// Grab creation date as unix timestamp
-		let created: i64 = res["data"]["created"].as_f64().unwrap_or(0.0).round() as i64;
+		let created_unix = res["data"]["created"].as_f64().unwrap_or(0.0).round() as i64;
+		let created = OffsetDateTime::from_unix_timestamp(created_unix).unwrap_or(OffsetDateTime::UNIX_EPOCH);
 
 		// Closure used to parse JSON from Reddit APIs
 		let about = |item| res["data"]["subreddit"][item].as_str().unwrap_or_default().to_string();
@@ -93,7 +94,7 @@ async fn user(name: &str) -> Result<User, String> {
 			title: esc!(about("title")),
 			icon: format_url(&about("icon_img")),
 			karma: res["data"]["total_karma"].as_i64().unwrap_or(0),
-			created: OffsetDateTime::from_unix_timestamp(created).format("%b %d '%y"),
+			created: created.format(format_description!("%b %d '%y")).unwrap_or_default(),
 			banner: esc!(about("banner_img")),
 			description: about("public_description"),
 		}

@@ -9,7 +9,7 @@ use regex::Regex;
 use serde_json::Value;
 use std::collections::{HashMap, HashSet};
 use std::str::FromStr;
-use time::{Duration, OffsetDateTime};
+use time::{Duration, OffsetDateTime, macros::format_description};
 use url::Url;
 
 // Post flair with content, background color and foreground color
@@ -584,6 +584,9 @@ pub fn format_url(url: &str) -> String {
 
 			match domain {
 				"www.reddit.com" => capture(r"https://www\.reddit\.com/(.*)", "/", 1),
+				"old.reddit.com" => capture(r"https://old\.reddit\.com/(.*)", "/", 1),
+				"np.reddit.com" => capture(r"https://np\.reddit\.com/(.*)", "/", 1),
+				"reddit.com" => capture(r"https://reddit\.com/(.*)", "/", 1),
 				"v.redd.it" => chain!(
 					capture(r"https://v\.redd\.it/(.*)/DASH_([0-9]{2,4}(\.mp4|$|\?source=fallback))", "/vid/", 2),
 					capture(r"https://v\.redd\.it/(.+)/(HLSPlaylist\.m3u8.*)$", "/hls/", 2)
@@ -634,12 +637,12 @@ pub fn format_num(num: i64) -> (String, String) {
 
 // Parse a relative and absolute time from a UNIX timestamp
 pub fn time(created: f64) -> (String, String) {
-	let time = OffsetDateTime::from_unix_timestamp(created.round() as i64);
+	let time = OffsetDateTime::from_unix_timestamp(created.round() as i64).unwrap_or(OffsetDateTime::UNIX_EPOCH);
 	let time_delta = OffsetDateTime::now_utc() - time;
 
 	// If the time difference is more than a month, show full date
 	let rel_time = if time_delta > Duration::days(30) {
-		time.format("%b %d '%y")
+		time.format(format_description!("%b %d '%y")).unwrap_or_default()
 	// Otherwise, show relative date/time
 	} else if time_delta.whole_days() > 0 {
 		format!("{}d ago", time_delta.whole_days())
@@ -649,7 +652,7 @@ pub fn time(created: f64) -> (String, String) {
 		format!("{}m ago", time_delta.whole_minutes())
 	};
 
-	(rel_time, time.format("%b %d %Y, %H:%M:%S UTC"))
+	(rel_time, time.format(format_description!("%b %d %Y, %H:%M:%S UTC")).unwrap_or_default())
 }
 
 // val() function used to parse JSON from Reddit APIs
