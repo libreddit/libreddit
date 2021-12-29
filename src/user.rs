@@ -94,7 +94,7 @@ async fn user(name: &str) -> Result<User, String> {
 			title: esc!(about("title")),
 			icon: format_url(&about("icon_img")),
 			karma: res["data"]["total_karma"].as_i64().unwrap_or(0),
-			created: created.format(format_description!("%b %d '%y")).unwrap_or_default(),
+			created: created.format(format_description!("[month repr:short] [day] '[year repr:last_two]")).unwrap_or_default(),
 			banner: esc!(about("banner_img")),
 			description: about("public_description"),
 		}

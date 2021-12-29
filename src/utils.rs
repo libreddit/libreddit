@@ -642,7 +642,7 @@ pub fn time(created: f64) -> (String, String) {
 
 	// If the time difference is more than a month, show full date
 	let rel_time = if time_delta > Duration::days(30) {
-		time.format(format_description!("%b %d '%y")).unwrap_or_default()
+		time.format(format_description!("[month repr:short] [day] '[year repr:last_two]")).unwrap_or_default()
 	// Otherwise, show relative date/time
 	} else if time_delta.whole_days() > 0 {
 		format!("{}d ago", time_delta.whole_days())
@@ -652,7 +652,7 @@ pub fn time(created: f64) -> (String, String) {
 		format!("{}m ago", time_delta.whole_minutes())
 	};
 
-	(rel_time, time.format(format_description!("%b %d %Y, %H:%M:%S UTC")).unwrap_or_default())
+	(rel_time, time.format(format_description!("[month repr:short] [day] [year], [hour]:[minute]:[second] UTC")).unwrap_or_default())
 }
 
 // val() function used to parse JSON from Reddit APIs
