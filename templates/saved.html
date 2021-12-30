@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% import "utils.html" as utils %}
+
+{% block title %}
+  Saved
+{% endblock %}
+
+{% block body %}
+  <main>
+    <div id="column_one">
+      {% for post in posts %}
+      {% if !(post.flags.nsfw && prefs.show_nsfw != "on") %}
+      <hr class="sep" />
+      {% call utils::post_in_list(post) %}
+      {% endif %}
+      {% endfor %}
+      {% if prefs.use_hls == "on" %}
+      <script src="/hls.min.js"></script>
+      <script src="/playHLSVideo.js"></script>
+      {% endif %}
+    </div>
+  </main>
+{% endblock body %}

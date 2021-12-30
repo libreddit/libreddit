@@ -4,6 +4,7 @@
 
 // Reference local files
 mod post;
+mod saved;
 mod search;
 mod settings;
 mod subreddit;
@@ -197,6 +198,11 @@ async fn main() {
 	app.at("/user/:name/comments/:id").get(|r| post::item(r).boxed());
 	app.at("/user/:name/comments/:id/:title").get(|r| post::item(r).boxed());
 	app.at("/user/:name/comments/:id/:title/:comment_id").get(|r| post::item(r).boxed());
+
+    // Saved posts
+    app.at("/saved").get(|r| saved::get(r).boxed());
+    app.at("/saved/:id/save").post(|r| saved::save(r).boxed());
+    app.at("/saved/:id/unsave").post(|r| saved::unsave(r).boxed());
 
 	// Configure settings
 	app.at("/settings").get(|r| settings::get(r).boxed()).post(|r| settings::set(r).boxed());

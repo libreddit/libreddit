@@ -1,5 +1,5 @@
 // CRATES
-use crate::utils::{catch_random, error, filter_posts, format_num, format_url, get_filters, param, redirect, setting, template, val, Post, Preferences};
+use crate::utils::{catch_random, error, filter_posts, format_num, format_url, get_filters, get_saved_posts, param, redirect, setting, template, val, Post, Preferences};
 use crate::{
 	client::json,
 	subreddit::{can_access_quarantine, quarantine},
@@ -36,6 +36,7 @@ struct SearchTemplate {
 	sub: String,
 	params: SearchParams,
 	prefs: Preferences,
+    saved: Vec<String>,
 	url: String,
 	/// Whether the subreddit itself is filtered.
 	is_filtered: bool,
@@ -69,6 +70,7 @@ pub async fn find(req: Request<Body>) -> Result<Response<Body>, String> {
 
 	let sort = param(&path, "sort").unwrap_or_else(|| "relevance".to_string());
 	let filters = get_filters(&req);
+    let saved = get_saved_posts(&req);
 
 	// If search is not restricted to this subreddit, show other subreddits in search results
 	let subreddits = if param(&path, "restrict_sr").is_none() {
@@ -97,6 +99,7 @@ pub async fn find(req: Request<Body>) -> Result<Response<Body>, String> {
 				typed,
 			},
 			prefs: Preferences::new(req),
+            saved,
 			url,
 			is_filtered: true,
 			all_posts_filtered: false,
@@ -120,6 +123,7 @@ pub async fn find(req: Request<Body>) -> Result<Response<Body>, String> {
 						typed,
 					},
 					prefs: Preferences::new(req),
+                    saved,
 					url,
 					is_filtered: false,
 					all_posts_filtered,
