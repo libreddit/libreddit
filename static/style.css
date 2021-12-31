@@ -597,7 +597,7 @@ button.submit:hover > svg { stroke: var(--accent); }
 	box-shadow: var(--shadow);
 	background: var(--outside);
 	display: flex;
-	overflow: auto;
+	overflow: hidden;
 }
 
 #sort_options > a, footer > a {
