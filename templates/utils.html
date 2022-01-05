@@ -19,7 +19,7 @@
 	<input id="search" type="text" name="q" placeholder="Search" title="Search libreddit" value="{{ search }}">
 	{% if root != "/r/" && !root.is_empty() %}
 	<div id="inside">
-		<input type="checkbox" name="restrict_sr" id="restrict_sr">
+		<input type="checkbox" name="restrict_sr" id="restrict_sr" checked>
 		<label for="restrict_sr" class="search_label" title="Restrict search to this subreddit">in {{ root }}</label>
 	</div>
 	{% endif %}
