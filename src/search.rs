@@ -54,6 +54,10 @@ pub async fn find(req: Request<Body>) -> Result<Response<Body>, String> {
 		return Ok(redirect("/".to_string()));
 	}
 
+	if query.starts_with("r/") {
+		return Ok(redirect(format!("/{}", query)));
+	}
+
 	let sub = req.param("sub").unwrap_or_default();
 	let quarantined = can_access_quarantine(&req, &sub);
 	// Handle random subreddits
