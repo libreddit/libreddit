@@ -211,7 +211,7 @@ pub async fn subscriptions_filters(req: Request<Body>) -> Result<Response<Body>,
 		.unwrap_or_default();
 
 	// Find each subreddit name (separated by '+') in sub parameter
-	for part in sub.split('+') {
+	for part in sub.split('+').filter(|x| x != &"") {
 		// Retrieve display name for the subreddit
 		let display;
 		let part = if part.starts_with("u_") {
