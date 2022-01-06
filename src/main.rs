@@ -91,15 +91,15 @@ async fn main() {
 		.version(env!("CARGO_PKG_VERSION"))
 		.about("Private front-end for Reddit written in Rust ")
 		.arg(
-			Arg::with_name("redirect-https")
-				.short("r")
+			Arg::new("redirect-https")
+				.short('r')
 				.long("redirect-https")
 				.help("Redirect all HTTP requests to HTTPS (no longer functional)")
 				.takes_value(false),
 		)
 		.arg(
-			Arg::with_name("address")
-				.short("a")
+			Arg::new("address")
+				.short('a')
 				.long("address")
 				.value_name("ADDRESS")
 				.help("Sets address to listen on")
@@ -107,8 +107,8 @@ async fn main() {
 				.takes_value(true),
 		)
 		.arg(
-			Arg::with_name("port")
-				.short("p")
+			Arg::new("port")
+				.short('p')
 				.long("port")
 				.value_name("PORT")
 				.help("Port to listen on")
@@ -116,8 +116,8 @@ async fn main() {
 				.takes_value(true),
 		)
 		.arg(
-			Arg::with_name("hsts")
-				.short("H")
+			Arg::new("hsts")
+				.short('H')
 				.long("hsts")
 				.value_name("EXPIRE_TIME")
 				.help("HSTS header to tell browsers that this site should only be accessed over HTTPS")
