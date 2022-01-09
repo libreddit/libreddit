@@ -13,7 +13,7 @@
 			{% if author.name != "[deleted]" %}
 				<a class="comment_author {{ author.distinguished }} {% if author.name == post_author %}op{% endif %}" href="/user/{{ author.name }}">u/{{ author.name }}</a>
 			{% else %}
-				<span class="comment_author">u/[deleted]</span>
+				<span class="comment_author {{ author.distinguished }}">u/[deleted]</span>
 			{% endif %}
 			{% if author.flair.flair_parts.len() > 0 %}
 				<small class="author_flair">{% call utils::render_flair(author.flair.flair_parts) %}</small>

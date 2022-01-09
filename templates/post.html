@@ -37,7 +37,7 @@
 			<p class="post_header">
 				<a class="post_subreddit" href="/r/{{ post.community }}">r/{{ post.community }}</a>
 				<span class="dot">&bull;</span>
-				<a class="post_author" href="/user/{{ post.author.name }}">u/{{ post.author.name }}</a>
+				<a class="post_author {{ post.author.distinguished }}" href="/user/{{ post.author.name }}">u/{{ post.author.name }}</a>
 				{% if post.author.flair.flair_parts.len() > 0 %}
 					<small class="author_flair">{% call utils::render_flair(post.author.flair.flair_parts) %}</small>
 				{% endif %}

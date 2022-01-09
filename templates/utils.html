@@ -72,7 +72,7 @@
 		{% endif -%}
 		<a class="post_subreddit" href="/{{ community }}">{{ community }}</a>
 		<span class="dot">&bull;</span>
-		<a class="post_author" href="/u/{{ post.author.name }}">u/{{ post.author.name }}</a>
+		<a class="post_author {{ post.author.distinguished }}" href="/u/{{ post.author.name }}">u/{{ post.author.name }}</a>
 		<span class="dot">&bull;</span>
 		<span class="created" title="{{ post.created }}">{{ post.rel_time }}</span>
 		{% if !post.awards.is_empty() %}
