@@ -193,6 +193,7 @@ async fn main() {
 
 	app.at("/user/[deleted]").get(|req| error(req, "User has deleted their account".to_string()).boxed());
 	app.at("/user/:name").get(|r| user::profile(r).boxed());
+	app.at("/user/:name/:listing").get(|r| user::profile(r).boxed());
 	app.at("/user/:name/comments/:id").get(|r| post::item(r).boxed());
 	app.at("/user/:name/comments/:id/:title").get(|r| post::item(r).boxed());
 	app.at("/user/:name/comments/:id/:title/:comment_id").get(|r| post::item(r).boxed());

@@ -19,6 +19,7 @@ struct SubredditTemplate {
 	ends: (String, String),
 	prefs: Preferences,
 	url: String,
+	redirect_url: String,
 	/// Whether the subreddit itself is filtered.
 	is_filtered: bool,
 	/// Whether all fetched posts are filtered (to differentiate between no posts fetched in the first place,
@@ -98,6 +99,7 @@ pub async fn community(req: Request<Body>) -> Result<Response<Body>, String> {
 
 	let path = format!("/r/{}/{}.json?{}&raw_json=1", sub_name.clone(), sort, req.uri().query().unwrap_or_default());
 	let url = String::from(req.uri().path_and_query().map_or("", |val| val.as_str()));
+	let redirect_url = url[1..].replace('?', "%3F").replace('&', "%26");
 	let filters = get_filters(&req);
 
 	// If all requested subs are filtered, we don't need to fetch posts.
@@ -109,6 +111,7 @@ pub async fn community(req: Request<Body>) -> Result<Response<Body>, String> {
 			ends: (param(&path, "after").unwrap_or_default(), "".to_string()),
 			prefs: Preferences::new(req),
 			url,
+			redirect_url,
 			is_filtered: true,
 			all_posts_filtered: false,
 		})
@@ -124,6 +127,7 @@ pub async fn community(req: Request<Body>) -> Result<Response<Body>, String> {
 					ends: (param(&path, "after").unwrap_or_default(), after),
 					prefs: Preferences::new(req),
 					url,
+					redirect_url,
 					is_filtered: false,
 					all_posts_filtered,
 				})
@@ -253,7 +257,7 @@ pub async fn subscriptions_filters(req: Request<Body>) -> Result<Response<Body>,
 	// Redirect back to subreddit
 	// check for redirect parameter if unsubscribing/unfiltering from outside sidebar
 	let path = if let Some(redirect_path) = param(&format!("?{}", query), "redirect") {
-		format!("/{}/", redirect_path)
+		format!("/{}", redirect_path)
 	} else {
 		format!("/r/{}", sub)
 	};
