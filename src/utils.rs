@@ -1,7 +1,7 @@
 //
 // CRATES
 //
-use crate::{client::json, esc, server::RequestExt};
+use crate::{client::json, server::RequestExt};
 use askama::Template;
 use cookie::Cookie;
 use hyper::{Body, Request, Response};
@@ -41,7 +41,7 @@ impl FlairPart {
 						Self {
 							flair_part_type: value("e").to_string(),
 							value: match value("e") {
-								"text" => esc!(value("t")),
+								"text" => value("t").to_string(),
 								"emoji" => format_url(value("u")),
 								_ => String::new(),
 							},
@@ -54,7 +54,7 @@ impl FlairPart {
 			"text" => match text_flair {
 				Some(text) => vec![Self {
 					flair_part_type: "text".to_string(),
-					value: esc!(text),
+					value: text.to_string(),
 				}],
 				None => Vec::new(),
 			},
@@ -245,7 +245,7 @@ impl Post {
 			let (rel_time, created) = time(data["created_utc"].as_f64().unwrap_or_default());
 			let score = data["score"].as_i64().unwrap_or_default();
 			let ratio: f64 = data["upvote_ratio"].as_f64().unwrap_or(1.0) * 100.0;
-			let title = esc!(post, "title");
+			let title = val(post, "title");
 
 			// Determine the type of media along with the media URL
 			let (post_type, media, gallery) = Media::parse(data).await;
@@ -270,7 +270,7 @@ impl Post {
 							data["author_flair_richtext"].as_array(),
 							data["author_flair_text"].as_str(),
 						),
-						text: esc!(post, "link_flair_text"),
+						text: val(post, "link_flair_text"),
 						background_color: val(post, "author_flair_background_color"),
 						foreground_color: val(post, "author_flair_text_color"),
 					},
@@ -298,7 +298,7 @@ impl Post {
 						data["link_flair_richtext"].as_array(),
 						data["link_flair_text"].as_str(),
 					),
-					text: esc!(post, "link_flair_text"),
+					text: val(post, "link_flair_text"),
 					background_color: val(post, "link_flair_background_color"),
 					foreground_color: if val(post, "link_flair_text_color") == "dark" {
 						"black".to_string()
@@ -324,7 +324,7 @@ impl Post {
 }
 
 #[derive(Template)]
-#[template(path = "comment.html", escape = "none")]
+#[template(path = "comment.html")]
 // Comment with content, post, score and data/time that it was posted
 pub struct Comment {
 	pub id: String,
@@ -400,7 +400,7 @@ impl Awards {
 }
 
 #[derive(Template)]
-#[template(path = "error.html", escape = "none")]
+#[template(path = "error.html")]
 pub struct ErrorTemplate {
 	pub msg: String,
 	pub prefs: Preferences,
@@ -658,17 +658,6 @@ pub fn time(created: f64) -> (String, String) {
 // val() function used to parse JSON from Reddit APIs
 pub fn val(j: &Value, k: &str) -> String {
 	j["data"][k].as_str().unwrap_or_default().to_string()
-}
-
-// Escape < and > to accurately render HTML
-#[macro_export]
-macro_rules! esc {
-	($f:expr) => {
-		$f.replace('&', "&amp;").replace('<', "&lt;").replace('>', "&gt;")
-	};
-	($j:expr, $k:expr) => {
-		$j["data"][$k].as_str().unwrap_or_default().to_string().replace('<', "&lt;").replace('>', "&gt;")
-	};
 }
 
 //
