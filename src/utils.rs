@@ -583,22 +583,22 @@ pub fn format_url(url: &str) -> String {
 			}
 
 			match domain {
-				"www.reddit.com" => capture(r"https://www\.reddit\.com/(.*)", "/", 1),
-				"old.reddit.com" => capture(r"https://old\.reddit\.com/(.*)", "/", 1),
-				"np.reddit.com" => capture(r"https://np\.reddit\.com/(.*)", "/", 1),
-				"reddit.com" => capture(r"https://reddit\.com/(.*)", "/", 1),
+				"www.reddit.com" => capture(r"https?://www\.reddit\.com/(.*)", "/", 1),
+				"old.reddit.com" => capture(r"https?://old\.reddit\.com/(.*)", "/", 1),
+				"np.reddit.com" => capture(r"https?://np\.reddit\.com/(.*)", "/", 1),
+				"reddit.com" => capture(r"https?://reddit\.com/(.*)", "/", 1),
 				"v.redd.it" => chain!(
-					capture(r"https://v\.redd\.it/(.*)/DASH_([0-9]{2,4}(\.mp4|$|\?source=fallback))", "/vid/", 2),
-					capture(r"https://v\.redd\.it/(.+)/(HLSPlaylist\.m3u8.*)$", "/hls/", 2)
+					capture(r"https?://v\.redd\.it/(.*)/DASH_([0-9]{2,4}(\.mp4|$|\?source=fallback))", "/vid/", 2),
+					capture(r"https?://v\.redd\.it/(.+)/(HLSPlaylist\.m3u8.*)$", "/hls/", 2)
 				),
-				"i.redd.it" => capture(r"https://i\.redd\.it/(.*)", "/img/", 1),
-				"a.thumbs.redditmedia.com" => capture(r"https://a\.thumbs\.redditmedia\.com/(.*)", "/thumb/a/", 1),
-				"b.thumbs.redditmedia.com" => capture(r"https://b\.thumbs\.redditmedia\.com/(.*)", "/thumb/b/", 1),
-				"emoji.redditmedia.com" => capture(r"https://emoji\.redditmedia\.com/(.*)/(.*)", "/emoji/", 2),
-				"preview.redd.it" => capture(r"https://preview\.redd\.it/(.*)", "/preview/pre/", 1),
-				"external-preview.redd.it" => capture(r"https://external\-preview\.redd\.it/(.*)", "/preview/external-pre/", 1),
-				"styles.redditmedia.com" => capture(r"https://styles\.redditmedia\.com/(.*)", "/style/", 1),
-				"www.redditstatic.com" => capture(r"https://www\.redditstatic\.com/(.*)", "/static/", 1),
+				"i.redd.it" => capture(r"https?://i\.redd\.it/(.*)", "/img/", 1),
+				"a.thumbs.redditmedia.com" => capture(r"https?://a\.thumbs\.redditmedia\.com/(.*)", "/thumb/a/", 1),
+				"b.thumbs.redditmedia.com" => capture(r"https?://b\.thumbs\.redditmedia\.com/(.*)", "/thumb/b/", 1),
+				"emoji.redditmedia.com" => capture(r"https?://emoji\.redditmedia\.com/(.*)/(.*)", "/emoji/", 2),
+				"preview.redd.it" => capture(r"https?://preview\.redd\.it/(.*)", "/preview/pre/", 1),
+				"external-preview.redd.it" => capture(r"https?://external\-preview\.redd\.it/(.*)", "/preview/external-pre/", 1),
+				"styles.redditmedia.com" => capture(r"https?://styles\.redditmedia\.com/(.*)", "/style/", 1),
+				"www.redditstatic.com" => capture(r"https?://www\.redditstatic\.com/(.*)", "/static/", 1),
 				_ => url.to_string(),
 			}
 		})
