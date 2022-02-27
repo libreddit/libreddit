@@ -1,0 +1,125 @@
+{
+  "defaultAction": "SCMP_ACT_ERRNO",
+  "archMap": [
+    {
+      "architecture": "SCMP_ARCH_X86_64",
+      "subArchitectures": [
+        "SCMP_ARCH_X86",
+        "SCMP_ARCH_X32"
+      ]
+    },
+    {
+      "architecture": "SCMP_ARCH_AARCH64",
+      "subArchitectures": [
+        "SCMP_ARCH_ARM"
+      ]
+    },
+    {
+      "architecture": "SCMP_ARCH_MIPS64",
+      "subArchitectures": [
+        "SCMP_ARCH_MIPS",
+        "SCMP_ARCH_MIPS64N32"
+      ]
+    },
+    {
+      "architecture": "SCMP_ARCH_MIPS64N32",
+      "subArchitectures": [
+        "SCMP_ARCH_MIPS",
+        "SCMP_ARCH_MIPS64"
+      ]
+    },
+    {
+      "architecture": "SCMP_ARCH_MIPSEL64",
+      "subArchitectures": [
+        "SCMP_ARCH_MIPSEL",
+        "SCMP_ARCH_MIPSEL64N32"
+      ]
+    },
+    {
+      "architecture": "SCMP_ARCH_MIPSEL64N32",
+      "subArchitectures": [
+        "SCMP_ARCH_MIPSEL",
+        "SCMP_ARCH_MIPSEL64"
+      ]
+    },
+    {
+      "architecture": "SCMP_ARCH_S390X",
+      "subArchitectures": [
+        "SCMP_ARCH_S390"
+      ]
+    }
+  ],
+  "syscalls": [
+    {
+      "names": [
+        "accept4",
+        "arch_prctl",
+        "bind",
+        "brk",
+        "clock_gettime",
+        "clone",
+        "close",
+        "connect",
+        "epoll_create1",
+        "epoll_ctl",
+        "epoll_pwait",
+        "eventfd2",
+        "execve",
+        "exit",
+        "exit_group",
+        "fcntl",
+        "flock",
+        "fork",
+        "fstat",
+        "futex",
+        "getcwd",
+        "getpeername",
+        "getpid",
+        "getrandom",
+        "getsockname",
+        "getsockopt",
+        "getgid",
+        "getppid",
+        "gettid",
+        "getuid",
+        "ioctl",
+        "listen",
+        "lseek",
+        "madvise",
+        "mmap",
+        "mprotect",
+        "mremap",
+        "munmap",
+        "newfstatat",
+        "open",
+        "openat",
+        "prctl",
+        "poll",
+        "read",
+        "recvfrom",
+        "rt_sigaction",
+        "rt_sigprocmask",
+        "rt_sigreturn",
+        "sched_getaffinity",
+        "sched_yield",
+        "sendto",
+        "setitimer",
+        "setsockopt",
+        "set_tid_address",
+        "shutdown",
+        "sigaltstack",
+        "socket",
+        "socketpair",
+        "stat",
+        "wait4",
+        "write",
+        "writev"
+      ],
+      "action": "SCMP_ACT_ALLOW",
+      "args": [],
+      "comment": "",
+      "includes": {},
+      "excludes": {}
+    }
+  ]
+}
