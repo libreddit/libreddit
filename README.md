@@ -31,6 +31,8 @@ I appreciate any donations! Your support allows me to continue developing Libred
 
 Feel free to [open an issue](https://github.com/spikecodes/libreddit/issues/new) to have your [selfhosted instance](#deployment) listed here!
 
+**Want to automatically redirect Reddit links to Libreddit? Use [LibRedirect](https://github.com/libredirect/libredirect)!**
+
 | Website | Country | Cloudflare |
 |-|-|-|
 | [libredd.it](https://libredd.it) (official) | 🇺🇸 US |  |
