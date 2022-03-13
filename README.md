@@ -17,7 +17,9 @@
 
 I appreciate any donations! Your support allows me to continue developing Libreddit.
 
-<a href="https://www.buymeacoffee.com/spikecodes" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 50px" ></a>
+<a href="https://www.buymeacoffee.com/spikecodes" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 40px" ></a>
+<a href="https://liberapay.com/spike/donate"><img alt="Donate using Liberapay" src="https://liberapay.com/assets/widgets/donate.svg" style="height: 40px"></a>
+
 
 **Bitcoin:** [bc1qwyxjnafpu3gypcpgs025cw9wa7ryudtecmwa6y](bitcoin:bc1qwyxjnafpu3gypcpgs025cw9wa7ryudtecmwa6y)
 
