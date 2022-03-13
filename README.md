@@ -55,7 +55,7 @@ Feel free to [open an issue](https://github.com/spikecodes/libreddit/issues/new)
 | [libreddit.igna.rocks](https://libreddit.igna.rocks) | 🇺🇸 US | |
 | [libreddit.autarkic.org](https://libreddit.autarkic.org) | 🇺🇸 US | |
 | [libreddit.flux.industries](https://libreddit.flux.industries) | 🇩🇪 DE | ✅ |
-| [libreddit.drivet.xyz](https://libreddit.drivet.xyz) | 🇫🇮 FI | ✅ |
+| [libreddit.drivet.xyz](https://libreddit.drivet.xyz) | 🇵🇱 PL |  |
 | [lr.oversold.host](https://lr.oversold.host) | 🇱🇺 LU | |
 | [libreddit.de](https://libreddit.de) | 🇩🇪 DE |  |
 | [libreddit.pussthecat.org](https://libreddit.pussthecat.org) | 🇩🇪 DE |  |
