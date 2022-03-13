@@ -71,8 +71,9 @@ Feel free to [open an issue](https://github.com/spikecodes/libreddit/issues/new)
 | [lr.stilic.ml](https://lr.stilic.ml) | 🇫🇷 FR | ✅ |
 | [reddi.tk](https://reddi.tk) | 🇺🇸 US | ✅ |
 | [libreddit.bus-hit.me](https://libreddit.bus-hit.me) | 🇨🇦 CA |  |
-| [lr.rfl890.cf](https://lr.rfl890.cf) | 🇺🇸 US |  |
 | [libreddit.datatunnel.xyz](https://libreddit.datatunnel.xyz) | 🇫🇮 FI |  |
+| [libreddit.crewz.me](https://libreddit.crewz.me) | 🇳🇱 NL | ✅ |
+| [r.walkx.org](https://r.walkx.org) | 🇩🇪 DE | ✅ |
 | [libreddit.kylrth.com](https://libreddit.kylrth.com) | 🇨🇦 CA |  |
 | [spjmllawtheisznfs7uryhxumin26ssv2draj7oope3ok3wuhy43eoyd.onion](http://spjmllawtheisznfs7uryhxumin26ssv2draj7oope3ok3wuhy43eoyd.onion) | 🇮🇳 IN |  |
 | [fwhhsbrbltmrct5hshrnqlqygqvcgmnek3cnka55zj4y7nuus5muwyyd.onion](http://fwhhsbrbltmrct5hshrnqlqygqvcgmnek3cnka55zj4y7nuus5muwyyd.onion) | 🇩🇪 DE |  |
