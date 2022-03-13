@@ -754,6 +754,7 @@ a.search_subreddit:hover {
 	font-size: 16px;
 	font-weight: 500;
 	line-height: 1.5;
+	overflow-wrap: anywhere;
 	margin: 5px 15px 5px 12px;
 	grid-area: post_title;
 }
