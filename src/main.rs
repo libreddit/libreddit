@@ -11,7 +11,7 @@ mod user;
 mod utils;
 
 // Import Crates
-use clap::{App as cli, Arg};
+use clap::{Command, Arg};
 
 use futures_lite::FutureExt;
 use hyper::{header::HeaderValue, Body, Request, Response};
@@ -87,7 +87,7 @@ async fn resource(body: &str, content_type: &str, cache: bool) -> Result<Respons
 
 #[tokio::main]
 async fn main() {
-	let matches = cli::new("Libreddit")
+	let matches = Command::new("Libreddit")
 		.version(env!("CARGO_PKG_VERSION"))
 		.about("Private front-end for Reddit written in Rust ")
 		.arg(
@@ -193,6 +193,7 @@ async fn main() {
 
 	app.at("/user/[deleted]").get(|req| error(req, "User has deleted their account".to_string()).boxed());
 	app.at("/user/:name").get(|r| user::profile(r).boxed());
+	app.at("/user/:name/:listing").get(|r| user::profile(r).boxed());
 	app.at("/user/:name/comments/:id").get(|r| post::item(r).boxed());
 	app.at("/user/:name/comments/:id/:title").get(|r| post::item(r).boxed());
 	app.at("/user/:name/comments/:id/:title/:comment_id").get(|r| post::item(r).boxed());
