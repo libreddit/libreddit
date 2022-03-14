@@ -79,6 +79,10 @@ Feel free to [open an issue](https://github.com/spikecodes/libreddit/issues/new)
 | [libreddit.crewz.me](https://libreddit.crewz.me) | 🇳🇱 NL | ✅ |
 | [r.walkx.org](https://r.walkx.org) | 🇩🇪 DE | ✅ |
 | [libreddit.kylrth.com](https://libreddit.kylrth.com) | 🇨🇦 CA |  |
+| [libreddit.yonalee.eu](https://libreddit.yonalee.eu) | 🇱🇺 LU | ✅ |
+| [libreddit.winscloud.net](https://libreddit.winscloud.net) | 🇹🇭 TH | ✅ |
+| [libreddit.tiekoetter.com](https://libreddit.tiekoetter.com) | 🇩🇪 DE |  |
+| [reddit.rtrace.io](https://reddit.rtrace.io) | 🇩🇪 DE |  |
 | [spjmllawtheisznfs7uryhxumin26ssv2draj7oope3ok3wuhy43eoyd.onion](http://spjmllawtheisznfs7uryhxumin26ssv2draj7oope3ok3wuhy43eoyd.onion) | 🇮🇳 IN |  |
 | [fwhhsbrbltmrct5hshrnqlqygqvcgmnek3cnka55zj4y7nuus5muwyyd.onion](http://fwhhsbrbltmrct5hshrnqlqygqvcgmnek3cnka55zj4y7nuus5muwyyd.onion) | 🇩🇪 DE |  |
 | [kphht2jcflojtqte4b4kyx7p2ahagv4debjj32nre67dxz7y57seqwyd.onion](http://kphht2jcflojtqte4b4kyx7p2ahagv4debjj32nre67dxz7y57seqwyd.onion) | 🇳🇱 NL |  |
