@@ -74,12 +74,12 @@
 			</footer>
 		</div>
 		{% endif %}
-		{% if is_filtered || (!sub.name.is_empty() && !sub.name.contains("+")) %}
+		{% if is_filtered || (sub.name != "all" && sub.name != "popular" && !sub.name.contains("+")) %}
 		<aside>
 			{% if is_filtered %}
 				<center>(Content from r/{{ sub.name }} has been filtered)</center>
 			{% endif %}
-			{% if !sub.name.is_empty() && !sub.name.contains("+") %}
+			{% if sub.name != "all" && sub.name != "popular" && !sub.name.contains("+") %}
 			<div class="panel" id="subreddit">
 				{% if sub.wiki %}
 				<div id="top">

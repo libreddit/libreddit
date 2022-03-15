@@ -87,14 +87,12 @@ pub async fn community(req: Request<Body>) -> Result<Response<Body>, String> {
 		} else {
 			Subreddit::default()
 		}
-	} else if sub_name.contains('+') {
-		// Multireddit
+	} else {
+		// Multireddit, all, popular
 		Subreddit {
 			name: sub_name.clone(),
 			..Subreddit::default()
 		}
-	} else {
-		Subreddit::default()
 	};
 
 	let path = format!("/r/{}/{}.json?{}&raw_json=1", sub_name.clone(), sort, req.uri().query().unwrap_or_default());
