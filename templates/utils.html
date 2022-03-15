@@ -94,8 +94,26 @@
 	</p>
 	<!-- POST MEDIA/THUMBNAIL -->
 	{% if (prefs.layout.is_empty() || prefs.layout == "card") && post.post_type == "image" %}
+
+	<!-- reddit-hosted images do not provide us with width/height information: the values will be 0. -->
+	<!-- To work around "content reflow" problems, use svg tags to keep the image in place. -->
+	<!-- This causes two problems: right-clicking images will have a very degraded menu: no "copy image (link)", and bad display of reddit-hosted previews. -->
 	<a href="{{ post.media.url }}" class="post_media_image {% if post.media.height < post.media.width*2 %}short{% endif %}" >
+		{% if post.media.height == 0 || post.media.width == 0 %}
+		<!-- debug: reddit-hosted: svg workaround image thumbnail -->
+		<svg
+			width="{{ post.media.width }}px" 
+			height="{{ post.media.height }}px" 
+			xmlns="http://www.w3.org/2000/svg">
+				<image width="100%" height="100%" href="{{ post.media.url }}"/>
+				<desc>
+					<img loading="lazy" alt="Post image" src="{{ post.media.url }}"/>
+				</desc>
+		</svg>
+		{% else %}
+		<!-- debug: simplified image thumbnail -->
 		<img loading="lazy" alt="Post image" src="{{ post.media.url }}"/>
+		{% endif %}
 	</a>
 	{% else if (prefs.layout.is_empty() || prefs.layout == "card") && post.post_type == "gif" %}
 	<video class="post_media_video short" src="{{ post.media.url }}" width="{{ post.media.width }}" height="{{ post.media.height }}" poster="{{ post.media.poster }}" preload="none" controls loop {% if prefs.autoplay_videos == "on" %}autoplay{% endif %}><a href={{ post.media.url }}>Video</a></video>
