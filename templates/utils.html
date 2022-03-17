@@ -100,10 +100,10 @@
 	<!-- This causes two problems: right-clicking images will have a very degraded menu: no "copy image (link)", and bad display of reddit-hosted previews. -->
 	<a href="{{ post.media.url }}" class="post_media_image {% if post.media.height < post.media.width*2 %}short{% endif %}" >
 		{% if post.media.height == 0 || post.media.width == 0 %}
-		<!-- debug: reddit-hosted: svg workaround image thumbnail -->
+		<!-- debug: reddit-hosted: svg workaround image thumbnail with unknown dimensions. -->
 		<svg
-			width="{{ post.media.width }}px" 
-			height="{{ post.media.height }}px" 
+			width="100%"
+			height="100%"
 			xmlns="http://www.w3.org/2000/svg">
 				<image width="100%" height="100%" href="{{ post.media.url }}"/>
 				<desc>
@@ -111,8 +111,8 @@
 				</desc>
 		</svg>
 		{% else %}
-		<!-- debug: simplified image thumbnail -->
-		<img loading="lazy" alt="Post image" src="{{ post.media.url }}"/>
+		<!-- debug: simplified image thumbnail with known dimensions. -->
+		<img loading="lazy" width="{{ post.media.width }}px" height="{{ post.media.height }}px" alt="Post image" src="{{ post.media.url }}"/>
 		{% endif %}
 	</a>
 	{% else if (prefs.layout.is_empty() || prefs.layout == "card") && post.post_type == "gif" %}

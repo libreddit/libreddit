@@ -69,7 +69,7 @@
 			<!-- post_type: {{ post.post_type }} -->
 			{% if post.post_type == "image" %}
 			<a href="{{ post.media.url }}" class="post_media_image" >
-				<img loading="lazy" alt="Post image" src="{{ post.media.url }}"/>
+				<img alt="Post image" src="{{ post.media.url }}"/>
 			</a>
 			{% else if post.post_type == "video" || post.post_type == "gif" %}
 			{% if prefs.use_hls == "on" && !post.media.alt_url.is_empty() %}
