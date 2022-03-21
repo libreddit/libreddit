@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 // CRATES
 use crate::server::ResponseExt;
-use crate::utils::{redirect, template, Preferences};
+use crate::utils::{get_saved_posts, redirect, template, Preferences};
 use askama::Template;
 use cookie::Cookie;
 use futures_lite::StreamExt;
@@ -14,6 +14,7 @@ use time::{Duration, OffsetDateTime};
 #[template(path = "settings.html")]
 struct SettingsTemplate {
 	prefs: Preferences,
+    saved_posts: Vec<String>,
 	url: String,
 }
 
@@ -36,9 +37,11 @@ const PREFS: [&str; 10] = [
 
 // Retrieve cookies from request "Cookie" header
 pub async fn get(req: Request<Body>) -> Result<Response<Body>, String> {
+    let saved_posts = get_saved_posts(&req);
 	let url = req.uri().to_string();
 	template(SettingsTemplate {
 		prefs: Preferences::new(req),
+        saved_posts,
 		url,
 	})
 }
@@ -109,7 +112,7 @@ fn set_cookies_method(req: Request<Body>, remove_cookies: bool) -> Response<Body
 
 	let mut response = redirect(path);
 
-	for name in [PREFS.to_vec(), vec!["subscriptions", "filters"]].concat() {
+	for name in [PREFS.to_vec(), vec!["subscriptions", "filters", "saved_posts"]].concat() {
 		match form.get(name) {
 			Some(value) => response.insert_cookie(
 				Cookie::build(name.to_owned(), value.clone())

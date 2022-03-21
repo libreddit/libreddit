@@ -57,7 +57,7 @@ pub async fn save(req: Request<Body>) -> Result<Response<Body>, String> {
         Some(id) => {
             saved_posts.push(id);
             response.insert_cookie(
-            Cookie::build(String::from("saved_posts"), saved_posts.join(","))
+            Cookie::build(String::from("saved_posts"), saved_posts.join("+"))
                 .path("/")
                 .http_only(true)
                 .expires(OffsetDateTime::now_utc() + Duration::weeks(52))
@@ -89,7 +89,7 @@ pub async fn unsave(req: Request<Body>) -> Result<Response<Body>, String> {
                 saved_posts.remove(index);
             }
             response.insert_cookie(
-            Cookie::build(String::from("saved_posts"), saved_posts.join(","))
+            Cookie::build(String::from("saved_posts"), saved_posts.join("+"))
                 .path("/")
                 .http_only(true)
                 .expires(OffsetDateTime::now_utc() + Duration::weeks(52))

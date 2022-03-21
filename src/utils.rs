@@ -713,7 +713,7 @@ pub async fn error(req: Request<Body>, msg: String) -> Result<Response<Body>, St
 
 pub fn get_saved_posts(req: &Request<Body>) -> Vec<String> {
     match req.cookie("saved_posts") {
-        Some(cookie) => cookie.value().split(',').map(String::from).collect(),
+        Some(cookie) => cookie.value().split('+').map(String::from).collect(),
         None => Vec::new(),
     }
 }
