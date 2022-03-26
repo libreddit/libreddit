@@ -607,8 +607,12 @@ pub fn format_url(url: &str) -> String {
 
 // Rewrite Reddit links to Libreddit in body of text
 pub fn rewrite_urls(input_text: &str) -> String {
+
 	let text1 =
-		Regex::new(r#"href="(https|http|)://(www\.|old\.|np\.|amp\.|)(reddit\.com|redd\.it)/"#).map_or(String::new(), |re| re.replace_all(input_text, r#"href="/"#).to_string());
+		Regex::new(r#"href="(https|http|)://(www\.|old\.|np\.|amp\.|)(reddit\.com|redd\.it)/"#)
+			.map_or(String::new(), |re| re.replace_all(input_text, r#"href="/"#).to_string())
+			// Remove (html-encoded) "\" from URLs.
+			.replace("%5C", "").replace(r"\", "");
 
 	// Rewrite external media previews to Libreddit
 	Regex::new(r"https://external-preview\.redd\.it(.*)[^?]").map_or(String::new(), |re| {
@@ -710,6 +714,7 @@ pub async fn error(req: Request<Body>, msg: String) -> Result<Response<Body>, St
 #[cfg(test)]
 mod tests {
 	use super::format_num;
+	use super::rewrite_urls;
 
 	#[test]
 	fn format_num_works() {
@@ -718,5 +723,14 @@ mod tests {
 		assert_eq!(format_num(1999), ("2.0k".to_string(), "1999".to_string()));
 		assert_eq!(format_num(1001), ("1.0k".to_string(), "1001".to_string()));
 		assert_eq!(format_num(1_999_999), ("2.0m".to_string(), "1999999".to_string()));
+	}
+
+	#[test]
+	fn rewrite_urls_removes_backslashes() {
+		let comment_body_html = r#"<a href=\"https://www.reddit.com/r/linux%5C_gaming/comments/x/just%5C_a%5C_test%5C/\">https://www.reddit.com/r/linux\\_gaming/comments/x/just\\_a\\_test/</a>"#;
+		assert_eq!(
+			rewrite_urls(comment_body_html),
+			r#"<a href="https://www.reddit.com/r/linux_gaming/comments/x/just_a_test/">https://www.reddit.com/r/linux_gaming/comments/x/just_a_test/</a>"#
+		)
 	}
 }

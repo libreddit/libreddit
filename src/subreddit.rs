@@ -336,10 +336,10 @@ pub async fn sidebar(req: Request<Body>) -> Result<Response<Body>, String> {
 	match json(path, quarantined).await {
 		// If success, receive JSON in response
 		Ok(response) => template(WikiTemplate {
-			wiki: rewrite_urls(&val(&response, "description_html").replace("\\", "")),
+			wiki: rewrite_urls(&val(&response, "description_html")),
 			// wiki: format!(
 			// 	"{}<hr><h1>Moderators</h1><br><ul>{}</ul>",
-			// 	rewrite_urls(&val(&response, "description_html").replace("\\", "")),
+			// 	rewrite_urls(&val(&response, "description_html"),
 			// 	moderators(&sub, quarantined).await.unwrap_or(vec!["Could not fetch moderators".to_string()]).join(""),
 			// ),
 			sub,
@@ -411,7 +411,7 @@ async fn subreddit(sub: &str, quarantined: bool) -> Result<Subreddit, String> {
 		name: esc!(&res, "display_name"),
 		title: esc!(&res, "title"),
 		description: esc!(&res, "public_description"),
-		info: rewrite_urls(&val(&res, "description_html").replace("\\", "")),
+		info: rewrite_urls(&val(&res, "description_html")),
 		// moderators: moderators_list(sub, quarantined).await.unwrap_or_default(),
 		icon: format_url(&icon),
 		members: format_num(members),
