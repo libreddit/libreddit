@@ -884,6 +884,7 @@ a.search_subreddit:hover {
 	color: var(--accent);
 	margin: 5px 12px;
 	grid-area: post_media;
+	overflow-wrap: anywhere;
 }
 
 .post_body {
