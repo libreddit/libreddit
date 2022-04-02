@@ -92,13 +92,13 @@
 			{% if params.before != "" %}
 			<a href="?q={{ params.q }}&restrict_sr={{ params.restrict_sr }}
 				&sort={{ params.sort }}&t={{ params.t }}
-				&before={{ params.before }}">PREV</a>
+				&before={{ params.before }}" accesskey="r">P<span style="text-decoration: underline;">R</span>EV</a>
 			{% endif %}
 
 			{% if params.after != "" %}
 			<a href="?q={{ params.q }}&restrict_sr={{ params.restrict_sr }}
 				&sort={{ params.sort }}&t={{ params.t }}
-				&after={{ params.after }}">NEXT</a>
+				&after={{ params.after }}" accesskey="x">NE<span style="text-decoration: underline;">X</span>T</a>
 			{% endif %}
 		</footer>
 		{% endif %}
