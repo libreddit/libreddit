@@ -1318,6 +1318,8 @@ input[type="submit"] {
 .md table {
 	margin: 5px;
 	overflow-x: auto;
+	display: block;
+	max-width: fit-content;
 }
 
 .md code {
