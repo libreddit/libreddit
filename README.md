@@ -42,7 +42,7 @@ Feel free to [open an issue](https://github.com/spikecodes/libreddit/issues/new)
 | [libreddit.40two.app](https://libreddit.40two.app) | 🇳🇱 NL |  |
 | [reddit.invak.id](https://reddit.invak.id) | 🇧🇬 BG |  |
 | [reddit.phii.me](https://reddit.phii.me) | 🇺🇸 US |  |
-| [lr.riverside.rocks](https://lr.riverside.rocks)
+| [lr.riverside.rocks](https://lr.riverside.rocks) | 🇺🇸 US |  |
 | [libreddit.silkky.cloud](https://libreddit.silkky.cloud) | 🇫🇮 FI | ✅ |
 | [libreddit.strongthany.cc](https://libreddit.strongthany.cc) | 🇺🇸 US |  |
 | [libreddit.database.red](https://libreddit.database.red) | 🇺🇸 US | ✅ |
