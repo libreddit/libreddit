@@ -21,9 +21,9 @@ I appreciate any donations! Your support allows me to continue developing Libred
 <a href="https://liberapay.com/spike/donate"><img alt="Donate using Liberapay" src="https://liberapay.com/assets/widgets/donate.svg" style="height: 40px"></a>
 
 
-**Bitcoin:** [bc1qwyxjnafpu3gypcpgs025cw9wa7ryudtecmwa6y](bitcoin:bc1qwyxjnafpu3gypcpgs025cw9wa7ryudtecmwa6y)
+**Bitcoin:** `bc1qwyxjnafpu3gypcpgs025cw9wa7ryudtecmwa6y`
 
-**Monero:** [45FJrEuFPtG2o7QZz2Nps77TbHD4sPqxViwbdyV9A6ktfHiWs47UngG5zXPcLoDXAc8taeuBgeNjfeprwgeXYXhN3C9tVSR](monero:45FJrEuFPtG2o7QZz2Nps77TbHD4sPqxViwbdyV9A6ktfHiWs47UngG5zXPcLoDXAc8taeuBgeNjfeprwgeXYXhN3C9tVSR)
+**Monero:** `45FJrEuFPtG2o7QZz2Nps77TbHD4sPqxViwbdyV9A6ktfHiWs47UngG5zXPcLoDXAc8taeuBgeNjfeprwgeXYXhN3C9tVSR`
 
 ---
 
