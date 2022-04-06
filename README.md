@@ -44,6 +44,7 @@ Feel free to [open an issue](https://github.com/spikecodes/libreddit/issues/new)
 | [reddit.phii.me](https://reddit.phii.me) | 🇺🇸 US |  |
 | [lr.riverside.rocks](https://lr.riverside.rocks) | 🇺🇸 US |  |
 | [libreddit.silkky.cloud](https://libreddit.silkky.cloud) | 🇫🇮 FI | ✅ |
+| [libreddit.strongthany.cc](https://libreddit.strongthany.cc) | 🇺🇸 US |  |
 | [libreddit.database.red](https://libreddit.database.red) | 🇺🇸 US | ✅ |
 | [libreddit.privacy.com.de](https://libreddit.privacy.com.de) | 🇩🇪 DE |  |
 | [libreddit.domain.glass](https://libreddit.domain.glass) | 🇺🇸 US | ✅ |
