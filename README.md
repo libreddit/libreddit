@@ -8,7 +8,7 @@
 
 **10 second pitch:** Libreddit is a portmanteau of "libre" (meaning freedom) and "Reddit". It is a private front-end like [Invidious](https://github.com/iv-org/invidious) but for Reddit. Browse the coldest takes of [r/unpopularopinion](https://libreddit.spike.codes/r/unpopularopinion) without being [tracked](#reddit).
 
-- 🚀 Fast: written in Rust for blazing fast speeds and memory safety
+- 🚀 Fast: written in Rust for blazing-fast speeds and memory safety
 - ☁️ Light: no JavaScript, no ads, no tracking, no bloat
 - 🕵 Private: all requests are proxied through the server, including media
 - 🔒 Secure: strong [Content Security Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP) prevents browser requests to Reddit
@@ -21,9 +21,9 @@ I appreciate any donations! Your support allows me to continue developing Libred
 <a href="https://liberapay.com/spike/donate"><img alt="Donate using Liberapay" src="https://liberapay.com/assets/widgets/donate.svg" style="height: 40px"></a>
 
 
-**Bitcoin:** [bc1qwyxjnafpu3gypcpgs025cw9wa7ryudtecmwa6y](bitcoin:bc1qwyxjnafpu3gypcpgs025cw9wa7ryudtecmwa6y)
+**Bitcoin:** `bc1qwyxjnafpu3gypcpgs025cw9wa7ryudtecmwa6y`
 
-**Monero:** [45FJrEuFPtG2o7QZz2Nps77TbHD4sPqxViwbdyV9A6ktfHiWs47UngG5zXPcLoDXAc8taeuBgeNjfeprwgeXYXhN3C9tVSR](monero:45FJrEuFPtG2o7QZz2Nps77TbHD4sPqxViwbdyV9A6ktfHiWs47UngG5zXPcLoDXAc8taeuBgeNjfeprwgeXYXhN3C9tVSR)
+**Monero:** `45FJrEuFPtG2o7QZz2Nps77TbHD4sPqxViwbdyV9A6ktfHiWs47UngG5zXPcLoDXAc8taeuBgeNjfeprwgeXYXhN3C9tVSR`
 
 ---
 
@@ -98,7 +98,7 @@ Feel free to [open an issue](https://github.com/spikecodes/libreddit/issues/new)
 | [libreddit.lqs5fjmajyp7rvp4qvyubwofzi6d4imua7vs237rkc4m5qogitqwrgyd.onion](http://libreddit.lqs5fjmajyp7rvp4qvyubwofzi6d4imua7vs237rkc4m5qogitqwrgyd.onion/) | 🇨🇦 CA |  |
 | [libreddit.lunar.icu](https://libreddit.lunar.icu) | 🇩🇪 DE | ✅ |
 
-A checkmark in the "Cloudflare" category here refers to the use of the reverse proxy, [Cloudflare](https://cloudflare). The checkmark will not be listed for a site which uses Cloudflare DNS but rather the proxying service which grants Cloudflare the ability to monitor traffic to the website.
+A checkmark in the "Cloudflare" category here refers to the use of the reverse proxy, [Cloudflare](https://cloudflare). The checkmark will not be listed for a site that uses Cloudflare DNS but rather the proxying service which grants Cloudflare the ability to monitor traffic to the website.
 
 ---
 
@@ -161,7 +161,7 @@ Results from Google Lighthouse ([Libreddit Report](https://lighthouse-dot-webdot
 - The requested URL
 - Search terms
 
-**Location:** The same privacy policy goes on to describe location data may be collected through the use of:
+**Location:** The same privacy policy goes on to describe that location data may be collected through the use of:
 - GPS (consensual)
 - Bluetooth (consensual)
 - Content associated with a location (consensual)
@@ -185,7 +185,7 @@ For transparency, I hope to describe all the ways Libreddit handles user privacy
 
 **Cookies:** Libreddit uses optional cookies to store any configured settings in [the settings menu](https://libreddit.spike.codes/settings). These are not cross-site cookies and the cookies hold no personal data.
 
-**Hosting:** The official instances are hosted on [Replit](https://replit.com/) which monitors usage to prevent abuse. I can understand if this invalidates certain users' threat models and therefore, selfhosting, using unofficial instances and browsing through Tor are welcomed.
+**Hosting:** The official instances are hosted on [Replit](https://replit.com/) which monitors usage to prevent abuse. I can understand if this invalidates certain users' threat models and therefore, self-hosting, using unofficial instances, and browsing through Tor are welcomed.
 
 ---
 
@@ -276,7 +276,7 @@ LIBREDDIT_DEFAULT_WIDE=on LIBREDDIT_DEFAULT_THEME=dark libreddit -r
 
 ## Proxying using NGINX
 
-**NOTE** If you're [proxying Libreddit through a NGINX Reverse Proxy](https://github.com/spikecodes/libreddit/issues/122#issuecomment-782226853), add
+**NOTE** If you're [proxying Libreddit through an NGINX Reverse Proxy](https://github.com/spikecodes/libreddit/issues/122#issuecomment-782226853), add
 ```nginx
 proxy_http_version 1.1;
 ```
