@@ -1,7 +1,7 @@
 ---
 name: 🐛 Bug report
 about: Create a report to help us improve
-title: ''
+title: '🐛 Bug Report: '
 labels: bug
 assignees: ''
 
@@ -12,7 +12,7 @@ assignees: ''
   A clear and concise description of what the bug is.
 -->
 
-## To reproduce
+## Steps to reproduce the bug
 
 <!--
 Steps to reproduce the behavior:
@@ -22,12 +22,12 @@ Steps to reproduce the behavior:
 4. See error
 -->
 
-## Expected behavior
+## What's the expected behavior?
 <!-- 
   A clear and concise description of what you expected to happen.
 -->
 
-## Additional context
+## Additional context / screenshot
 <!--
   Add any other context about the problem here.
 -->
