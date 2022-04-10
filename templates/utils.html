@@ -95,8 +95,9 @@
 	<!-- POST MEDIA/THUMBNAIL -->
 	{% if (prefs.layout.is_empty() || prefs.layout == "card") && post.post_type == "image" %}
 	<div class="post_media_content">
-		<a href="{{ post.media.url }}" class="post_media_image {%if post.flags.nsfw && prefs.blur_nsfw=="on" %}post_nsfw_blur{% endif %}  {% if post.media.height / post.media.width < 2 %}short{% endif %}" >
+		<a href="{{ post.media.url }}" class="post_media_image {% if post.media.height / post.media.width < 2 %}short{% endif %}" >
 			<svg
+				{%if post.flags.nsfw && prefs.blur_nsfw=="on" %}class="post_nsfw_blur"{% endif %} 
 				width="{{ post.media.width }}px" 
 				height="{{ post.media.height }}px" 
 				xmlns="http://www.w3.org/2000/svg">
