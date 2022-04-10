@@ -955,13 +955,25 @@ a.search_subreddit:hover {
 	margin: 5px;
 }
 
-.post_thumbnail svg {
+.post_thumbnail div {
 	grid-area: 1 / 1 / 2 / 2;
-	width: 100%;
-	height: auto;
 	object-fit: cover;
 	align-self: center;
 	justify-self: center;
+	overflow: hidden;
+}
+
+.post_thumbnail div svg {
+	width: 100%;
+	height: auto;
+}
+
+.post_thumbnail span {
+	z-index: 0;
+}
+
+.thumb_nsfw_blur {
+	filter: blur(0.3rem)
 }
 
 .post_thumbnail.no_thumbnail {
