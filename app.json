@@ -32,6 +32,9 @@
     "LIBREDDIT_DEFAULT_SHOW_NSFW": {
       "required": false
     },
+    "LIBREDDIT_DEFAULT_BLUR_NSFW": {
+      "required": false
+    },
     "LIBREDDIT_USE_HLS": {
       "required": false
     },
