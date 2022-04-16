@@ -605,14 +605,17 @@ pub fn format_url(url: &str) -> String {
 	}
 }
 
-// Rewrite Reddit links to Libreddit in body of text
+// Rewrite Reddit links to Libreddit in body of text.
+// Also fix superfluous backslashes and underscores in links.
 pub fn rewrite_urls(input_text: &str) -> String {
-
 	let text1 =
 		Regex::new(r#"href="(https|http|)://(www\.|old\.|np\.|amp\.|)(reddit\.com|redd\.it)/"#)
+			// Replace reddit-prefix in href with "/" (i.e. point to our local instance).
 			.map_or(String::new(), |re| re.replace_all(input_text, r#"href="/"#).to_string())
-			// Remove (html-encoded) "\" from URLs.
-			.replace("%5C", "").replace(r"\", "");
+			// Remove (html-encoded) "\" from URLs. These seem to occur inside the href-attribute only.
+			.replace("%5C", "")
+			// Format underscores nicely for display.
+			.replace("\\_", "_");
 
 	// Rewrite external media previews to Libreddit
 	Regex::new(r"https://external-preview\.redd\.it(.*)[^?]").map_or(String::new(), |re| {
@@ -726,11 +729,28 @@ mod tests {
 	}
 
 	#[test]
-	fn rewrite_urls_removes_backslashes() {
-		let comment_body_html = r#"<a href=\"https://www.reddit.com/r/linux%5C_gaming/comments/x/just%5C_a%5C_test%5C/\">https://www.reddit.com/r/linux\\_gaming/comments/x/just\\_a\\_test/</a>"#;
+	fn rewrite_urls_removes_backslashes_and_rewrites_url() {
 		assert_eq!(
-			rewrite_urls(comment_body_html),
-			r#"<a href="https://www.reddit.com/r/linux_gaming/comments/x/just_a_test/">https://www.reddit.com/r/linux_gaming/comments/x/just_a_test/</a>"#
-		)
+			rewrite_urls(
+				"<a href=\"https://www.reddit.com/r/linux%5C_gaming/comments/x/just%5C_a%5C_test%5C/\">https://www.reddit.com/r/linux\\_gaming/comments/x/just\\_a\\_test/</a>"
+			),
+			"<a href=\"/r/linux_gaming/comments/x/just_a_test/\">https://www.reddit.com/r/linux_gaming/comments/x/just_a_test/</a>"
+		);
+		assert_eq!(
+			rewrite_urls(
+				"e.g. &lt;a href=\"https://www.reddit.com/r/linux%5C_gaming/comments/ql9j15/anyone%5C_else%5C_confused%5C_with%5C_linus%5C_linux%5C_issues/\"&gt;https://www.reddit.com/r/linux\\_gaming/comments/ql9j15/anyone\\_else\\_confused\\_with\\_linus\\_linux\\_issues/&lt;/a&gt;"
+			),
+			"e.g. &lt;a href=\"/r/linux_gaming/comments/ql9j15/anyone_else_confused_with_linus_linux_issues/\"&gt;https://www.reddit.com/r/linux_gaming/comments/ql9j15/anyone_else_confused_with_linus_linux_issues/&lt;/a&gt;"
+		);
+	}
+
+	#[test]
+	fn rewrite_urls_keeps_intentional_backslashes() {
+		assert_eq!(
+			rewrite_urls(
+				"printf \"\\npolkit.addRule(function(action, subject)"
+			),
+			"printf \"\\npolkit.addRule(function(action, subject)"
+		);
 	}
 }
