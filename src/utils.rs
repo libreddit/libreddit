@@ -11,6 +11,7 @@ use std::collections::{HashMap, HashSet};
 use std::str::FromStr;
 use time::{Duration, OffsetDateTime, macros::format_description};
 use url::Url;
+use rust_embed::RustEmbed;
 
 // Post flair with content, background color and foreground color
 pub struct Flair {
@@ -445,6 +446,7 @@ pub struct Params {
 
 #[derive(Default)]
 pub struct Preferences {
+	pub available_themes: Vec<String>,
 	pub theme: String,
 	pub front_page: String,
 	pub layout: String,
@@ -459,10 +461,23 @@ pub struct Preferences {
 	pub filters: Vec<String>,
 }
 
+#[derive(RustEmbed)]
+#[folder = "static/themes/"]
+#[include = "*.css"]
+struct ThemeAssets;
+
 impl Preferences {
 	// Build preferences from cookies
 	pub fn new(req: Request<Body>) -> Self {
+		// Read available theme names from embedded css files.
+		// Always make the default "system" theme available.
+		let mut themes = vec!["system".to_string()];
+		for file in ThemeAssets::iter() {
+			let chunks: Vec<&str> = file.as_ref().split(".css").collect();
+			themes.push(chunks[0].to_owned())
+		}
 		Self {
+			available_themes: themes,
 			theme: setting(&req, "theme"),
 			front_page: setting(&req, "front_page"),
 			layout: setting(&req, "layout"),
