@@ -916,6 +916,14 @@ a.search_subreddit:hover {
 	margin: 5px 20px 15px 12px;
 }
 
+.post_footer__end {
+  display: flex;
+}
+
+.post_footer__end > p {
+  margin-right: 15px;
+}
+
 .post_comments {
 	font-weight: bold;
 }
