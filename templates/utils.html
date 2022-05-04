@@ -150,7 +150,7 @@
 
 {% macro save_unsave(post, saved) -%}
 {% if saved.contains(post.id) %}
-<form action="/saved/{{ post.id }}/unsave?redirect={{ url }}" method="POST">
+<form action="/saved/{{ post.id }}/unsave?redirect={{ url }}#{{ post.id }}" method="POST">
   <button class="save">
     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-star-fill" viewBox="0 0 16 16">
       <title>Unsave</title>
@@ -159,7 +159,7 @@
   </button>
 </form>
 {% else %}
-<form action="/saved/{{ post.id }}/save?redirect={{ url }}" method="POST">
+<form action="/saved/{{ post.id }}/save?redirect={{ url }}#{{ post.id }}" method="POST">
   <button class="save">
     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-star" viewBox="0 0 16 16">
       <title>Save</title>
