@@ -4,7 +4,7 @@ use crate::esc;
 use crate::server::RequestExt;
 use crate::subreddit::{can_access_quarantine, quarantine};
 use crate::utils::{
-	error, format_num, format_url, get_filters, param, rewrite_urls, setting, template, time, val, Author, Awards, Comment, Flags, Flair, FlairPart, Media, Post, Preferences,
+	error, format_num, format_url, get_filters, get_saved_posts, param, rewrite_urls, setting, template, time, val, Author, Awards, Comment, Flags, Flair, FlairPart, Media, Post, Preferences,
 };
 use hyper::{Body, Request, Response};
 
@@ -19,6 +19,7 @@ struct PostTemplate {
 	post: Post,
 	sort: String,
 	prefs: Preferences,
+    saved: Vec<String>,
 	single_thread: bool,
 	url: String,
 }
@@ -57,6 +58,7 @@ pub async fn item(req: Request<Body>) -> Result<Response<Body>, String> {
 			// Parse the JSON into Post and Comment structs
 			let post = parse_post(&response[0]).await;
 			let comments = parse_comments(&response[1], &post.permalink, &post.author.name, highlighted_comment, &get_filters(&req));
+            let saved = get_saved_posts(&req);
 			let url = req.uri().to_string();
 
 			// Use the Post and Comment structs to generate a website to show users
@@ -65,6 +67,7 @@ pub async fn item(req: Request<Body>) -> Result<Response<Body>, String> {
 				post,
 				sort,
 				prefs: Preferences::new(req),
+                saved,
 				single_thread,
 				url,
 			})

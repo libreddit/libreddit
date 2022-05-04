@@ -548,10 +548,13 @@ button.submit {
 	align-items: center;
 }
 
+button.save { color: var(--text); }
+
 select:hover { background: var(--foreground); }
 
 input[type="submit"]:hover { color: var(--accent); }
 button.submit:hover > svg { stroke: var(--accent); }
+button.save:hover > svg { stroke: var(--accent); }
 
 #timeframe {
 	margin: 0 2px;
@@ -911,6 +914,14 @@ a.search_subreddit:hover {
 	font-size: 14px;
 	grid-area: post_footer;
 	margin: 5px 20px 15px 12px;
+}
+
+.post_footer__end {
+  display: flex;
+}
+
+.post_footer__end > p {
+  margin-right: 15px;
 }
 
 .post_comments {

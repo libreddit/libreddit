@@ -117,7 +117,10 @@
 					<li><a href="/{{ post.id }}">permalink</a></li>
 					<li><a href="https://reddit.com/{{ post.id }}" rel="nofollow">reddit</a></li>
 				</ul>
-				<p>{{ post.upvote_ratio }}% Upvoted</p>
+        <div class="post_footer__end">
+          <p>{{ post.upvote_ratio }}% Upvoted</p>
+          {% call utils::save_unsave(post, saved) %}
+        </div>
 			</div>
 		</div>
 

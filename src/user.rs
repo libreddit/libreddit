@@ -2,7 +2,7 @@
 use crate::client::json;
 use crate::esc;
 use crate::server::RequestExt;
-use crate::utils::{error, filter_posts, format_url, get_filters, param, template, Post, Preferences, User};
+use crate::utils::{error, filter_posts, format_url, get_filters, get_saved_posts, param, template, Post, Preferences, User};
 use askama::Template;
 use hyper::{Body, Request, Response};
 use time::{OffsetDateTime, macros::format_description};
@@ -18,6 +18,7 @@ struct UserTemplate {
 	/// "overview", "comments", or "submitted"
 	listing: String,
 	prefs: Preferences,
+    saved: Vec<String>,
 	url: String,
 	redirect_url: String,
 	/// Whether the user themself is filtered.
@@ -47,6 +48,7 @@ pub async fn profile(req: Request<Body>) -> Result<Response<Body>, String> {
 	let user = user(&username).await.unwrap_or_default();
 
 	let filters = get_filters(&req);
+    let saved = get_saved_posts(&req);
 	if filters.contains(&["u_", &username].concat()) {
 		template(UserTemplate {
 			user,
@@ -55,6 +57,7 @@ pub async fn profile(req: Request<Body>) -> Result<Response<Body>, String> {
 			ends: (param(&path, "after").unwrap_or_default(), "".to_string()),
 			listing,
 			prefs: Preferences::new(req),
+            saved,
 			url,
 			redirect_url,
 			is_filtered: true,
@@ -73,6 +76,7 @@ pub async fn profile(req: Request<Body>) -> Result<Response<Body>, String> {
 					ends: (param(&path, "after").unwrap_or_default(), after),
 					listing,
 					prefs: Preferences::new(req),
+                    saved,
 					url,
 					redirect_url,
 					is_filtered: false,

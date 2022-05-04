@@ -1,7 +1,7 @@
 // CRATES
 use crate::esc;
 use crate::utils::{
-	catch_random, error, filter_posts, format_num, format_url, get_filters, param, redirect, rewrite_urls, setting, template, val, Post, Preferences, Subreddit,
+	catch_random, error, filter_posts, format_num, format_url, get_filters, get_saved_posts, param, redirect, rewrite_urls, setting, template, val, Post, Preferences, Subreddit,
 };
 use crate::{client::json, server::ResponseExt, RequestExt};
 use askama::Template;
@@ -18,6 +18,7 @@ struct SubredditTemplate {
 	sort: (String, String),
 	ends: (String, String),
 	prefs: Preferences,
+    saved: Vec<String>,
 	url: String,
 	redirect_url: String,
 	/// Whether the subreddit itself is filtered.
@@ -99,6 +100,7 @@ pub async fn community(req: Request<Body>) -> Result<Response<Body>, String> {
 	let url = String::from(req.uri().path_and_query().map_or("", |val| val.as_str()));
 	let redirect_url = url[1..].replace('?', "%3F").replace('&', "%26");
 	let filters = get_filters(&req);
+    let saved = get_saved_posts(&req);
 
 	// If all requested subs are filtered, we don't need to fetch posts.
 	if sub_name.split('+').all(|s| filters.contains(s)) {
@@ -108,6 +110,7 @@ pub async fn community(req: Request<Body>) -> Result<Response<Body>, String> {
 			sort: (sort, param(&path, "t").unwrap_or_default()),
 			ends: (param(&path, "after").unwrap_or_default(), "".to_string()),
 			prefs: Preferences::new(req),
+            saved,
 			url,
 			redirect_url,
 			is_filtered: true,
@@ -124,6 +127,7 @@ pub async fn community(req: Request<Body>) -> Result<Response<Body>, String> {
 					sort: (sort, param(&path, "t").unwrap_or_default()),
 					ends: (param(&path, "after").unwrap_or_default(), after),
 					prefs: Preferences::new(req),
+                    saved,
 					url,
 					redirect_url,
 					is_filtered: false,

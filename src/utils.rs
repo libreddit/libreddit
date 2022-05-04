@@ -711,6 +711,13 @@ pub async fn error(req: Request<Body>, msg: String) -> Result<Response<Body>, St
 	Ok(Response::builder().status(404).header("content-type", "text/html").body(body.into()).unwrap_or_default())
 }
 
+pub fn get_saved_posts(req: &Request<Body>) -> Vec<String> {
+    match req.cookie("saved_posts") {
+        Some(cookie) => cookie.value().split('+').map(String::from).collect(),
+        None => Vec::new(),
+    }
+}
+
 #[cfg(test)]
 mod tests {
 	use super::format_num;
