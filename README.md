@@ -72,6 +72,7 @@ Feel free to [open an issue](https://github.com/spikecodes/libreddit/issues/new)
 | [libreddit.hu](https://libreddit.hu) | 🇫🇮 FI | ✅ |
 | [libreddit.totaldarkness.net](https://libreddit.totaldarkness.net) | 🇨🇦 CA |  |
 | [libreddit.esmailelbob.xyz](https://libreddit.esmailelbob.xyz) | 🇨🇦 CA |  |
+| [lr.vern.cc](https://lr.vern.cc) | 🇵🇱 PL |  |
 | [libreddit.nl](https://libreddit.nl) | 🇳🇱 NL |  |
 | [lr.stilic.ml](https://lr.stilic.ml) | 🇫🇷 FR | ✅ |
 | [reddi.tk](https://reddi.tk) | 🇺🇸 US | ✅ |
