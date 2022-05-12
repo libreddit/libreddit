@@ -46,6 +46,10 @@
 				</form>
 			{% endif %}
 
+			{% if any_posts_hidden_nsfw %}
+			<center>Some posts were hidden because they are NSFW. Enable "Show NSFW posts" in settings to view.</center>
+			{% endif %}
+
 			{% if all_posts_filtered %}
 				 <center>(All content on this page has been filtered)</center>
 			{% else %}
