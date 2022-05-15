@@ -92,6 +92,7 @@ Feel free to [open an issue](https://github.com/spikecodes/libreddit/issues/new)
 | [bob.fr.to](https://bob.fr.to) | 🇺🇸 US |  |
 | [reddit.beparanoid.de](https://reddit.beparanoid.de) | 🇨🇭 CH |  |
 | [libreddit.dcs0.hu](https://libreddit.dcs0.hu) | 🇭🇺 HU |  |
+| [reddit.dr460nf1r3.org](https://reddit.dr460nf1r3.org) | 🇩🇪 DE | ✅ |
 | [spjmllawtheisznfs7uryhxumin26ssv2draj7oope3ok3wuhy43eoyd.onion](http://spjmllawtheisznfs7uryhxumin26ssv2draj7oope3ok3wuhy43eoyd.onion) | 🇮🇳 IN |  |
 | [fwhhsbrbltmrct5hshrnqlqygqvcgmnek3cnka55zj4y7nuus5muwyyd.onion](http://fwhhsbrbltmrct5hshrnqlqygqvcgmnek3cnka55zj4y7nuus5muwyyd.onion) | 🇩🇪 DE |  |
 | [kphht2jcflojtqte4b4kyx7p2ahagv4debjj32nre67dxz7y57seqwyd.onion](http://kphht2jcflojtqte4b4kyx7p2ahagv4debjj32nre67dxz7y57seqwyd.onion) | 🇳🇱 NL |  |
