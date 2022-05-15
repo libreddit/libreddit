@@ -78,12 +78,19 @@ Feel free to [open an issue](https://github.com/spikecodes/libreddit/issues/new)
 | [libreddit.bus-hit.me](https://libreddit.bus-hit.me) | 🇨🇦 CA |  |
 | [libreddit.datatunnel.xyz](https://libreddit.datatunnel.xyz) | 🇫🇮 FI |  |
 | [libreddit.crewz.me](https://libreddit.crewz.me) | 🇳🇱 NL | ✅ |
-| [r.walkx.org](https://r.walkx.org) | 🇩🇪 DE | ✅ |
+| [r.walkx.org](https://r.walkx.org) | 🇳🇱 NL | ✅ |
 | [libreddit.kylrth.com](https://libreddit.kylrth.com) | 🇨🇦 CA |  |
 | [libreddit.yonalee.eu](https://libreddit.yonalee.eu) | 🇱🇺 LU | ✅ |
 | [libreddit.winscloud.net](https://libreddit.winscloud.net) | 🇹🇭 TH | ✅ |
 | [libreddit.tiekoetter.com](https://libreddit.tiekoetter.com) | 🇩🇪 DE |  |
 | [reddit.rtrace.io](https://reddit.rtrace.io) | 🇩🇪 DE |  |
+| [libreddit.lunar.icu](https://libreddit.lunar.icu) | 🇩🇪 DE | ✅ |
+| [libreddit.privacydev.net](https://libreddit.privacydev.net) | 🇺🇸 US |  |
+| [libreddit.notyourcomputer.net](https://libreddit.notyourcomputer.net) | 🇺🇸 US |  |
+| [r.ahwx.org](https://r.ahwx.org) | 🇳🇱 NL | ✅ |
+| [bob.fr.to](https://bob.fr.to) | 🇺🇸 US |  |
+| [reddit.beparanoid.de](https://reddit.beparanoid.de) | 🇨🇭 CH |  |
+| [libreddit.dcs0.hu](https://libreddit.dcs0.hu) | 🇭🇺 HU |  |
 | [spjmllawtheisznfs7uryhxumin26ssv2draj7oope3ok3wuhy43eoyd.onion](http://spjmllawtheisznfs7uryhxumin26ssv2draj7oope3ok3wuhy43eoyd.onion) | 🇮🇳 IN |  |
 | [fwhhsbrbltmrct5hshrnqlqygqvcgmnek3cnka55zj4y7nuus5muwyyd.onion](http://fwhhsbrbltmrct5hshrnqlqygqvcgmnek3cnka55zj4y7nuus5muwyyd.onion) | 🇩🇪 DE |  |
 | [kphht2jcflojtqte4b4kyx7p2ahagv4debjj32nre67dxz7y57seqwyd.onion](http://kphht2jcflojtqte4b4kyx7p2ahagv4debjj32nre67dxz7y57seqwyd.onion) | 🇳🇱 NL |  |
@@ -96,8 +103,8 @@ Feel free to [open an issue](https://github.com/spikecodes/libreddit/issues/new)
 | [libreddit.2syis2nnyytz6jnusnjurva4swlaizlnleiks5mjp46phuwjbdjqwgqd.onion](http://libreddit.2syis2nnyytz6jnusnjurva4swlaizlnleiks5mjp46phuwjbdjqwgqd.onion) | 🇪🇬 EG |  |
 | [ol5begilptoou34emq2sshf3may3hlblvipdjtybbovpb7c7zodxmtqd.onion](http://ol5begilptoou34emq2sshf3may3hlblvipdjtybbovpb7c7zodxmtqd.onion) | 🇩🇪 DE |  |
 | [lbrdtjaj7567ptdd4rv74lv27qhxfkraabnyphgcvptl64ijx2tijwid.onion](http://lbrdtjaj7567ptdd4rv74lv27qhxfkraabnyphgcvptl64ijx2tijwid.onion) | 🇨🇦 CA |  |
-| [libreddit.lqs5fjmajyp7rvp4qvyubwofzi6d4imua7vs237rkc4m5qogitqwrgyd.onion](http://libreddit.lqs5fjmajyp7rvp4qvyubwofzi6d4imua7vs237rkc4m5qogitqwrgyd.onion/) | 🇨🇦 CA |  |
-| [libreddit.lunar.icu](https://libreddit.lunar.icu) | 🇩🇪 DE | ✅ |
+| [libreddit.lqs5fjmajyp7rvp4qvyubwofzi6d4imua7vs237rkc4m5qogitqwrgyd.onion](http://libreddit.lqs5fjmajyp7rvp4qvyubwofzi6d4imua7vs237rkc4m5qogitqwrgyd.onion) | 🇨🇦 CA |  |
+| [reddit.prnoid54e44a4bduq5due64jkk7wcnkxcp5kv3juncm7veptjcqudgyd.onion](reddit.prnoid54e44a4bduq5due64jkk7wcnkxcp5kv3juncm7veptjcqudgyd.onion) | 🇨🇭 CH |  |
 
 A checkmark in the "Cloudflare" category here refers to the use of the reverse proxy, [Cloudflare](https://cloudflare). The checkmark will not be listed for a site that uses Cloudflare DNS but rather the proxying service which grants Cloudflare the ability to monitor traffic to the website.
 
