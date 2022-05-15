@@ -37,3 +37,5 @@ jobs:
           platforms: linux/arm/v7
           push: true
           tags: spikecodes/libreddit:armv7
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
