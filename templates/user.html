@@ -32,8 +32,8 @@
 				</button>
 			</form>
 
-			{% if any_posts_hidden_nsfw %}
-			<center>Some posts were hidden because they are NSFW. Enable "Show NSFW posts" in settings to view.</center>
+			{% if all_posts_hidden_nsfw %}
+			<center>All posts are hidden because they are NSFW. Enable "Show NSFW posts" in settings to view.</center>
 			{% endif %}
 
 			{% if all_posts_filtered %}
