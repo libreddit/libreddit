@@ -12,7 +12,6 @@ mod utils;
 
 // Import Crates
 use clap::{Command, Arg};
-use rust_embed::RustEmbed;
 
 use futures_lite::FutureExt;
 use hyper::{header::HeaderValue, Body, Request, Response};
@@ -20,7 +19,7 @@ use hyper::{header::HeaderValue, Body, Request, Response};
 mod client;
 use client::proxy;
 use server::RequestExt;
-use utils::{error, redirect};
+use utils::{error, redirect, ThemeAssets};
 
 mod server;
 
@@ -102,11 +101,6 @@ async fn style() -> Result<Response<Body>, String> {
 			.unwrap_or_default(),
 	)
 }
-
-#[derive(RustEmbed)]
-#[folder = "static/themes/"]
-#[include = "*.css"]
-struct ThemeAssets;
 
 #[tokio::main]
 async fn main() {

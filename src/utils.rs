@@ -464,7 +464,7 @@ pub struct Preferences {
 #[derive(RustEmbed)]
 #[folder = "static/themes/"]
 #[include = "*.css"]
-struct ThemeAssets;
+pub struct ThemeAssets;
 
 impl Preferences {
 	// Build preferences from cookies
