@@ -262,7 +262,7 @@ Assign a default value for each setting by passing environment variables to Libr
 
 | Name                    | Possible values                                                                                     | Default value |
 |-------------------------|-----------------------------------------------------------------------------------------------------|---------------|
-| `THEME`                 | `["system", "light", "dark", "black", "dracula", "nord", "laserwave", "violet", "gold", "rosebox"]` | `system`      |
+| `THEME`                 | `["system", "light", "dark", "black", "dracula", "nord", "laserwave", "violet", "gold", "rosebox", "solarized"]` | `system`      |
 | `FRONT_PAGE`            | `["default", "popular", "all"]`                                                                     | `default`     |
 | `LAYOUT`                | `["card", "clean", "compact"]`                                                                      | `card`        |
 | `WIDE`                  | `["on", "off"]`                                                                                     | `off`         |

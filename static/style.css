@@ -164,6 +164,21 @@
 	--shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
 }
 
+/* Solarized theme setting */
+.solarized {
+    --accent: #2aa198;
+    --green: #b58900;
+    --text: #eee8d5;
+    --foreground: #002b36;
+    --background: #002b36;
+    --outside: #073642;
+    --post: #073642;
+    --panel-border: 1px solid #839496;
+    --highlighted: #002b36;
+    --visited: #586e75;
+    --shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
 /* General */
 
 ::selection {
