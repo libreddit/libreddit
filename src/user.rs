@@ -5,7 +5,7 @@ use crate::server::RequestExt;
 use crate::utils::{error, filter_posts, format_url, get_filters, param, template, Post, Preferences, User};
 use askama::Template;
 use hyper::{Body, Request, Response};
-use time::{OffsetDateTime, macros::format_description};
+use time::{macros::format_description, OffsetDateTime};
 
 // STRUCTS
 #[derive(Template)]

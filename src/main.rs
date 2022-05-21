@@ -11,7 +11,7 @@ mod user;
 mod utils;
 
 // Import Crates
-use clap::{Command, Arg};
+use clap::{Arg, Command};
 
 use futures_lite::FutureExt;
 use hyper::{header::HeaderValue, Body, Request, Response};
@@ -88,7 +88,7 @@ async fn resource(body: &str, content_type: &str, cache: bool) -> Result<Respons
 async fn style() -> Result<Response<Body>, String> {
 	let mut res = include_str!("../static/style.css").to_string();
 	for file in ThemeAssets::iter() {
-		res.push_str("\n");
+		res.push('\n');
 		let theme = ThemeAssets::get(file.as_ref()).unwrap();
 		res.push_str(std::str::from_utf8(theme.data.as_ref()).unwrap());
 	}

@@ -100,7 +100,10 @@ async fn parse_post(json: &serde_json::Value) -> Post {
 	let permalink = val(post, "permalink");
 
 	let body = if val(post, "removed_by_category") == "moderator" {
-		format!("<div class=\"md\"><p>[removed] — <a href=\"https://www.reveddit.com{}\">view removed post</a></p></div>", permalink)
+		format!(
+			"<div class=\"md\"><p>[removed] — <a href=\"https://www.reveddit.com{}\">view removed post</a></p></div>",
+			permalink
+		)
 	} else {
 		rewrite_urls(&val(post, "selftext_html"))
 	};
@@ -199,7 +202,10 @@ fn parse_comments(json: &serde_json::Value, post_link: &str, post_author: &str, 
 			let highlighted = id == highlighted_comment;
 
 			let body = if val(&comment, "author") == "[deleted]" && val(&comment, "body") == "[removed]" {
-				format!("<div class=\"md\"><p>[removed] — <a href=\"https://www.reveddit.com{}{}\">view removed comment</a></p></div>", post_link, id)
+				format!(
+					"<div class=\"md\"><p>[removed] — <a href=\"https://www.reveddit.com{}{}\">view removed comment</a></p></div>",
+					post_link, id
+				)
 			} else {
 				rewrite_urls(&val(&comment, "body_html"))
 			};
