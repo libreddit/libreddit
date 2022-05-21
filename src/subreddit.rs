@@ -410,7 +410,7 @@ async fn subreddit(sub: &str, quarantined: bool) -> Result<Subreddit, String> {
 		name: val(&res, "display_name"),
 		title: val(&res, "title"),
 		description: val(&res, "public_description"),
-		info: rewrite_urls(&val(&res, "description_html"),
+		info: rewrite_urls(&val(&res, "description_html")),
 		// moderators: moderators_list(sub, quarantined).await.unwrap_or_default(),
 		icon: format_url(&icon),
 		members: format_num(members),
