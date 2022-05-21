@@ -1,15 +1,16 @@
 //
 // CRATES
 //
-use crate::{client::json, esc, server::RequestExt};
+use crate::{client::json, server::RequestExt};
 use askama::Template;
 use cookie::Cookie;
 use hyper::{Body, Request, Response};
 use regex::Regex;
+use rust_embed::RustEmbed;
 use serde_json::Value;
 use std::collections::{HashMap, HashSet};
 use std::str::FromStr;
-use time::{Duration, OffsetDateTime, macros::format_description};
+use time::{macros::format_description, Duration, OffsetDateTime};
 use url::Url;
 
 // Post flair with content, background color and foreground color
@@ -41,7 +42,7 @@ impl FlairPart {
 						Self {
 							flair_part_type: value("e").to_string(),
 							value: match value("e") {
-								"text" => esc!(value("t")),
+								"text" => value("t").to_string(),
 								"emoji" => format_url(value("u")),
 								_ => String::new(),
 							},
@@ -54,7 +55,7 @@ impl FlairPart {
 			"text" => match text_flair {
 				Some(text) => vec![Self {
 					flair_part_type: "text".to_string(),
-					value: esc!(text),
+					value: text.to_string(),
 				}],
 				None => Vec::new(),
 			},
@@ -217,24 +218,19 @@ pub struct Post {
 impl Post {
 	// Fetch posts of a user or subreddit and return a vector of posts and the "after" value
 	pub async fn fetch(path: &str, quarantine: bool) -> Result<(Vec<Self>, String), String> {
-		let res;
-		let post_list;
-
 		// Send a request to the url
-		match json(path.to_string(), quarantine).await {
+		let res = match json(path.to_string(), quarantine).await {
 			// If success, receive JSON in response
-			Ok(response) => {
-				res = response;
-			}
+			Ok(response) => response,
 			// If the Reddit API returns an error, exit this function
 			Err(msg) => return Err(msg),
-		}
+		};
 
 		// Fetch the list of posts from the JSON response
-		match res["data"]["children"].as_array() {
-			Some(list) => post_list = list,
+		let post_list = match res["data"]["children"].as_array() {
+			Some(list) => list,
 			None => return Err("No posts found".to_string()),
-		}
+		};
 
 		let mut posts: Vec<Self> = Vec::new();
 
@@ -245,7 +241,7 @@ impl Post {
 			let (rel_time, created) = time(data["created_utc"].as_f64().unwrap_or_default());
 			let score = data["score"].as_i64().unwrap_or_default();
 			let ratio: f64 = data["upvote_ratio"].as_f64().unwrap_or(1.0) * 100.0;
-			let title = esc!(post, "title");
+			let title = val(post, "title");
 
 			// Determine the type of media along with the media URL
 			let (post_type, media, gallery) = Media::parse(data).await;
@@ -270,7 +266,7 @@ impl Post {
 							data["author_flair_richtext"].as_array(),
 							data["author_flair_text"].as_str(),
 						),
-						text: esc!(post, "link_flair_text"),
+						text: val(post, "link_flair_text"),
 						background_color: val(post, "author_flair_background_color"),
 						foreground_color: val(post, "author_flair_text_color"),
 					},
@@ -298,7 +294,7 @@ impl Post {
 						data["link_flair_richtext"].as_array(),
 						data["link_flair_text"].as_str(),
 					),
-					text: esc!(post, "link_flair_text"),
+					text: val(post, "link_flair_text"),
 					background_color: val(post, "link_flair_background_color"),
 					foreground_color: if val(post, "link_flair_text_color") == "dark" {
 						"black".to_string()
@@ -324,7 +320,7 @@ impl Post {
 }
 
 #[derive(Template)]
-#[template(path = "comment.html", escape = "none")]
+#[template(path = "comment.html")]
 // Comment with content, post, score and data/time that it was posted
 pub struct Comment {
 	pub id: String,
@@ -400,7 +396,7 @@ impl Awards {
 }
 
 #[derive(Template)]
-#[template(path = "error.html", escape = "none")]
+#[template(path = "error.html")]
 pub struct ErrorTemplate {
 	pub msg: String,
 	pub prefs: Preferences,
@@ -445,6 +441,7 @@ pub struct Params {
 
 #[derive(Default)]
 pub struct Preferences {
+	pub available_themes: Vec<String>,
 	pub theme: String,
 	pub front_page: String,
 	pub layout: String,
@@ -459,10 +456,23 @@ pub struct Preferences {
 	pub filters: Vec<String>,
 }
 
+#[derive(RustEmbed)]
+#[folder = "static/themes/"]
+#[include = "*.css"]
+pub struct ThemeAssets;
+
 impl Preferences {
 	// Build preferences from cookies
 	pub fn new(req: Request<Body>) -> Self {
+		// Read available theme names from embedded css files.
+		// Always make the default "system" theme available.
+		let mut themes = vec!["system".to_string()];
+		for file in ThemeAssets::iter() {
+			let chunks: Vec<&str> = file.as_ref().split(".css").collect();
+			themes.push(chunks[0].to_owned())
+		}
 		Self {
+			available_themes: themes,
 			theme: setting(&req, "theme"),
 			front_page: setting(&req, "front_page"),
 			layout: setting(&req, "layout"),
@@ -608,8 +618,7 @@ pub fn format_url(url: &str) -> String {
 // Rewrite Reddit links to Libreddit in body of text.
 // Also fix superfluous backslashes and underscores in links.
 pub fn rewrite_urls(input_text: &str) -> String {
-	let text1 =
-		Regex::new(r#"href="(https|http|)://(www\.|old\.|np\.|amp\.|new\.)(reddit\.com|redd\.it)/"#)
+	let text1 = Regex::new(r#"href="(https|http|)://(www\.|old\.|np\.|amp\.|new\.)(reddit\.com|redd\.it)/"#)
 			// Replace reddit-prefix in href with "/" (i.e. point to our local instance).
 			.map_or(String::new(), |re| re.replace_all(input_text, r#"href="/"#).to_string())
 			// Remove (html-encoded) "\" from URLs. These seem to occur inside the href-attribute only.
@@ -659,23 +668,17 @@ pub fn time(created: f64) -> (String, String) {
 		format!("{}m ago", time_delta.whole_minutes())
 	};
 
-	(rel_time, time.format(format_description!("[month repr:short] [day] [year], [hour]:[minute]:[second] UTC")).unwrap_or_default())
+	(
+		rel_time,
+		time
+			.format(format_description!("[month repr:short] [day] [year], [hour]:[minute]:[second] UTC"))
+			.unwrap_or_default(),
+	)
 }
 
 // val() function used to parse JSON from Reddit APIs
 pub fn val(j: &Value, k: &str) -> String {
 	j["data"][k].as_str().unwrap_or_default().to_string()
-}
-
-// Escape < and > to accurately render HTML
-#[macro_export]
-macro_rules! esc {
-	($f:expr) => {
-		$f.replace('&', "&amp;").replace('<', "&lt;").replace('>', "&gt;")
-	};
-	($j:expr, $k:expr) => {
-		$j["data"][$k].as_str().unwrap_or_default().to_string().replace('<', "&lt;").replace('>', "&gt;")
-	};
 }
 
 //

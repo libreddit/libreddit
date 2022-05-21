@@ -1,0 +1,14 @@
+/* Black theme setting */
+.black {
+	--accent: #009a9a;
+	--green: #00a229;
+	--text: white;
+	--foreground: #0f0f0f;
+	--background: black;
+	--outside: black;
+	--post: black;
+	--panel-border: 2px solid #0f0f0f;
+	--highlighted: #0f0f0f;
+	--visited: #aaa;
+	--shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
