@@ -83,7 +83,7 @@
 			{% endfor %}
 		{% endif %}
 	</p>
-	<p class="post_title">
+	<h2 class="post_title">
 		{% if post.flair.flair_parts.len() > 0 %}
 			<a href="/r/{{ post.community }}/search?q=flair_name%3A%22{{ post.flair.text }}%22&restrict_sr=on"
 				class="post_flair"
@@ -91,7 +91,7 @@
 				dir="ltr">{% call render_flair(post.flair.flair_parts) %}</a>
 		{% endif %}
 		<a href="{{ post.permalink }}">{{ post.title }}</a>{% if post.flags.nsfw %} <small class="nsfw">NSFW</small>{% endif %}
-	</p>
+	</h2>
 	<!-- POST MEDIA/THUMBNAIL -->
 	{% if (prefs.layout.is_empty() || prefs.layout == "card") && post.post_type == "image" %}
 	<a href="{{ post.media.url }}" class="post_media_image {% if post.media.height / post.media.width < 2 %}short{% endif %}" >
