@@ -32,9 +32,9 @@
 		{% if is_filtered %}
 		<div class="comment_body_filtered {% if highlighted %}highlighted{% endif %}">(Filtered content)</div>
 		{% else %}
-		<div class="comment_body {% if highlighted %}highlighted{% endif %}">{{ body }}</div>
+		<div class="comment_body {% if highlighted %}highlighted{% endif %}">{{ body|safe }}</div>
 		{% endif %}
-		<blockquote class="replies">{% for c in replies -%}{{ c.render().unwrap() }}{%- endfor %}
+		<blockquote class="replies">{% for c in replies -%}{{ c.render().unwrap()|safe }}{%- endfor %}
 		</blockquote>
 	</details>
 </div>
