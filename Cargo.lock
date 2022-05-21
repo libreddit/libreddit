@@ -596,6 +596,7 @@ dependencies = [
  "futures-lite",
  "hyper",
  "hyper-rustls",
+ "percent-encoding",
  "regex",
  "route-recognizer",
  "rust-embed",

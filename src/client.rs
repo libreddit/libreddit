@@ -1,6 +1,7 @@
 use cached::proc_macro::cached;
 use futures_lite::{future::Boxed, FutureExt};
 use hyper::{body::Buf, client, Body, Request, Response, Uri};
+use percent_encoding::{percent_encode, CONTROLS};
 use serde_json::Value;
 use std::result::Result;
 
@@ -90,7 +91,7 @@ fn request(url: String, quarantine: bool) -> Boxed<Result<Response<Body>, String
 								.headers()
 								.get("Location")
 								.map(|val| {
-									let new_url = val.to_str().unwrap_or_default();
+									let new_url = percent_encode(val.as_bytes(), CONTROLS).to_string();
 									format!("{}{}raw_json=1", new_url, if new_url.contains('?') { "&" } else { "?" })
 								})
 								.unwrap_or_default()
