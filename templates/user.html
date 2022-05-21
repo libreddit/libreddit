@@ -66,11 +66,11 @@
 
 			<footer>
 				{% if ends.0 != "" %}
-				<a href="?sort={{ sort.0 }}&t={{ sort.1 }}&before={{ ends.0 }}">PREV</a>
+				<a href="?sort={{ sort.0 }}&t={{ sort.1 }}&before={{ ends.0 }}" accesskey="P">PREV</a>
 				{% endif %}
 
 				{% if ends.1 != "" %}
-				<a href="?sort={{ sort.0 }}&t={{ sort.1 }}&after={{ ends.1 }}">NEXT</a>
+				<a href="?sort={{ sort.0 }}&t={{ sort.1 }}&after={{ ends.1 }}" accesskey="N">NEXT</a>
 				{% endif %}
 			</footer>
 		</div>
