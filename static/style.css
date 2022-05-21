@@ -777,6 +777,7 @@ a.search_subreddit:hover {
 	padding: 5px 15px 5px 12px;
 	grid-area: post_body;
 	width: calc(100% - 30px);
+	overflow-wrap: anywhere;
 }
 
 /* Used only for text post preview */
