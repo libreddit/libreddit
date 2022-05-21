@@ -1,7 +1,7 @@
 ---
 name: ✨ Feature parity
 about: Suggest implementing a feature into Libreddit that is found in Reddit.com
-title: ''
+title: '✨ Feature parity: '
 labels: feature parity
 assignees: ''
 
@@ -12,7 +12,7 @@ assignees: ''
   A clear and concise description of what the feature is.
 -->
 
-## Describe the implementation into Libreddit
+## Describe how this could be implemented into Libreddit
 <!--
   A clear and concise description of what you want to happen.
 -->
@@ -22,7 +22,7 @@ assignees: ''
   A clear and concise description of any alternative solutions or features you've considered.
 -->
 
-## Additional context
+## Additional context / screenshot
 <!--
   Add any other context or screenshots about the feature parity request here.
 -->

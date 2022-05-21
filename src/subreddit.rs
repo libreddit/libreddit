@@ -18,6 +18,7 @@ struct SubredditTemplate {
 	ends: (String, String),
 	prefs: Preferences,
 	url: String,
+	redirect_url: String,
 	/// Whether the subreddit itself is filtered.
 	is_filtered: bool,
 	/// Whether all fetched posts are filtered (to differentiate between no posts fetched in the first place,
@@ -85,18 +86,17 @@ pub async fn community(req: Request<Body>) -> Result<Response<Body>, String> {
 		} else {
 			Subreddit::default()
 		}
-	} else if sub_name.contains('+') {
-		// Multireddit
+	} else {
+		// Multireddit, all, popular
 		Subreddit {
 			name: sub_name.clone(),
 			..Subreddit::default()
 		}
-	} else {
-		Subreddit::default()
 	};
 
 	let path = format!("/r/{}/{}.json?{}&raw_json=1", sub_name.clone(), sort, req.uri().query().unwrap_or_default());
 	let url = String::from(req.uri().path_and_query().map_or("", |val| val.as_str()));
+	let redirect_url = url[1..].replace('?', "%3F").replace('&', "%26").replace('+', "%2B");
 	let filters = get_filters(&req);
 
 	// If all requested subs are filtered, we don't need to fetch posts.
@@ -108,6 +108,7 @@ pub async fn community(req: Request<Body>) -> Result<Response<Body>, String> {
 			ends: (param(&path, "after").unwrap_or_default(), "".to_string()),
 			prefs: Preferences::new(req),
 			url,
+			redirect_url,
 			is_filtered: true,
 			all_posts_filtered: false,
 		})
@@ -123,6 +124,7 @@ pub async fn community(req: Request<Body>) -> Result<Response<Body>, String> {
 					ends: (param(&path, "after").unwrap_or_default(), after),
 					prefs: Preferences::new(req),
 					url,
+					redirect_url,
 					is_filtered: false,
 					all_posts_filtered,
 				})
@@ -252,7 +254,7 @@ pub async fn subscriptions_filters(req: Request<Body>) -> Result<Response<Body>,
 	// Redirect back to subreddit
 	// check for redirect parameter if unsubscribing/unfiltering from outside sidebar
 	let path = if let Some(redirect_path) = param(&format!("?{}", query), "redirect") {
-		format!("/{}/", redirect_path)
+		format!("/{}", redirect_path)
 	} else {
 		format!("/r/{}", sub)
 	};
@@ -333,10 +335,10 @@ pub async fn sidebar(req: Request<Body>) -> Result<Response<Body>, String> {
 	match json(path, quarantined).await {
 		// If success, receive JSON in response
 		Ok(response) => template(WikiTemplate {
-			wiki: rewrite_urls(&val(&response, "description_html").replace("\\", "")),
+			wiki: rewrite_urls(&val(&response, "description_html")),
 			// wiki: format!(
 			// 	"{}<hr><h1>Moderators</h1><br><ul>{}</ul>",
-			// 	rewrite_urls(&val(&response, "description_html").replace("\\", "")),
+			// 	rewrite_urls(&val(&response, "description_html"),
 			// 	moderators(&sub, quarantined).await.unwrap_or(vec!["Could not fetch moderators".to_string()]).join(""),
 			// ),
 			sub,
@@ -408,7 +410,7 @@ async fn subreddit(sub: &str, quarantined: bool) -> Result<Subreddit, String> {
 		name: val(&res, "display_name"),
 		title: val(&res, "title"),
 		description: val(&res, "public_description"),
-		info: rewrite_urls(&val(&res, "description_html").replace("\\", "")),
+		info: rewrite_urls(&val(&res, "description_html"),
 		// moderators: moderators_list(sub, quarantined).await.unwrap_or_default(),
 		icon: format_url(&icon),
 		members: format_num(members),

@@ -6,10 +6,11 @@ use askama::Template;
 use cookie::Cookie;
 use hyper::{Body, Request, Response};
 use regex::Regex;
+use rust_embed::RustEmbed;
 use serde_json::Value;
 use std::collections::{HashMap, HashSet};
 use std::str::FromStr;
-use time::{Duration, OffsetDateTime, macros::format_description};
+use time::{macros::format_description, Duration, OffsetDateTime};
 use url::Url;
 
 // Post flair with content, background color and foreground color
@@ -217,24 +218,19 @@ pub struct Post {
 impl Post {
 	// Fetch posts of a user or subreddit and return a vector of posts and the "after" value
 	pub async fn fetch(path: &str, quarantine: bool) -> Result<(Vec<Self>, String), String> {
-		let res;
-		let post_list;
-
 		// Send a request to the url
-		match json(path.to_string(), quarantine).await {
+		let res = match json(path.to_string(), quarantine).await {
 			// If success, receive JSON in response
-			Ok(response) => {
-				res = response;
-			}
+			Ok(response) => response,
 			// If the Reddit API returns an error, exit this function
 			Err(msg) => return Err(msg),
-		}
+		};
 
 		// Fetch the list of posts from the JSON response
-		match res["data"]["children"].as_array() {
-			Some(list) => post_list = list,
+		let post_list = match res["data"]["children"].as_array() {
+			Some(list) => list,
 			None => return Err("No posts found".to_string()),
-		}
+		};
 
 		let mut posts: Vec<Self> = Vec::new();
 
@@ -445,6 +441,7 @@ pub struct Params {
 
 #[derive(Default)]
 pub struct Preferences {
+	pub available_themes: Vec<String>,
 	pub theme: String,
 	pub front_page: String,
 	pub layout: String,
@@ -459,10 +456,23 @@ pub struct Preferences {
 	pub filters: Vec<String>,
 }
 
+#[derive(RustEmbed)]
+#[folder = "static/themes/"]
+#[include = "*.css"]
+pub struct ThemeAssets;
+
 impl Preferences {
 	// Build preferences from cookies
 	pub fn new(req: Request<Body>) -> Self {
+		// Read available theme names from embedded css files.
+		// Always make the default "system" theme available.
+		let mut themes = vec!["system".to_string()];
+		for file in ThemeAssets::iter() {
+			let chunks: Vec<&str> = file.as_ref().split(".css").collect();
+			themes.push(chunks[0].to_owned())
+		}
 		Self {
+			available_themes: themes,
 			theme: setting(&req, "theme"),
 			front_page: setting(&req, "front_page"),
 			layout: setting(&req, "layout"),
@@ -607,8 +617,11 @@ pub fn format_url(url: &str) -> String {
 
 // Rewrite Reddit links to Libreddit in body of text
 pub fn rewrite_urls(input_text: &str) -> String {
-	let text1 =
-		Regex::new(r#"href="(https|http|)://(www\.|old\.|np\.|amp\.|)(reddit\.com|redd\.it)/"#).map_or(String::new(), |re| re.replace_all(input_text, r#"href="/"#).to_string());
+	let text1 = Regex::new(r#"href="(https|http|)://(www\.|old\.|np\.|amp\.|)(reddit\.com|redd\.it)/"#)
+		.map_or(String::new(), |re| re.replace_all(input_text, r#"href="/"#).to_string())
+		// Remove (html-encoded) "\" from URLs.
+		.replace("%5C", "")
+		.replace('\\', "");
 
 	// Rewrite external media previews to Libreddit
 	Regex::new(r"https://external-preview\.redd\.it(.*)[^?]").map_or(String::new(), |re| {
@@ -652,7 +665,12 @@ pub fn time(created: f64) -> (String, String) {
 		format!("{}m ago", time_delta.whole_minutes())
 	};
 
-	(rel_time, time.format(format_description!("[month repr:short] [day] [year], [hour]:[minute]:[second] UTC")).unwrap_or_default())
+	(
+		rel_time,
+		time
+			.format(format_description!("[month repr:short] [day] [year], [hour]:[minute]:[second] UTC"))
+			.unwrap_or_default(),
+	)
 }
 
 // val() function used to parse JSON from Reddit APIs
@@ -699,6 +717,7 @@ pub async fn error(req: Request<Body>, msg: String) -> Result<Response<Body>, St
 #[cfg(test)]
 mod tests {
 	use super::format_num;
+	use super::rewrite_urls;
 
 	#[test]
 	fn format_num_works() {
@@ -707,5 +726,15 @@ mod tests {
 		assert_eq!(format_num(1999), ("2.0k".to_string(), "1999".to_string()));
 		assert_eq!(format_num(1001), ("1.0k".to_string(), "1001".to_string()));
 		assert_eq!(format_num(1_999_999), ("2.0m".to_string(), "1999999".to_string()));
+	}
+
+	#[test]
+	fn rewrite_urls_removes_backslashes() {
+		let comment_body_html =
+			r#"<a href=\"https://www.reddit.com/r/linux%5C_gaming/comments/x/just%5C_a%5C_test%5C/\">https://www.reddit.com/r/linux\\_gaming/comments/x/just\\_a\\_test/</a>"#;
+		assert_eq!(
+			rewrite_urls(comment_body_html),
+			r#"<a href="https://www.reddit.com/r/linux_gaming/comments/x/just_a_test/">https://www.reddit.com/r/linux_gaming/comments/x/just_a_test/</a>"#
+		)
 	}
 }

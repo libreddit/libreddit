@@ -1,0 +1,14 @@
+/* Nord theme setting */
+.nord {
+	--accent: #8fbcbb; 
+	--green: #a3be8c;
+	--text: #eceff4;
+	--foreground: #3b4252;
+	--background: #2e3440;
+	--outside: #434c5e;
+	--post: #434c5e;
+	--panel-border: 2px solid #4c566a;
+	--highlighted: #3b4252;
+	--visited: #a3a5aa;
+	--shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}

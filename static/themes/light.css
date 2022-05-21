@@ -1,0 +1,14 @@
+/* Light theme setting */
+.light {
+	--accent: #009a9a;
+	--green: #00a229;
+	--text: black;
+	--foreground: #f5f5f5;
+	--background: #ddd;
+	--outside: #ececec;
+	--post: #eee;
+	--panel-border: 1px solid #ccc;
+	--highlighted: white;
+	--visited: #555;
+	--shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}

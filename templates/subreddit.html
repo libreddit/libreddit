@@ -41,7 +41,7 @@
 			</form>
 
 			{% if sub.name.contains("+") %}
-				<form action="/r/{{ sub.name }}/subscribe" method="POST">
+				<form action="/r/{{ sub.name }}/subscribe?redirect={{ redirect_url }}" method="POST">
 					<button id="multisub" class="subscribe" title="Subscribe to each sub in this multireddit">Subscribe to Multireddit</button>
 				</form>
 			{% endif %}
@@ -74,12 +74,12 @@
 			</footer>
 		</div>
 		{% endif %}
-		{% if is_filtered || (!sub.name.is_empty() && !sub.name.contains("+")) %}
+		{% if is_filtered || (!sub.name.is_empty() && sub.name != "all" && sub.name != "popular" && !sub.name.contains("+")) %}
 		<aside>
 			{% if is_filtered %}
 				<center>(Content from r/{{ sub.name }} has been filtered)</center>
 			{% endif %}
-			{% if !sub.name.is_empty() && !sub.name.contains("+") %}
+			{% if !sub.name.is_empty() && sub.name != "all" && sub.name != "popular" && !sub.name.contains("+") %}
 			<div class="panel" id="subreddit">
 				{% if sub.wiki %}
 				<div id="top">
@@ -101,22 +101,22 @@
 					<div id="sub_actions">
 						<div id="sub_subscription">
 							{% if prefs.subscriptions.contains(sub.name) %}
-								<form action="/r/{{ sub.name }}/unsubscribe" method="POST">
+								<form action="/r/{{ sub.name }}/unsubscribe?redirect={{ redirect_url }}" method="POST">
 									<button class="unsubscribe">Unsubscribe</button>
 								</form>
 							{% else %}
-								<form action="/r/{{ sub.name }}/subscribe" method="POST">
+								<form action="/r/{{ sub.name }}/subscribe?redirect={{ redirect_url }}" method="POST">
 									<button class="subscribe">Subscribe</button>
 								</form>
 							{% endif %}
 						</div>
 						<div id="sub_filter">
 							{% if prefs.filters.contains(sub.name) %}
-								<form action="/r/{{ sub.name }}/unfilter" method="POST">
+								<form action="/r/{{ sub.name }}/unfilter?redirect={{ redirect_url }}" method="POST">
 									<button class="unfilter">Unfilter</button>
 								</form>
 							{% else %}
-							<form action="/r/{{ sub.name }}/filter" method="POST">
+							<form action="/r/{{ sub.name }}/filter?redirect={{ redirect_url }}" method="POST">
 								<button class="filter">Filter</button>
 							</form>
 							{% endif %}
