@@ -158,8 +158,8 @@ impl Server {
 				Ok::<_, String>(service_fn(move |req: Request<Body>| {
 					let headers = default_headers.clone();
 
-					// Remove double slashes
-					let mut path = req.uri().path().replace("//", "/");
+					// Remove double slashes and decode encoded slashes
+					let mut path = req.uri().path().replace("//", "/").replace("%2F","/");
 
 					// Remove trailing slashes
 					if path != "/" && path.ends_with('/') {
