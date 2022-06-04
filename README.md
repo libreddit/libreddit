@@ -266,8 +266,8 @@ Assign a default value for each setting by passing environment variables to Libr
 | `FRONT_PAGE`            | `["default", "popular", "all"]`                                                                     | `default`     |
 | `LAYOUT`                | `["card", "clean", "compact"]`                                                                      | `card`        |
 | `WIDE`                  | `["on", "off"]`                                                                                     | `off`         |
-| `COMMENT_SORT`          | `["hot", "new", "top", "rising", "controversial"]`                                                  | `hot`         |
-| `POST_SORT`             | `["confidence", "top", "new", "controversial", "old"]`                                              | `confidence`  |
+| `POST_SORT`             | `["hot", "new", "top", "rising", "controversial"]`                                                  | `hot`         |
+| `COMMENT_SORT`          | `["confidence", "top", "new", "controversial", "old"]`                                              | `confidence`  |
 | `SHOW_NSFW`             | `["on", "off"]`                                                                                     | `off`         |
 | `USE_HLS`               | `["on", "off"]`                                                                                     | `off`         |
 | `HIDE_HLS_NOTIFICATION` | `["on", "off"]`                                                                                     | `off`         |
