@@ -81,6 +81,7 @@ Feel free to [open an issue](https://github.com/spikecodes/libreddit/issues/new)
 | [libreddit.yonalee.eu](https://libreddit.yonalee.eu) | 🇱🇺 LU | ✅ |
 | [libreddit.winscloud.net](https://libreddit.winscloud.net) | 🇹🇭 TH | ✅ |
 | [libreddit.tiekoetter.com](https://libreddit.tiekoetter.com) | 🇩🇪 DE |  |
+| [libreddit.foss.wtf](https://libreddit.foss.wtf)| 🇩🇪 DE |  |
 | [reddit.rtrace.io](https://reddit.rtrace.io) | 🇩🇪 DE |  |
 | [libreddit.lunar.icu](https://libreddit.lunar.icu) | 🇩🇪 DE | ✅ |
 | [libreddit.privacydev.net](https://libreddit.privacydev.net) | 🇺🇸 US |  |
