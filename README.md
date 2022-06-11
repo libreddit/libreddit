@@ -69,7 +69,7 @@ Feel free to [open an issue](https://github.com/spikecodes/libreddit/issues/new)
 | [libreddit.hu](https://libreddit.hu) | 🇫🇮 FI | ✅ |
 | [libreddit.totaldarkness.net](https://libreddit.totaldarkness.net) | 🇨🇦 CA |  |
 | [libreddit.esmailelbob.xyz](https://libreddit.esmailelbob.xyz) | 🇨🇦 CA |  |
-| [lr.vern.cc](https://lr.vern.cc) | 🇵🇱 PL |  |
+| [lr.vern.cc](https://lr.vern.cc) | 🇨🇦 CA |  |
 | [libreddit.nl](https://libreddit.nl) | 🇳🇱 NL |  |
 | [lr.stilic.ml](https://lr.stilic.ml) | 🇫🇷 FR | ✅ |
 | [reddi.tk](https://reddi.tk) | 🇺🇸 US | ✅ |
@@ -81,7 +81,6 @@ Feel free to [open an issue](https://github.com/spikecodes/libreddit/issues/new)
 | [libreddit.yonalee.eu](https://libreddit.yonalee.eu) | 🇱🇺 LU | ✅ |
 | [libreddit.winscloud.net](https://libreddit.winscloud.net) | 🇹🇭 TH | ✅ |
 | [libreddit.tiekoetter.com](https://libreddit.tiekoetter.com) | 🇩🇪 DE |  |
-| [libreddit.foss.wtf](https://libreddit.foss.wtf)| 🇩🇪 DE |  |
 | [reddit.rtrace.io](https://reddit.rtrace.io) | 🇩🇪 DE |  |
 | [libreddit.lunar.icu](https://libreddit.lunar.icu) | 🇩🇪 DE | ✅ |
 | [libreddit.privacydev.net](https://libreddit.privacydev.net) | 🇺🇸 US |  |
@@ -93,6 +92,7 @@ Feel free to [open an issue](https://github.com/spikecodes/libreddit/issues/new)
 | [reddit.dr460nf1r3.org](https://reddit.dr460nf1r3.org) | 🇩🇪 DE | ✅ |
 | [rd.jae.su](https://rd.jae.su) | 🇫🇮 FI |  |
 | [libreddit.mha.fi](https://libreddit.mha.fi) | 🇫🇮 FI |  |
+| [libreddit.foss.wtf](https://libreddit.foss.wtf) | 🇩🇪 DE |  |
 | [spjmllawtheisznfs7uryhxumin26ssv2draj7oope3ok3wuhy43eoyd.onion](http://spjmllawtheisznfs7uryhxumin26ssv2draj7oope3ok3wuhy43eoyd.onion) | 🇮🇳 IN |  |
 | [fwhhsbrbltmrct5hshrnqlqygqvcgmnek3cnka55zj4y7nuus5muwyyd.onion](http://fwhhsbrbltmrct5hshrnqlqygqvcgmnek3cnka55zj4y7nuus5muwyyd.onion) | 🇩🇪 DE |  |
 | [kphht2jcflojtqte4b4kyx7p2ahagv4debjj32nre67dxz7y57seqwyd.onion](http://kphht2jcflojtqte4b4kyx7p2ahagv4debjj32nre67dxz7y57seqwyd.onion) | 🇳🇱 NL |  |
