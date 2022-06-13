@@ -56,7 +56,7 @@
 						<a class="comment_link" href="{{ post.permalink }}">COMMENT</a>
 						<span class="created" title="{{ post.created }}">{{ post.rel_time }}</span>
 					</summary>
-					<p class="comment_body">{{ post.body }}</p>
+					<p class="comment_body">{{ post.body|safe }}</p>
 				</details>
 			</div>
 			{% endif %}
@@ -70,11 +70,11 @@
 
 			<footer>
 				{% if ends.0 != "" %}
-				<a href="?sort={{ sort.0 }}&t={{ sort.1 }}&before={{ ends.0 }}">PREV</a>
+				<a href="?sort={{ sort.0 }}&t={{ sort.1 }}&before={{ ends.0 }}" accesskey="P">PREV</a>
 				{% endif %}
 
 				{% if ends.1 != "" %}
-				<a href="?sort={{ sort.0 }}&t={{ sort.1 }}&after={{ ends.1 }}">NEXT</a>
+				<a href="?sort={{ sort.0 }}&t={{ sort.1 }}&after={{ ends.1 }}" accesskey="N">NEXT</a>
 				{% endif %}
 			</footer>
 		</div>
@@ -85,7 +85,7 @@
 			{% endif %}
 			<div class="panel" id="user">
 				<img loading="lazy" id="user_icon" src="{{ user.icon }}" alt="User icon">
-				<p id="user_title">{{ user.title }}</p>
+				<h1 id="user_title">{{ user.title }}</h1>
 				<p id="user_name">u/{{ user.name }}</p>
 				<div id="user_description">{{ user.description }}</div>
 				<div id="user_details">

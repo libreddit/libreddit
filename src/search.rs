@@ -29,7 +29,7 @@ struct Subreddit {
 }
 
 #[derive(Template)]
-#[template(path = "search.html", escape = "none")]
+#[template(path = "search.html")]
 struct SearchTemplate {
 	posts: Vec<Post>,
 	subreddits: Vec<Subreddit>,

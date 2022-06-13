@@ -69,11 +69,11 @@
 
 			<footer>
 				{% if !ends.0.is_empty() %}
-				<a href="?sort={{ sort.0 }}&t={{ sort.1 }}&before={{ ends.0 }}">PREV</a>
+				<a href="?sort={{ sort.0 }}&t={{ sort.1 }}&before={{ ends.0 }}" accesskey="P">PREV</a>
 				{% endif %}
 
 				{% if !ends.1.is_empty() %}
-				<a href="?sort={{ sort.0 }}&t={{ sort.1 }}&after={{ ends.1 }}">NEXT</a>
+				<a href="?sort={{ sort.0 }}&t={{ sort.1 }}&after={{ ends.1 }}" accesskey="N">NEXT</a>
 				{% endif %}
 			</footer>
 		</div>
@@ -93,7 +93,7 @@
 				{% endif %}
 				<div id="sub_meta">
 					<img loading="lazy" id="sub_icon" src="{{ sub.icon }}" alt="Icon for r/{{ sub.name }}">
-					<p id="sub_title">{{ sub.title }}</p>
+					<h1 id="sub_title">{{ sub.title }}</h1>
 					<p id="sub_name">r/{{ sub.name }}</p>
 					<p id="sub_description">{{ sub.description }}</p>
 					<div id="sub_details">
@@ -131,7 +131,7 @@
 			<details class="panel" id="sidebar">
 				<summary id="sidebar_label">Sidebar</summary>
 				<div id="sidebar_contents">
-					{{ sub.info }}
+					{{ sub.info|safe }}
 					{# <hr>
 					<h2>Moderators</h2>
 					<br>

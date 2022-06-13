@@ -55,7 +55,7 @@
 				</span>
 				{% endif %}
 			</p>
-			<p class="post_title">
+			<h1 class="post_title">
 				{{ post.title }}
 				{% if post.flair.flair_parts.len() > 0 %}
 					<a href="/r/{{ post.community }}/search?q=flair_name%3A%22{{ post.flair.text }}%22&restrict_sr=on"
@@ -63,7 +63,7 @@
 						style="color:{{ post.flair.foreground_color }}; background:{{ post.flair.background_color }};">{% call utils::render_flair(post.flair.flair_parts) %}</a>
 				{% endif %}
 				{% if post.flags.nsfw %} <small class="nsfw">NSFW</small>{% endif %}
-			</p>
+			</h1>
 
 			<!-- POST MEDIA -->
 			<!-- post_type: {{ post.post_type }} -->
@@ -110,7 +110,7 @@
 			{% endif %}
 
 			<!-- POST BODY -->
-			<div class="post_body">{{ post.body }}</div>
+			<div class="post_body">{{ post.body|safe }}</div>
 			<div class="post_score" title="{{ post.score.1 }}">{{ post.score.0 }}<span class="label"> Upvotes</span></div>
 			<div class="post_footer">
 				<ul id="post_links">
@@ -144,7 +144,7 @@
 			{% endif %}
 			{% endif %}
 			
-			{{ c.render().unwrap() }}
+			{{ c.render().unwrap()|safe }}
 		</div>
 		{%- endfor %}
 

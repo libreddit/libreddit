@@ -39,11 +39,9 @@ Feel free to [open an issue](https://github.com/spikecodes/libreddit/issues/new)
 | [libreddit.spike.codes](https://libreddit.spike.codes) (official) | 🇺🇸 US |  |
 | [libreddit.dothq.co](https://libreddit.dothq.co) | 🇩🇪 DE | ✅ |
 | [libreddit.kavin.rocks](https://libreddit.kavin.rocks) | 🇮🇳 IN |  |
-| [libreddit.40two.app](https://libreddit.40two.app) | 🇳🇱 NL |  |
 | [reddit.invak.id](https://reddit.invak.id) | 🇧🇬 BG |  |
 | [reddit.phii.me](https://reddit.phii.me) | 🇺🇸 US |  |
 | [lr.riverside.rocks](https://lr.riverside.rocks) | 🇺🇸 US |  |
-| [libreddit.silkky.cloud](https://libreddit.silkky.cloud) | 🇫🇮 FI | ✅ |
 | [libreddit.strongthany.cc](https://libreddit.strongthany.cc) | 🇺🇸 US |  |
 | [libreddit.database.red](https://libreddit.database.red) | 🇺🇸 US | ✅ |
 | [libreddit.privacy.com.de](https://libreddit.privacy.com.de) | 🇩🇪 DE |  |
@@ -56,7 +54,6 @@ Feel free to [open an issue](https://github.com/spikecodes/libreddit/issues/new)
 | [libreddit.some-things.org](https://libreddit.some-things.org) | 🇨🇭 CH |  |
 | [reddit.stuehieyr.com](https://reddit.stuehieyr.com) | 🇩🇪 DE  |  |
 | [lr.mint.lgbt](https://lr.mint.lgbt) | 🇨🇦 CA |  |
-| [libreddit.alefvanoon.xyz](https://libreddit.alefvanoon.xyz) | 🇺🇸 US | ✅ |
 | [libreddit.igna.rocks](https://libreddit.igna.rocks) | 🇺🇸 US | |
 | [libreddit.autarkic.org](https://libreddit.autarkic.org) | 🇺🇸 US | |
 | [libreddit.flux.industries](https://libreddit.flux.industries) | 🇩🇪 DE | ✅ |
@@ -72,7 +69,7 @@ Feel free to [open an issue](https://github.com/spikecodes/libreddit/issues/new)
 | [libreddit.hu](https://libreddit.hu) | 🇫🇮 FI | ✅ |
 | [libreddit.totaldarkness.net](https://libreddit.totaldarkness.net) | 🇨🇦 CA |  |
 | [libreddit.esmailelbob.xyz](https://libreddit.esmailelbob.xyz) | 🇨🇦 CA |  |
-| [lr.vern.cc](https://lr.vern.cc) | 🇵🇱 PL |  |
+| [lr.vern.cc](https://lr.vern.cc) | 🇨🇦 CA |  |
 | [libreddit.nl](https://libreddit.nl) | 🇳🇱 NL |  |
 | [lr.stilic.ml](https://lr.stilic.ml) | 🇫🇷 FR | ✅ |
 | [reddi.tk](https://reddi.tk) | 🇺🇸 US | ✅ |
@@ -93,6 +90,9 @@ Feel free to [open an issue](https://github.com/spikecodes/libreddit/issues/new)
 | [reddit.beparanoid.de](https://reddit.beparanoid.de) | 🇨🇭 CH |  |
 | [libreddit.dcs0.hu](https://libreddit.dcs0.hu) | 🇭🇺 HU |  |
 | [reddit.dr460nf1r3.org](https://reddit.dr460nf1r3.org) | 🇩🇪 DE | ✅ |
+| [rd.jae.su](https://rd.jae.su) | 🇫🇮 FI |  |
+| [libreddit.mha.fi](https://libreddit.mha.fi) | 🇫🇮 FI |  |
+| [libreddit.foss.wtf](https://libreddit.foss.wtf) | 🇩🇪 DE |  |
 | [spjmllawtheisznfs7uryhxumin26ssv2draj7oope3ok3wuhy43eoyd.onion](http://spjmllawtheisznfs7uryhxumin26ssv2draj7oope3ok3wuhy43eoyd.onion) | 🇮🇳 IN |  |
 | [fwhhsbrbltmrct5hshrnqlqygqvcgmnek3cnka55zj4y7nuus5muwyyd.onion](http://fwhhsbrbltmrct5hshrnqlqygqvcgmnek3cnka55zj4y7nuus5muwyyd.onion) | 🇩🇪 DE |  |
 | [kphht2jcflojtqte4b4kyx7p2ahagv4debjj32nre67dxz7y57seqwyd.onion](http://kphht2jcflojtqte4b4kyx7p2ahagv4debjj32nre67dxz7y57seqwyd.onion) | 🇳🇱 NL |  |
@@ -106,7 +106,9 @@ Feel free to [open an issue](https://github.com/spikecodes/libreddit/issues/new)
 | [ol5begilptoou34emq2sshf3may3hlblvipdjtybbovpb7c7zodxmtqd.onion](http://ol5begilptoou34emq2sshf3may3hlblvipdjtybbovpb7c7zodxmtqd.onion) | 🇩🇪 DE |  |
 | [lbrdtjaj7567ptdd4rv74lv27qhxfkraabnyphgcvptl64ijx2tijwid.onion](http://lbrdtjaj7567ptdd4rv74lv27qhxfkraabnyphgcvptl64ijx2tijwid.onion) | 🇨🇦 CA |  |
 | [libreddit.lqs5fjmajyp7rvp4qvyubwofzi6d4imua7vs237rkc4m5qogitqwrgyd.onion](http://libreddit.lqs5fjmajyp7rvp4qvyubwofzi6d4imua7vs237rkc4m5qogitqwrgyd.onion) | 🇨🇦 CA |  |
-| [reddit.prnoid54e44a4bduq5due64jkk7wcnkxcp5kv3juncm7veptjcqudgyd.onion](reddit.prnoid54e44a4bduq5due64jkk7wcnkxcp5kv3juncm7veptjcqudgyd.onion) | 🇨🇭 CH |  |
+| [reddit.prnoid54e44a4bduq5due64jkk7wcnkxcp5kv3juncm7veptjcqudgyd.onion](http://reddit.prnoid54e44a4bduq5due64jkk7wcnkxcp5kv3juncm7veptjcqudgyd.onion) | 🇨🇭 CH |  |
+| [inz6tbezfwzexva6dize4cqraj2tjdhygxabmcgysccesvw2pybzhbyd.onion](http://inz6tbezfwzexva6dize4cqraj2tjdhygxabmcgysccesvw2pybzhbyd.onion) | 🇫🇮 FI |  |
+| [libreddit.micohauwkjbyw5meacrb4ipicwvwg4xtzl7y7viv53kig2mdcsvwkyyd.onion](http://libreddit.micohauwkjbyw5meacrb4ipicwvwg4xtzl7y7viv53kig2mdcsvwkyyd.onion/)| 🇫🇮 FI |  |
 
 A checkmark in the "Cloudflare" category here refers to the use of the reverse proxy, [Cloudflare](https://cloudflare.com). The checkmark will not be listed for a site that uses Cloudflare DNS but rather the proxying service which grants Cloudflare the ability to monitor traffic to the website.
 
@@ -267,8 +269,8 @@ Assign a default value for each setting by passing environment variables to Libr
 | `FRONT_PAGE`            | `["default", "popular", "all"]`                                                                     | `default`     |
 | `LAYOUT`                | `["card", "clean", "compact"]`                                                                      | `card`        |
 | `WIDE`                  | `["on", "off"]`                                                                                     | `off`         |
-| `COMMENT_SORT`          | `["hot", "new", "top", "rising", "controversial"]`                                                  | `hot`         |
-| `POST_SORT`             | `["confidence", "top", "new", "controversial", "old"]`                                              | `confidence`  |
+| `POST_SORT`             | `["hot", "new", "top", "rising", "controversial"]`                                                  | `hot`         |
+| `COMMENT_SORT`          | `["confidence", "top", "new", "controversial", "old"]`                                              | `confidence`  |
 | `SHOW_NSFW`             | `["on", "off"]`                                                                                     | `off`         |
 | `USE_HLS`               | `["on", "off"]`                                                                                     | `off`         |
 | `HIDE_HLS_NOTIFICATION` | `["on", "off"]`                                                                                     | `off`         |

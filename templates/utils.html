@@ -38,7 +38,6 @@
 {%- endmacro %}
 
 {% macro sub_list(current) -%}
-{% if prefs.subscriptions.len() > 0 %}
 	<details id="feeds">
 		<summary>Feeds</summary>
 		<div id="feed_list">
@@ -46,13 +45,14 @@
 			<a href="/">Home</a>
 			<a href="/r/popular">Popular</a>
 			<a href="/r/all">All</a>
-			<p>REDDIT FEEDS</p>
-			{% for sub in prefs.subscriptions %}
-				<a href="/r/{{ sub }}" {% if sub == current %}class="selected"{% endif %}>{{ sub }}</a>
-			{% endfor %}
+			{% if prefs.subscriptions.len() > 0 %}
+				<p>REDDIT FEEDS</p>
+				{% for sub in prefs.subscriptions %}
+					<a href="/r/{{ sub }}" {% if sub == current %}class="selected"{% endif %}>{{ sub }}</a>
+				{% endfor %}
+			{% endif %}
 		</div>
 	</details>
-{% endif %}
 {%- endmacro %}
 
 {% macro render_hls_notification(redirect_url) -%}
@@ -83,7 +83,7 @@
 			{% endfor %}
 		{% endif %}
 	</p>
-	<p class="post_title">
+	<h2 class="post_title">
 		{% if post.flair.flair_parts.len() > 0 %}
 			<a href="/r/{{ post.community }}/search?q=flair_name%3A%22{{ post.flair.text }}%22&restrict_sr=on"
 				class="post_flair"
@@ -91,7 +91,7 @@
 				dir="ltr">{% call render_flair(post.flair.flair_parts) %}</a>
 		{% endif %}
 		<a href="{{ post.permalink }}">{{ post.title }}</a>{% if post.flags.nsfw %} <small class="nsfw">NSFW</small>{% endif %}
-	</p>
+	</h2>
 	<!-- POST MEDIA/THUMBNAIL -->
 	{% if (prefs.layout.is_empty() || prefs.layout == "card") && post.post_type == "image" %}
 	<a href="{{ post.media.url }}" class="post_media_image {% if post.media.height / post.media.width < 2 %}short{% endif %}" >
@@ -138,7 +138,7 @@
 
 	<div class="post_score" title="{{ post.score.1 }}">{{ post.score.0 }}<span class="label"> Upvotes</span></div>
 	<div class="post_body post_preview">
-		{{ post.body }}
+		{{ post.body|safe }}
 	</div>
 	<div class="post_footer">
 		<a href="{{ post.permalink }}" class="post_comments" title="{{ post.comments.1 }} comments">{{ post.comments.0 }} comments</a>

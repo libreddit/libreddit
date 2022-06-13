@@ -1,0 +1,14 @@
+/* Laserwave theme setting */
+.laserwave {
+	--accent: #eb64b9;
+	--green: #74dfc4;
+	--text: #e0dfe1;
+	--foreground: #302a36;
+	--background: #27212e;
+	--outside: #3e3647;
+	--post: #3e3647;
+	--panel-border: 2px solid #2f2738;
+	--highlighted: #302a36;
+	--visited: #91889b;
+	--shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
