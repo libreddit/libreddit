@@ -59,6 +59,11 @@
 				<input type="hidden" value="off" name="autoplay_videos">
 				<input type="checkbox" name="autoplay_videos" {% if prefs.autoplay_videos == "on" %}checked{% endif %}>
 			</div>
+			<div id="fixed_navbar">
+				<label for="fixed_navbar">Keep navbar fixed</label>
+				<input type="hidden" value="off" name="fixed_navbar">
+				<input type="checkbox" name="fixed_navbar" {% if prefs.fixed_navbar == "on" %}checked{% endif %}>
+			</div>
 			<div id="use_hls">
 				<label for="use_hls">Use HLS for videos
 					<details id="feeds">

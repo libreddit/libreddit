@@ -272,6 +272,7 @@ Assign a default value for each setting by passing environment variables to Libr
 | `USE_HLS`               | `["on", "off"]`                                                                                     | `off`         |
 | `HIDE_HLS_NOTIFICATION` | `["on", "off"]`                                                                                     | `off`         |
 | `AUTOPLAY_VIDEOS`       | `["on", "off"]`                                                                                     | `off`         |
+| `FIXED_NAVBAR`          | `["on", "off"]`                                                                                     | `on`          |
 
 ### Examples
 

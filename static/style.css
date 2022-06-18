@@ -69,6 +69,9 @@ pre, form, fieldset, table, th, td, select, input {
 body {
 	background: var(--background);
 	font-size: 15px;
+}
+
+body.fixed_navbar {
 	padding-top: 60px;
 }
 
@@ -88,8 +91,12 @@ nav {
 	z-index: 2;
 	top: 0;
 	padding: 5px 15px;
+	margin-bottom: 10px;
 	min-height: 40px;
 	width: calc(100% - 30px);
+}
+
+nav.fixed_navbar {
 	position: fixed;
 }
 
@@ -1237,7 +1244,7 @@ td, th {
 /* Mobile */
 
 @media screen and (max-width: 800px) {
-	body { padding-top: 120px }
+	body.fixed_navbar { padding-top: 120px }
 
 	main {
 		flex-direction: column-reverse;
@@ -1279,7 +1286,7 @@ td, th {
 }
 
 @media screen and (max-width: 480px) {
-	body { padding-top: 100px; }
+	body.fixed_navbar { padding-top: 100px; }
 	#version { display: none; }
 
 	.post {
