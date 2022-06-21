@@ -109,7 +109,7 @@ Feel free to [open an issue](https://github.com/spikecodes/libreddit/issues/new)
 | [reddit.prnoid54e44a4bduq5due64jkk7wcnkxcp5kv3juncm7veptjcqudgyd.onion](http://reddit.prnoid54e44a4bduq5due64jkk7wcnkxcp5kv3juncm7veptjcqudgyd.onion) | 🇨🇭 CH |  |
 | [inz6tbezfwzexva6dize4cqraj2tjdhygxabmcgysccesvw2pybzhbyd.onion](http://inz6tbezfwzexva6dize4cqraj2tjdhygxabmcgysccesvw2pybzhbyd.onion) | 🇫🇮 FI |  |
 | [libreddit.micohauwkjbyw5meacrb4ipicwvwg4xtzl7y7viv53kig2mdcsvwkyyd.onion](http://libreddit.micohauwkjbyw5meacrb4ipicwvwg4xtzl7y7viv53kig2mdcsvwkyyd.onion/)| 🇫🇮 FI |  |
-| [http://lr.vernccvbvyi5qhfzyqengccj7lkove6bjot2xhh5kajhwvidqafczrad.onion/](http://lr.vernccvbvyi5qhfzyqengccj7lkove6bjot2xhh5kajhwvidqafczrad.onion/) | 🇨🇦 CA |  |
+| [http://lr.vernccvbvyi5qhfzyqengccj7lkove6bjot2xhh5kajhwvidqafczrad.onion/](lr.vernccvbvyi5qhfzyqengccj7lkove6bjot2xhh5kajhwvidqafczrad.onion) | 🇨🇦 CA |  |
 A checkmark in the "Cloudflare" category here refers to the use of the reverse proxy, [Cloudflare](https://cloudflare.com). The checkmark will not be listed for a site that uses Cloudflare DNS but rather the proxying service which grants Cloudflare the ability to monitor traffic to the website.
 
 ---
