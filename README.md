@@ -89,6 +89,7 @@ Feel free to [open an issue](https://github.com/spikecodes/libreddit/issues/new)
 | [reddit.beparanoid.de](https://reddit.beparanoid.de) | 🇨🇭 CH |  |
 | [libreddit.dcs0.hu](https://libreddit.dcs0.hu) | 🇭🇺 HU |  |
 | [reddit.dr460nf1r3.org](https://reddit.dr460nf1r3.org) | 🇩🇪 DE | ✅ |
+| [libreddit.garudalinux.org](https://libreddit.garudalinux.org) | 🇫🇮 FI | ✅ |
 | [rd.jae.su](https://rd.jae.su) | 🇫🇮 FI |  |
 | [libreddit.mha.fi](https://libreddit.mha.fi) | 🇫🇮 FI |  |
 | [libreddit.foss.wtf](https://libreddit.foss.wtf) | 🇩🇪 DE |  |
