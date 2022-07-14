@@ -1,0 +1,4 @@
+FROM spikecodes/libreddit:latest
+# Exposing port 8080 only for local testing
+EXPOSE 8080
+CMD ["libreddit"]
