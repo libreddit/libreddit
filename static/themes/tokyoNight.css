@@ -1,0 +1,14 @@
+/* Tokyo Night theme setting */
+.tokyoNight {
+	--accent: #565f89;
+	--green: #73daca;
+	--text: #a9b1d6;
+	--foreground: #24283b;
+	--background: #1a1b26;
+	--outside: #24283b;
+	--post: #1a1b26;
+	--panel-border: 1px solid #a9b1d6;
+	--highlighted: #414868;
+	--visited: #414868;
+	--shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}

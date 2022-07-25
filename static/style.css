@@ -47,6 +47,21 @@
 
 /* Other themes are located in the "themes" folder */
 
+/* Tokyo Night theme setting */
+.tokyoNight {
+	--accent: #565f89;
+	--green: #73daca;
+	--text: #a9b1d6;
+	--foreground: #24283b;
+	--background: #1a1b26;
+	--outside: #24283b;
+	--post: #1a1b26;
+	--panel-border: 1px solid #a9b1d6;
+	--highlighted: #414868;
+	--visited: #414868;
+	--shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
 /* General */
 
 ::selection {
@@ -78,13 +93,13 @@ nav {
 
 	justify-content: space-between;
 	align-items: center;
-	
+
 	color: var(--accent);
 	background: var(--outside);
 	box-shadow: var(--shadow);
-	
+
 	font-size: 20px;
-	
+
 	z-index: 2;
 	top: 0;
 	padding: 5px 15px;
@@ -390,7 +405,7 @@ select {
 select, #search {
 	border: none;
 	padding: 0 10px;
-	
+
 	appearance: none;
 	-webkit-appearance: none;
 	-moz-appearance: none;
@@ -515,7 +530,7 @@ button.submit:hover > svg { stroke: var(--accent); }
 	margin-bottom: 20px;
 }
 
-.search_subreddit { 
+.search_subreddit {
 	padding: 16px 20px;
 	display: flex;
 }
@@ -544,7 +559,7 @@ a.search_subreddit:hover {
 	background: var(--foreground);
 }
 
-.search_subreddit:not(:last-child) { 
+.search_subreddit:not(:last-child) {
 	border-bottom: 1px solid var(--highlighted);
 }
 
@@ -622,7 +637,7 @@ a.search_subreddit:hover {
 
 .post_score .label {
 	display: none;
-} 
+}
 
 .post_header {
 	margin: 15px 20px 5px 12px;
@@ -856,7 +871,7 @@ a.search_subreddit:hover {
 }
 
 .post_thumbnail img {
-	max-width: 100%;	
+	max-width: 100%;
 }
 
 .stickied {
@@ -1245,7 +1260,7 @@ td, th {
 		margin: 0 0 10px 0;
 		max-width: 100%;
 	}
-	
+
 	nav {
 		grid-template-areas: 'logo links' 'searchbox searchbox';
 		padding: 10px;
@@ -1263,7 +1278,7 @@ td, th {
 		right: 10px;
 		min-width: auto;
 	}
-	
+
 	#settings {
 		max-width: unset;
 	}
@@ -1291,14 +1306,14 @@ td, th {
 				"post_score  post_footer post_thumbnail" auto
 				/ auto 1fr fit-content(min(20%, 152px));
 	}
-	
+
 	.post_score {
 		margin: 5px 0px 20px 15px;
 		padding: 0;
 	}
-	
+
 	.compact .post_score { padding: 0; }
-	
+
 	.post_score::before {	content: "↑" }
 
 	.post_header { font-size: 14px; }
