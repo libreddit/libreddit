@@ -1,0 +1,14 @@
+/* Dracula theme setting */
+.dracula {
+	--accent: #bd93f9;
+	--green: #50fa7b;
+	--text: #f8f8f2;
+	--foreground: #3d4051;
+	--background: #282a36;
+	--outside: #393c4d;
+	--post: #333544;
+	--panel-border: 2px solid #44475a;
+	--highlighted: #4e5267;
+	--visited: #969692;
+	--shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}

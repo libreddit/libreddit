@@ -41,7 +41,7 @@
 			</form>
 
 			{% if sub.name.contains("+") %}
-				<form action="/r/{{ sub.name }}/subscribe" method="POST">
+				<form action="/r/{{ sub.name }}/subscribe?redirect={{ redirect_url }}" method="POST">
 					<button id="multisub" class="subscribe" title="Subscribe to each sub in this multireddit">Subscribe to Multireddit</button>
 				</form>
 			{% endif %}
@@ -65,21 +65,21 @@
 
 			<footer>
 				{% if !ends.0.is_empty() %}
-				<a href="?sort={{ sort.0 }}&t={{ sort.1 }}&before={{ ends.0 }}">PREV</a>
+				<a href="?sort={{ sort.0 }}&t={{ sort.1 }}&before={{ ends.0 }}" accesskey="P">PREV</a>
 				{% endif %}
 
 				{% if !ends.1.is_empty() %}
-				<a href="?sort={{ sort.0 }}&t={{ sort.1 }}&after={{ ends.1 }}">NEXT</a>
+				<a href="?sort={{ sort.0 }}&t={{ sort.1 }}&after={{ ends.1 }}" accesskey="N">NEXT</a>
 				{% endif %}
 			</footer>
 		</div>
 		{% endif %}
-		{% if is_filtered || (!sub.name.is_empty() && !sub.name.contains("+")) %}
+		{% if is_filtered || (!sub.name.is_empty() && sub.name != "all" && sub.name != "popular" && !sub.name.contains("+")) %}
 		<aside>
 			{% if is_filtered %}
 				<center>(Content from r/{{ sub.name }} has been filtered)</center>
 			{% endif %}
-			{% if !sub.name.is_empty() && !sub.name.contains("+") %}
+			{% if !sub.name.is_empty() && sub.name != "all" && sub.name != "popular" && !sub.name.contains("+") %}
 			<div class="panel" id="subreddit">
 				{% if sub.wiki %}
 				<div id="top">
@@ -89,7 +89,7 @@
 				{% endif %}
 				<div id="sub_meta">
 					<img loading="lazy" id="sub_icon" src="{{ sub.icon }}" alt="Icon for r/{{ sub.name }}">
-					<p id="sub_title">{{ sub.title }}</p>
+					<h1 id="sub_title">{{ sub.title }}</h1>
 					<p id="sub_name">r/{{ sub.name }}</p>
 					<p id="sub_description">{{ sub.description }}</p>
 					<div id="sub_details">
@@ -101,22 +101,22 @@
 					<div id="sub_actions">
 						<div id="sub_subscription">
 							{% if prefs.subscriptions.contains(sub.name) %}
-								<form action="/r/{{ sub.name }}/unsubscribe" method="POST">
+								<form action="/r/{{ sub.name }}/unsubscribe?redirect={{ redirect_url }}" method="POST">
 									<button class="unsubscribe">Unsubscribe</button>
 								</form>
 							{% else %}
-								<form action="/r/{{ sub.name }}/subscribe" method="POST">
+								<form action="/r/{{ sub.name }}/subscribe?redirect={{ redirect_url }}" method="POST">
 									<button class="subscribe">Subscribe</button>
 								</form>
 							{% endif %}
 						</div>
 						<div id="sub_filter">
 							{% if prefs.filters.contains(sub.name) %}
-								<form action="/r/{{ sub.name }}/unfilter" method="POST">
+								<form action="/r/{{ sub.name }}/unfilter?redirect={{ redirect_url }}" method="POST">
 									<button class="unfilter">Unfilter</button>
 								</form>
 							{% else %}
-							<form action="/r/{{ sub.name }}/filter" method="POST">
+							<form action="/r/{{ sub.name }}/filter?redirect={{ redirect_url }}" method="POST">
 								<button class="filter">Filter</button>
 							</form>
 							{% endif %}
@@ -127,7 +127,7 @@
 			<details class="panel" id="sidebar">
 				<summary id="sidebar_label">Sidebar</summary>
 				<div id="sidebar_contents">
-					{{ sub.info }}
+					{{ sub.info|safe }}
 					{# <hr>
 					<h2>Moderators</h2>
 					<br>

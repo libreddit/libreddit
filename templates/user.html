@@ -16,9 +16,12 @@
 		{% if !is_filtered %}
 		<div id="column_one">
 			<form id="sort">
-				<select name="sort">
-					{% call utils::options(sort.0, ["hot", "new", "top"], "") %}
-				</select>{% if sort.0 == "top" %}<select id="timeframe" name="t">
+				<div id="listing_options">
+					{% call utils::sort(["/user/", user.name.as_str()].concat(), ["overview", "comments", "submitted"], listing) %}
+				</div>
+				<select id="sort_select" name="sort">
+					{% call utils::options(sort.0, ["hot", "new", "top", "controversial"], "") %}
+				</select>{% if sort.0 == "top" || sort.0 == "controversial" %}<select id="timeframe" name="t">
 					{% call utils::options(sort.1, ["hour", "day", "week", "month", "year", "all"], "all") %}
 				</select>{% endif %}<button id="sort_submit" class="submit">
 					<svg width="15" viewBox="0 0 110 100" fill="none" stroke-width="10" stroke-linecap="round">
@@ -49,7 +52,7 @@
 						<a class="comment_link" href="{{ post.permalink }}">COMMENT</a>
 						<span class="created" title="{{ post.created }}">{{ post.rel_time }}</span>
 					</summary>
-					<p class="comment_body">{{ post.body }}</p>
+					<p class="comment_body">{{ post.body|safe }}</p>
 				</details>
 			</div>
 			{% endif %}
@@ -63,11 +66,11 @@
 
 			<footer>
 				{% if ends.0 != "" %}
-				<a href="?sort={{ sort.0 }}&t={{ sort.1 }}&before={{ ends.0 }}">PREV</a>
+				<a href="?sort={{ sort.0 }}&t={{ sort.1 }}&before={{ ends.0 }}" accesskey="P">PREV</a>
 				{% endif %}
 
 				{% if ends.1 != "" %}
-				<a href="?sort={{ sort.0 }}&t={{ sort.1 }}&after={{ ends.1 }}">NEXT</a>
+				<a href="?sort={{ sort.0 }}&t={{ sort.1 }}&after={{ ends.1 }}" accesskey="N">NEXT</a>
 				{% endif %}
 			</footer>
 		</div>
@@ -78,7 +81,7 @@
 			{% endif %}
 			<div class="panel" id="user">
 				<img loading="lazy" id="user_icon" src="{{ user.icon }}" alt="User icon">
-				<p id="user_title">{{ user.title }}</p>
+				<h1 id="user_title">{{ user.title }}</h1>
 				<p id="user_name">u/{{ user.name }}</p>
 				<div id="user_description">{{ user.description }}</div>
 				<div id="user_details">
@@ -91,22 +94,22 @@
 				{% let name = ["u_", user.name.as_str()].join("") %}
 				<div id="user_subscription">
 					{% if prefs.subscriptions.contains(name) %}
-						<form action="/r/{{ name }}/unsubscribe" method="POST">
+						<form action="/r/{{ name }}/unsubscribe?redirect={{ redirect_url }}" method="POST">
 							<button class="unsubscribe">Unfollow</button>
 						</form>
 					{% else %}
-						<form action="/r/{{ name }}/subscribe" method="POST">
+						<form action="/r/{{ name }}/subscribe?redirect={{ redirect_url }}" method="POST">
 							<button class="subscribe">Follow</button>
 						</form>
 					{% endif %}
 					</div>
 					<div id="user_filter">
 						{% if prefs.filters.contains(name) %}
-							<form action="/r/{{ name }}/unfilter" method="POST">
+							<form action="/r/{{ name }}/unfilter?redirect={{ redirect_url }}" method="POST">
 								<button class="unfilter">Unfilter</button>
 							</form>
 						{% else %}
-							<form action="/r/{{ name }}/filter" method="POST">
+							<form action="/r/{{ name }}/filter?redirect={{ redirect_url }}" method="POST">
 								<button class="filter">Filter</button>
 							</form>
 						{% endif %}

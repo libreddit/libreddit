@@ -1,0 +1,14 @@
+/* Violet theme setting */
+.violet {
+	--accent: #7c71dd;
+	--green: #5cff85;
+	--text: white;
+	--foreground: #1F2347;
+	--background: #12152b;
+	--outside: #181c3a;
+	--post: #181c3a;
+	--panel-border: 1px solid #1F2347;
+	--highlighted: #1F2347;
+	--visited: #aaa;
+	--shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+}

@@ -1,0 +1,14 @@
+/* Gold theme setting */
+.gold {
+	--accent: #f2aa4c;
+	--green: #5cff85;
+	--text: white;
+	--foreground: #234;
+	--background: #101820;
+	--outside: #1b2936;
+	--post: #1b2936;
+	--panel-border: 0px solid black;
+	--highlighted: #234;
+	--visited: #aaa;
+	--shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+}

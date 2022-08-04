@@ -1,22 +1,24 @@
 // CRATES
 use crate::client::json;
-use crate::esc;
 use crate::server::RequestExt;
 use crate::utils::{error, filter_posts, format_url, get_filters, param, template, Post, Preferences, User};
 use askama::Template;
 use hyper::{Body, Request, Response};
-use time::{OffsetDateTime, macros::format_description};
+use time::{macros::format_description, OffsetDateTime};
 
 // STRUCTS
 #[derive(Template)]
-#[template(path = "user.html", escape = "none")]
+#[template(path = "user.html")]
 struct UserTemplate {
 	user: User,
 	posts: Vec<Post>,
 	sort: (String, String),
 	ends: (String, String),
+	/// "overview", "comments", or "submitted"
+	listing: String,
 	prefs: Preferences,
 	url: String,
+	redirect_url: String,
 	/// Whether the user themself is filtered.
 	is_filtered: bool,
 	/// Whether all fetched posts are filtered (to differentiate between no posts fetched in the first place,
@@ -26,13 +28,17 @@ struct UserTemplate {
 
 // FUNCTIONS
 pub async fn profile(req: Request<Body>) -> Result<Response<Body>, String> {
+	let listing = req.param("listing").unwrap_or_else(|| "overview".to_string());
+
 	// Build the Reddit JSON API path
 	let path = format!(
-		"/user/{}.json?{}&raw_json=1",
+		"/user/{}/{}.json?{}&raw_json=1",
 		req.param("name").unwrap_or_else(|| "reddit".to_string()),
-		req.uri().query().unwrap_or_default()
+		listing,
+		req.uri().query().unwrap_or_default(),
 	);
 	let url = String::from(req.uri().path_and_query().map_or("", |val| val.as_str()));
+	let redirect_url = url[1..].replace('?', "%3F").replace('&', "%26");
 
 	// Retrieve other variables from Libreddit request
 	let sort = param(&path, "sort").unwrap_or_default();
@@ -46,8 +52,10 @@ pub async fn profile(req: Request<Body>) -> Result<Response<Body>, String> {
 			posts: Vec::new(),
 			sort: (sort, param(&path, "t").unwrap_or_default()),
 			ends: (param(&path, "after").unwrap_or_default(), "".to_string()),
+			listing,
 			prefs: Preferences::new(req),
 			url,
+			redirect_url,
 			is_filtered: true,
 			all_posts_filtered: false,
 		})
@@ -62,8 +70,10 @@ pub async fn profile(req: Request<Body>) -> Result<Response<Body>, String> {
 					posts,
 					sort: (sort, param(&path, "t").unwrap_or_default()),
 					ends: (param(&path, "after").unwrap_or_default(), after),
+					listing,
 					prefs: Preferences::new(req),
 					url,
+					redirect_url,
 					is_filtered: false,
 					all_posts_filtered,
 				})
@@ -91,11 +101,11 @@ async fn user(name: &str) -> Result<User, String> {
 		// Parse the JSON output into a User struct
 		User {
 			name: res["data"]["name"].as_str().unwrap_or(name).to_owned(),
-			title: esc!(about("title")),
+			title: about("title"),
 			icon: format_url(&about("icon_img")),
 			karma: res["data"]["total_karma"].as_i64().unwrap_or(0),
 			created: created.format(format_description!("[month repr:short] [day] '[year repr:last_two]")).unwrap_or_default(),
-			banner: esc!(about("banner_img")),
+			banner: about("banner_img"),
 			description: about("public_description"),
 		}
 	})

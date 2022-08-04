@@ -39,7 +39,7 @@
 			{% endif %}
 			{% for subreddit in subreddits %}
 			<a href="{{ subreddit.url }}" class="search_subreddit">
-				<div class="search_subreddit_left">{% if subreddit.icon != "" %}<img loading="lazy" src="{{ subreddit.icon }}" alt="r/{{ subreddit.name }} icon">{% endif %}</div>
+				<div class="search_subreddit_left">{% if subreddit.icon != "" %}<img loading="lazy" src="{{ subreddit.icon|safe }}" alt="r/{{ subreddit.name }} icon">{% endif %}</div>
 				<div class="search_subreddit_right">
 					<p class="search_subreddit_header"> 
 						<span class="search_subreddit_name">r/{{ subreddit.name }}</span>
@@ -92,13 +92,13 @@
 			{% if params.before != "" %}
 			<a href="?q={{ params.q }}&restrict_sr={{ params.restrict_sr }}
 				&sort={{ params.sort }}&t={{ params.t }}
-				&before={{ params.before }}">PREV</a>
+				&before={{ params.before }}" accesskey="P">PREV</a>
 			{% endif %}
 
 			{% if params.after != "" %}
 			<a href="?q={{ params.q }}&restrict_sr={{ params.restrict_sr }}
 				&sort={{ params.sort }}&t={{ params.t }}
-				&after={{ params.after }}">NEXT</a>
+				&after={{ params.after }}" accesskey="N">NEXT</a>
 			{% endif %}
 		</footer>
 		{% endif %}
