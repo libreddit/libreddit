@@ -141,7 +141,7 @@
 		{{ post.body|safe }}
 	</div>
 	<div class="post_footer">
-		<a href="{{ post.permalink }}" class="post_comments" title="{{ post.comments.1 }} comments">{{ post.comments.0 }} comments</a>
+		<a href="{{ post.permalink }}" class="post_comments" title="{{ post.comments.1 }} comments">{{ post.comments.0 }} {% if post.comments.1 == "1" %}comment{% else %}comments{% endif %}</a>
 	</div>
 </div>
 {%- endmacro %}
