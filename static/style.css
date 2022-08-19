@@ -121,6 +121,7 @@ nav #version {
 
 nav #libreddit {
 	vertical-align: -2px;
+	text-decoration: none;
 }
 
 #settings_link {
