@@ -62,8 +62,7 @@ Feel free to [open an issue](https://github.com/spikecodes/libreddit/issues/new)
 | [libreddit.pussthecat.org](https://libreddit.pussthecat.org) | 🇩🇪 DE |  |
 | [libreddit.mutahar.rocks](https://libreddit.mutahar.rocks) | 🇫🇷 FR |  |
 | [libreddit.northboot.xyz](https://libreddit.northboot.xyz) | 🇩🇪 DE |  |
-| [leddit.xyz](https://leddit.xyz) | 🇺🇸 US |  |
-| [de.leddit.xyz](https://de.leddit.xyz) | 🇩🇪 DE |  |
+| [leddit.xyz](https://leddit.xyz) | 🇩🇪 DE |  |
 | [lr.cowfee.moe](https://lr.cowfee.moe) | 🇺🇸 US |  |
 | [libreddit.hu](https://libreddit.hu) | 🇫🇮 FI | ✅ |
 | [libreddit.totaldarkness.net](https://libreddit.totaldarkness.net) | 🇨🇦 CA |  |
