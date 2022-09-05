@@ -48,7 +48,6 @@ Feel free to [open an issue](https://github.com/spikecodes/libreddit/issues/new)
 | [libreddit.domain.glass](https://libreddit.domain.glass) | 🇺🇸 US | ✅ |
 | [libreddit.sugoma.tk](https://libreddit.sugoma.tk) | 🇺🇸 US | |
 | [libreddit.jamiethalacker.dev](https://libreddit.jamiethalacker.dev) | 🇺🇸 US | ✅ |
-| [reddit.artemislena.eu](https://reddit.artemislena.eu) | 🇩🇪 DE |  |
 | [r.nf](https://r.nf) | 🇩🇪 DE | ✅ |
 | [libreddit.some-things.org](https://libreddit.some-things.org) | 🇨🇭 CH |  |
 | [reddit.stuehieyr.com](https://reddit.stuehieyr.com) | 🇩🇪 DE  |  |
