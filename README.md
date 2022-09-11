@@ -95,6 +95,7 @@ Feel free to [open an issue](https://github.com/spikecodes/libreddit/issues/new)
 | [libreddit.encrypted-data.xyz](https://libreddit.encrypted-data.xyz)| 🇫🇷 FR | ✅ |
 | [libreddit.eu.org](https://libreddit.eu.org)| 🇮🇪 IE | ✅ |
 | [l.opnxng.com](https://l.opnxng.com)| 🇸🇬 SG |  |
+| [libreddit.oxymagnesium.com](https://libreddit.oxymagnesium.com) | 🇺🇸 US |  |
 | [spjmllawtheisznfs7uryhxumin26ssv2draj7oope3ok3wuhy43eoyd.onion](http://spjmllawtheisznfs7uryhxumin26ssv2draj7oope3ok3wuhy43eoyd.onion) | 🇮🇳 IN |  |
 | [fwhhsbrbltmrct5hshrnqlqygqvcgmnek3cnka55zj4y7nuus5muwyyd.onion](http://fwhhsbrbltmrct5hshrnqlqygqvcgmnek3cnka55zj4y7nuus5muwyyd.onion) | 🇩🇪 DE |  |
 | [kphht2jcflojtqte4b4kyx7p2ahagv4debjj32nre67dxz7y57seqwyd.onion](http://kphht2jcflojtqte4b4kyx7p2ahagv4debjj32nre67dxz7y57seqwyd.onion) | 🇳🇱 NL |  |
