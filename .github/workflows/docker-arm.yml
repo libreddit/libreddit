@@ -33,6 +33,6 @@ jobs:
           file: ./Dockerfile.arm
           platforms: linux/arm64
           push: true
-          tags: spikecodes/libreddit:arm
+          tags: libbacon/libbacon:arm
           cache-from: type=gha
           cache-to: type=gha,mode=max

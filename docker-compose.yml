@@ -4,7 +4,7 @@ services:
   web:
     build: .
     restart: always
-    container_name: "libreddit"
+    container_name: "libbacon"
     ports:
       - 8080:8080
     healthcheck:

@@ -530,7 +530,7 @@ pub fn setting(req: &Request<Body>, name: &str) -> String {
 		.cookie(name)
 		.unwrap_or_else(|| {
 			// If there is no cookie for this setting, try receiving a default from an environment variable
-			if let Ok(default) = std::env::var(format!("LIBREDDIT_DEFAULT_{}", name.to_uppercase())) {
+			if let Ok(default) = std::env::var(format!("LIBBACON_DEFAULT_{}", name.to_uppercase())) {
 				Cookie::new(name, default)
 			} else {
 				Cookie::named(name)
@@ -615,7 +615,7 @@ pub fn format_url(url: &str) -> String {
 	}
 }
 
-// Rewrite Reddit links to Libreddit in body of text
+// Rewrite Reddit links to libbacon in body of text
 pub fn rewrite_urls(input_text: &str) -> String {
 	let text1 = Regex::new(r#"href="(https|http|)://(www\.|old\.|np\.|amp\.|)(reddit\.com|redd\.it)/"#)
 		.map_or(String::new(), |re| re.replace_all(input_text, r#"href="/"#).to_string())
@@ -623,7 +623,7 @@ pub fn rewrite_urls(input_text: &str) -> String {
 		.replace("%5C", "")
 		.replace('\\', "");
 
-	// Rewrite external media previews to Libreddit
+	// Rewrite external media previews to libbacon
 	Regex::new(r"https://external-preview\.redd\.it(.*)[^?]").map_or(String::new(), |re| {
 		if re.is_match(&text1) {
 			re.replace_all(&text1, format_url(re.find(&text1).map(|x| x.as_str()).unwrap_or_default())).to_string()

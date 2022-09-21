@@ -94,7 +94,7 @@ nav {
 }
 
 nav * { color: var(--text); }
-nav #reddit, #code > span { color: var(--accent); }
+nav #bacon, #code > span { color: var(--accent); }
 nav #code > svg { stroke: var(--accent); }
 
 nav #logo {
@@ -119,7 +119,7 @@ nav #version {
 	margin-right: 10px;
 }
 
-nav #libreddit {
+nav #libbacon {
 	vertical-align: -2px;
 }
 
