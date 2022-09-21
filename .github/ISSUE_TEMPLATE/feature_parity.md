@@ -1,6 +1,6 @@
 ---
 name: ✨ Feature parity
-about: Suggest implementing a feature into Libreddit that is found in Reddit.com
+about: Suggest implementing a feature into libbacon that is found in Reddit.com
 title: '✨ Feature parity: '
 labels: feature parity
 assignees: ''
@@ -12,7 +12,7 @@ assignees: ''
   A clear and concise description of what the feature is.
 -->
 
-## Describe how this could be implemented into Libreddit
+## Describe how this could be implemented into libbacon
 <!--
   A clear and concise description of what you want to happen.
 -->

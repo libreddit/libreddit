@@ -1,5 +1,5 @@
 {
-  "name": "Libreddit",
+  "name": "libbacon",
   "description": "Private front-end for Reddit",
   "buildpacks": [
     {
@@ -11,31 +11,31 @@
   ],
   "stack": "container",
   "env": {
-    "LIBREDDIT_DEFAULT_THEME": {
+    "LIBBACON_DEFAULT_THEME": {
       "required": false
     },
-    "LIBREDDIT_DEFAULT_FRONT_PAGE": {
+    "LIBBACON_DEFAULT_FRONT_PAGE": {
       "required": false
     },
-    "LIBREDDIT_DEFAULT_LAYOUT": {
+    "LIBBACON_DEFAULT_LAYOUT": {
       "required": false
     },
-    "LIBREDDIT_DEFAULT_WIDE": {
+    "LIBBACON_DEFAULT_WIDE": {
       "required": false
     },
-    "LIBREDDIT_DEFAULT_COMMENT_SORT": {
+    "LIBBACON_DEFAULT_COMMENT_SORT": {
       "required": false
     },
-    "LIBREDDIT_DEFAULT_POST_SORT": {
+    "LIBBACON_DEFAULT_POST_SORT": {
       "required": false
     },
-    "LIBREDDIT_DEFAULT_SHOW_NSFW": {
+    "LIBBACON_DEFAULT_SHOW_NSFW": {
       "required": false
     },
-    "LIBREDDIT_USE_HLS": {
+    "LIBBACON_USE_HLS": {
       "required": false
     },
-    "LIBREDDIT_HIDE_HLS_NOTIFICATION": {
+    "LIBBACON_HIDE_HLS_NOTIFICATION": {
       "required": false
     }
   }

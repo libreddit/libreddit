@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% import "utils.html" as utils %}
 
-{% block title %}Libreddit: search results - {{ params.q }}{% endblock %}
+{% block title %}libbacon: search results - {{ params.q }}{% endblock %}
 
 {% block subscriptions %}
 	{% call utils::sub_list("") %}
@@ -10,7 +10,7 @@
 {% block content %}
 	<div id="column_one">
 		<form id="search_sort">
-			<input id="search" type="text" name="q" placeholder="Search" value="{{ params.q }}" title="Search libreddit">
+			<input id="search" type="text" name="q" placeholder="Search" value="{{ params.q }}" title="Search libbacon">
 			{% if sub != "" %}
 			<div id="inside">
 				<input type="checkbox" name="restrict_sr" id="restrict_sr" {% if params.restrict_sr != "" %}checked{% endif %}>

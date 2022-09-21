@@ -30,8 +30,8 @@ jobs:
       - uses: actions/upload-artifact@v2.2.1
         name: Upload a Build Artifact
         with:
-          name: libreddit
-          path: target/release/libreddit
+          name: libbacon
+          path: target/release/libbacon
         
       - name: Versions
         id: version
@@ -40,7 +40,7 @@ jobs:
           echo "::set-output name=tag::$(git describe --tags)"
           
       - name: Calculate SHA512 checksum
-        run: sha512sum target/release/libreddit > libreddit.sha512
+        run: sha512sum target/release/libbacon > libbacon.sha512
         
       - name: Release
         uses: softprops/action-gh-release@v1
@@ -50,8 +50,8 @@ jobs:
           name: ${{ steps.version.outputs.version }} - ${{ github.event.head_commit.message }}
           draft: true
           files: |
-            target/release/libreddit
-            libreddit.sha512
+            target/release/libbacon
+            libbacon.sha512
           body: |
             - ${{ github.event.head_commit.message }} ${{ github.sha }}
           generate_release_notes: true

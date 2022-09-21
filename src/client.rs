@@ -73,7 +73,7 @@ fn request(url: String, quarantine: bool) -> Boxed<Result<Response<Body>, String
 	let builder = Request::builder()
 		.method("GET")
 		.uri(&url)
-		.header("User-Agent", format!("web:libreddit:{}", env!("CARGO_PKG_VERSION")))
+		.header("User-Agent", format!("web:libbacon:{}", env!("CARGO_PKG_VERSION")))
 		.header("Host", "www.reddit.com")
 		.header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8")
 		.header("Accept-Language", "en-US,en;q=0.5")

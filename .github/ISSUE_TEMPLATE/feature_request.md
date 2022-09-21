@@ -1,6 +1,6 @@
 ---
 name: 💡 Feature request
-about: Suggest a feature for Libreddit that is not found in Reddit
+about: Suggest a feature for libbacon that is not found in Reddit
 title: '💡 Feature request: '
 labels: enhancement
 assignees: ''

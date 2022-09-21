@@ -33,6 +33,6 @@ jobs:
           file: ./Dockerfile
           platforms: linux/amd64
           push: true
-          tags: spikecodes/libreddit:latest
+          tags: libbacon/libbacon:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
