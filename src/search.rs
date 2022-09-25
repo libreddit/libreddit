@@ -42,6 +42,8 @@ struct SearchTemplate {
 	/// Whether all fetched posts are filtered (to differentiate between no posts fetched in the first place,
 	/// and all fetched posts being filtered).
 	all_posts_filtered: bool,
+	/// Whether all posts were hidden because they are NSFW (and user has disabled show NSFW)
+	all_posts_hidden_nsfw: bool,
 }
 
 // SERVICES
@@ -100,12 +102,13 @@ pub async fn find(req: Request<Body>) -> Result<Response<Body>, String> {
 			url,
 			is_filtered: true,
 			all_posts_filtered: false,
+			all_posts_hidden_nsfw: false,
 		})
 	} else {
 		match Post::fetch(&path, quarantined).await {
 			Ok((mut posts, after)) => {
 				let all_posts_filtered = filter_posts(&mut posts, &filters);
-
+				let all_posts_hidden_nsfw = posts.iter().all(|p| p.flags.nsfw) && setting(&req, "show_nsfw") != "on";
 				template(SearchTemplate {
 					posts,
 					subreddits,
@@ -123,6 +126,7 @@ pub async fn find(req: Request<Body>) -> Result<Response<Body>, String> {
 					url,
 					is_filtered: false,
 					all_posts_filtered,
+					all_posts_hidden_nsfw,
 				})
 			}
 			Err(msg) => {
