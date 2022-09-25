@@ -4,7 +4,7 @@ description = " Alternative private front-end to Reddit"
 license = "AGPL-3.0"
 repository = "https://github.com/libbacon/libbacon"
 version = "0.1.0"
-authors = ["Daniel Valentine <Daniel-Valentine@users.noreply.github.com>"]
+authors = ["Daniel Valentine <Daniel-Valentine@users.noreply.github.com>", "spikecodes <19519553+spikecodes@users.noreply.github.com>"]
 edition = "2021"
 
 [dependencies]
