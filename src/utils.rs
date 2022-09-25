@@ -469,7 +469,7 @@ impl Preferences {
 		let mut themes = vec!["system".to_string()];
 		for file in ThemeAssets::iter() {
 			let chunks: Vec<&str> = file.as_ref().split(".css").collect();
-			themes.push(chunks[0].to_owned())
+			themes.push(chunks[0].to_owned());
 		}
 		Self {
 			available_themes: themes,

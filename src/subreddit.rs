@@ -257,11 +257,7 @@ pub async fn subscriptions_filters(req: Request<Body>) -> Result<Response<Body>,
 
 	// Redirect back to subreddit
 	// check for redirect parameter if unsubscribing/unfiltering from outside sidebar
-	let path = if let Some(redirect_path) = param(&format!("?{}", query), "redirect") {
-		format!("/{}", redirect_path)
-	} else {
-		format!("/r/{}", sub)
-	};
+	let path = param(&format!("?{}", query), "redirect").map_or_else(|| format!("/r/{}", sub), |redirect_path| format!("/{}", redirect_path));
 
 	let mut response = redirect(path);
 
