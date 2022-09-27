@@ -32,6 +32,9 @@
     "LIBBACON_DEFAULT_SHOW_NSFW": {
       "required": false
     },
+    "LIBBACON_DEFAULT_BLUR_NSFW": {
+      "required": false
+    },
     "LIBBACON_USE_HLS": {
       "required": false
     },
