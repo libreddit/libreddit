@@ -94,27 +94,36 @@
 	</h2>
 	<!-- POST MEDIA/THUMBNAIL -->
 	{% if (prefs.layout.is_empty() || prefs.layout == "card") && post.post_type == "image" %}
-	<a href="{{ post.media.url }}" class="post_media_image {% if post.media.height / post.media.width < 2 %}short{% endif %}" >
-		<svg
-			width="{{ post.media.width }}px" 
-			height="{{ post.media.height }}px" 
-			xmlns="http://www.w3.org/2000/svg">
-				<image width="100%" height="100%" href="{{ post.media.url }}"/>
-				<desc>
-					<img loading="lazy" alt="Post image" src="{{ post.media.url }}"/>
-				</desc>
-		</svg>
-	</a>
+	<div class="post_media_content">
+		<a href="{{ post.media.url }}" class="post_media_image {% if post.media.height / post.media.width < 2 %}short{% endif %}" >
+			<svg
+				{%if post.flags.nsfw && prefs.blur_nsfw=="on" %}class="post_nsfw_blur"{% endif %}
+				width="{{ post.media.width }}px"
+				height="{{ post.media.height }}px"
+				xmlns="http://www.w3.org/2000/svg">
+					<image width="100%" height="100%" href="{{ post.media.url }}"/>
+					<desc>
+						<img loading="lazy" alt="Post image" src="{{ post.media.url }}"/>
+					</desc>
+			</svg>
+		</a>
+	</div>
 	{% else if (prefs.layout.is_empty() || prefs.layout == "card") && post.post_type == "gif" %}
-	<video class="post_media_video short" src="{{ post.media.url }}" width="{{ post.media.width }}" height="{{ post.media.height }}" poster="{{ post.media.poster }}" preload="none" controls loop {% if prefs.autoplay_videos == "on" %}autoplay{% endif %}><a href={{ post.media.url }}>Video</a></video>
+	<div class="post_media_content">
+		<video class="post_media_video short {%if post.flags.nsfw && prefs.blur_nsfw=="on" %}post_nsfw_blur{% endif %}" src="{{ post.media.url }}" width="{{ post.media.width }}" height="{{ post.media.height }}" poster="{{ post.media.poster }}" preload="none" controls loop {% if prefs.autoplay_videos == "on" %}autoplay{% endif %}><a href={{ post.media.url }}>Video</a></video>
+	</div>
 	{% else if (prefs.layout.is_empty() || prefs.layout == "card") && post.post_type == "video" %}
 	{% if prefs.use_hls == "on" && !post.media.alt_url.is_empty() %}
-	<video class="post_media_video short {% if prefs.autoplay_videos == "on" %}hls_autoplay{% endif %}" width="{{ post.media.width }}" height="{{ post.media.height }}" poster="{{ post.media.poster }}" controls preload="none">
-		<source src="{{ post.media.alt_url }}" type="application/vnd.apple.mpegurl" />
-		<source src="{{ post.media.url }}" type="video/mp4" />
-	</video>
+	<div class="post_media_content">
+		<video class="post_media_video short {%if post.flags.nsfw && prefs.blur_nsfw=="on" %}post_nsfw_blur{% endif %} {% if prefs.autoplay_videos == "on" %}hls_autoplay{% endif %}" width="{{ post.media.width }}" height="{{ post.media.height }}" poster="{{ post.media.poster }}" controls preload="none">
+			<source src="{{ post.media.alt_url }}" type="application/vnd.apple.mpegurl" />
+			<source src="{{ post.media.url }}" type="video/mp4" />
+		</video>
+	</div>
 	{% else %}
-	<video class="post_media_video short" src="{{ post.media.url }}" width="{{ post.media.width }}" height="{{ post.media.height }}" poster="{{ post.media.poster }}" preload="none" controls {% if prefs.autoplay_videos == "on" %}autoplay{% endif %}><a href={{ post.media.url }}>Video</a></video>
+	<div class="post_media_content">
+		<video class="post_media_video short {%if post.flags.nsfw && prefs.blur_nsfw=="on" %}post_nsfw_blur{% endif %}" src="{{ post.media.url }}" width="{{ post.media.width }}" height="{{ post.media.height }}" poster="{{ post.media.poster }}" preload="none" controls {% if prefs.autoplay_videos == "on" %}autoplay{% endif %}><a href={{ post.media.url }}>Video</a></video>
+	</div>
 	{% call render_hls_notification(format!("{}%23{}", &self.url[1..].replace("&", "%26").replace("+", "%2B"), post.id)) %}
 	{% endif %}
 	{% else if post.post_type != "self" %}
@@ -125,12 +134,14 @@
 			<path d="M35,15h-15a10,10 0,0,0 0,20h25a10,10 0,0,0 10,-10m-12.5,0a10, 10 0,0,1 10, -10h25a10,10 0,0,1 0,20h-15" fill="none" stroke-width="5" stroke-linecap="round"/>
 		</svg>
 		{% else %}
-		<svg width="{{ post.thumbnail.width }}px" height="{{ post.thumbnail.height }}px" xmlns="http://www.w3.org/2000/svg">
-			<image width="100%" height="100%" href="{{ post.thumbnail.url }}"/>
-			<desc>
-				<img loading="lazy" alt="Thumbnail" src="{{ post.thumbnail.url }}"/>
-			</desc>
-		</svg>
+		<div style="max-width:{{ post.thumbnail.width }}px;max-height:{{ post.thumbnail.height }}px;">
+			<svg {% if post.flags.nsfw && prefs.blur_nsfw=="on" %} class="thumb_nsfw_blur" {% endif %} width="{{ post.thumbnail.width }}px" height="{{ post.thumbnail.height }}px" xmlns="http://www.w3.org/2000/svg">
+				<image width="100%" height="100%" href="{{ post.thumbnail.url }}"/>
+				<desc>
+					<img loading="lazy" alt="Thumbnail" src="{{ post.thumbnail.url }}"/>
+				</desc>
+			</svg>
+		</div>
 		{% endif %}
 		<span>{% if post.post_type == "link" %}{{ post.domain }}{% else %}{{ post.post_type }}{% endif %}</span>
 	</a>

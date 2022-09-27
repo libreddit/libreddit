@@ -46,11 +46,7 @@ pub async fn canonical_path(path: String) -> Result<Option<String>, String> {
 		res
 			.headers()
 			.get(header::LOCATION)
-			.map(|val| percent_encode(val.as_bytes(), CONTROLS)
-				.to_string()
-				.trim_start_matches(REDDIT_URL_BASE)
-				.to_string()
-			),
+			.map(|val| percent_encode(val.as_bytes(), CONTROLS).to_string().trim_start_matches(REDDIT_URL_BASE).to_string()),
 	)
 }
 

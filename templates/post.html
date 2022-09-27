@@ -68,27 +68,33 @@
 			<!-- POST MEDIA -->
 			<!-- post_type: {{ post.post_type }} -->
 			{% if post.post_type == "image" %}
-			<a href="{{ post.media.url }}" class="post_media_image" >
-				<svg
-					width="{{ post.media.width }}px" 
-					height="{{ post.media.height }}px" 
-					xmlns="http://www.w3.org/2000/svg">
-						<image width="100%" height="100%" href="{{ post.media.url }}"/>
-						<desc>
-							<img loading="lazy" alt="Post image" src="{{ post.media.url }}"/>
-						</desc>
-				</svg>
-			</a>
+			<div class="post_media_content">
+				<a href="{{ post.media.url }}" class="post_media_image" >
+					<svg
+						width="{{ post.media.width }}px"
+						height="{{ post.media.height }}px"
+						xmlns="http://www.w3.org/2000/svg">
+							<image width="100%" height="100%" href="{{ post.media.url }}"/>
+							<desc>
+								<img loading="lazy" alt="Post image" src="{{ post.media.url }}"/>
+							</desc>
+					</svg>
+				</a>
+			</div>
 			{% else if post.post_type == "video" || post.post_type == "gif" %}
 			{% if prefs.use_hls == "on" && !post.media.alt_url.is_empty() %}
 			<script src="/hls.min.js"></script>
-			<video class="post_media_video short {% if prefs.autoplay_videos == "on" %}hls_autoplay{% endif %}" width="{{ post.media.width }}" height="{{ post.media.height }}" poster="{{ post.media.poster }}" preload="none" controls>
-				<source src="{{ post.media.alt_url }}" type="application/vnd.apple.mpegurl" />
-				<source src="{{ post.media.url }}" type="video/mp4" />
-			</video>
+			<div class="post_media_content">
+				<video class="post_media_video short {% if prefs.autoplay_videos == "on" %}hls_autoplay{% endif %}" width="{{ post.media.width }}" height="{{ post.media.height }}" poster="{{ post.media.poster }}" preload="none" controls>
+					<source src="{{ post.media.alt_url }}" type="application/vnd.apple.mpegurl" />
+					<source src="{{ post.media.url }}" type="video/mp4" />
+				</video>
+			</div>
 			<script src="/playHLSVideo.js"></script>
 			{% else %}
-			<video class="post_media_video" src="{{ post.media.url }}" controls {% if prefs.autoplay_videos == "on" %}autoplay{% endif %} loop><a href={{ post.media.url }}>Video</a></video>
+			<div class="post_media_content">
+				<video class="post_media_video" src="{{ post.media.url }}" controls {% if prefs.autoplay_videos == "on" %}autoplay{% endif %} loop><a href={{ post.media.url }}>Video</a></video>
+			</div>
 			{% call utils::render_hls_notification(post.permalink[1..]) %}
 			{% endif %}
 			{% else if post.post_type == "gallery" %}
