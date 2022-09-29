@@ -120,8 +120,8 @@
 			<div class="post_score" title="{{ post.score.1 }}">{{ post.score.0 }}<span class="label"> Upvotes</span></div>
 			<div class="post_footer">
 				<ul id="post_links">
-					<li><a href="/{{ post.id }}">permalink</a></li>
-					<li><a href="https://reddit.com/{{ post.id }}" rel="nofollow">reddit</a></li>
+					<li><a href="{{ post.permalink }}">permalink</a></li>
+					<li><a href="https://reddit.com{{ post.permalink }}" rel="nofollow">reddit</a></li>
 				</ul>
 				<p>{{ post.upvote_ratio }}% Upvoted</p>
 			</div>
@@ -144,7 +144,7 @@
 		{% for c in comments -%}
 		<div class="thread">
 			{% if single_thread %}
-			<p class="thread_nav"><a href="/{{ post.id }}">View all comments</a></p>
+			<p class="thread_nav"><a href="{{ post.permalink }}">View all comments</a></p>
 			{% if c.parent_kind == "t1" %}
 			<p class="thread_nav"><a href="?context=9999">Show parent comments</a></p>
 			{% endif %}
