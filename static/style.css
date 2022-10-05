@@ -1263,6 +1263,29 @@ td, th {
 #error h3 { opacity: 0.85; }
 #error a { color: var(--accent); }
 
+/* Messages */
+
+#duplicates_msg h3 {
+	display: inline-block;
+	margin-top: 10px;
+	margin-bottom: 10px;
+	text-align: center;
+	width: 100%;
+}
+
+/* Warnings */
+
+.listing_warn {
+	display: inline-block;
+	margin: 10px;
+	text-align: center;
+	width: 100%;
+}
+
+.listing_warn a {
+	color: var(--accent);
+};
+
 /* Mobile */
 
 @media screen and (max-width: 800px) {

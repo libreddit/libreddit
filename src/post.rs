@@ -3,7 +3,7 @@ use crate::client::json;
 use crate::server::RequestExt;
 use crate::subreddit::{can_access_quarantine, quarantine};
 use crate::utils::{
-	error, format_num, format_url, get_filters, param, rewrite_urls, setting, template, time, val, Author, Awards, Comment, Flags, Flair, FlairPart, Media, Post, Preferences,
+	error, format_num, get_filters, param, parse_post, rewrite_urls, setting, template, time, val, Author, Awards, Comment, Flair, FlairPart, Post, Preferences,
 };
 use hyper::{Body, Request, Response};
 
@@ -54,7 +54,7 @@ pub async fn item(req: Request<Body>) -> Result<Response<Body>, String> {
 		// Otherwise, grab the JSON output from the request
 		Ok(response) => {
 			// Parse the JSON into Post and Comment structs
-			let post = parse_post(&response[0]).await;
+			let post = parse_post(&response[0]["data"]["children"][0]).await;
 			let comments = parse_comments(&response[1], &post.permalink, &post.author.name, highlighted_comment, &get_filters(&req));
 			let url = req.uri().to_string();
 
@@ -77,92 +77,6 @@ pub async fn item(req: Request<Body>) -> Result<Response<Body>, String> {
 				error(req, msg).await
 			}
 		}
-	}
-}
-
-// POSTS
-async fn parse_post(json: &serde_json::Value) -> Post {
-	// Retrieve post (as opposed to comments) from JSON
-	let post: &serde_json::Value = &json["data"]["children"][0];
-
-	// Grab UTC time as unix timestamp
-	let (rel_time, created) = time(post["data"]["created_utc"].as_f64().unwrap_or_default());
-	// Parse post score and upvote ratio
-	let score = post["data"]["score"].as_i64().unwrap_or_default();
-	let ratio: f64 = post["data"]["upvote_ratio"].as_f64().unwrap_or(1.0) * 100.0;
-
-	// Determine the type of media along with the media URL
-	let (post_type, media, gallery) = Media::parse(&post["data"]).await;
-
-	let awards: Awards = Awards::parse(&post["data"]["all_awardings"]);
-
-	let permalink = val(post, "permalink");
-
-	let body = if val(post, "removed_by_category") == "moderator" {
-		format!(
-			"<div class=\"md\"><p>[removed] — <a href=\"https://www.reveddit.com{}\">view removed post</a></p></div>",
-			permalink
-		)
-	} else {
-		rewrite_urls(&val(post, "selftext_html"))
-	};
-
-	// Build a post using data parsed from Reddit post API
-	Post {
-		id: val(post, "id"),
-		title: val(post, "title"),
-		community: val(post, "subreddit"),
-		body,
-		author: Author {
-			name: val(post, "author"),
-			flair: Flair {
-				flair_parts: FlairPart::parse(
-					post["data"]["author_flair_type"].as_str().unwrap_or_default(),
-					post["data"]["author_flair_richtext"].as_array(),
-					post["data"]["author_flair_text"].as_str(),
-				),
-				text: val(post, "link_flair_text"),
-				background_color: val(post, "author_flair_background_color"),
-				foreground_color: val(post, "author_flair_text_color"),
-			},
-			distinguished: val(post, "distinguished"),
-		},
-		permalink,
-		score: format_num(score),
-		upvote_ratio: ratio as i64,
-		post_type,
-		media,
-		thumbnail: Media {
-			url: format_url(val(post, "thumbnail").as_str()),
-			alt_url: String::new(),
-			width: post["data"]["thumbnail_width"].as_i64().unwrap_or_default(),
-			height: post["data"]["thumbnail_height"].as_i64().unwrap_or_default(),
-			poster: "".to_string(),
-		},
-		flair: Flair {
-			flair_parts: FlairPart::parse(
-				post["data"]["link_flair_type"].as_str().unwrap_or_default(),
-				post["data"]["link_flair_richtext"].as_array(),
-				post["data"]["link_flair_text"].as_str(),
-			),
-			text: val(post, "link_flair_text"),
-			background_color: val(post, "link_flair_background_color"),
-			foreground_color: if val(post, "link_flair_text_color") == "dark" {
-				"black".to_string()
-			} else {
-				"white".to_string()
-			},
-		},
-		flags: Flags {
-			nsfw: post["data"]["over_18"].as_bool().unwrap_or(false),
-			stickied: post["data"]["stickied"].as_bool().unwrap_or(false),
-		},
-		domain: val(post, "domain"),
-		rel_time,
-		created,
-		comments: format_num(post["data"]["num_comments"].as_i64().unwrap_or_default()),
-		gallery,
-		awards,
 	}
 }
 

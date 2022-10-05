@@ -210,6 +210,7 @@ pub struct Post {
 	pub domain: String,
 	pub rel_time: String,
 	pub created: String,
+	pub num_duplicates: u64,
 	pub comments: (String, String),
 	pub gallery: Vec<GalleryMedia>,
 	pub awards: Awards,
@@ -309,6 +310,7 @@ impl Post {
 				permalink: val(post, "permalink"),
 				rel_time,
 				created,
+				num_duplicates: post["data"]["num_duplicates"].as_u64().unwrap_or(0),
 				comments: format_num(data["num_comments"].as_i64().unwrap_or_default()),
 				gallery,
 				awards,
@@ -496,15 +498,110 @@ pub fn get_filters(req: &Request<Body>) -> HashSet<String> {
 	setting(req, "filters").split('+').map(String::from).filter(|s| !s.is_empty()).collect::<HashSet<String>>()
 }
 
-/// Filters a `Vec<Post>` by the given `HashSet` of filters (each filter being a subreddit name or a user name). If a
-/// `Post`'s subreddit or author is found in the filters, it is removed. Returns `true` if _all_ posts were filtered
-/// out, or `false` otherwise.
-pub fn filter_posts(posts: &mut Vec<Post>, filters: &HashSet<String>) -> bool {
+/// Filters a `Vec<Post>` by the given `HashSet` of filters (each filter being
+/// a subreddit name or a user name). If a `Post`'s subreddit or author is
+/// found in the filters, it is removed.
+///
+/// The first value of the return tuple is the number of posts filtered. The
+/// second return value is `true` if all posts were filtered.
+pub fn filter_posts(posts: &mut Vec<Post>, filters: &HashSet<String>) -> (u64, bool) {
+	// This is the length of the Vec<Post> prior to applying the filter.
+	let lb: u64 = posts.len().try_into().unwrap_or(0);
+
 	if posts.is_empty() {
-		false
+		(0, false)
 	} else {
-		posts.retain(|p| !filters.contains(&p.community) && !filters.contains(&["u_", &p.author.name].concat()));
-		posts.is_empty()
+		posts.retain(|p| !(filters.contains(&p.community) || filters.contains(&["u_", &p.author.name].concat())));
+
+		// Get the length of the Vec<Post> after applying the filter.
+		// If lb > la, then at least one post was removed.
+		let la: u64 = posts.len().try_into().unwrap_or(0);
+
+		(lb - la, posts.is_empty())
+	}
+}
+
+/// Creates a [`Post`] from a provided JSON.
+pub async fn parse_post(post: &serde_json::Value) -> Post {
+	// Grab UTC time as unix timestamp
+	let (rel_time, created) = time(post["data"]["created_utc"].as_f64().unwrap_or_default());
+	// Parse post score and upvote ratio
+	let score = post["data"]["score"].as_i64().unwrap_or_default();
+	let ratio: f64 = post["data"]["upvote_ratio"].as_f64().unwrap_or(1.0) * 100.0;
+
+	// Determine the type of media along with the media URL
+	let (post_type, media, gallery) = Media::parse(&post["data"]).await;
+
+	let awards: Awards = Awards::parse(&post["data"]["all_awardings"]);
+
+	let permalink = val(post, "permalink");
+
+	let body = if val(post, "removed_by_category") == "moderator" {
+		format!(
+			"<div class=\"md\"><p>[removed] — <a href=\"https://www.reveddit.com{}\">view removed post</a></p></div>",
+			permalink
+		)
+	} else {
+		rewrite_urls(&val(post, "selftext_html"))
+	};
+
+	// Build a post using data parsed from Reddit post API
+	Post {
+		id: val(post, "id"),
+		title: val(post, "title"),
+		community: val(post, "subreddit"),
+		body,
+		author: Author {
+			name: val(post, "author"),
+			flair: Flair {
+				flair_parts: FlairPart::parse(
+					post["data"]["author_flair_type"].as_str().unwrap_or_default(),
+					post["data"]["author_flair_richtext"].as_array(),
+					post["data"]["author_flair_text"].as_str(),
+				),
+				text: val(post, "link_flair_text"),
+				background_color: val(post, "author_flair_background_color"),
+				foreground_color: val(post, "author_flair_text_color"),
+			},
+			distinguished: val(post, "distinguished"),
+		},
+		permalink,
+		score: format_num(score),
+		upvote_ratio: ratio as i64,
+		post_type,
+		media,
+		thumbnail: Media {
+			url: format_url(val(post, "thumbnail").as_str()),
+			alt_url: String::new(),
+			width: post["data"]["thumbnail_width"].as_i64().unwrap_or_default(),
+			height: post["data"]["thumbnail_height"].as_i64().unwrap_or_default(),
+			poster: "".to_string(),
+		},
+		flair: Flair {
+			flair_parts: FlairPart::parse(
+				post["data"]["link_flair_type"].as_str().unwrap_or_default(),
+				post["data"]["link_flair_richtext"].as_array(),
+				post["data"]["link_flair_text"].as_str(),
+			),
+			text: val(post, "link_flair_text"),
+			background_color: val(post, "link_flair_background_color"),
+			foreground_color: if val(post, "link_flair_text_color") == "dark" {
+				"black".to_string()
+			} else {
+				"white".to_string()
+			},
+		},
+		flags: Flags {
+			nsfw: post["data"]["over_18"].as_bool().unwrap_or(false),
+			stickied: post["data"]["stickied"].as_bool().unwrap_or(false),
+		},
+		domain: val(post, "domain"),
+		rel_time,
+		created,
+		num_duplicates: post["data"]["num_duplicates"].as_u64().unwrap_or(0),
+		comments: format_num(post["data"]["num_comments"].as_i64().unwrap_or_default()),
+		gallery,
+		awards,
 	}
 }
 
