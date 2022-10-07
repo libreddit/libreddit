@@ -1286,6 +1286,31 @@ td, th {
 	color: var(--accent);
 };
 
+/* NSFW Landing Page */
+
+#nsfw_landing {
+	display: inline-block;
+	text-align: center;
+	width: 100%;
+}
+
+#nsfw_landing h1 {
+	display: inline-block;
+	margin-bottom: 20px;
+	text-align: center;
+	width: 100%;
+}
+
+#nsfw_landing p {
+	display: inline-block;
+	text-align: center;
+	width: 100%;
+}
+
+#nsfw_landing a {
+	color: var(--accent);
+}
+
 /* Mobile */
 
 @media screen and (max-width: 800px) {

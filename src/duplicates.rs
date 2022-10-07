@@ -3,7 +3,7 @@
 use crate::client::json;
 use crate::server::RequestExt;
 use crate::subreddit::{can_access_quarantine, quarantine};
-use crate::utils::{error, filter_posts, get_filters, parse_post, template, Post, Preferences};
+use crate::utils::{error, filter_posts, get_filters, nsfw_landing, parse_post, setting, template, Post, Preferences};
 
 use askama::Template;
 use hyper::{Body, Request, Response};
@@ -65,8 +65,15 @@ pub async fn item(req: Request<Body>) -> Result<Response<Body>, String> {
 	match json(path, quarantined).await {
 		// Process response JSON.
 		Ok(response) => {
-			let filters = get_filters(&req);
 			let post = parse_post(&response[0]["data"]["children"][0]).await;
+
+			// Return landing page if this post if this Reddit deems this post
+			// NSFW, but we have also disabled the display of NSFW content.
+			if setting(&req, "show_nsfw") != "on" && post.nsfw {
+				return Ok(nsfw_landing(req).await.unwrap_or_default());
+			}
+
+			let filters = get_filters(&req);
 			let (duplicates, num_posts_filtered, all_posts_filtered) = parse_duplicates(&response[1], &filters).await;
 
 			// These are the values for the "before=", "after=", and "sort="

@@ -1,6 +1,6 @@
 // CRATES
 use crate::utils::{
-	catch_random, error, filter_posts, format_num, format_url, get_filters, param, redirect, rewrite_urls, setting, template, val, Post, Preferences, Subreddit,
+	catch_random, error, filter_posts, format_num, format_url, get_filters, nsfw_landing, param, redirect, rewrite_urls, setting, template, val, Post, Preferences, Subreddit,
 };
 use crate::{client::json, server::ResponseExt, RequestExt};
 use askama::Template;
@@ -95,6 +95,12 @@ pub async fn community(req: Request<Body>) -> Result<Response<Body>, String> {
 			..Subreddit::default()
 		}
 	};
+
+	// Return landing page if this post if this is NSFW community but the user
+	// has disabled the display of NSFW content.
+	if setting(&req, "show_nsfw") != "on" && sub.nsfw {
+		return Ok(nsfw_landing(req).await.unwrap_or_default());
+	}
 
 	let path = format!("/r/{}/{}.json?{}&raw_json=1", sub_name.clone(), sort, req.uri().query().unwrap_or_default());
 	let url = String::from(req.uri().path_and_query().map_or("", |val| val.as_str()));
@@ -416,5 +422,6 @@ async fn subreddit(sub: &str, quarantined: bool) -> Result<Subreddit, String> {
 		members: format_num(members),
 		active: format_num(active),
 		wiki: res["data"]["wiki_enabled"].as_bool().unwrap_or_default(),
+		nsfw: res["data"]["over18"].as_bool().unwrap_or_default(),
 	})
 }

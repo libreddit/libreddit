@@ -1,7 +1,7 @@
 // CRATES
 use crate::client::json;
 use crate::server::RequestExt;
-use crate::utils::{error, filter_posts, format_url, get_filters, param, setting, template, Post, Preferences, User};
+use crate::utils::{error, filter_posts, format_url, get_filters, nsfw_landing, param, setting, template, Post, Preferences, User};
 use askama::Template;
 use hyper::{Body, Request, Response};
 use time::{macros::format_description, OffsetDateTime};
@@ -45,7 +45,15 @@ pub async fn profile(req: Request<Body>) -> Result<Response<Body>, String> {
 	// Retrieve other variables from libbacon request
 	let sort = param(&path, "sort").unwrap_or_default();
 	let username = req.param("name").unwrap_or_default();
+
+	// Retrieve info from user about page.
 	let user = user(&username).await.unwrap_or_default();
+
+	// Return landing page if this post if this Reddit deems this user NSFW,
+	// but we have also disabled the display of NSFW content.
+	if setting(&req, "show_nsfw") != "on" && user.nsfw {
+		return Ok(nsfw_landing(req).await.unwrap_or_default());
+	}
 
 	let filters = get_filters(&req);
 	if filters.contains(&["u_", &username].concat()) {
@@ -111,6 +119,7 @@ async fn user(name: &str) -> Result<User, String> {
 			created: created.format(format_description!("[month repr:short] [day] '[year repr:last_two]")).unwrap_or_default(),
 			banner: about("banner_img"),
 			description: about("public_description"),
+			nsfw: res["data"]["subreddit"]["over_18"].as_bool().unwrap_or_default(),
 		}
 	})
 }
