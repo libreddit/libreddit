@@ -1,5 +1,5 @@
 {
-  "name": "libbacon",
+  "name": "Ferrit",
   "description": "Private front-end for Reddit",
   "buildpacks": [
     {
@@ -11,34 +11,34 @@
   ],
   "stack": "container",
   "env": {
-    "LIBBACON_DEFAULT_THEME": {
+    "FERRIT_DEFAULT_THEME": {
       "required": false
     },
-    "LIBBACON_DEFAULT_FRONT_PAGE": {
+    "FERRIT_DEFAULT_FRONT_PAGE": {
       "required": false
     },
-    "LIBBACON_DEFAULT_LAYOUT": {
+    "FERRIT_DEFAULT_LAYOUT": {
       "required": false
     },
-    "LIBBACON_DEFAULT_WIDE": {
+    "FERRIT_DEFAULT_WIDE": {
       "required": false
     },
-    "LIBBACON_DEFAULT_COMMENT_SORT": {
+    "FERRIT_DEFAULT_COMMENT_SORT": {
       "required": false
     },
-    "LIBBACON_DEFAULT_POST_SORT": {
+    "FERRIT_DEFAULT_POST_SORT": {
       "required": false
     },
-    "LIBBACON_DEFAULT_SHOW_NSFW": {
+    "FERRIT_DEFAULT_SHOW_NSFW": {
       "required": false
     },
-    "LIBBACON_DEFAULT_BLUR_NSFW": {
+    "FERRIT_DEFAULT_BLUR_NSFW": {
       "required": false
     },
-    "LIBBACON_USE_HLS": {
+    "FERRIT_USE_HLS": {
       "required": false
     },
-    "LIBBACON_HIDE_HLS_NOTIFICATION": {
+    "FERRIT_HIDE_HLS_NOTIFICATION": {
       "required": false
     }
   }

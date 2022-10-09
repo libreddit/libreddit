@@ -1,5 +1,5 @@
 [Unit]
-Description=libbacon daemon
+Description=Ferrit daemon
 After=network.service
 
 [Service]
@@ -8,8 +8,8 @@ DynamicUser=yes
 Environment=ADDRESS=0.0.0.0
 Environment=PORT=8080
 # Optional Override
-EnvironmentFile=-/etc/libbacon.conf
-ExecStart=/usr/bin/libbacon -a ${ADDRESS} -p ${PORT}
+EnvironmentFile=-/etc/ferrit.conf
+ExecStart=/usr/bin/ferrit -a ${ADDRESS} -p ${PORT}
 
 # Hardening
 DeviceAllow=

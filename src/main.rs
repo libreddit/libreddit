@@ -105,7 +105,7 @@ async fn style() -> Result<Response<Body>, String> {
 
 #[tokio::main]
 async fn main() {
-	let matches = Command::new("libbacon")
+	let matches = Command::new("Ferrit")
 		.version(env!("CARGO_PKG_VERSION"))
 		.about("Private front-end for Reddit written in Rust ")
 		.arg(
@@ -150,7 +150,7 @@ async fn main() {
 
 	let listener = [address, ":", &port].concat();
 
-	println!("Starting libbacon...");
+	println!("Starting Ferrit...");
 
 	// Begin constructing a server
 	let mut app = server::Server::new();
@@ -189,7 +189,7 @@ async fn main() {
 		.at("/hls.min.js")
 		.get(|_| resource(include_str!("../static/hls.min.js"), "text/javascript", false).boxed());
 
-	// Proxy media through libbacon
+	// Proxy media through Ferrit
 	app.at("/vid/:id/:size").get(|r| proxy(r, "https://v.redd.it/{id}/DASH_{size}").boxed());
 	app.at("/hls/:id/*path").get(|r| proxy(r, "https://v.redd.it/{id}/{path}").boxed());
 	app.at("/img/*path").get(|r| proxy(r, "https://i.redd.it/{path}").boxed());
@@ -297,7 +297,7 @@ async fn main() {
 	// Default service in case no routes match
 	app.at("/*").get(|req| error(req, "Nothing here".to_string()).boxed());
 
-	println!("Running libbacon v{} on {}!", env!("CARGO_PKG_VERSION"), listener);
+	println!("Running Ferrit v{} on {}!", env!("CARGO_PKG_VERSION"), listener);
 
 	let server = app.listen(listener);
 

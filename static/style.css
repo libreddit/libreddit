@@ -94,7 +94,7 @@ nav {
 }
 
 nav * { color: var(--text); }
-nav #bacon, #code > span { color: var(--accent); }
+nav #ferrit_logo_p2, #code > span { color: var(--accent); }
 nav #code > svg { stroke: var(--accent); }
 
 nav #logo {
@@ -119,7 +119,7 @@ nav #version {
 	margin-right: 10px;
 }
 
-nav #libbacon {
+nav #ferrit_logo {
 	vertical-align: -2px;
 }
 

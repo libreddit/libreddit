@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% import "utils.html" as utils %}
 
-{% block title %}libbacon Settings{% endblock %}
+{% block title %}Ferrit Settings{% endblock %}
 
 {% block search %}
 	{% call utils::search("".to_owned(), "", "") %}
@@ -68,7 +68,7 @@
 				<label for="use_hls">Use HLS for videos
 					<details id="feeds">
 						<summary>Why?</summary>
-						<div id="feed_list" class="helper">Reddit videos require JavaScript (via HLS.js) to be enabled to be played with audio. Therefore, this toggle lets you either use libbacon JS-free or utilize this feature.</div>
+						<div id="feed_list" class="helper">Reddit videos require JavaScript (via HLS.js) to be enabled to be played with audio. Therefore, this toggle lets you either use Ferrit JS-free or utilize this feature.</div>
 					</details>
 				</label>
 				<input type="hidden" value="off" name="use_hls">

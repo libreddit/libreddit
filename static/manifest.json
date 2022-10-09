@@ -1,6 +1,6 @@
 {
-	"name": "libbacon",
-	"short_name": "libbacon",
+	"name": "Ferrit",
+	"short_name": "Ferrit",
 	"display": "standalone",
 	"background_color": "#1f1f1f",
 	"description": "An alternative private front-end to Reddit",

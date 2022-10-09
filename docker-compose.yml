@@ -4,7 +4,7 @@ services:
   web:
     build: .
     restart: always
-    container_name: "libbacon"
+    container_name: "ferrit"
     ports:
       - 8080:8080
     healthcheck:
