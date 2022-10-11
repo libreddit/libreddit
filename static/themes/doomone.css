@@ -1,0 +1,13 @@
+.doomone {
+	--accent: #51afef;
+	--green: #00a229;
+	--text: #bbc2cf;
+	--foreground: #3d4148;
+	--background: #282c34;
+	--outside: #52565c;
+	--post: #24272e;
+	--panel-border: 2px solid #52565c;
+	--highlighted: #686b70;
+	--visited: #969692;
+	--shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
