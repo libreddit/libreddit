@@ -2,7 +2,7 @@
 name = "ferrit"
 description = " Alternative private front-end to Reddit"
 license = "AGPL-3.0"
-repository = "https://github.com/libbacon/ferrit"
+repository = "https://github.com/ferritreader/ferrit"
 version = "0.1.0"
 authors = ["Daniel Valentine <Daniel-Valentine@users.noreply.github.com>", "spikecodes <19519553+spikecodes@users.noreply.github.com>"]
 edition = "2021"
