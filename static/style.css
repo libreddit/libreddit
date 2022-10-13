@@ -830,6 +830,16 @@ a.search_subreddit:hover {
 	margin-right: 15px;
 }
 
+#post_links > li.desktop_item {
+	display: auto;
+}
+
+@media screen and (min-width: 480px) {
+	#post_links > li.mobile_item {
+		display: none;
+	}
+}
+
 .post_thumbnail {
 	border-radius: 5px;
 	border: var(--panel-border);
@@ -1411,4 +1421,9 @@ td, th {
 		padding: 7px 0px;
 		margin-right: -5px;
 	}
+
+	#post_links > li { margin-right: 10px }
+	#post_links > li.desktop_item { display: none }
+	#post_links > li.mobile_item { display: auto }
+	.post_footer > p > span#upvoted { display: none }
 }
