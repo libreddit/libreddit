@@ -14,8 +14,18 @@ The [whole FAQ](https://github.com/ferritreader/ferrit/wiki/FAQ) may address oth
 
 ## Instances
 
-Visit the [Instances wiki page](https://github.com/ferritreader/ferrit/wiki/Instances) for a list of running Ferrit instances.
+Visit the [_Instances_ wiki page](https://github.com/ferritreader/ferrit/wiki/Instances) for a list of running Ferrit instances.
 
 ## Getting and Installing Ferrit
 
 Visit [Building, Installation, and Deployment](https://github.com/ferritreader/ferrit/wiki/Building,-Installation,-and-Deployment) on the wiki for detailed instructions on how to obtain and set up Ferrit.
+
+## Discuss
+
+You can talk with the Ferrit maintainers and other uses in the official forums. See the [_Discuss_ wiki page](https://github.com/ferritreader/ferrit/wiki/Discuss) for more information.
+
+## Credits
+
+See the CREDITS file in the repository root for a list of contributors up to and including the commit of the latest release. This file is updated with each release and on occasion in between releases.
+
+We offer special thanks to **spikecodes** for his foundational work on the Libreddit project.
