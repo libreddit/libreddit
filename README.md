@@ -14,7 +14,7 @@ The [whole FAQ](https://github.com/ferritreader/ferrit/wiki/FAQ) may address oth
 
 ## Instances
 
-Visit the [Instances wiki page](https://github.com/ferritreader/ferrit/wiki/Instances) for a list of running Ferrit instances. _Note that this page is currently empty since there are no (known) instances of Ferrit that are in operation._
+Visit the [Instances wiki page](https://github.com/ferritreader/ferrit/wiki/Instances) for a list of running Ferrit instances.
 
 ## Getting and Installing Ferrit
 
