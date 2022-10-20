@@ -573,7 +573,7 @@ pub async fn parse_post(post: &serde_json::Value) -> Post {
 
 	let body = if val(post, "removed_by_category") == "moderator" {
 		format!(
-			"<div class=\"md\"><p>[removed] — <a href=\"https://www.reveddit.com{}\">view removed post</a></p></div>",
+			"<div class=\"md\"><p>[removed] — <a href=\"https://www.unddit.com{}\">view removed post</a></p></div>",
 			permalink
 		)
 	} else {
