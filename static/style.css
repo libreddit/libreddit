@@ -123,6 +123,15 @@ nav #libreddit {
 	vertical-align: -2px;
 }
 
+nav #libreddit-sfw {
+	vertical-align: -2px;
+	color: var(--green);
+	border: 1px solid var(--green);
+	padding: 5px;
+	box-sizing: border-box;
+	border-radius: 5px;
+}
+
 #settings_link {
 	opacity: 0.8;
 	margin-left: 10px;

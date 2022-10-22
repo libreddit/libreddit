@@ -29,7 +29,11 @@
 		<!-- NAVIGATION BAR -->
 		<nav>
 			<div id="logo">
+				{% if crate::utils::sfw_only() %}
+				<a id="libreddit-sfw" href="/" title="This instance is SFW-only.">libreddit.</a>
+				{% else %}
 				<a id="libreddit" href="/"><span id="lib">lib</span><span id="reddit">reddit.</span></a>
+				{% endif %}
 				<span id="version">v{{ env!("CARGO_PKG_VERSION") }}</span>
 				{% block subscriptions %}{% endblock %}
 			</div>

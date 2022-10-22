@@ -9,6 +9,7 @@ use regex::Regex;
 use rust_embed::RustEmbed;
 use serde_json::Value;
 use std::collections::{HashMap, HashSet};
+use std::env;
 use std::str::FromStr;
 use time::{macros::format_description, Duration, OffsetDateTime};
 use url::Url;
@@ -865,7 +866,21 @@ pub async fn error(req: Request<Body>, msg: impl ToString) -> Result<Response<Bo
 	Ok(Response::builder().status(404).header("content-type", "text/html").body(body.into()).unwrap_or_default())
 }
 
-/// Render the landing page for NSFW content when the user has not enabled
+/// Returns true if the environment variable `LIBREDDIT_SFW_ONLY` carries the
+/// value `on`.
+///
+/// If this variable is set as such, the instance will operate in SFW-only
+/// mode; all NSFW content will be filtered. Attempts to access NSFW
+/// subreddits or posts or userpages for users Reddit has deemed NSFW will
+/// be denied.
+pub fn sfw_only() -> bool {
+	match env::var("LIBREDDIT_SFW_ONLY") {
+		Ok(val) => val == "on",
+		Err(_) => false,
+	}
+}
+
+/// Renders the landing page for NSFW content when the user has not enabled
 /// "show NSFW posts" in settings.
 pub async fn nsfw_landing(req: Request<Body>) -> Result<Response<Body>, String> {
 	let res_type: ResourceType;

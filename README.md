@@ -182,9 +182,17 @@ Once installed, deploy Libreddit to `0.0.0.0:8080` by running:
 libreddit
 ```
 
-## Change Default Settings
+## Instance settings
 
-Assign a default value for each setting by passing environment variables to Libreddit in the format `LIBREDDIT_DEFAULT_{X}`. Replace `{X}` with the setting name (see list below) in capital letters.
+Assign a default value for each instance-specific setting by passing environment variables to Libreddit in the format `LIBREDDIT_{X}`. Replace `{X}` with the setting name (see list below) in capital letters.
+
+|Name|Possible values|Default value|Description|
+|-|-|-|-|
+| `SFW_ONLY` | `["on", "off"]` | `off` | Enables SFW-only mode for the instance, i.e. all NSFW content is filtered. |
+
+## Default User Settings
+
+Assign a default value for each user-modifiable setting by passing environment variables to Libreddit in the format `LIBREDDIT_DEFAULT_{Y}`. Replace `{Y}` with the setting name (see list below) in capital letters.
 
 | Name                    | Possible values                                                                                     | Default value |
 |-------------------------|-----------------------------------------------------------------------------------------------------|---------------|
