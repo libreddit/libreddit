@@ -97,8 +97,8 @@ pub async fn community(req: Request<Body>) -> Result<Response<Body>, String> {
 	};
 
 	// Return landing page if this post if this is NSFW community but the user
-	// has disabled the display of NSFW content.
-	if setting(&req, "show_nsfw") != "on" && sub.nsfw {
+	// has disabled the display of NSFW content or if the instance is SFW-only.
+	if sub.nsfw && (setting(&req, "show_nsfw") != "on" || crate::utils::sfw_only()) {
 		return Ok(nsfw_landing(req).await.unwrap_or_default());
 	}
 

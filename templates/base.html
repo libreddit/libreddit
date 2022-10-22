@@ -30,7 +30,7 @@
 		<nav>
 			<div id="logo">
 				<a id="ferrit_logo" href="/"><span id="ferrit_logo_p1">ferr</span><span id="ferrit_logo_p2">it.</span></a>
-				<span id="version">v{{ env!("CARGO_PKG_VERSION") }}</span>
+				<span id="version">v{{ env!("CARGO_PKG_VERSION") }}{% if crate::utils::sfw_only() %} <span title="This instance is SFW-only.">💼</span>{% endif %}</span>
 				{% block subscriptions %}{% endblock %}
 			</div>
 			{% block search %}{% endblock %}

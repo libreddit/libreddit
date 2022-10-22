@@ -68,8 +68,9 @@ pub async fn item(req: Request<Body>) -> Result<Response<Body>, String> {
 			let post = parse_post(&response[0]["data"]["children"][0]).await;
 
 			// Return landing page if this post if this Reddit deems this post
-			// NSFW, but we have also disabled the display of NSFW content.
-			if setting(&req, "show_nsfw") != "on" && post.nsfw {
+			// NSFW, but we have also disabled the display of NSFW content
+			// or if the instance is SFW-only.
+			if post.nsfw && (setting(&req, "show_nsfw") != "on" || crate::utils::sfw_only()) {
 				return Ok(nsfw_landing(req).await.unwrap_or_default());
 			}
 
@@ -125,9 +126,7 @@ pub async fn item(req: Request<Body>) -> Result<Response<Body>, String> {
 				let query_str = req.uri().query().unwrap_or_default().to_string();
 
 				if !query_str.is_empty() {
-					let query: Vec<&str> = query_str.split('&').collect::<Vec<&str>>();
-
-					for param in query.into_iter() {
+					for param in query_str.split('&') {
 						let kv: Vec<&str> = param.split('=').collect();
 						if kv.len() < 2 {
 							// Reject invalid query parameter.

@@ -11,6 +11,10 @@
     <h1>😱 This post is NSFW!</h1>
     {% endif %}
     <br />
+    {% if crate::utils::sfw_only() %}
+    <p>This instance of Ferrit is SFW-only.</p>
+    {% else %}
     <p>Enable "Show NSFW posts" in <a href="/settings">settings</a> to view this {% if res_type == crate::utils::ResourceType::Subreddit %}subreddit{% else if res_type == crate::utils::ResourceType::User %}user's posts or comments{% else if res_type == crate::utils::ResourceType::Post %}post{% endif %}.</p>
+    {% endif %}
 </div>
 {% endblock %}

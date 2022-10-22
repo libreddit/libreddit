@@ -50,8 +50,9 @@ pub async fn profile(req: Request<Body>) -> Result<Response<Body>, String> {
 	let user = user(&username).await.unwrap_or_default();
 
 	// Return landing page if this post if this Reddit deems this user NSFW,
-	// but we have also disabled the display of NSFW content.
-	if setting(&req, "show_nsfw") != "on" && user.nsfw {
+	// but we have also disabled the display of NSFW content or if the instance
+	// is SFW-only.
+	if user.nsfw && (setting(&req, "show_nsfw") != "on" || crate::utils::sfw_only()) {
 		return Ok(nsfw_landing(req).await.unwrap_or_default());
 	}
 
