@@ -53,7 +53,7 @@ Feel free to [open an issue](https://github.com/spikecodes/libreddit/issues/new)
 | [libreddit.some-things.org](https://libreddit.some-things.org) | 🇨🇭 CH |  |
 | [reddit.stuehieyr.com](https://reddit.stuehieyr.com) | 🇩🇪 DE  |  |
 | [lr.mint.lgbt](https://lr.mint.lgbt) | 🇨🇦 CA |  |
-| [libreddit.igna.rocks](https://libreddit.igna.rocks) | 🇺🇸 US | |
+| [libreddit.intent.cool](https://libreddit.intent.cool) | 🇺🇸 US | ✅ |
 | [libreddit.autarkic.org](https://libreddit.autarkic.org) | 🇺🇸 US | |
 | [libreddit.flux.industries](https://libreddit.flux.industries) | 🇩🇪 DE | ✅ |
 | [libreddit.drivet.xyz](https://libreddit.drivet.xyz) | 🇵🇱 PL |  |
