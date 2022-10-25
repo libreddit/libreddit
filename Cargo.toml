@@ -10,7 +10,7 @@ edition = "2021"
 [dependencies]
 askama = { version = "0.11.1", default-features = false }
 async-recursion = "1.0.0"
-cached = "0.34.0"
+cached = "0.40.0"
 clap = { version = "3.1.18", default-features = false, features = ["std"] }
 regex = "1.5.6"
 serde = { version = "1.0.137", features = ["derive"] }
