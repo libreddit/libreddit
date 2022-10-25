@@ -1,2 +1,2 @@
-run = "while :; do set -ex; curl -o./ferrit -fsSL -- https://github.com/ferritreader/ferrit/releases/latest/download/ferrit; chmod +x ferrit; set +e; ./ferrit -H 63115200; sleep 1; done"
+run = "while :; do set -ex; curl -o./ferrit -fsSL -- https://github.com/ferritreader/ferrit/releases/latest/download/ferrit.x86_64-unknown-linux-gnu ; chmod +x ferrit; set +e; ./ferrit -H 63115200; sleep 1; done"
 language = "bash"
