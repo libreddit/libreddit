@@ -14,6 +14,21 @@ use std::str::FromStr;
 use time::{macros::format_description, Duration, OffsetDateTime};
 use url::Url;
 
+/// Write a message to stderr on debug mode. This function is a no-op on
+/// release code.
+#[macro_export]
+macro_rules! dbg_msg {
+	($x:expr) => {
+		#[cfg(debug_assertions)]
+		eprintln!("{}:{}: {}", file!(), line!(), $x.to_string())
+	};
+
+	($($x:expr),+) => {
+		#[cfg(debug_assertions)]
+		dbg_msg!(format!($($x),+))
+	};
+}
+
 /// Identifies whether or not the page is a subreddit, a user page, or a post.
 /// This is used by the NSFW landing template to determine the mesage to convey
 /// to the user.

@@ -1,9 +1,10 @@
 use cached::proc_macro::cached;
 use futures_lite::{future::Boxed, FutureExt};
-use hyper::{body::Buf, client, Body, Request, Response, Uri};
+use hyper::{body, body::Buf, client, header, Body, Request, Response, Uri};
+use libflate::gzip;
 use percent_encoding::{percent_encode, CONTROLS};
 use serde_json::Value;
-use std::result::Result;
+use std::{io, result::Result};
 
 use crate::server::RequestExt;
 
@@ -76,6 +77,7 @@ fn request(url: String, quarantine: bool) -> Boxed<Result<Response<Body>, String
 		.header("User-Agent", format!("web:ferrit:{}", env!("CARGO_PKG_VERSION")))
 		.header("Host", "www.reddit.com")
 		.header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8")
+		.header("Accept-Encoding", "gzip") // Reddit doesn't do brotli yet.
 		.header("Accept-Language", "en-US,en;q=0.5")
 		.header("Connection", "keep-alive")
 		.header("Cookie", if quarantine { "_options=%7B%22pref_quarantine_optin%22%3A%20true%7D" } else { "" })
@@ -84,7 +86,7 @@ fn request(url: String, quarantine: bool) -> Boxed<Result<Response<Body>, String
 	async move {
 		match builder {
 			Ok(req) => match client.request(req).await {
-				Ok(response) => {
+				Ok(mut response) => {
 					if response.status().to_string().starts_with('3') {
 						request(
 							response
@@ -100,7 +102,49 @@ fn request(url: String, quarantine: bool) -> Boxed<Result<Response<Body>, String
 						)
 						.await
 					} else {
-						Ok(response)
+						match response.headers().get(header::CONTENT_ENCODING) {
+							// Content not compressed.
+							None => Ok(response),
+
+							// Content gzipped.
+							Some(hdr) => {
+								// Since we requested gzipped content, we expect
+								// to get back gzipped content. If we get
+								// back anything else, that's a problem.
+								if hdr.ne("gzip") {
+									return Err("Reddit response was encoded with an unsupported compressor".to_string());
+								}
+
+								// The body must be something that implements
+								// std::io::Read, hence the conversion to
+								// bytes::buf::Buf and then transformation into a
+								// Reader.
+								let mut decompressed: Vec<u8>;
+								{
+									let mut aggregated_body = match body::aggregate(response.body_mut()).await {
+										Ok(b) => b.reader(),
+										Err(e) => return Err(e.to_string()),
+									};
+
+									let mut decoder = match gzip::Decoder::new(&mut aggregated_body) {
+										Ok(decoder) => decoder,
+										Err(e) => return Err(e.to_string()),
+									};
+
+									decompressed = Vec::<u8>::new();
+									match io::copy(&mut decoder, &mut decompressed) {
+										Ok(_) => {}
+										Err(e) => return Err(e.to_string()),
+									};
+								}
+
+								response.headers_mut().remove(header::CONTENT_ENCODING);
+								response.headers_mut().insert(header::CONTENT_LENGTH, decompressed.len().into());
+								*(response.body_mut()) = Body::from(decompressed);
+
+								Ok(response)
+							}
+						}
 					}
 				}
 				Err(e) => Err(e.to_string()),

@@ -25,3 +25,8 @@ tokio = { version = "1.18.2", features = ["full"] }
 time = "0.3.9"
 url = "2.2.2"
 rust-embed = "6.4.0"
+libflate = "1.2.0"
+brotli = { version = "3.3.4", features = ["std"] }
+
+[dev-dependencies]
+lipsum = "0.8.2"
