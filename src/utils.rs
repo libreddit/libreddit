@@ -852,10 +852,11 @@ pub fn redirect(path: String) -> Response<Body> {
 		.unwrap_or_default()
 }
 
-pub async fn error(req: Request<Body>, msg: String) -> Result<Response<Body>, String> {
+/// Renders a generic error landing page.
+pub async fn error(req: Request<Body>, msg: impl ToString) -> Result<Response<Body>, String> {
 	let url = req.uri().to_string();
 	let body = ErrorTemplate {
-		msg,
+		msg: msg.to_string(),
 		prefs: Preferences::new(req),
 		url,
 	}
