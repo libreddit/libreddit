@@ -51,7 +51,7 @@ Feel free to [open an issue](https://github.com/spikecodes/libreddit/issues/new)
 | [lr.mint.lgbt](https://lr.mint.lgbt) | 🇨🇦 CA |  |
 | [libreddit.igna.rocks](https://libreddit.igna.rocks) | 🇺🇸 US | |
 | [libreddit.drivet.xyz](https://libreddit.drivet.xyz) | 🇵🇱 PL |  |
-| [libreddit.flux.industries](https://libreddit.flux.industries) | 🇩🇪 DE | ✅ ||
+| [libreddit.flux.industries](https://libreddit.flux.industries) | 🇩🇪 DE | ✅ |
 | [libreddit.de](https://libreddit.de) | 🇩🇪 DE |  |
 | [libreddit.pussthecat.org](https://libreddit.pussthecat.org) | 🇩🇪 DE |  |
 | [libreddit.mutahar.rocks](https://libreddit.mutahar.rocks) | 🇫🇷 FR |  |
