@@ -112,7 +112,7 @@ async fn main() {
 				.short('r')
 				.long("redirect-https")
 				.help("Redirect all HTTP requests to HTTPS (no longer functional)")
-				.takes_value(false),
+				.num_args(0),
 		)
 		.arg(
 			Arg::new("address")
@@ -121,7 +121,7 @@ async fn main() {
 				.value_name("ADDRESS")
 				.help("Sets address to listen on")
 				.default_value("0.0.0.0")
-				.takes_value(true),
+				.num_args(1),
 		)
 		.arg(
 			Arg::new("port")
@@ -130,7 +130,7 @@ async fn main() {
 				.value_name("PORT")
 				.help("Port to listen on")
 				.default_value("8080")
-				.takes_value(true),
+				.num_args(1),
 		)
 		.arg(
 			Arg::new("hsts")
@@ -139,13 +139,13 @@ async fn main() {
 				.value_name("EXPIRE_TIME")
 				.help("HSTS header to tell browsers that this site should only be accessed over HTTPS")
 				.default_value("604800")
-				.takes_value(true),
+				.num_args(1),
 		)
 		.get_matches();
 
-	let address = matches.value_of("address").unwrap_or("0.0.0.0");
-	let port = std::env::var("PORT").unwrap_or_else(|_| matches.value_of("port").unwrap_or("8080").to_string());
-	let hsts = matches.value_of("hsts");
+	let address = matches.get_one("address").map(|m: &String| m.as_str()).unwrap_or("0.0.0.0");
+	let port = std::env::var("PORT").unwrap_or_else(|_| matches.get_one("port").map(|m: &String| m.as_str()).unwrap_or("8080").to_string());
+	let hsts = matches.get_one("hsts").map(|m: &String| m.as_str());
 
 	let listener = [address, ":", &port].concat();
 
