@@ -40,6 +40,7 @@ Feel free to [open an issue](https://github.com/spikecodes/libreddit/issues/new)
 | [libreddit.dothq.co](https://libreddit.dothq.co) | 🇩🇪 DE | ✅ |
 | [libreddit.kavin.rocks](https://libreddit.kavin.rocks) | 🇮🇳 IN |  |
 | [reddit.invak.id](https://reddit.invak.id) | 🇧🇬 BG |  |
+| [reddit.simo.sh](https://reddit.simo.sh) | 🇧🇬 BG |  |
 | [lr.riverside.rocks](https://lr.riverside.rocks) | 🇺🇸 US |  |
 | [libreddit.strongthany.cc](https://libreddit.strongthany.cc) | 🇺🇸 US |  |
 | [libreddit.privacy.com.de](https://libreddit.privacy.com.de) | 🇩🇪 DE |  |
