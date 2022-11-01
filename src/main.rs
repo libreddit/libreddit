@@ -3,6 +3,7 @@
 #![allow(clippy::cmp_owned)]
 
 // Reference local files
+mod config;
 mod duplicates;
 mod post;
 mod search;

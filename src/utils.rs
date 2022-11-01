@@ -680,8 +680,8 @@ pub fn setting(req: &Request<Body>, name: &str) -> String {
 	req
 		.cookie(name)
 		.unwrap_or_else(|| {
-			// If there is no cookie for this setting, try receiving a default from an environment variable
-			if let Ok(default) = std::env::var(format!("FERRIT_DEFAULT_{}", name.to_uppercase())) {
+			// If there is no cookie for this setting, try receiving a default from the config
+			if let Some(default) = crate::config::get_setting(&format!("FERRIT_DEFAULT_{}", name.to_uppercase())) {
 				Cookie::new(name, default)
 			} else {
 				Cookie::named(name)
@@ -866,11 +866,10 @@ pub async fn error(req: Request<Body>, msg: impl ToString) -> Result<Response<Bo
 	Ok(Response::builder().status(404).header("content-type", "text/html").body(body.into()).unwrap_or_default())
 }
 
-/// Set the FERRIT_SFW_ONLY environment variable to anything, to enable SFW-only mode.
-/// If environment variable is set, this bool will be true. Otherwise it will be false.
-/// This variable is set by the instance operator, and as such, side-steps the user config
+/// Retrieve the `FERRIT_SFW_ONLY` setting value from the config, based on
+/// environment variables and the config file.
 pub fn sfw_only() -> bool {
-	env::var("FERRIT_SFW_ONLY").is_ok()
+	crate::config::get_setting("FERRIT_SFW_ONLY").is_some()
 }
 
 /// Render the landing page for NSFW content when the user has not enabled
