@@ -40,24 +40,19 @@ Feel free to [open an issue](https://github.com/spikecodes/libreddit/issues/new)
 | [libreddit.dothq.co](https://libreddit.dothq.co) | 🇩🇪 DE | ✅ |
 | [libreddit.kavin.rocks](https://libreddit.kavin.rocks) | 🇮🇳 IN |  |
 | [reddit.invak.id](https://reddit.invak.id) | 🇧🇬 BG |  |
-| [reddit.phii.me](https://reddit.phii.me) | 🇺🇸 US |  |
 | [lr.riverside.rocks](https://lr.riverside.rocks) | 🇺🇸 US |  |
 | [libreddit.strongthany.cc](https://libreddit.strongthany.cc) | 🇺🇸 US |  |
-| [libreddit.database.red](https://libreddit.database.red) | 🇺🇸 US | ✅ |
 | [libreddit.privacy.com.de](https://libreddit.privacy.com.de) | 🇩🇪 DE |  |
 | [libreddit.domain.glass](https://libreddit.domain.glass) | 🇺🇸 US | ✅ |
-| [libreddit.sugoma.tk](https://libreddit.sugoma.tk) | 🇺🇸 US | |
-| [libreddit.jamiethalacker.dev](https://libreddit.jamiethalacker.dev) | 🇺🇸 US | ✅ |
-| [reddit.artemislena.eu](https://reddit.artemislena.eu) | 🇩🇪 DE |  |
 | [r.nf](https://r.nf) | 🇩🇪 DE | ✅ |
 | [libreddit.some-things.org](https://libreddit.some-things.org) | 🇨🇭 CH |  |
 | [reddit.stuehieyr.com](https://reddit.stuehieyr.com) | 🇩🇪 DE  |  |
 | [lr.mint.lgbt](https://lr.mint.lgbt) | 🇨🇦 CA |  |
-| [libreddit.intent.cool](https://libreddit.intent.cool) | 🇺🇸 US | ✅ |
+| [libreddit.intent.cool](https://libreddit.intent.cool) | 🇺🇸 US |  |
 | [libreddit.autarkic.org](https://libreddit.autarkic.org) | 🇺🇸 US | |
 | [libreddit.flux.industries](https://libreddit.flux.industries) | 🇩🇪 DE | ✅ |
 | [libreddit.drivet.xyz](https://libreddit.drivet.xyz) | 🇵🇱 PL |  |
-| [lr.oversold.host](https://lr.oversold.host) | 🇱🇺 LU | |
+| [libreddit.flux.industries](https://libreddit.flux.industries) | 🇩🇪 DE | ✅ |
 | [libreddit.de](https://libreddit.de) | 🇩🇪 DE |  |
 | [libreddit.pussthecat.org](https://libreddit.pussthecat.org) | 🇩🇪 DE |  |
 | [libreddit.mutahar.rocks](https://libreddit.mutahar.rocks) | 🇫🇷 FR |  |
@@ -73,8 +68,6 @@ Feel free to [open an issue](https://github.com/spikecodes/libreddit/issues/new)
 | [lr.stilic.ml](https://lr.stilic.ml) | 🇫🇷 FR | ✅ |
 | [reddi.tk](https://reddi.tk) | 🇺🇸 US | ✅ |
 | [libreddit.bus-hit.me](https://libreddit.bus-hit.me) | 🇨🇦 CA |  |
-| [libreddit.datatunnel.xyz](https://libreddit.datatunnel.xyz) | 🇫🇮 FI |  |
-| [libreddit.crewz.me](https://libreddit.crewz.me) | 🇳🇱 NL | ✅ |
 | [r.walkx.org](https://r.walkx.org) | 🇳🇱 NL | ✅ |
 | [libreddit.kylrth.com](https://libreddit.kylrth.com) | 🇨🇦 CA |  |
 | [libreddit.yonalee.eu](https://libreddit.yonalee.eu) | 🇱🇺 LU | ✅ |
@@ -95,6 +88,8 @@ Feel free to [open an issue](https://github.com/spikecodes/libreddit/issues/new)
 | [libreddit.encrypted-data.xyz](https://libreddit.encrypted-data.xyz)| 🇫🇷 FR | ✅ |
 | [libreddit.eu.org](https://libreddit.eu.org)| 🇮🇪 IE | ✅ |
 | [l.opnxng.com](https://l.opnxng.com)| 🇸🇬 SG |  |
+| [libreddit.cachyos.org](https://libreddit.cachyos.org) | 🇩🇪 DE | ✅ |
+| [libreddit.oxymagnesium.com](https://libreddit.oxymagnesium.com) | 🇺🇸 US |  |
 | [spjmllawtheisznfs7uryhxumin26ssv2draj7oope3ok3wuhy43eoyd.onion](http://spjmllawtheisznfs7uryhxumin26ssv2draj7oope3ok3wuhy43eoyd.onion) | 🇮🇳 IN |  |
 | [fwhhsbrbltmrct5hshrnqlqygqvcgmnek3cnka55zj4y7nuus5muwyyd.onion](http://fwhhsbrbltmrct5hshrnqlqygqvcgmnek3cnka55zj4y7nuus5muwyyd.onion) | 🇩🇪 DE |  |
 | [kphht2jcflojtqte4b4kyx7p2ahagv4debjj32nre67dxz7y57seqwyd.onion](http://kphht2jcflojtqte4b4kyx7p2ahagv4debjj32nre67dxz7y57seqwyd.onion) | 🇳🇱 NL |  |
@@ -107,7 +102,7 @@ Feel free to [open an issue](https://github.com/spikecodes/libreddit/issues/new)
 | [libreddit.2syis2nnyytz6jnusnjurva4swlaizlnleiks5mjp46phuwjbdjqwgqd.onion](http://libreddit.2syis2nnyytz6jnusnjurva4swlaizlnleiks5mjp46phuwjbdjqwgqd.onion) | 🇪🇬 EG |  |
 | [ol5begilptoou34emq2sshf3may3hlblvipdjtybbovpb7c7zodxmtqd.onion](http://ol5begilptoou34emq2sshf3may3hlblvipdjtybbovpb7c7zodxmtqd.onion) | 🇩🇪 DE |  |
 | [lbrdtjaj7567ptdd4rv74lv27qhxfkraabnyphgcvptl64ijx2tijwid.onion](http://lbrdtjaj7567ptdd4rv74lv27qhxfkraabnyphgcvptl64ijx2tijwid.onion) | 🇨🇦 CA |  |
-| [libreddit.lqs5fjmajyp7rvp4qvyubwofzi6d4imua7vs237rkc4m5qogitqwrgyd.onion](http://libreddit.lqs5fjmajyp7rvp4qvyubwofzi6d4imua7vs237rkc4m5qogitqwrgyd.onion) | 🇨🇦 CA |  |
+| [libreddit.esmail5pdn24shtvieloeedh7ehz3nrwcdivnfhfcedl7gf4kwddhkqd.onion](http://libreddit.esmail5pdn24shtvieloeedh7ehz3nrwcdivnfhfcedl7gf4kwddhkqd.onion) | 🇨🇦 CA |  |
 | [reddit.prnoid54e44a4bduq5due64jkk7wcnkxcp5kv3juncm7veptjcqudgyd.onion](http://reddit.prnoid54e44a4bduq5due64jkk7wcnkxcp5kv3juncm7veptjcqudgyd.onion) | 🇨🇭 CH |  |
 | [inz6tbezfwzexva6dize4cqraj2tjdhygxabmcgysccesvw2pybzhbyd.onion](http://inz6tbezfwzexva6dize4cqraj2tjdhygxabmcgysccesvw2pybzhbyd.onion) | 🇫🇮 FI |  |
 | [libreddit.micohauwkjbyw5meacrb4ipicwvwg4xtzl7y7viv53kig2mdcsvwkyyd.onion](http://libreddit.micohauwkjbyw5meacrb4ipicwvwg4xtzl7y7viv53kig2mdcsvwkyyd.onion/)| 🇫🇮 FI |  |
