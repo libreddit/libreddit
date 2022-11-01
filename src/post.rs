@@ -100,7 +100,7 @@ async fn parse_post(json: &serde_json::Value) -> Post {
 
 	let body = if val(post, "removed_by_category") == "moderator" {
 		format!(
-			"<div class=\"md\"><p>[removed] — <a href=\"https://www.reveddit.com{}\">view removed post</a></p></div>",
+			"<div class=\"md\"><p>[removed] — <a href=\"https://www.unddit.com{}\">view removed post</a></p></div>",
 			permalink
 		)
 	} else {
@@ -200,9 +200,9 @@ fn parse_comments(json: &serde_json::Value, post_link: &str, post_author: &str, 
 			let id = val(&comment, "id");
 			let highlighted = id == highlighted_comment;
 
-			let body = if val(&comment, "author") == "[deleted]" && val(&comment, "body") == "[removed]" {
+			let body = if (val(&comment, "author") == "[deleted]" && val(&comment, "body") == "[removed]") || val(&comment, "body") == "[ Removed by Reddit ]" {
 				format!(
-					"<div class=\"md\"><p>[removed] — <a href=\"https://www.reveddit.com{}{}\">view removed comment</a></p></div>",
+					"<div class=\"md\"><p>[removed] — <a href=\"https://www.unddit.com{}{}\">view removed comment</a></p></div>",
 					post_link, id
 				)
 			} else {

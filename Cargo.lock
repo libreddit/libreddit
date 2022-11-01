@@ -582,7 +582,7 @@ checksum = "fc7fcc620a3bff7cdd7a365be3376c97191aeaccc2a603e600951e452615bf89"
 
 [[package]]
 name = "libreddit"
-version = "0.23.0"
+version = "0.23.1"
 dependencies = [
  "askama",
  "async-recursion",
