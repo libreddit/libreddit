@@ -40,23 +40,17 @@ Feel free to [open an issue](https://github.com/spikecodes/libreddit/issues/new)
 | [libreddit.dothq.co](https://libreddit.dothq.co) | 🇩🇪 DE | ✅ |
 | [libreddit.kavin.rocks](https://libreddit.kavin.rocks) | 🇮🇳 IN |  |
 | [reddit.invak.id](https://reddit.invak.id) | 🇧🇬 BG |  |
-| [reddit.phii.me](https://reddit.phii.me) | 🇺🇸 US |  |
 | [lr.riverside.rocks](https://lr.riverside.rocks) | 🇺🇸 US |  |
 | [libreddit.strongthany.cc](https://libreddit.strongthany.cc) | 🇺🇸 US |  |
-| [libreddit.database.red](https://libreddit.database.red) | 🇺🇸 US | ✅ |
 | [libreddit.privacy.com.de](https://libreddit.privacy.com.de) | 🇩🇪 DE |  |
 | [libreddit.domain.glass](https://libreddit.domain.glass) | 🇺🇸 US | ✅ |
-| [libreddit.sugoma.tk](https://libreddit.sugoma.tk) | 🇺🇸 US | |
-| [libreddit.jamiethalacker.dev](https://libreddit.jamiethalacker.dev) | 🇺🇸 US | ✅ |
 | [r.nf](https://r.nf) | 🇩🇪 DE | ✅ |
 | [libreddit.some-things.org](https://libreddit.some-things.org) | 🇨🇭 CH |  |
 | [reddit.stuehieyr.com](https://reddit.stuehieyr.com) | 🇩🇪 DE  |  |
 | [lr.mint.lgbt](https://lr.mint.lgbt) | 🇨🇦 CA |  |
 | [libreddit.igna.rocks](https://libreddit.igna.rocks) | 🇺🇸 US | |
-| [libreddit.autarkic.org](https://libreddit.autarkic.org) | 🇺🇸 US | |
-| [libreddit.flux.industries](https://libreddit.flux.industries) | 🇩🇪 DE | ✅ |
 | [libreddit.drivet.xyz](https://libreddit.drivet.xyz) | 🇵🇱 PL |  |
-| [lr.oversold.host](https://lr.oversold.host) | 🇱🇺 LU | |
+| [libreddit.flux.industries](https://libreddit.flux.industries) | 🇩🇪 DE | ✅ |
 | [libreddit.de](https://libreddit.de) | 🇩🇪 DE |  |
 | [libreddit.pussthecat.org](https://libreddit.pussthecat.org) | 🇩🇪 DE |  |
 | [libreddit.mutahar.rocks](https://libreddit.mutahar.rocks) | 🇫🇷 FR |  |
@@ -72,8 +66,6 @@ Feel free to [open an issue](https://github.com/spikecodes/libreddit/issues/new)
 | [lr.stilic.ml](https://lr.stilic.ml) | 🇫🇷 FR | ✅ |
 | [reddi.tk](https://reddi.tk) | 🇺🇸 US | ✅ |
 | [libreddit.bus-hit.me](https://libreddit.bus-hit.me) | 🇨🇦 CA |  |
-| [libreddit.datatunnel.xyz](https://libreddit.datatunnel.xyz) | 🇫🇮 FI |  |
-| [libreddit.crewz.me](https://libreddit.crewz.me) | 🇳🇱 NL | ✅ |
 | [r.walkx.org](https://r.walkx.org) | 🇳🇱 NL | ✅ |
 | [libreddit.kylrth.com](https://libreddit.kylrth.com) | 🇨🇦 CA |  |
 | [libreddit.yonalee.eu](https://libreddit.yonalee.eu) | 🇱🇺 LU | ✅ |
