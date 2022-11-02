@@ -238,6 +238,11 @@ async fn main() {
 	app.at("/r/:sub/comments/:id").get(|r| post::item(r).boxed());
 	app.at("/r/:sub/comments/:id/:title").get(|r| post::item(r).boxed());
 	app.at("/r/:sub/comments/:id/:title/:comment_id").get(|r| post::item(r).boxed());
+	app.at("/comments/:id").get(|r| post::item(r).boxed());
+	app.at("/comments/:id/comments").get(|r| post::item(r).boxed());
+	app.at("/comments/:id/comments/:comment_id").get(|r| post::item(r).boxed());
+	app.at("/comments/:id/:title").get(|r| post::item(r).boxed());
+	app.at("/comments/:id/:title/:comment_id").get(|r| post::item(r).boxed());
 
 	app.at("/r/:sub/search").get(|r| search::find(r).boxed());
 
