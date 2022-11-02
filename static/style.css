@@ -480,6 +480,10 @@ button.submit:hover > svg { stroke: var(--accent); }
 	margin-bottom: 20px;
 }
 
+#listing_options {
+	overflow-x: auto;
+}
+
 #sort_options, #listing_options, footer > a {
 	border-radius: 5px;
 	align-items: center;
