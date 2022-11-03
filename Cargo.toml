@@ -25,3 +25,8 @@ tokio = { version = "1.21.2", features = ["full"] }
 time = "0.3.16"
 url = "2.3.1"
 rust-embed = { version = "6.4.2", features = ["include-exclude"] }
+
+[profile.release]
+codegen-units = 1
+lto = true
+strip = true
