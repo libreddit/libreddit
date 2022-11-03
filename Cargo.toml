@@ -10,7 +10,7 @@ edition = "2021"
 [dependencies]
 askama = { version = "0.11.1", default-features = false }
 async-recursion = "1.0.0"
-cached = "0.40.0"
+cached = { version = "0.40.0", optional = true }
 clap = { version = "4.0.18", default-features = false, features = ["std"] }
 regex = "1.6.0"
 serde = { version = "1.0.147", features = ["derive"] }
@@ -25,3 +25,6 @@ tokio = { version = "1.21.2", features = ["full"] }
 time = "0.3.16"
 url = "2.3.1"
 rust-embed = { version = "6.4.2", features = ["include-exclude"] }
+
+[features]
+default = ["cached"]
