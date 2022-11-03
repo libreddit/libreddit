@@ -112,7 +112,7 @@ fn request(url: String, quarantine: bool) -> Boxed<Result<Response<Body>, String
 }
 
 // Make a request to a Reddit API and parse the JSON response
-#[cached(size = 100, time = 30, result = true)]
+#[cfg_attr(feature = "cached", cached(size = 100, time = 30, result = true))]
 pub async fn json(path: String, quarantine: bool) -> Result<Value, String> {
 	// Build Reddit url from path
 	let url = format!("https://www.reddit.com{}", path);
