@@ -731,8 +731,7 @@ pub async fn error(req: Request<Body>, msg: String) -> Result<Response<Body>, St
 
 #[cfg(test)]
 mod tests {
-	use super::format_num;
-	use super::rewrite_urls;
+	use super::{format_num, format_url, rewrite_urls};
 
 	#[test]
 	fn format_num_works() {
@@ -751,5 +750,34 @@ mod tests {
 			rewrite_urls(comment_body_html),
 			r#"<a href="https://www.reddit.com/r/linux_gaming/comments/x/just_a_test/">https://www.reddit.com/r/linux_gaming/comments/x/just_a_test/</a>"#
 		)
+	}
+
+	#[test]
+	fn test_format_url() {
+		assert_eq!(format_url("https://a.thumbs.redditmedia.com/XYZ.jpg"), "/thumb/a/XYZ.jpg");
+		assert_eq!(format_url("https://emoji.redditmedia.com/a/b"), "/emoji/a/b");
+
+		assert_eq!(
+			format_url("https://external-preview.redd.it/foo.jpg?auto=webp&s=bar"),
+			"/preview/external-pre/foo.jpg?auto=webp&s=bar"
+		);
+
+		assert_eq!(format_url("https://i.redd.it/foobar.jpg"), "/img/foobar.jpg");
+		assert_eq!(
+			format_url("https://preview.redd.it/qwerty.jpg?auto=webp&s=asdf"),
+			"/preview/pre/qwerty.jpg?auto=webp&s=asdf"
+		);
+		assert_eq!(format_url("https://v.redd.it/foo/DASH_360.mp4?source=fallback"), "/vid/foo/360.mp4");
+		assert_eq!(
+			format_url("https://v.redd.it/foo/HLSPlaylist.m3u8?a=bar&v=1&f=sd"),
+			"/hls/foo/HLSPlaylist.m3u8?a=bar&v=1&f=sd"
+		);
+		assert_eq!(format_url("https://www.redditstatic.com/gold/awards/icon/icon.png"), "/static/gold/awards/icon/icon.png");
+
+		assert_eq!(format_url(""), "");
+		assert_eq!(format_url("self"), "");
+		assert_eq!(format_url("default"), "");
+		assert_eq!(format_url("nsfw"), "");
+		assert_eq!(format_url("spoiler"), "");
 	}
 }
