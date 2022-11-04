@@ -13,6 +13,21 @@ use std::str::FromStr;
 use time::{macros::format_description, Duration, OffsetDateTime};
 use url::Url;
 
+/// Write a message to stderr on debug mode. This function is a no-op on
+/// release code.
+#[macro_export]
+macro_rules! dbg_msg {
+	($x:expr) => {
+		#[cfg(debug_assertions)]
+		eprintln!("{}:{}: {}", file!(), line!(), $x.to_string())
+	};
+
+	($($x:expr),+) => {
+		#[cfg(debug_assertions)]
+		dbg_msg!(format!($($x),+))
+	};
+}
+
 // Post flair with content, background color and foreground color
 pub struct Flair {
 	pub flair_parts: Vec<FlairPart>,
