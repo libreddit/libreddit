@@ -67,14 +67,11 @@ impl CompressionType {
 
 impl ToString for CompressionType {
 	fn to_string(&self) -> String {
-		let s: &str = match *self {
-			CompressionType::Gzip => "gzip",
-			CompressionType::Brotli => "br",
-
-			_ => "",
-		};
-
-		s.to_string()
+		match self {
+			CompressionType::Gzip => "gzip".to_string(),
+			CompressionType::Brotli => "br".to_string(),
+			_ => String::new(),
+		}
 	}
 }
 
