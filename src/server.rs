@@ -664,7 +664,7 @@ mod tests {
 			};
 		}
 
-		for accept_encoding in vec![
+		for accept_encoding in [
 			"*",
 			ae_gen!(CompressionType::Gzip),
 			ae_gen!(CompressionType::Brotli, CompressionType::Gzip),
