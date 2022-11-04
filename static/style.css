@@ -1182,14 +1182,19 @@ input[type="submit"] {
 	color: var(--accent);
 }
 
-.md .md-spoiler-text {
+.md .md-spoiler-text, .md-spoiler-text a {
 	background: var(--highlighted);
 	color: transparent;
 }
 
-.md .md-spoiler-text:hover {
+.md-spoiler-text:hover {
 	background: var(--foreground);
 	color: var(--text);
+}
+
+.md-spoiler-text:hover a {
+	background: var(--foreground);
+	color: var(--accent);
 }
 
 .md li { margin: 10px 0; }
