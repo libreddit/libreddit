@@ -42,13 +42,16 @@ pub async fn canonical_path(path: String) -> Result<Option<String>, String> {
 		return Ok(None);
 	}
 
-	match res.headers().get(header::LOCATION) {
-		None => Ok(None),
-		Some(hdr) => match hdr.to_str() {
-			Ok(val) => Ok(Some(val.to_string().trim_start_matches(REDDIT_URL_BASE).to_string())),
-			Err(e) => Err(e.to_string()),
-		},
-	}
+	Ok(
+		res
+			.headers()
+			.get(header::LOCATION)
+			.map(|val| percent_encode(val.as_bytes(), CONTROLS)
+				.to_string()
+				.trim_start_matches(REDDIT_URL_BASE)
+				.to_string()
+			),
+	)
 }
 
 pub async fn proxy(req: Request<Body>, format: &str) -> Result<Response<Body>, String> {
