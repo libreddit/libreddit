@@ -39,7 +39,7 @@ Both files are part of the [libreddit-instances](https://github.com/libreddit/li
 
 # About
 
-Find Libreddit on 💬 [Matrix](https://matrix.to/#/#libreddit:kde.org), 🐋 [Docker](https://hub.docker.com/r/spikecodes/libreddit), :octocat: [GitHub](https://github.com/spikecodes/libreddit), and 🦊 [GitLab](https://gitlab.com/spikecodes/libreddit).
+Find Libreddit on 💬 [Matrix](https://matrix.to/#/#libreddit:kde.org), 🐋 [Docker](https://hub.docker.com/r/spikecodes/libreddit), :octocat: [GitHub](https://github.com/libreddit/libreddit), and 🦊 [GitLab](https://gitlab.com/spikecodes/libreddit).
 
 ## Built with
 
@@ -51,7 +51,7 @@ Find Libreddit on 💬 [Matrix](https://matrix.to/#/#libreddit:kde.org), 🐋 [D
 ## Info
 Libreddit hopes to provide an easier way to browse Reddit, without the ads, trackers, and bloat. Libreddit was inspired by other alternative front-ends to popular services such as [Invidious](https://github.com/iv-org/invidious) for YouTube, [Nitter](https://github.com/zedeus/nitter) for Twitter, and [Bibliogram](https://sr.ht/~cadence/bibliogram/) for Instagram.
 
-Libreddit currently implements most of Reddit's (signed-out) functionalities but still lacks [a few features](https://github.com/spikecodes/libreddit/issues).
+Libreddit currently implements most of Reddit's (signed-out) functionalities but still lacks [a few features](https://github.com/libreddit/libreddit/issues).
 
 ## How does it compare to Teddit?
 
@@ -162,14 +162,14 @@ yay -S libreddit-git
 
 ## 4) GitHub Releases
 
-If you're on Linux and none of these methods work for you, you can grab a Linux binary from [the newest release](https://github.com/spikecodes/libreddit/releases/latest).
+If you're on Linux and none of these methods work for you, you can grab a Linux binary from [the newest release](https://github.com/libreddit/libreddit/releases/latest).
 
 ## 5) Replit/Heroku/Glitch
 
 **Note:** These are free hosting options but they are *not* private and will monitor server usage to prevent abuse. If you need a free and easy setup, this method may work best for you.
 
-<a href="https://repl.it/github/spikecodes/libreddit"><img src="https://repl.it/badge/github/spikecodes/libreddit" alt="Run on Repl.it" height="32" /></a>
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/spikecodes/libreddit)
+<a href="https://repl.it/github/libreddit/libreddit"><img src="https://repl.it/badge/github/libreddit/libreddit" alt="Run on Repl.it" height="32" /></a>
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/libreddit/libreddit)
 [![Remix on Glitch](https://cdn.glitch.com/2703baf2-b643-4da7-ab91-7ee2a2d00b5b%2Fremix-button-v2.svg)](https://glitch.com/edit/#!/remix/libreddit)
 
 ---
@@ -211,7 +211,7 @@ LIBREDDIT_DEFAULT_WIDE=on LIBREDDIT_DEFAULT_THEME=dark libreddit -r
 
 ## Proxying using NGINX
 
-**NOTE** If you're [proxying Libreddit through an NGINX Reverse Proxy](https://github.com/spikecodes/libreddit/issues/122#issuecomment-782226853), add
+**NOTE** If you're [proxying Libreddit through an NGINX Reverse Proxy](https://github.com/libreddit/libreddit/issues/122#issuecomment-782226853), add
 ```nginx
 proxy_http_version 1.1;
 ```
@@ -239,7 +239,7 @@ Before=nginx.service
 ## Building
 
 ```
-git clone https://github.com/spikecodes/libreddit
+git clone https://github.com/libreddit/libreddit
 cd libreddit
 cargo run
 ```
