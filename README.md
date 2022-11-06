@@ -31,7 +31,9 @@ I appreciate any donations! Your support allows me to continue developing Libred
 
 🔗 **Want to automatically redirect Reddit links to Libreddit? Use [LibRedirect](https://github.com/libredirect/libredirect) or [Privacy Redirect](https://github.com/SimonBrazell/privacy-redirect)!**
 
-An up-to-date list of instances is maintained in the [libreddit-instances](https://github.com/libreddit/libreddit-instances) repo, in the form of [a machine-readable JSON](https://github.com/libreddit/libreddit-instances/blob/master/instances.json). To contribute your [self-hosted instance](#deployment) to the list, see the [libreddit-instances README](https://github.com/libreddit/libreddit-instances/blob/master/README.md).
+[Follow this link](https://github.com/libreddit/libreddit-instances/blob/master/instances.md) for an up-to-date table of instances in markdown format. This list is also available as [a machine-readable JSON](https://github.com/libreddit/libreddit-instances/blob/master/instances.json).
+
+Both files are part of the [libreddit-instances](https://github.com/libreddit/libreddit-instances) repository. To contribute your [self-hosted instance](#deployment) to the list, see the [libreddit-instances README](https://github.com/libreddit/libreddit-instances/blob/master/README.md).
 
 ---
 
