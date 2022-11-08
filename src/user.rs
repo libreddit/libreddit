@@ -1,7 +1,7 @@
 // CRATES
 use crate::client::json;
 use crate::server::RequestExt;
-use crate::utils::{error, filter_posts, format_url, get_filters, param, template, Post, Preferences, User};
+use crate::utils::{error, filter_posts, format_url, get_filters, param, setting, template, Post, Preferences, User};
 use askama::Template;
 use hyper::{Body, Request, Response};
 use time::{macros::format_description, OffsetDateTime};
@@ -24,6 +24,8 @@ struct UserTemplate {
 	/// Whether all fetched posts are filtered (to differentiate between no posts fetched in the first place,
 	/// and all fetched posts being filtered).
 	all_posts_filtered: bool,
+	/// Whether all posts were hidden because they are NSFW (and user has disabled show NSFW)
+	all_posts_hidden_nsfw: bool,
 }
 
 // FUNCTIONS
@@ -58,13 +60,14 @@ pub async fn profile(req: Request<Body>) -> Result<Response<Body>, String> {
 			redirect_url,
 			is_filtered: true,
 			all_posts_filtered: false,
+			all_posts_hidden_nsfw: false,
 		})
 	} else {
 		// Request user posts/comments from Reddit
 		match Post::fetch(&path, false).await {
 			Ok((mut posts, after)) => {
 				let all_posts_filtered = filter_posts(&mut posts, &filters);
-
+				let all_posts_hidden_nsfw = posts.iter().all(|p| p.flags.nsfw) && setting(&req, "show_nsfw") != "on";
 				template(UserTemplate {
 					user,
 					posts,
@@ -76,6 +79,7 @@ pub async fn profile(req: Request<Body>) -> Result<Response<Body>, String> {
 					redirect_url,
 					is_filtered: false,
 					all_posts_filtered,
+					all_posts_hidden_nsfw,
 				})
 			}
 			// If there is an error show error page
