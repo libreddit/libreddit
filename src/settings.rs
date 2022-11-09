@@ -38,10 +38,10 @@ const PREFS: [&str; 11] = [
 // Retrieve cookies from request "Cookie" header
 pub async fn get(req: Request<Body>) -> Result<Response<Body>, String> {
 	let url = req.uri().to_string();
-	template(SettingsTemplate {
-		prefs: Preferences::new(req),
+	Ok(template(&SettingsTemplate {
+		prefs: Preferences::new(&req),
 		url,
-	})
+	}))
 }
 
 // Set cookies using response "Set-Cookie" header
@@ -69,7 +69,7 @@ pub async fn set(req: Request<Body>) -> Result<Response<Body>, String> {
 
 	let form = url::form_urlencoded::parse(&body_bytes).collect::<HashMap<_, _>>();
 
-	let mut response = redirect("/settings".to_string());
+	let mut response = redirect("/settings");
 
 	for &name in &PREFS {
 		match form.get(name) {
@@ -103,12 +103,11 @@ fn set_cookies_method(req: Request<Body>, remove_cookies: bool) -> Response<Body
 
 	let form = url::form_urlencoded::parse(query).collect::<HashMap<_, _>>();
 
-	let path = match form.get("redirect") {
-		Some(value) => format!("/{}", value.replace("%26", "&").replace("%23", "#")),
-		None => "/".to_string(),
-	};
+	let path = form
+		.get("redirect")
+		.map_or_else(|| "/".to_string(), |value| format!("/{}", value.replace("%26", "&").replace("%23", "#")));
 
-	let mut response = redirect(path);
+	let mut response = redirect(&path);
 
 	for name in [PREFS.to_vec(), vec!["subscriptions", "filters"]].concat() {
 		match form.get(name) {

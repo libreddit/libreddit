@@ -48,8 +48,8 @@ impl FlairPart {
 		// Parse type of flair
 		match flair_type {
 			// If flair contains emojis and text
-			"richtext" => match rich_flair {
-				Some(rich) => rich
+			"richtext" => rich_flair.map_or_else(Vec::new, |rich| {
+				rich
 					.iter()
 					// For each part of the flair, extract text and emojis
 					.map(|part| {
@@ -63,17 +63,18 @@ impl FlairPart {
 							},
 						}
 					})
-					.collect::<Vec<Self>>(),
-				None => Vec::new(),
-			},
+					.collect::<Vec<Self>>()
+			}),
 			// If flair contains only text
-			"text" => match text_flair {
-				Some(text) => vec![Self {
-					flair_part_type: "text".to_string(),
-					value: text.to_string(),
-				}],
-				None => Vec::new(),
-			},
+			"text" => text_flair.map_or_else(
+				Vec::new,
+				|text| {
+					vec![Self {
+						flair_part_type: "text".to_string(),
+						value: text.to_string(),
+					}]
+				},
+			),
 			_ => Vec::new(),
 		}
 	}
@@ -299,7 +300,7 @@ impl Post {
 					alt_url: String::new(),
 					width: data["thumbnail_width"].as_i64().unwrap_or_default(),
 					height: data["thumbnail_height"].as_i64().unwrap_or_default(),
-					poster: "".to_string(),
+					poster: String::new(),
 				},
 				media,
 				domain: val(post, "domain"),
@@ -383,7 +384,7 @@ impl std::ops::Deref for Awards {
 
 impl std::fmt::Display for Awards {
 	fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-		self.iter().fold(Ok(()), |result, award| result.and_then(|_| writeln!(f, "{}", award)))
+		self.iter().fold(Ok(()), |result, award| result.and_then(|_| writeln!(f, "{award}")))
 	}
 }
 
@@ -479,29 +480,29 @@ pub struct ThemeAssets;
 
 impl Preferences {
 	// Build preferences from cookies
-	pub fn new(req: Request<Body>) -> Self {
+	pub fn new(req: &Request<Body>) -> Self {
 		// Read available theme names from embedded css files.
 		// Always make the default "system" theme available.
 		let mut themes = vec!["system".to_string()];
 		for file in ThemeAssets::iter() {
 			let chunks: Vec<&str> = file.as_ref().split(".css").collect();
-			themes.push(chunks[0].to_owned())
+			themes.push(chunks[0].to_owned());
 		}
 		Self {
 			available_themes: themes,
-			theme: setting(&req, "theme"),
-			front_page: setting(&req, "front_page"),
-			layout: setting(&req, "layout"),
-			wide: setting(&req, "wide"),
-			show_nsfw: setting(&req, "show_nsfw"),
-			blur_nsfw: setting(&req, "blur_nsfw"),
-			use_hls: setting(&req, "use_hls"),
-			hide_hls_notification: setting(&req, "hide_hls_notification"),
-			autoplay_videos: setting(&req, "autoplay_videos"),
-			comment_sort: setting(&req, "comment_sort"),
-			post_sort: setting(&req, "post_sort"),
-			subscriptions: setting(&req, "subscriptions").split('+').map(String::from).filter(|s| !s.is_empty()).collect(),
-			filters: setting(&req, "filters").split('+').map(String::from).filter(|s| !s.is_empty()).collect(),
+			theme: setting(req, "theme"),
+			front_page: setting(req, "front_page"),
+			layout: setting(req, "layout"),
+			wide: setting(req, "wide"),
+			show_nsfw: setting(req, "show_nsfw"),
+			blur_nsfw: setting(req, "blur_nsfw"),
+			use_hls: setting(req, "use_hls"),
+			hide_hls_notification: setting(req, "hide_hls_notification"),
+			autoplay_videos: setting(req, "autoplay_videos"),
+			comment_sort: setting(req, "comment_sort"),
+			post_sort: setting(req, "post_sort"),
+			subscriptions: setting(req, "subscriptions").split('+').map(String::from).filter(|s| !s.is_empty()).collect(),
+			filters: setting(req, "filters").split('+').map(String::from).filter(|s| !s.is_empty()).collect(),
 		}
 	}
 }
@@ -530,7 +531,7 @@ pub fn filter_posts(posts: &mut Vec<Post>, filters: &HashSet<String>) -> bool {
 // Grab a query parameter from a url
 pub fn param(path: &str, value: &str) -> Option<String> {
 	Some(
-		Url::parse(format!("https://libredd.it/{}", path).as_str())
+		Url::parse(format!("https://libredd.it/{path}").as_str())
 			.ok()?
 			.query_pairs()
 			.into_owned()
@@ -547,11 +548,7 @@ pub fn setting(req: &Request<Body>, name: &str) -> String {
 		.cookie(name)
 		.unwrap_or_else(|| {
 			// If there is no cookie for this setting, try receiving a default from an environment variable
-			if let Ok(default) = std::env::var(format!("LIBREDDIT_DEFAULT_{}", name.to_uppercase())) {
-				Cookie::new(name, default)
-			} else {
-				Cookie::named(name)
-			}
+			std::env::var(format!("LIBREDDIT_DEFAULT_{}", name.to_uppercase())).map_or_else(|_| Cookie::named(name), |default| Cookie::new(name, default))
 		})
 		.value()
 		.to_string()
@@ -560,11 +557,11 @@ pub fn setting(req: &Request<Body>, name: &str) -> String {
 // Detect and redirect in the event of a random subreddit
 pub async fn catch_random(sub: &str, additional: &str) -> Result<Response<Body>, String> {
 	if sub == "random" || sub == "randnsfw" {
-		let new_sub = json(format!("/r/{}/about.json?raw_json=1", sub), false).await?["data"]["display_name"]
+		let new_sub = json(format!("/r/{sub}/about.json?raw_json=1"), false).await?["data"]["display_name"]
 			.as_str()
 			.unwrap_or_default()
 			.to_string();
-		Ok(redirect(format!("/r/{}{}", new_sub, additional)))
+		Ok(redirect(&format!("/r/{new_sub}{additional}")))
 	} else {
 		Err("No redirect needed".to_string())
 	}
@@ -699,22 +696,22 @@ pub fn val(j: &Value, k: &str) -> String {
 // NETWORKING
 //
 
-pub fn template(t: impl Template) -> Result<Response<Body>, String> {
-	Ok(
-		Response::builder()
-			.status(200)
-			.header("content-type", "text/html")
-			.body(t.render().unwrap_or_default().into())
-			.unwrap_or_default(),
-	)
+pub fn template(t: &impl Template) -> Response<Body> {
+	// Ok(
+	Response::builder()
+		.status(200)
+		.header("content-type", "text/html")
+		.body(t.render().unwrap_or_default().into())
+		.unwrap_or_default()
+	// )
 }
 
-pub fn redirect(path: String) -> Response<Body> {
+pub fn redirect(path: &str) -> Response<Body> {
 	Response::builder()
 		.status(302)
 		.header("content-type", "text/html")
-		.header("Location", &path)
-		.body(format!("Redirecting to <a href=\"{0}\">{0}</a>...", path).into())
+		.header("Location", path)
+		.body(format!("Redirecting to <a href=\"{path}\">{path}</a>...").into())
 		.unwrap_or_default()
 }
 
@@ -723,7 +720,7 @@ pub async fn error(req: Request<Body>, msg: impl ToString) -> Result<Response<Bo
 	let url = req.uri().to_string();
 	let body = ErrorTemplate {
 		msg: msg.to_string(),
-		prefs: Preferences::new(req),
+		prefs: Preferences::new(&req),
 		url,
 	}
 	.render()

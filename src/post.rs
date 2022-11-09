@@ -37,14 +37,14 @@ pub async fn item(req: Request<Body>) -> Result<Response<Body>, String> {
 		if default_sort.is_empty() {
 			String::new()
 		} else {
-			path = format!("{}.json?{}&sort={}&raw_json=1", req.uri().path(), req.uri().query().unwrap_or_default(), default_sort);
+			path = format!("{}.json?{}&sort={default_sort}&raw_json=1", req.uri().path(), req.uri().query().unwrap_or_default());
 			default_sort
 		}
 	});
 
 	// Log the post ID being fetched in debug mode
 	#[cfg(debug_assertions)]
-	dbg!(req.param("id").unwrap_or_default());
+	req.param("id").unwrap_or_default();
 
 	let single_thread = req.param("comment_id").is_some();
 	let highlighted_comment = &req.param("comment_id").unwrap_or_default();
@@ -59,20 +59,20 @@ pub async fn item(req: Request<Body>) -> Result<Response<Body>, String> {
 			let url = req.uri().to_string();
 
 			// Use the Post and Comment structs to generate a website to show users
-			template(PostTemplate {
+			Ok(template(&PostTemplate {
 				comments,
 				post,
 				sort,
-				prefs: Preferences::new(req),
+				prefs: Preferences::new(&req),
 				single_thread,
 				url,
-			})
+			}))
 		}
 		// If the Reddit API returns an error, exit and send error page to user
 		Err(msg) => {
 			if msg == "quarantined" {
 				let sub = req.param("sub").unwrap_or_default();
-				quarantine(req, sub)
+				Ok(quarantine(&req, sub))
 			} else {
 				error(req, msg).await
 			}
@@ -137,7 +137,7 @@ async fn parse_post(json: &serde_json::Value) -> Post {
 			alt_url: String::new(),
 			width: post["data"]["thumbnail_width"].as_i64().unwrap_or_default(),
 			height: post["data"]["thumbnail_height"].as_i64().unwrap_or_default(),
-			poster: "".to_string(),
+			poster: String::new(),
 		},
 		flair: Flair {
 			flair_parts: FlairPart::parse(

@@ -49,15 +49,15 @@ struct SearchTemplate {
 // SERVICES
 pub async fn find(req: Request<Body>) -> Result<Response<Body>, String> {
 	let nsfw_results = if setting(&req, "show_nsfw") == "on" { "&include_over_18=on" } else { "" };
-	let path = format!("{}.json?{}{}&raw_json=1", req.uri().path(), req.uri().query().unwrap_or_default(), nsfw_results);
+	let path = format!("{}.json?{}{nsfw_results}&raw_json=1", req.uri().path(), req.uri().query().unwrap_or_default());
 	let query = param(&path, "q").unwrap_or_default();
 
 	if query.is_empty() {
-		return Ok(redirect("/".to_string()));
+		return Ok(redirect("/"));
 	}
 
 	if query.starts_with("r/") {
-		return Ok(redirect(format!("/{}", query)));
+		return Ok(redirect(&format!("/{query}")));
 	}
 
 	let sub = req.param("sub").unwrap_or_default();
@@ -85,7 +85,7 @@ pub async fn find(req: Request<Body>) -> Result<Response<Body>, String> {
 
 	// If all requested subs are filtered, we don't need to fetch posts.
 	if sub.split('+').all(|s| filters.contains(s)) {
-		template(SearchTemplate {
+		Ok(template(&SearchTemplate {
 			posts: Vec::new(),
 			subreddits,
 			sub,
@@ -94,22 +94,22 @@ pub async fn find(req: Request<Body>) -> Result<Response<Body>, String> {
 				sort,
 				t: param(&path, "t").unwrap_or_default(),
 				before: param(&path, "after").unwrap_or_default(),
-				after: "".to_string(),
+				after: String::new(),
 				restrict_sr: param(&path, "restrict_sr").unwrap_or_default(),
 				typed,
 			},
-			prefs: Preferences::new(req),
+			prefs: Preferences::new(&req),
 			url,
 			is_filtered: true,
 			all_posts_filtered: false,
 			all_posts_hidden_nsfw: false,
-		})
+		}))
 	} else {
 		match Post::fetch(&path, quarantined).await {
 			Ok((mut posts, after)) => {
 				let all_posts_filtered = filter_posts(&mut posts, &filters);
 				let all_posts_hidden_nsfw = posts.iter().all(|p| p.flags.nsfw) && setting(&req, "show_nsfw") != "on";
-				template(SearchTemplate {
+				Ok(template(&SearchTemplate {
 					posts,
 					subreddits,
 					sub,
@@ -122,17 +122,17 @@ pub async fn find(req: Request<Body>) -> Result<Response<Body>, String> {
 						restrict_sr: param(&path, "restrict_sr").unwrap_or_default(),
 						typed,
 					},
-					prefs: Preferences::new(req),
+					prefs: Preferences::new(&req),
 					url,
 					is_filtered: false,
 					all_posts_filtered,
 					all_posts_hidden_nsfw,
-				})
+				}))
 			}
 			Err(msg) => {
 				if msg == "quarantined" {
 					let sub = req.param("sub").unwrap_or_default();
-					quarantine(req, sub)
+					Ok(quarantine(&req, sub))
 				} else {
 					error(req, msg).await
 				}
@@ -143,7 +143,7 @@ pub async fn find(req: Request<Body>) -> Result<Response<Body>, String> {
 
 async fn search_subreddits(q: &str, typed: &str) -> Vec<Subreddit> {
 	let limit = if typed == "sr_user" { "50" } else { "3" };
-	let subreddit_search_path = format!("/subreddits/search.json?q={}&limit={}", q.replace(' ', "+"), limit);
+	let subreddit_search_path = format!("/subreddits/search.json?q={}&limit={limit}", q.replace(' ', "+"));
 
 	// Send a request to the url
 	json(subreddit_search_path, false).await.unwrap_or_default()["data"]["children"]

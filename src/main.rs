@@ -1,3 +1,35 @@
+#![deny(
+	anonymous_parameters,
+	clippy::all,
+	illegal_floating_point_literal_pattern,
+	late_bound_lifetime_arguments,
+	path_statements,
+	patterns_in_fns_without_body,
+	rust_2018_idioms,
+	trivial_numeric_casts,
+	unused_extern_crates
+)]
+#![warn(
+	clippy::dbg_macro,
+	clippy::decimal_literal_representation,
+	clippy::get_unwrap,
+	clippy::nursery,
+	clippy::pedantic,
+	clippy::todo,
+	clippy::unimplemented,
+	clippy::use_debug,
+	clippy::all,
+	unused_qualifications,
+	variant_size_differences
+)]
+#![allow(elided_lifetimes_in_paths)]
+#![allow(clippy::unused_async)]
+#![allow(clippy::similar_names)]
+#![allow(clippy::items_after_statements)]
+#![allow(clippy::cast_possible_truncation)]
+#![allow(clippy::cast_precision_loss)]
+#![allow(clippy::match_wildcard_for_single_variants)]
+
 // Global specifiers
 #![forbid(unsafe_code)]
 #![allow(clippy::cmp_owned)]
@@ -143,9 +175,9 @@ async fn main() {
 		)
 		.get_matches();
 
-	let address = matches.get_one("address").map(|m: &String| m.as_str()).unwrap_or("0.0.0.0");
-	let port = std::env::var("PORT").unwrap_or_else(|_| matches.get_one("port").map(|m: &String| m.as_str()).unwrap_or("8080").to_string());
-	let hsts = matches.get_one("hsts").map(|m: &String| m.as_str());
+	let address = matches.get_one("address").map_or("0.0.0.0", std::string::String::as_str);
+	let port = std::env::var("PORT").unwrap_or_else(|_| matches.get_one("port").map_or("8080", std::string::String::as_str).to_string());
+	let hsts = matches.get_one("hsts").map(std::string::String::as_str);
 
 	let listener = [address, ":", &port].concat();
 
@@ -163,7 +195,7 @@ async fn main() {
 	};
 
 	if let Some(expire_time) = hsts {
-		if let Ok(val) = HeaderValue::from_str(&format!("max-age={}", expire_time)) {
+		if let Ok(val) = HeaderValue::from_str(&format!("max-age={expire_time}")) {
 			app.default_headers.insert("Strict-Transport-Security", val);
 		}
 	}
@@ -204,7 +236,7 @@ async fn main() {
 	// Browse user profile
 	app
 		.at("/u/:name")
-		.get(|r| async move { Ok(redirect(format!("/user/{}", r.param("name").unwrap_or_default()))) }.boxed());
+		.get(|r| async move { Ok(redirect(&format!("/user/{}", r.param("name").unwrap_or_default()))) }.boxed());
 	app.at("/u/:name/comments/:id/:title").get(|r| post::item(r).boxed());
 	app.at("/u/:name/comments/:id/:title/:comment_id").get(|r| post::item(r).boxed());
 
@@ -228,7 +260,7 @@ async fn main() {
 
 	app
 		.at("/r/u_:name")
-		.get(|r| async move { Ok(redirect(format!("/user/{}", r.param("name").unwrap_or_default()))) }.boxed());
+		.get(|r| async move { Ok(redirect(&format!("/user/{}", r.param("name").unwrap_or_default()))) }.boxed());
 
 	app.at("/r/:sub/subscribe").post(|r| subreddit::subscriptions_filters(r).boxed());
 	app.at("/r/:sub/unsubscribe").post(|r| subreddit::subscriptions_filters(r).boxed());
@@ -248,10 +280,10 @@ async fn main() {
 
 	app
 		.at("/r/:sub/w")
-		.get(|r| async move { Ok(redirect(format!("/r/{}/wiki", r.param("sub").unwrap_or_default()))) }.boxed());
+		.get(|r| async move { Ok(redirect(&format!("/r/{}/wiki", r.param("sub").unwrap_or_default()))) }.boxed());
 	app
 		.at("/r/:sub/w/*page")
-		.get(|r| async move { Ok(redirect(format!("/r/{}/wiki/{}", r.param("sub").unwrap_or_default(), r.param("wiki").unwrap_or_default()))) }.boxed());
+		.get(|r| async move { Ok(redirect(&format!("/r/{}/wiki/{}", r.param("sub").unwrap_or_default(), r.param("wiki").unwrap_or_default()))) }.boxed());
 	app.at("/r/:sub/wiki").get(|r| subreddit::wiki(r).boxed());
 	app.at("/r/:sub/wiki/*page").get(|r| subreddit::wiki(r).boxed());
 
@@ -263,10 +295,10 @@ async fn main() {
 	app.at("/").get(|r| subreddit::community(r).boxed());
 
 	// View Reddit wiki
-	app.at("/w").get(|_| async { Ok(redirect("/wiki".to_string())) }.boxed());
+	app.at("/w").get(|_| async { Ok(redirect("/wiki")) }.boxed());
 	app
 		.at("/w/*page")
-		.get(|r| async move { Ok(redirect(format!("/wiki/{}", r.param("page").unwrap_or_default()))) }.boxed());
+		.get(|r| async move { Ok(redirect(&format!("/wiki/{}", r.param("page").unwrap_or_default()))) }.boxed());
 	app.at("/wiki").get(|r| subreddit::wiki(r).boxed());
 	app.at("/wiki/*page").get(|r| subreddit::wiki(r).boxed());
 
@@ -283,9 +315,9 @@ async fn main() {
 				Some("best" | "hot" | "new" | "top" | "rising" | "controversial") => subreddit::community(req).await,
 
 				// Short link for post
-				Some(id) if (5..7).contains(&id.len()) => match canonical_path(format!("/{}", id)).await {
+				Some(id) if (5..7).contains(&id.len()) => match canonical_path(format!("/{id}")).await {
 					Ok(path_opt) => match path_opt {
-						Some(path) => Ok(redirect(path)),
+						Some(path) => Ok(redirect(&path)),
 						None => error(req, "Post ID is invalid. It may point to a post on a community that has been banned.").await,
 					},
 					Err(e) => error(req, e).await,
@@ -300,12 +332,12 @@ async fn main() {
 	// Default service in case no routes match
 	app.at("/*").get(|req| error(req, "Nothing here".to_string()).boxed());
 
-	println!("Running Libreddit v{} on {}!", env!("CARGO_PKG_VERSION"), listener);
+	println!("Running Libreddit v{} on {listener}!", env!("CARGO_PKG_VERSION"));
 
-	let server = app.listen(listener);
+	let server = app.listen(&listener);
 
 	// Run this server for... forever!
 	if let Err(e) = server.await {
-		eprintln!("Server error: {}", e);
+		eprintln!("Server error: {e}");
 	}
 }

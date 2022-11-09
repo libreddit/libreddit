@@ -51,12 +51,12 @@ pub async fn canonical_path(path: String) -> Result<Option<String>, String> {
 }
 
 pub async fn proxy(req: Request<Body>, format: &str) -> Result<Response<Body>, String> {
-	let mut url = format!("{}?{}", format, req.uri().query().unwrap_or_default());
+	let mut url = format!("{format}?{}", req.uri().query().unwrap_or_default());
 
 	// For each parameter in request
 	for (name, value) in req.params().iter() {
 		// Fill the parameter value in the url
-		url = url.replace(&format!("{{{}}}", name), value);
+		url = url.replace(&format!("{{{name}}}"), value);
 	}
 
 	stream(&url, &req).await
@@ -70,7 +70,7 @@ async fn stream(url: &str, req: &Request<Body>) -> Result<Response<Body>, String
 	let https = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_only().enable_http1().build();
 
 	// Build the hyper client from the HTTPS connector.
-	let client: client::Client<_, hyper::Body> = client::Client::builder().build(https);
+	let client: client::Client<_, Body> = client::Client::builder().build(https);
 
 	let mut builder = Request::get(uri);
 
@@ -116,18 +116,18 @@ fn reddit_head(path: String, quarantine: bool) -> Boxed<Result<Response<Body>, S
 	request(&Method::HEAD, path, false, quarantine)
 }
 
-/// Makes a request to Reddit. If `redirect` is `true`, request_with_redirect
+/// Makes a request to Reddit. If `redirect` is `true`, `request_with_redirect`
 /// will recurse on the URL that Reddit provides in the Location HTTP header
 /// in its response.
 fn request(method: &'static Method, path: String, redirect: bool, quarantine: bool) -> Boxed<Result<Response<Body>, String>> {
 	// Build Reddit URL from path.
-	let url = format!("{}{}", REDDIT_URL_BASE, path);
+	let url = format!("{REDDIT_URL_BASE}{path}");
 
 	// Prepare the HTTPS connector.
 	let https = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build();
 
 	// Construct the hyper client from the HTTPS connector.
-	let client: client::Client<_, hyper::Body> = client::Client::builder().build(https);
+	let client: client::Client<_, Body> = client::Client::builder().build(https);
 
 	// Build request to Reddit. When making a GET, request gzip compression.
 	// (Reddit doesn't do brotli yet.)
@@ -161,7 +161,7 @@ fn request(method: &'static Method, path: String, redirect: bool, quarantine: bo
 								.get("Location")
 								.map(|val| {
 									let new_url = percent_encode(val.as_bytes(), CONTROLS).to_string();
-									format!("{}{}raw_json=1", new_url, if new_url.contains('?') { "&" } else { "?" })
+									format!("{new_url}{}raw_json=1", if new_url.contains('?') { "&" } else { "?" })
 								})
 								.unwrap_or_default()
 								.to_string(),
@@ -236,7 +236,7 @@ pub async fn json(path: String, quarantine: bool) -> Result<Value, String> {
 	// Closure to quickly build errors
 	let err = |msg: &str, e: String| -> Result<Value, String> {
 		// eprintln!("{} - {}: {}", url, msg, e);
-		Err(format!("{}: {}", msg, e))
+		Err(format!("{msg}: {e}"))
 	};
 
 	// Fetch the url...
@@ -258,7 +258,7 @@ pub async fn json(path: String, quarantine: bool) -> Result<Value, String> {
 										.as_str()
 										.unwrap_or_else(|| {
 											json["message"].as_str().unwrap_or_else(|| {
-												eprintln!("{}{} - Error parsing reddit error", REDDIT_URL_BASE, path);
+												eprintln!("{REDDIT_URL_BASE}{path} - Error parsing reddit error");
 												"Error parsing reddit error"
 											})
 										})

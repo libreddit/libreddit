@@ -46,11 +46,11 @@ impl CompressionType {
 	/// Returns a `CompressionType` given a content coding
 	/// in [RFC 7231](https://datatracker.ietf.org/doc/html/rfc7231#section-5.3.4)
 	/// format.
-	fn parse(s: &str) -> Option<CompressionType> {
+	fn parse(s: &str) -> Option<Self> {
 		let c = match s {
 			// Compressors we support.
-			"gzip" => CompressionType::Gzip,
-			"br" => CompressionType::Brotli,
+			"gzip" => Self::Gzip,
+			"br" => Self::Brotli,
 
 			// The wildcard means that we can choose whatever
 			// compression we prefer. In this case, use the
@@ -68,8 +68,8 @@ impl CompressionType {
 impl ToString for CompressionType {
 	fn to_string(&self) -> String {
 		match self {
-			CompressionType::Gzip => "gzip".to_string(),
-			CompressionType::Brotli => "br".to_string(),
+			Self::Gzip => "gzip".to_string(),
+			Self::Brotli => "br".to_string(),
 			_ => String::new(),
 		}
 	}
@@ -176,25 +176,25 @@ impl ResponseExt for Response<Body> {
 }
 
 impl Route<'_> {
-	fn method(&mut self, method: Method, dest: fn(Request<Body>) -> BoxResponse) -> &mut Self {
+	fn method(&mut self, method: &Method, dest: fn(Request<Body>) -> BoxResponse) -> &mut Self {
 		self.router.add(&format!("/{}{}", method.as_str(), self.path), dest);
 		self
 	}
 
 	/// Add an endpoint for `GET` requests
 	pub fn get(&mut self, dest: fn(Request<Body>) -> BoxResponse) -> &mut Self {
-		self.method(Method::GET, dest)
+		self.method(&Method::GET, dest)
 	}
 
 	/// Add an endpoint for `POST` requests
 	pub fn post(&mut self, dest: fn(Request<Body>) -> BoxResponse) -> &mut Self {
-		self.method(Method::POST, dest)
+		self.method(&Method::POST, dest)
 	}
 }
 
 impl Server {
 	pub fn new() -> Self {
-		Server {
+		Self {
 			default_headers: HeaderMap::new(),
 			router: Router::new(),
 		}
@@ -207,7 +207,7 @@ impl Server {
 		}
 	}
 
-	pub fn listen(self, addr: String) -> Boxed<Result<(), hyper::Error>> {
+	pub fn listen(self, addr: &str) -> Boxed<Result<(), hyper::Error>> {
 		let make_svc = make_service_fn(move |_conn| {
 			// For correct borrowing, these values need to be borrowed
 			let router = self.router.clone();
@@ -231,7 +231,7 @@ impl Server {
 					}
 
 					// Match the visited path with an added route
-					match router.recognize(&format!("/{}{}", req.method().as_str(), path)) {
+					match router.recognize(&format!("/{}{path}", req.method().as_str())) {
 						// If a route was configured for this path
 						Ok(found) => {
 							let mut parammed = req;
@@ -243,7 +243,7 @@ impl Server {
 								match func.await {
 									Ok(mut res) => {
 										res.headers_mut().extend(def_headers);
-										let _ = compress_response(req_headers, &mut res).await;
+										drop(compress_response(req_headers, &mut res).await);
 
 										Ok(res)
 									}
@@ -260,7 +260,7 @@ impl Server {
 		});
 
 		// Build SocketAddr from provided address
-		let address = &addr.parse().unwrap_or_else(|_| panic!("Cannot parse {} as address (example format: 0.0.0.0:8080)", addr));
+		let address = &addr.parse().unwrap_or_else(|_| panic!("Cannot parse {addr} as address (example format: 0.0.0.0:8080)"));
 
 		// Bind server to address specified above. Gracefully shut down if CTRL+C is pressed
 		let server = HyperServer::bind(address).serve(make_svc).with_graceful_shutdown(async {
@@ -282,7 +282,7 @@ async fn new_boilerplate(
 ) -> Result<Response<Body>, String> {
 	match Response::builder().status(status).body(body) {
 		Ok(mut res) => {
-			let _ = compress_response(req_headers, &mut res).await;
+			drop(compress_response(req_headers, &mut res).await);
 
 			res.headers_mut().extend(default_headers.clone());
 			Ok(res)
@@ -445,10 +445,10 @@ fn determine_compressor(accept_encoding: &str) -> Option<CompressionType> {
 		};
 	}
 
-	if cur_candidate.q != f64::NEG_INFINITY {
-		Some(cur_candidate.alg)
-	} else {
+	if cur_candidate.q == f64::NEG_INFINITY {
 		None
+	} else {
+		Some(cur_candidate.alg)
 	}
 }
 
@@ -460,16 +460,16 @@ fn determine_compressor(accept_encoding: &str) -> Option<CompressionType> {
 /// conditions are met:
 ///
 /// 1. the HTTP client requests a compression encoding in the Content-Encoding
-///    header (hence the need for the req_headers);
+///    header (hence the need for the `req_headers`);
 ///
 /// 2. the content encoding corresponds to a compression algorithm we support;
 ///
 /// 3. the Media type in the Content-Type response header is text with any
 ///    subtype (e.g. text/plain) or application/json.
 ///
-/// compress_response returns Ok on successful compression, or if not all three
+/// `compress_response` returns Ok on successful compression, or if not all three
 /// conditions above are met. It returns Err if there was a problem decoding
-/// any header in either req_headers or res, but res will remain intact.
+/// any header in either `req_headers` or res, but res will remain intact.
 ///
 /// This function logs errors to stderr, but only in debug mode. No information
 /// is logged in release builds.
@@ -506,21 +506,18 @@ async fn compress_response(req_headers: HeaderMap<header::HeaderValue>, res: &mu
 	// Quick and dirty closure for extracting a header from the request and
 	// returning it as a &str.
 	let get_req_header = |k: header::HeaderName| -> Option<&str> {
-		match req_headers.get(k) {
-			Some(hdr) => match from_utf8(hdr.as_bytes()) {
-				Ok(val) => Some(val),
+		req_headers.get(k).and_then(|hdr| match from_utf8(hdr.as_bytes()) {
+			Ok(val) => Some(val),
 
-				#[cfg(debug_assertions)]
-				Err(e) => {
-					dbg_msg!(e);
-					None
-				}
+			#[cfg(debug_assertions)]
+			Err(e) => {
+				dbg_msg!(e);
+				None
+			}
 
-				#[cfg(not(debug_assertions))]
-				Err(_) => None,
-			},
-			None => None,
-		}
+			#[cfg(not(debug_assertions))]
+			Err(_) => None,
+		})
 	};
 
 	// Check to see which compressor is requested, and if we can use it.
@@ -692,7 +689,7 @@ mod tests {
 
 			// Perform the compression.
 			if let Err(e) = block_on(compress_response(req_headers, &mut res)) {
-				panic!("compress_response(req_headers, &mut res) => Err(\"{}\")", e);
+				panic!("compress_response(req_headers, &mut res) => Err(\"{e}\")");
 			};
 
 			// If the content was compressed, we expect the Content-Encoding
