@@ -58,13 +58,13 @@
 		{% endif %}
 
 		{% if all_posts_hidden_nsfw %}
-		<center>All posts are hidden because they are NSFW. Enable "Show NSFW posts" in settings to view.</center>
+		<span class="listing_warn">All posts are hidden because they are NSFW. Enable "Show NSFW posts" in settings to view.</span>
 		{% endif %}
 
 		{% if all_posts_filtered %}
-			<center>(All content on this page has been filtered)</center>
+			<span class="listing_warn">(All content on this page has been filtered)</span>
 		{% else if is_filtered %}
-			<center>(Content from r/{{ sub }} has been filtered)</center>
+			<span class="listing_warn">(Content from r/{{ sub }} has been filtered)</span>
 		{% else if params.typed != "sr_user" %}
 			{% for post in posts %}
 				{% if post.flags.nsfw && prefs.show_nsfw != "on" %}

@@ -3,6 +3,7 @@
 #![allow(clippy::cmp_owned)]
 
 // Reference local files
+mod duplicates;
 mod post;
 mod search;
 mod settings;
@@ -243,6 +244,11 @@ async fn main() {
 	app.at("/comments/:id/comments/:comment_id").get(|r| post::item(r).boxed());
 	app.at("/comments/:id/:title").get(|r| post::item(r).boxed());
 	app.at("/comments/:id/:title/:comment_id").get(|r| post::item(r).boxed());
+
+	app.at("/r/:sub/duplicates/:id").get(|r| duplicates::item(r).boxed());
+	app.at("/r/:sub/duplicates/:id/:title").get(|r| duplicates::item(r).boxed());
+	app.at("/duplicates/:id").get(|r| duplicates::item(r).boxed());
+	app.at("/duplicates/:id/:title").get(|r| duplicates::item(r).boxed());
 
 	app.at("/r/:sub/search").get(|r| search::find(r).boxed());
 
