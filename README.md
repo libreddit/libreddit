@@ -69,15 +69,15 @@ This section outlines how Libreddit compares to Reddit.
 
 ## Speed
 
-Lasted tested Jan 17, 2021.
+Lasted tested Nov 11, 2022.
 
-Results from Google Lighthouse ([Libreddit Report](https://lighthouse-dot-webdotdevsite.appspot.com/lh/html?url=https%3A%2F%2Flibredd.it), [Reddit Report](https://lighthouse-dot-webdotdevsite.appspot.com/lh/html?url=https%3A%2F%2Fwww.reddit.com%2F)).
+Results from Google PageSpeed Insights ([Libreddit Report](https://pagespeed.web.dev/report?url=https%3A%2F%2Flibreddit.spike.codes%2F), [Reddit Report](https://pagespeed.web.dev/report?url=https://www.reddit.com)).
 
-|                        | Libreddit     | Reddit     |
-|------------------------|---------------|------------|
-| Requests               | 20            | 70         |
-| Resource Size (card ui)| 1,224 KiB     | 1,690 KiB  |
-| Time to Interactive    | **1.5 s**     | **11.2 s** |
+|                        | Libreddit   | Reddit    |
+|------------------------|-------------|-----------|
+| Requests               | 60          | 83        |
+| Speed Index            | 2.0s        | 10.4s     |
+| Time to Interactive    | **2.8s**    | **12.4s** |
 
 ## Privacy
 
