@@ -3,7 +3,7 @@ name = "libreddit"
 description = " Alternative private front-end to Reddit"
 license = "AGPL-3.0"
 repository = "https://github.com/spikecodes/libreddit"
-version = "0.23.2"
+version = "0.24.0"
 authors = ["spikecodes <19519553+spikecodes@users.noreply.github.com>"]
 edition = "2021"
 
@@ -11,18 +11,18 @@ edition = "2021"
 askama = { version = "0.11.1", default-features = false }
 async-recursion = "1.0.0"
 cached = "0.40.0"
-clap = { version = "4.0.18", default-features = false, features = ["std"] }
-regex = "1.6.0"
+clap = { version = "4.0.24", default-features = false, features = ["std"] }
+regex = "1.7.0"
 serde = { version = "1.0.147", features = ["derive"] }
 cookie = "0.16.1"
 futures-lite = "1.12.0"
-hyper = { version = "0.14.22", features = ["full"] }
+hyper = { version = "0.14.23", features = ["full"] }
 hyper-rustls = "0.23.0"
 percent-encoding = "2.2.0"
 route-recognizer = "0.3.1"
 serde_json = "1.0.87"
 tokio = { version = "1.21.2", features = ["full"] }
-time = "0.3.16"
+time = "0.3.17"
 url = "2.3.1"
 rust-embed = { version = "6.4.2", features = ["include-exclude"] }
 libflate = "1.2.0"
