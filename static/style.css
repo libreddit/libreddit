@@ -105,7 +105,7 @@ nav #logo {
 
 nav #links {
 	grid-area: links;
-	margin-left: 10px;
+	margin-left: 20px;
 	display: flex;
 }
 
@@ -125,15 +125,92 @@ nav #libreddit {
 
 #settings_link {
 	opacity: 0.8;
-	margin-left: 10px;
+	margin-left: 20px;
 }
 
 #reddit_link {
 	opacity: 0.8;
 }
 
+.popup {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	overflow: clip;
+	opacity: 0;
+	position: fixed;
+	width: 100vw;
+	height: 100vh;
+	bottom: 0;
+	right: 0;
+	background: #000000aa;
+	visibility: hidden;
+	transition: all 0.1s ease-in-out;
+	z-index: 2;
+}
+
+.popup-inner {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	text-align: center;
+	max-width: 600px;
+	max-height: 500px;
+	width: fit-content;
+	height: fit-content;
+	padding: 1rem;
+	background: var(--foreground);
+	border: var(--panel-border);
+	border-radius: 5px;
+	transition: all 0.1s ease-in-out;
+}
+
+.popup-inner svg {
+	display: unset !important;
+	width: 35%;
+	stroke: none;
+	margin: 1rem;
+}
+
+.popup-inner h1 {
+	margin: 1.5rem 1.5rem 1rem 1.5rem;
+}
+
+.popup-inner a {
+	border-radius: 5px;
+	padding: 2%;
+	width: 80%;
+	margin: 0.5rem;
+	cursor: pointer;
+	transition: all 0.1s ease-in-out;
+}
+
+#goback {
+	background: var(--admin);
+	color: var(--foreground);
+}
+
+#goback:not(.selected):hover {
+	opacity: 0.8;
+}
+
+#toreddit {
+	background: var(--foreground);
+	color: var(--admin);
+}
+
+#toreddit:not(.selected):hover {
+	background: var(--admin);
+	color: var(--foreground);
+}
+
+.popup:target {
+	visibility: visible;
+	opacity: 1;
+}
+
 #code {
-	margin-left: 10px;
+	margin-left: 20px;
 }
 
 main {
@@ -1371,5 +1448,14 @@ td, th {
 		font-size: 15px;
 		padding: 7px 0px;
 		margin-right: -5px;
+	}
+
+	.popup {
+		width: auto;
+		bottom: 10vh;
+	}
+	
+	.popup-inner > a, h1, p, img {
+		width: 100%;
 	}
 }
