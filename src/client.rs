@@ -158,10 +158,21 @@ fn request(method: &'static Method, path: String, redirect: bool, quarantine: bo
 							method,
 							response
 								.headers()
-								.get("Location")
+								.get(header::LOCATION)
 								.map(|val| {
-									let new_url = percent_encode(val.as_bytes(), CONTROLS).to_string();
-									format!("{}{}raw_json=1", new_url, if new_url.contains('?') { "&" } else { "?" })
+									// We need to make adjustments to the URI
+									// we get back from Reddit. Namely, we
+									// must:
+									//
+									//     1. Remove the authority (e.g.
+									//     https://www.reddit.com) that may be
+									//     present, so that we recurse on the
+									//     path (and query parameters) as
+									//     required.
+									//
+									//     2. Percent-encode the path.
+									let new_path = percent_encode(val.as_bytes(), CONTROLS).to_string().trim_start_matches(REDDIT_URL_BASE).to_string();
+									format!("{}{}raw_json=1", new_path, if new_path.contains('?') { "&" } else { "?" })
 								})
 								.unwrap_or_default()
 								.to_string(),
