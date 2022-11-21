@@ -158,10 +158,10 @@ fn request(method: &'static Method, path: String, redirect: bool, quarantine: bo
 							method,
 							response
 								.headers()
-								.get("Location")
+								.get(header::LOCATION)
 								.map(|val| {
-									let new_url = percent_encode(val.as_bytes(), CONTROLS).to_string();
-									format!("{}{}raw_json=1", new_url, if new_url.contains('?') { "&" } else { "?" })
+									let new_path = percent_encode(val.as_bytes(), CONTROLS).to_string().trim_start_matches(REDDIT_URL_BASE).to_string();
+									format!("{}{}raw_json=1", new_path, if new_path.contains('?') { "&" } else { "?" })
 								})
 								.unwrap_or_default()
 								.to_string(),
