@@ -9,7 +9,7 @@ WORKDIR /usr/src/libreddit
 
 COPY . .
 
-RUN cargo install --verbose --path .
+RUN cargo install --path .
 
 ####################################################################################################
 ## Final image
