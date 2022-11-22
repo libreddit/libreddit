@@ -105,7 +105,7 @@ nav #logo {
 
 nav #links {
 	grid-area: links;
-	margin-left: 20px;
+	margin-left: 10px;
 	display: flex;
 }
 
@@ -125,7 +125,7 @@ nav #libreddit {
 
 #settings_link {
 	opacity: 0.8;
-	margin-left: 20px;
+	margin-left: 10px;
 }
 
 #reddit_link {
@@ -210,7 +210,7 @@ nav #libreddit {
 }
 
 #code {
-	margin-left: 20px;
+	margin-left: 10px;
 }
 
 main {
