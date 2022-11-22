@@ -1,0 +1,13 @@
+/* Gruvbox-Dark theme setting */
+.gruvboxdark {
+	--accent: #8ec07c;
+	--green: #b8bb26;
+	--text: #ebdbb2;
+	--foreground: #3c3836;
+	--background: #282828;
+	--outside: #3c3836;
+	--post: #3c3836;
+	--panel-border: 1px solid #504945;
+	--highlighted: #282828;
+	--shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
