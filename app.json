@@ -41,7 +41,7 @@
     "LIBREDDIT_HIDE_HLS_NOTIFICATION": {
       "required": false
     },
-    "LIBREDDIT_DEFAULT_LINK_CONFIRMATION": {
+    "LIBREDDIT_DEFAULT_VISIT_REDDIT_CONFIRMATION": {
       "required": false
     }
   }
