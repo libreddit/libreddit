@@ -79,10 +79,10 @@
 				<input type="hidden" value="off" name="hide_hls_notification">
 				<input type="checkbox" name="hide_hls_notification" {% if prefs.hide_hls_notification == "on" %}checked{% endif %}>
 			</div>
-			<div id="link_confirmation">
-				<label for="link_confirmation">Require confirmation for Open in Reddit</label>
-				<input type="hidden" value="off" name="link_confirmation">
-				<input type="checkbox" name="link_confirmation" {% if prefs.link_confirmation == "on" %}checked{% endif %}>
+			<div id="visit_reddit_confirmation">
+				<label for="visit_reddit_confirmation">Confirm before visiting content on Reddit</label>
+				<input type="hidden" value="off" name="visit_reddit_confirmation">
+				<input type="checkbox" name="visit_reddit_confirmation" {% if prefs.visit_reddit_confirmation == "on" %}checked{% endif %}>
 			</div>
 			<input id="save" type="submit" value="Save">
 		</div>
