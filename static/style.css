@@ -173,7 +173,7 @@ nav #libreddit {
 }
 
 .popup-inner h1 {
-	margin: 1.5rem 1.5rem 1rem 1.5rem;
+	margin: 1.5rem 1.5rem 1rem;
 }
 
 .popup-inner a {
@@ -207,6 +207,14 @@ nav #libreddit {
 .popup:target {
 	visibility: visible;
 	opacity: 1;
+}
+
+#reddit_url {
+	width: 80%;
+	color: var(--admin);
+	font-weight: 600;
+	line-break: anywhere;
+	margin-top: 1rem;
 }
 
 #code {
