@@ -13,16 +13,25 @@
 	<!-- Meta Tags -->
 	<meta name="author" content="u/{{ post.author.name }}">
 	<meta name="title" content="{{ post.title }} - r/{{ post.community }}">
-	<meta property="og:type" content="website">
-	<meta property="og:url" content="{{ post.permalink }}">
 	<meta property="og:title" content="{{ post.title }} - r/{{ post.community }}">
 	<meta property="og:description" content="View on Libreddit, an alternative private front-end to Reddit.">
-	<meta property="og:image" content="{{ post.thumbnail.url }}">
-	<meta property="twitter:card" content="summary_large_image">
+	<meta property="og:url" content="{{ post.permalink }}">
 	<meta property="twitter:url" content="{{ post.permalink }}">
 	<meta property="twitter:title" content="{{ post.title }} - r/{{ post.community }}">
 	<meta property="twitter:description" content="View on Libreddit, an alternative private front-end to Reddit.">
+	{% if post.post_type == "image" %}
+	<meta property="og:type" content="image">
+	<meta property="og:image" content="{{ post.thumbnail.url }}">
+	<meta property="twitter:card" content="summary_large_image">
 	<meta property="twitter:image" content="{{ post.thumbnail.url }}">
+	{% else if post.post_type == "video" || post.post_type == "gif" %}
+	<meta property="twitter:card" content="video">
+	<meta property="og:type" content="video">
+	<meta property="og:video" content="{{ post.media.url }}">
+	<meta property="og:video:type" content="video/mp4">
+	{% else %}
+	<meta property="og:type" content="website">
+	{% endif %}
 {% endblock %}
 
 {% block subscriptions %}
