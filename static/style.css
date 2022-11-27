@@ -4,6 +4,28 @@
 :root {
 	--nsfw: #ff5c5d;
 	--admin: #ea0027;
+
+	/* Reddit redirect warning constants */
+	--popup-red: #ea0027;
+	--popup-black: #111;
+	--popup-text: #fff;
+	--popup-background-1: #0f0f0f;
+	--popup-background-2: #220f0f;
+	--popup-reddit-url: var(--popup-red);
+
+	--popup-background: repeating-linear-gradient(
+		-45deg,
+		var(--popup-background-1),
+		var(--popup-background-1) 50px,
+		var(--popup-background-2) 50px,
+		var(--popup-background-2) 100px
+	);
+
+	--popup-toreddit-background: var(--popup-black);
+	--popup-toreddit-text: var(--popup-red);
+	--popup-goback-background: var(--popup-red);
+	--popup-goback-text: #222;
+	--popup-border: 1px solid var(--popup-red);
 }
 
 @font-face {
@@ -26,6 +48,7 @@
 	--highlighted: #333;
 	--visited: #aaa;
 	--shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+	--popup: #b80a27;
 }
 
 /* Browser-defined light theme */
@@ -143,10 +166,22 @@ nav #libreddit {
 	height: 100vh;
 	bottom: 0;
 	right: 0;
-	background: #000000aa;
 	visibility: hidden;
 	transition: all 0.1s ease-in-out;
 	z-index: 2;
+}
+
+/* fallback for firefox esr */
+.popup {
+	background-color: #000000fd;
+}
+
+/* all other browsers */
+@supports ((-webkit-backdrop-filter: none) or (backdrop-filter: none)) {
+	.popup {
+		-webkit-backdrop-filter: blur(.25rem) brightness(15%);
+		backdrop-filter: blur(.25rem) brightness(15%);
+	}
 }
 
 .popup-inner {
@@ -159,8 +194,8 @@ nav #libreddit {
 	width: fit-content;
 	height: fit-content;
 	padding: 1rem;
-	background: var(--foreground);
-	border: var(--panel-border);
+	background: var(--popup-background);
+	border: var(--popup-border);
 	border-radius: 5px;
 	transition: all 0.1s ease-in-out;
 }
@@ -173,7 +208,12 @@ nav #libreddit {
 }
 
 .popup-inner h1 {
+	color: var(--popup-text);
 	margin: 1.5rem 1.5rem 1rem;
+}
+
+.popup-inner p {
+	color: var(--popup-text);
 }
 
 .popup-inner a {
@@ -186,8 +226,8 @@ nav #libreddit {
 }
 
 #goback {
-	background: var(--admin);
-	color: var(--foreground);
+	background: var(--popup-goback-background);
+	color: var(--popup-goback-text);
 }
 
 #goback:not(.selected):hover {
@@ -195,13 +235,14 @@ nav #libreddit {
 }
 
 #toreddit {
-	background: var(--foreground);
-	color: var(--admin);
+	background: var(--popup-toreddit-background);
+	color: var(--popup-toreddit-text);
+	border: 1px solid var(--popup-red);
 }
 
 #toreddit:not(.selected):hover {
-	background: var(--admin);
-	color: var(--foreground);
+	background: var(--popup-toreddit-text);
+	color: var(--popup-toreddit-background);
 }
 
 .popup:target {
@@ -211,7 +252,7 @@ nav #libreddit {
 
 #reddit_url {
 	width: 80%;
-	color: var(--admin);
+	color: var(--popup-reddit-url);
 	font-weight: 600;
 	line-break: anywhere;
 	margin-top: 1rem;
@@ -1462,7 +1503,7 @@ td, th {
 		width: auto;
 		bottom: 10vh;
 	}
-	
+
 	.popup-inner > a, h1, p, img {
 		width: 100%;
 	}
