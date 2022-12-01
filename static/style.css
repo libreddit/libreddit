@@ -154,6 +154,7 @@ main {
 }
 
 #column_one {
+	width: 100%;
 	max-width: 750px;
 	border-radius: 5px;
 	overflow: inherit;
