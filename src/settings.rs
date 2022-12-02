@@ -31,7 +31,7 @@ const PREFS: [&str; 12] = [
 	"use_hls",
 	"hide_hls_notification",
 	"autoplay_videos",
-	"visit_reddit_confirmation",
+	"disable_visit_reddit_confirmation",
 ];
 
 // FUNCTIONS
