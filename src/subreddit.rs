@@ -118,7 +118,7 @@ pub async fn community(req: Request<Body>) -> Result<Response<Body>, String> {
 	} else {
 		match Post::fetch(&path, quarantined).await {
 			Ok((mut posts, after)) => {
-				let all_posts_filtered = filter_posts(&mut posts, &filters);
+				let (_, all_posts_filtered) = filter_posts(&mut posts, &filters);
 				let all_posts_hidden_nsfw = posts.iter().all(|p| p.flags.nsfw) && setting(&req, "show_nsfw") != "on";
 				template(SubredditTemplate {
 					sub,
