@@ -39,7 +39,7 @@ Both files are part of the [libreddit-instances](https://github.com/libreddit/li
 
 # About
 
-Find Libreddit on 💬 [Matrix](https://matrix.to/#/#libreddit:kde.org), 🐋 [Docker](https://hub.docker.com/r/spikecodes/libreddit), :octocat: [GitHub](https://github.com/libreddit/libreddit), and 🦊 [GitLab](https://gitlab.com/spikecodes/libreddit).
+Find Libreddit on 💬 [Matrix](https://matrix.to/#/#libreddit:kde.org), 🐋 [Docker](https://hub.docker.com/r/libreddit/libreddit), :octocat: [GitHub](https://github.com/libreddit/libreddit), and 🦊 [GitLab](https://gitlab.com/libreddit/libreddit).
 
 ## Built with
 
@@ -136,21 +136,21 @@ cargo install libreddit
 
 ## 2) Docker
 
-Deploy the [Docker image](https://hub.docker.com/r/spikecodes/libreddit) of Libreddit:
+Deploy the [Docker image](https://hub.docker.com/r/libreddit/libreddit) of Libreddit:
 ```
-docker pull spikecodes/libreddit
-docker run -d --name libreddit -p 8080:8080 spikecodes/libreddit
+docker pull libreddit/libreddit
+docker run -d --name libreddit -p 8080:8080 libreddit/libreddit
 ```
 
 Deploy using a different port (in this case, port 80):
 ```
-docker pull spikecodes/libreddit
-docker run -d --name libreddit -p 80:8080 spikecodes/libreddit
+docker pull libreddit/libreddit
+docker run -d --name libreddit -p 80:8080 libreddit/libreddit
 ```
 
-To deploy on `arm64` platforms, simply replace `spikecodes/libreddit` in the commands above with `spikecodes/libreddit:arm`.
+To deploy on `arm64` platforms, simply replace `libreddit/libreddit` in the commands above with `libreddit/libreddit:arm`.
 
-To deploy on `armv7` platforms, simply replace `spikecodes/libreddit` in the commands above with `spikecodes/libreddit:armv7`.
+To deploy on `armv7` platforms, simply replace `libreddit/libreddit` in the commands above with `libreddit/libreddit:armv7`.
 
 ## 3) AUR
 
