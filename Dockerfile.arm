@@ -3,13 +3,18 @@
 ####################################################################################################
 FROM rust:alpine AS builder
 
-RUN apk add --no-cache g++
+RUN apk add --no-cache g++ git
 
 WORKDIR /usr/src/libreddit
 
 COPY . .
 
-RUN cargo install --path .
+# net.git-fetch-with-cli is specified in order to prevent a potential OOM kill
+# in low memory environments. See:
+#     https://users.rust-lang.org/t/cargo-uses-too-much-memory-being-run-in-qemu/76531
+# This is tracked under issue #641. This also requires us to install git in the
+# builder.
+RUN cargo install --config net.git-fetch-with-cli=true --path .
 
 ####################################################################################################
 ## Final image

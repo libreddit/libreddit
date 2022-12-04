@@ -3,6 +3,7 @@
 #![allow(clippy::cmp_owned)]
 
 // Reference local files
+mod duplicates;
 mod post;
 mod search;
 mod settings;
@@ -17,7 +18,7 @@ use futures_lite::FutureExt;
 use hyper::{header::HeaderValue, Body, Request, Response};
 
 mod client;
-use client::proxy;
+use client::{canonical_path, proxy};
 use server::RequestExt;
 use utils::{error, redirect, ThemeAssets};
 
@@ -244,6 +245,11 @@ async fn main() {
 	app.at("/comments/:id/:title").get(|r| post::item(r).boxed());
 	app.at("/comments/:id/:title/:comment_id").get(|r| post::item(r).boxed());
 
+	app.at("/r/:sub/duplicates/:id").get(|r| duplicates::item(r).boxed());
+	app.at("/r/:sub/duplicates/:id/:title").get(|r| duplicates::item(r).boxed());
+	app.at("/duplicates/:id").get(|r| duplicates::item(r).boxed());
+	app.at("/duplicates/:id/:title").get(|r| duplicates::item(r).boxed());
+
 	app.at("/r/:sub/search").get(|r| search::find(r).boxed());
 
 	app
@@ -258,9 +264,6 @@ async fn main() {
 	app.at("/r/:sub/about/sidebar").get(|r| subreddit::sidebar(r).boxed());
 
 	app.at("/r/:sub/:sort").get(|r| subreddit::community(r).boxed());
-
-	// Comments handler
-	app.at("/comments/:id").get(|r| post::item(r).boxed());
 
 	// Front page
 	app.at("/").get(|r| subreddit::community(r).boxed());
@@ -279,13 +282,25 @@ async fn main() {
 	// Handle about pages
 	app.at("/about").get(|req| error(req, "About pages aren't added yet".to_string()).boxed());
 
-	app.at("/:id").get(|req: Request<Body>| match req.param("id").as_deref() {
-		// Sort front page
-		Some("best" | "hot" | "new" | "top" | "rising" | "controversial") => subreddit::community(req).boxed(),
-		// Short link for post
-		Some(id) if id.len() > 4 && id.len() < 7 => post::item(req).boxed(),
-		// Error message for unknown pages
-		_ => error(req, "Nothing here".to_string()).boxed(),
+	app.at("/:id").get(|req: Request<Body>| {
+		Box::pin(async move {
+			match req.param("id").as_deref() {
+				// Sort front page
+				Some("best" | "hot" | "new" | "top" | "rising" | "controversial") => subreddit::community(req).await,
+
+				// Short link for post
+				Some(id) if (5..7).contains(&id.len()) => match canonical_path(format!("/{}", id)).await {
+					Ok(path_opt) => match path_opt {
+						Some(path) => Ok(redirect(path)),
+						None => error(req, "Post ID is invalid. It may point to a post on a community that has been banned.").await,
+					},
+					Err(e) => error(req, e).await,
+				},
+
+				// Error message for unknown pages
+				_ => error(req, "Nothing here".to_string()).await,
+			}
+		})
 	});
 
 	// Default service in case no routes match
