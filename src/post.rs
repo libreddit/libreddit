@@ -3,7 +3,7 @@ use crate::client::json;
 use crate::server::RequestExt;
 use crate::subreddit::{can_access_quarantine, quarantine};
 use crate::utils::{
-	error, format_num, get_filters, param, parse_post, rewrite_urls, setting, template, time, val, Author, Awards, Comment, Flair, FlairPart, Post, Preferences,
+	error, format_num, get_filters, nsfw_landing, param, parse_post, rewrite_urls, setting, template, time, val, Author, Awards, Comment, Flair, FlairPart, Post, Preferences,
 };
 use hyper::{Body, Request, Response};
 
@@ -55,6 +55,13 @@ pub async fn item(req: Request<Body>) -> Result<Response<Body>, String> {
 		Ok(response) => {
 			// Parse the JSON into Post and Comment structs
 			let post = parse_post(&response[0]["data"]["children"][0]).await;
+
+			// Return landing page if this post if this Reddit deems this post
+			// NSFW, but we have also disabled the display of NSFW content.
+			if setting(&req, "show_nsfw") != "on" && post.nsfw {
+				return Ok(nsfw_landing(req).await.unwrap_or_default());
+			}
+
 			let comments = parse_comments(&response[1], &post.permalink, &post.author.name, highlighted_comment, &get_filters(&req));
 			let url = req.uri().to_string();
 
