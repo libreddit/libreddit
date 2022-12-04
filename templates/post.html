@@ -122,7 +122,7 @@
 				<ul id="post_links">
 					<li><a href="{{ post.permalink }}">permalink</a></li>
 					<li>
-						<a id="reddit_link" {% if prefs.visit_reddit_confirmation != "on" %}href="#popup"{% else %}href="https://reddit.com{{ post.permalink }}" rel="nofollow"{{ url }}"{% endif %}>reddit</a>
+						<a id="reddit_link" {% if prefs.disable_visit_reddit_confirmation != "on" %}href="#popup"{% else %}href="https://reddit.com{{ post.permalink }}" rel="nofollow"{{ url }}"{% endif %}>reddit</a>
 						{% if prefs.disable_visit_reddit_confirmation != "on" %}
 							{% call utils::visit_reddit_confirmation(post.permalink) %}
 						{% endif %}

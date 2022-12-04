@@ -499,7 +499,7 @@ impl Preferences {
 			use_hls: setting(&req, "use_hls"),
 			hide_hls_notification: setting(&req, "hide_hls_notification"),
 			autoplay_videos: setting(&req, "autoplay_videos"),
-			disable_visit_reddit_confirmation: setting(&req, "visit_reddit_confirmation"),
+			disable_visit_reddit_confirmation: setting(&req, "disable_visit_reddit_confirmation"),
 			comment_sort: setting(&req, "comment_sort"),
 			post_sort: setting(&req, "post_sort"),
 			subscriptions: setting(&req, "subscriptions").split('+').map(String::from).filter(|s| !s.is_empty()).collect(),
