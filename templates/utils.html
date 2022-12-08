@@ -159,7 +159,7 @@
 			<li class="desktop_item"><a href="https://reddit.com{{ post.permalink }}" rel="nofollow">reddit</a></li>
 			<li class="mobile_item"><a href="https://reddit.com{{ post.permalink }}" rel="nofollow">reddit</a></li>
 		</ul>
-		<p>{{ post.upvote_ratio }}%<span id="upvoted"> Upvoted</span></p>
+		<p>{{ post.upvote_ratio }}%<span id="upvoted"> Upvoted | {{post.comments.0}} comments</span></p>
 	</div>
 </div>
 {%- endmacro %}
