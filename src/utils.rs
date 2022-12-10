@@ -643,8 +643,8 @@ pub fn setting(req: &Request<Body>, name: &str) -> String {
 	req
 		.cookie(name)
 		.unwrap_or_else(|| {
-			// If there is no cookie for this setting, try receiving a default from an environment variable
-			if let Ok(default) = std::env::var(format!("LIBREDDIT_DEFAULT_{}", name.to_uppercase())) {
+			// If there is no cookie for this setting, try receiving a default from the config
+			if let Some(default) = crate::config::get_setting(&format!("LIBREDDIT_DEFAULT_{}", name.to_uppercase())) {
 				Cookie::new(name, default)
 			} else {
 				Cookie::named(name)
@@ -790,6 +790,12 @@ pub fn time(created: f64) -> (String, String) {
 // val() function used to parse JSON from Reddit APIs
 pub fn val(j: &Value, k: &str) -> String {
 	j["data"][k].as_str().unwrap_or_default().to_string()
+}
+
+/// Retrieve the `LIBREDDIT_SFW_ONLY` setting value from the config, based on
+/// environment variables and the config file.
+pub fn sfw_only() -> bool {
+	crate::config::get_setting("LIBREDDIT_SFW_ONLY").is_some()
 }
 
 //
