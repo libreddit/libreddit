@@ -115,7 +115,7 @@
 	{% if prefs.use_hls == "on" && !post.media.alt_url.is_empty() %}
 	<script src="/hls.min.js"></script>
 	<div class="post_media_content">
-		<video class="post_media_video short {% if prefs.autoplay_videos == "on" %}hls_autoplay{% endif %}" width="{{ post.media.width }}" height="{{ post.media.height }}" poster="{{ post.media.poster }}" preload="none" controls>
+		<video class="post_media_video short {% if prefs.autoplay_videos == "on" %}hls_autoplay{% endif %}" {% if post.media.width > 0 && post.media.height > 0 %}width="{{ post.media.width }}" height="{{ post.media.height }}"{% endif %} poster="{{ post.media.poster }}" preload="none" controls>
 			<source src="{{ post.media.alt_url }}" type="application/vnd.apple.mpegurl" />
 			<source src="{{ post.media.url }}" type="video/mp4" />
 		</video>
@@ -213,19 +213,19 @@
 	</div>
 	{% else if (prefs.layout.is_empty() || prefs.layout == "card") && post.post_type == "gif" %}
 	<div class="post_media_content">
-		<video class="post_media_video short {%if post.flags.nsfw && prefs.blur_nsfw=="on" %}post_nsfw_blur{% endif %}" src="{{ post.media.url }}" width="{{ post.media.width }}" height="{{ post.media.height }}" poster="{{ post.media.poster }}" preload="none" controls loop {% if prefs.autoplay_videos == "on" %}autoplay{% endif %}><a href={{ post.media.url }}>Video</a></video>
+		<video class="post_media_video short {%if post.flags.nsfw && prefs.blur_nsfw=="on" %}post_nsfw_blur{% endif %}" src="{{ post.media.url }}" {% if post.media.width > 0 && post.media.height > 0 %}width="{{ post.media.width }}" height="{{ post.media.height }}"{% endif %} poster="{{ post.media.poster }}" preload="none" controls loop {% if prefs.autoplay_videos == "on" %}autoplay{% endif %}><a href={{ post.media.url }}>Video</a></video>
 	</div>
 	{% else if (prefs.layout.is_empty() || prefs.layout == "card") && post.post_type == "video" %}
 	{% if prefs.use_hls == "on" && !post.media.alt_url.is_empty() %}
 	<div class="post_media_content">
-		<video class="post_media_video short {%if post.flags.nsfw && prefs.blur_nsfw=="on" %}post_nsfw_blur{% endif %} {% if prefs.autoplay_videos == "on" %}hls_autoplay{% endif %}" width="{{ post.media.width }}" height="{{ post.media.height }}" poster="{{ post.media.poster }}" controls preload="none">
+        <video class="post_media_video short {%if post.flags.nsfw && prefs.blur_nsfw=="on" %}post_nsfw_blur{% endif %} {% if prefs.autoplay_videos == "on" %}hls_autoplay{% endif %}" {% if post.media.width > 0 && post.media.height > 0 %}width="{{ post.media.width }}" height="{{ post.media.height }}"{% endif %} poster="{{ post.media.poster }}" controls preload="none">
 			<source src="{{ post.media.alt_url }}" type="application/vnd.apple.mpegurl" />
 			<source src="{{ post.media.url }}" type="video/mp4" />
 		</video>
 	</div>
 	{% else %}
 	<div class="post_media_content">
-		<video class="post_media_video short {%if post.flags.nsfw && prefs.blur_nsfw=="on" %}post_nsfw_blur{% endif %}" src="{{ post.media.url }}" width="{{ post.media.width }}" height="{{ post.media.height }}" poster="{{ post.media.poster }}" preload="none" controls {% if prefs.autoplay_videos == "on" %}autoplay{% endif %}><a href={{ post.media.url }}>Video</a></video>
+		<video class="post_media_video short {%if post.flags.nsfw && prefs.blur_nsfw=="on" %}post_nsfw_blur{% endif %}" src="{{ post.media.url }}" {% if post.media.width > 0 && post.media.height > 0 %}width="{{ post.media.width }}" height="{{ post.media.height }}"{% endif %} poster="{{ post.media.poster }}" preload="none" controls {% if prefs.autoplay_videos == "on" %}autoplay{% endif %}><a href={{ post.media.url }}>Video</a></video>
 	</div>
 	{% call render_hls_notification(format!("{}%23{}", &self.url[1..].replace("&", "%26").replace("+", "%2B"), post.id)) %}
 	{% endif %}
