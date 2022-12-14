@@ -1118,22 +1118,16 @@ summary.comment_data {
 }
 
 .prefs {
-	display: flex;
-	flex-direction: column;
-	justify-content: space-between;
-	padding: 20px;
+	padding: 10px 20px 20px;
 	background: var(--post);
 	border-radius: 5px;
 	margin-bottom: 20px;
 }
 
-.prefs > div {
-	display: flex;
-	justify-content: space-between;
-	width: 100%;
-	height: 35px;
-	align-items: center;
-	margin-top: 7px;
+.prefs fieldset {
+	border: 0;
+	padding: 10px 0;
+	margin: 0 0 5px;
 }
 
 .prefs legend {
@@ -1141,11 +1135,25 @@ summary.comment_data {
 	border-bottom: 1px solid var(--highlighted);
 	font-size: 18px;
 	padding-bottom: 10px;
+	margin-bottom: 7px;
+	width: 100%;
+	float: left; /* places the legend inside the (invisible) border, instead of vertically centered on top border*/
 }
 
-.prefs legend:not(:first-child) {
-	padding-top: 10px;
-	margin-top: 15px;
+.prefs-group {
+	display: flex;
+	width: 100%;
+	height: 35px;
+	align-items: center;
+	margin-top: 7px;
+}
+
+.prefs-group > *:not(:last-child) {
+	margin-right: 1ch;
+}
+
+.prefs-group > *:last-child {
+	margin-left: auto;
 }
 
 .prefs select {
@@ -1163,7 +1171,8 @@ aside.prefs {
 	background: var(--highlighted);
 	padding: 10px 15px;
 	border-radius: 5px;
-	margin-top: 20px;
+	margin-top: 5px;
+	width: 100%
 }
 
 input[type="submit"] {
