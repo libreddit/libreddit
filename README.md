@@ -200,6 +200,21 @@ Assign a default value for each setting by passing environment variables to Libr
 | `HIDE_HLS_NOTIFICATION` | `["on", "off"]`                                                                                     | `off`         |
 | `AUTOPLAY_VIDEOS`       | `["on", "off"]`                                                                                     | `off`         |
 
+You can also configure Libreddit with a configuration file. An example `libreddit.toml` can be found below:
+
+```toml
+LIBREDDIT_DEFAULT_WIDE = "on"
+LIBREDDIT_DEFAULT_USE_HLS = "on"
+```
+
+#### SFW-only mode
+
+You can deploy Libreddit in a SFW-only mode to disallow any access to content marked as NSFW. Set the `LIBREDDIT_SFW_ONLY` environment variable to anything or set it in the config file: 
+
+```toml
+LIBREDDIT_SFW_ONLY = "on"
+```
+
 ### Examples
 
 ```bash
