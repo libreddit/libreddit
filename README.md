@@ -207,14 +207,6 @@ LIBREDDIT_DEFAULT_WIDE = "on"
 LIBREDDIT_DEFAULT_USE_HLS = "on"
 ```
 
-#### SFW-only mode
-
-You can deploy Libreddit in a SFW-only mode to disallow any access to content marked as NSFW. Set the `LIBREDDIT_SFW_ONLY` environment variable to anything or set it in the config file: 
-
-```toml
-LIBREDDIT_SFW_ONLY = "on"
-```
-
 ### Examples
 
 ```bash
