@@ -50,7 +50,13 @@ struct SearchTemplate {
 pub async fn find(req: Request<Body>) -> Result<Response<Body>, String> {
 	let nsfw_results = if setting(&req, "show_nsfw") == "on" { "&include_over_18=on" } else { "" };
 	let path = format!("{}.json?{}{}&raw_json=1", req.uri().path(), req.uri().query().unwrap_or_default(), nsfw_results);
-	let query = param(&path, "q").unwrap_or_default();
+	let mut query = param(&path, "q").unwrap_or_default();
+
+	if query.starts_with("https://www.reddit.com/") {
+		query = query.trim_start_matches("https://www.reddit.com/").to_string();
+	} else if query.starts_with("https://old.reddit.com/") {
+		query = query.trim_start_matches("https://old.reddit.com/").to_string();
+	}
 
 	if query.is_empty() {
 		return Ok(redirect("/".to_string()));
