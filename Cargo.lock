@@ -677,6 +677,7 @@ dependencies = [
  "hyper-rustls",
  "libflate",
  "lipsum",
+ "once_cell",
  "percent-encoding",
  "regex",
  "route-recognizer",
