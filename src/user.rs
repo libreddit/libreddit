@@ -67,7 +67,7 @@ pub async fn profile(req: Request<Body>) -> Result<Response<Body>, String> {
 		match Post::fetch(&path, false).await {
 			Ok((mut posts, after)) => {
 				let (_, all_posts_filtered) = filter_posts(&mut posts, &filters);
-				let all_posts_hidden_nsfw = posts.iter().all(|p| p.flags.nsfw) && setting(&req, "show_nsfw") != "on";
+				let all_posts_hidden_nsfw = posts.len() > 0 && (posts.iter().all(|p| p.flags.nsfw) && setting(&req, "show_nsfw") != "on");
 				template(UserTemplate {
 					user,
 					posts,
