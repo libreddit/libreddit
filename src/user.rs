@@ -26,6 +26,7 @@ struct UserTemplate {
 	all_posts_filtered: bool,
 	/// Whether all posts were hidden because they are NSFW (and user has disabled show NSFW)
 	all_posts_hidden_nsfw: bool,
+	no_posts: bool,
 }
 
 // FUNCTIONS
@@ -61,13 +62,15 @@ pub async fn profile(req: Request<Body>) -> Result<Response<Body>, String> {
 			is_filtered: true,
 			all_posts_filtered: false,
 			all_posts_hidden_nsfw: false,
+			no_posts: false,
 		})
 	} else {
 		// Request user posts/comments from Reddit
 		match Post::fetch(&path, false).await {
 			Ok((mut posts, after)) => {
 				let (_, all_posts_filtered) = filter_posts(&mut posts, &filters);
-				let all_posts_hidden_nsfw = posts.len() > 0 && (posts.iter().all(|p| p.flags.nsfw) && setting(&req, "show_nsfw") != "on");
+				let no_posts = posts.is_empty();
+				let all_posts_hidden_nsfw = !no_posts && (posts.iter().all(|p| p.flags.nsfw) && setting(&req, "show_nsfw") != "on");
 				template(UserTemplate {
 					user,
 					posts,
@@ -80,6 +83,7 @@ pub async fn profile(req: Request<Body>) -> Result<Response<Body>, String> {
 					is_filtered: false,
 					all_posts_filtered,
 					all_posts_hidden_nsfw,
+					no_posts,
 				})
 			}
 			// If there is an error show error page
