@@ -7,6 +7,8 @@ use crate::{
 };
 use askama::Template;
 use hyper::{Body, Request, Response};
+use once_cell::sync::Lazy;
+use regex::Regex;
 
 // STRUCTS
 struct SearchParams {
@@ -47,6 +49,9 @@ struct SearchTemplate {
 	no_posts: bool,
 }
 
+// Regex matched against search queries to determine if they are reddit urls.
+static REDDIT_URL_MATCH: Lazy<Regex> = Lazy::new(|| Regex::new(r"^https?://([^\./]+\.)*reddit.com/").unwrap());
+
 // SERVICES
 pub async fn find(req: Request<Body>) -> Result<Response<Body>, String> {
 	// This ensures that during a search, no NSFW posts are fetched at all
@@ -56,7 +61,8 @@ pub async fn find(req: Request<Body>) -> Result<Response<Body>, String> {
 		""
 	};
 	let path = format!("{}.json?{}{}&raw_json=1", req.uri().path(), req.uri().query().unwrap_or_default(), nsfw_results);
-	let query = param(&path, "q").unwrap_or_default();
+	let mut query = param(&path, "q").unwrap_or_default();
+	query = REDDIT_URL_MATCH.replace(&query, "").to_string();
 
 	if query.is_empty() {
 		return Ok(redirect("/".to_string()));
