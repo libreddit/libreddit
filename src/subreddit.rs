@@ -26,6 +26,7 @@ struct SubredditTemplate {
 	all_posts_filtered: bool,
 	/// Whether all posts were hidden because they are NSFW (and user has disabled show NSFW)
 	all_posts_hidden_nsfw: bool,
+	no_posts: bool,
 }
 
 #[derive(Template)]
@@ -114,12 +115,14 @@ pub async fn community(req: Request<Body>) -> Result<Response<Body>, String> {
 			is_filtered: true,
 			all_posts_filtered: false,
 			all_posts_hidden_nsfw: false,
+			no_posts: false,
 		})
 	} else {
 		match Post::fetch(&path, quarantined).await {
 			Ok((mut posts, after)) => {
 				let (_, all_posts_filtered) = filter_posts(&mut posts, &filters);
-				let all_posts_hidden_nsfw = posts.iter().all(|p| p.flags.nsfw) && setting(&req, "show_nsfw") != "on";
+				let no_posts = posts.is_empty();
+				let all_posts_hidden_nsfw = !no_posts && (posts.iter().all(|p| p.flags.nsfw) && setting(&req, "show_nsfw") != "on");
 				template(SubredditTemplate {
 					sub,
 					posts,
@@ -131,6 +134,7 @@ pub async fn community(req: Request<Body>) -> Result<Response<Body>, String> {
 					is_filtered: false,
 					all_posts_filtered,
 					all_posts_hidden_nsfw,
+					no_posts,
 				})
 			}
 			Err(msg) => match msg.as_str() {
