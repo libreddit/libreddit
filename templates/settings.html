@@ -83,6 +83,11 @@
 					<input type="hidden" value="off" name="hide_hls_notification">
 					<input type="checkbox" name="hide_hls_notification" id="hide_hls_notification" {% if prefs.hide_hls_notification == "on" %}checked{% endif %}>
 				</div>
+				<div class="prefs-group">
+					<label for="hide_awards">Hide awards</label>
+					<input type="hidden" value="off" name="hide_awards">
+					<input type="checkbox" name="hide_awards" id="hide_awards" {% if prefs.hide_awards == "on" %}checked{% endif %}>
+				</div>
 			</fieldset>
 			<input id="save" type="submit" value="Save">
 		</div>

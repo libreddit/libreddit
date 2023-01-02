@@ -55,7 +55,7 @@ pub async fn item(req: Request<Body>) -> Result<Response<Body>, String> {
 		Ok(response) => {
 			// Parse the JSON into Post and Comment structs
 			let post = parse_post(&response[0]["data"]["children"][0]).await;
-			let comments = parse_comments(&response[1], &post.permalink, &post.author.name, highlighted_comment, &get_filters(&req));
+			let comments = parse_comments(&response[1], &post.permalink, &post.author.name, highlighted_comment, &get_filters(&req), &req);
 			let url = req.uri().to_string();
 
 			// Use the Post and Comment structs to generate a website to show users
@@ -63,7 +63,7 @@ pub async fn item(req: Request<Body>) -> Result<Response<Body>, String> {
 				comments,
 				post,
 				sort,
-				prefs: Preferences::new(req),
+				prefs: Preferences::new(&req),
 				single_thread,
 				url,
 			})
@@ -81,7 +81,7 @@ pub async fn item(req: Request<Body>) -> Result<Response<Body>, String> {
 }
 
 // COMMENTS
-fn parse_comments(json: &serde_json::Value, post_link: &str, post_author: &str, highlighted_comment: &str, filters: &HashSet<String>) -> Vec<Comment> {
+fn parse_comments(json: &serde_json::Value, post_link: &str, post_author: &str, highlighted_comment: &str, filters: &HashSet<String>, req: &Request<Body>) -> Vec<Comment> {
 	// Parse the comment JSON into a Vector of Comments
 	let comments = json["data"]["children"].as_array().map_or(Vec::new(), std::borrow::ToOwned::to_owned);
 
@@ -101,7 +101,7 @@ fn parse_comments(json: &serde_json::Value, post_link: &str, post_author: &str, 
 
 			// If this comment contains replies, handle those too
 			let replies: Vec<Comment> = if data["replies"].is_object() {
-				parse_comments(&data["replies"], post_link, post_author, highlighted_comment, filters)
+				parse_comments(&data["replies"], post_link, post_author, highlighted_comment, filters, req)
 			} else {
 				Vec::new()
 			};
@@ -169,6 +169,7 @@ fn parse_comments(json: &serde_json::Value, post_link: &str, post_author: &str, 
 				awards,
 				collapsed,
 				is_filtered,
+				prefs: Preferences::new(req),
 			}
 		})
 		.collect()

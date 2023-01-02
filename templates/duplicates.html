@@ -65,7 +65,7 @@
                             <a class="post_author {{ post.author.distinguished }}" href="/u/{{ post.author.name }}">u/{{ post.author.name }}</a>
                             <span class="dot">&bull;</span>
                             <span class="created" title="{{ post.created }}">{{ post.rel_time }}</span>
-                            {% if !post.awards.is_empty() %}
+                            {% if !post.awards.is_empty() && prefs.hide_awards != "on" %}
                                 {% for award in post.awards.clone() %}
                                 <span class="award" title="{{ award.name }}">
                                     <img alt="{{ award.name }}" src="{{ award.icon_url }}" width="16" height="16"/>

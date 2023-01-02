@@ -193,7 +193,7 @@ pub async fn item(req: Request<Body>) -> Result<Response<Body>, String> {
 				params: DuplicatesParams { before, after, sort },
 				post,
 				duplicates,
-				prefs: Preferences::new(req),
+				prefs: Preferences::new(&req),
 				url,
 				num_posts_filtered,
 				all_posts_filtered,

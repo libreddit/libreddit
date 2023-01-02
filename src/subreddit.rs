@@ -109,7 +109,7 @@ pub async fn community(req: Request<Body>) -> Result<Response<Body>, String> {
 			posts: Vec::new(),
 			sort: (sort, param(&path, "t").unwrap_or_default()),
 			ends: (param(&path, "after").unwrap_or_default(), "".to_string()),
-			prefs: Preferences::new(req),
+			prefs: Preferences::new(&req),
 			url,
 			redirect_url,
 			is_filtered: true,
@@ -128,7 +128,7 @@ pub async fn community(req: Request<Body>) -> Result<Response<Body>, String> {
 					posts,
 					sort: (sort, param(&path, "t").unwrap_or_default()),
 					ends: (param(&path, "after").unwrap_or_default(), after),
-					prefs: Preferences::new(req),
+					prefs: Preferences::new(&req),
 					url,
 					redirect_url,
 					is_filtered: false,
@@ -153,7 +153,7 @@ pub fn quarantine(req: Request<Body>, sub: String) -> Result<Response<Body>, Str
 		msg: "Please click the button below to continue to this subreddit.".to_string(),
 		url: req.uri().to_string(),
 		sub,
-		prefs: Preferences::new(req),
+		prefs: Preferences::new(&req),
 	};
 
 	Ok(
@@ -200,7 +200,7 @@ pub async fn subscriptions_filters(req: Request<Body>) -> Result<Response<Body>,
 
 	let query = req.uri().query().unwrap_or_default().to_string();
 
-	let preferences = Preferences::new(req);
+	let preferences = Preferences::new(&req);
 	let mut sub_list = preferences.subscriptions;
 	let mut filters = preferences.filters;
 
@@ -313,7 +313,7 @@ pub async fn wiki(req: Request<Body>) -> Result<Response<Body>, String> {
 			sub,
 			wiki: rewrite_urls(response["data"]["content_html"].as_str().unwrap_or("<h3>Wiki not found</h3>")),
 			page,
-			prefs: Preferences::new(req),
+			prefs: Preferences::new(&req),
 			url,
 		}),
 		Err(msg) => {
@@ -351,7 +351,7 @@ pub async fn sidebar(req: Request<Body>) -> Result<Response<Body>, String> {
 			// ),
 			sub,
 			page: "Sidebar".to_string(),
-			prefs: Preferences::new(req),
+			prefs: Preferences::new(&req),
 			url,
 		}),
 		Err(msg) => {

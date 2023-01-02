@@ -357,6 +357,7 @@ pub struct Comment {
 	pub awards: Awards,
 	pub collapsed: bool,
 	pub is_filtered: bool,
+	pub prefs: Preferences,
 }
 
 #[derive(Default, Clone)]
@@ -472,6 +473,7 @@ pub struct Preferences {
 	pub post_sort: String,
 	pub subscriptions: Vec<String>,
 	pub filters: Vec<String>,
+	pub hide_awards: String,
 }
 
 #[derive(RustEmbed)]
@@ -481,7 +483,7 @@ pub struct ThemeAssets;
 
 impl Preferences {
 	// Build preferences from cookies
-	pub fn new(req: Request<Body>) -> Self {
+	pub fn new(req: &Request<Body>) -> Self {
 		// Read available theme names from embedded css files.
 		// Always make the default "system" theme available.
 		let mut themes = vec!["system".to_string()];
@@ -504,6 +506,7 @@ impl Preferences {
 			post_sort: setting(&req, "post_sort"),
 			subscriptions: setting(&req, "subscriptions").split('+').map(String::from).filter(|s| !s.is_empty()).collect(),
 			filters: setting(&req, "filters").split('+').map(String::from).filter(|s| !s.is_empty()).collect(),
+			hide_awards: setting(&req, "hide_awards"),
 		}
 	}
 }
@@ -820,7 +823,7 @@ pub async fn error(req: Request<Body>, msg: impl ToString) -> Result<Response<Bo
 	let url = req.uri().to_string();
 	let body = ErrorTemplate {
 		msg: msg.to_string(),
-		prefs: Preferences::new(req),
+		prefs: Preferences::new(&req),
 		url,
 	}
 	.render()
