@@ -3,7 +3,7 @@
 use crate::client::json;
 use crate::server::RequestExt;
 use crate::subreddit::{can_access_quarantine, quarantine};
-use crate::utils::{error, filter_posts, get_filters, parse_post, template, Post, Preferences};
+use crate::utils::{error, filter_posts, get_filters, parse_post, template, Post, Preferences, setting};
 
 use askama::Template;
 use hyper::{Body, Request, Response};
@@ -66,8 +66,8 @@ pub async fn item(req: Request<Body>) -> Result<Response<Body>, String> {
 		// Process response JSON.
 		Ok(response) => {
 			let filters = get_filters(&req);
-			let post = parse_post(&response[0]["data"]["children"][0]).await;
-			let (duplicates, num_posts_filtered, all_posts_filtered) = parse_duplicates(&response[1], &filters).await;
+			let post = parse_post(&response[0]["data"]["children"][0], &setting(&req, "display_awards")).await;
+			let (duplicates, num_posts_filtered, all_posts_filtered) = parse_duplicates(&response[1], &filters, &setting(&req, "display_awards")).await;
 
 			// These are the values for the "before=", "after=", and "sort="
 			// query params, respectively.
@@ -213,13 +213,13 @@ pub async fn item(req: Request<Body>) -> Result<Response<Body>, String> {
 }
 
 // DUPLICATES
-async fn parse_duplicates(json: &serde_json::Value, filters: &HashSet<String>) -> (Vec<Post>, u64, bool) {
+async fn parse_duplicates(json: &serde_json::Value, filters: &HashSet<String>, with_awards: &str) -> (Vec<Post>, u64, bool) {
 	let post_duplicates: &Vec<Value> = &json["data"]["children"].as_array().map_or(Vec::new(), ToOwned::to_owned);
 	let mut duplicates: Vec<Post> = Vec::new();
 
 	// Process each post and place them in the Vec<Post>.
 	for val in post_duplicates.iter() {
-		let post: Post = parse_post(val).await;
+		let post: Post = parse_post(val, with_awards).await;
 		duplicates.push(post);
 	}
 

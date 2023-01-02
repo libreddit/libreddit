@@ -54,8 +54,8 @@ pub async fn item(req: Request<Body>) -> Result<Response<Body>, String> {
 		// Otherwise, grab the JSON output from the request
 		Ok(response) => {
 			// Parse the JSON into Post and Comment structs
-			let post = parse_post(&response[0]["data"]["children"][0]).await;
-			let comments = parse_comments(&response[1], &post.permalink, &post.author.name, highlighted_comment, &get_filters(&req));
+			let post = parse_post(&response[0]["data"]["children"][0], &setting(&req, "display_awards")).await;
+			let comments = parse_comments(&response[1], &post.permalink, &post.author.name, highlighted_comment, &get_filters(&req), &setting(&req, "display_awards"));
 			let url = req.uri().to_string();
 
 			// Use the Post and Comment structs to generate a website to show users
@@ -81,7 +81,7 @@ pub async fn item(req: Request<Body>) -> Result<Response<Body>, String> {
 }
 
 // COMMENTS
-fn parse_comments(json: &serde_json::Value, post_link: &str, post_author: &str, highlighted_comment: &str, filters: &HashSet<String>) -> Vec<Comment> {
+fn parse_comments(json: &serde_json::Value, post_link: &str, post_author: &str, highlighted_comment: &str, filters: &HashSet<String>, with_awards: &str) -> Vec<Comment> {
 	// Parse the comment JSON into a Vector of Comments
 	let comments = json["data"]["children"].as_array().map_or(Vec::new(), std::borrow::ToOwned::to_owned);
 
@@ -101,12 +101,15 @@ fn parse_comments(json: &serde_json::Value, post_link: &str, post_author: &str, 
 
 			// If this comment contains replies, handle those too
 			let replies: Vec<Comment> = if data["replies"].is_object() {
-				parse_comments(&data["replies"], post_link, post_author, highlighted_comment, filters)
+				parse_comments(&data["replies"], post_link, post_author, highlighted_comment, filters, with_awards)
 			} else {
 				Vec::new()
 			};
 
-			let awards: Awards = Awards::parse(&data["all_awardings"]);
+			let mut awards: Option<Awards> = None;
+			if with_awards == "on" {
+				awards = Option::from(Awards::parse(&data["all_awardings"]));
+			}
 
 			let parent_kind_and_id = val(&comment, "parent_id");
 			let parent_info = parent_kind_and_id.split('_').collect::<Vec<&str>>();

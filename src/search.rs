@@ -113,7 +113,7 @@ pub async fn find(req: Request<Body>) -> Result<Response<Body>, String> {
 			no_posts: false,
 		})
 	} else {
-		match Post::fetch(&path, quarantined).await {
+		match Post::fetch(&path, quarantined, &setting(&req, "display_awards")).await {
 			Ok((mut posts, after)) => {
 				let (_, all_posts_filtered) = filter_posts(&mut posts, &filters);
 				let no_posts = posts.is_empty();

@@ -73,17 +73,19 @@
 		{% endif %}
 		<span class="dot">&bull;</span>
 		<span class="created" title="{{ post.created }}">{{ post.rel_time }}</span>
-		{% if !post.awards.is_empty() %}
+		{% match post.awards %}
+		{% when Some with (values) %}
 		<span class="dot">&bull;</span>
 		<span class="awards">
-			{% for award in post.awards.clone() %}
+			{% for award in values.clone().iter() %}
 			<span class="award" title="{{ award.name }}">
 				<img alt="{{ award.name }}" src="{{ award.icon_url }}" width="16" height="16"/>
 				{{ award.count }}
 			</span>
 			{% endfor %}
 		</span>
-		{% endif %}
+		{% when None %}
+		{% endmatch %}
 	</p>
 	<h1 class="post_title">
 		{{ post.title }}
@@ -178,13 +180,15 @@
 		<a class="post_author {{ post.author.distinguished }}" href="/u/{{ post.author.name }}">u/{{ post.author.name }}</a>
 		<span class="dot">&bull;</span>
 		<span class="created" title="{{ post.created }}">{{ post.rel_time }}</span>
-		{% if !post.awards.is_empty() %}
-			{% for award in post.awards.clone() %}
+		{% match post.awards %}
+		{% when Some with (values) %}
+			{% for award in values.clone().iter() %}
 			<span class="award" title="{{ award.name }}">
 				<img alt="{{ award.name }}" src="{{ award.icon_url }}" width="16" height="16"/>
 			</span>
 			{% endfor %}
-		{% endif %}
+		{% when None %}
+		{% endmatch %}
 	</p>
 	<h2 class="post_title">
 		{% if post.flair.flair_parts.len() > 0 %}

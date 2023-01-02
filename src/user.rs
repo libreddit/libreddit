@@ -66,7 +66,7 @@ pub async fn profile(req: Request<Body>) -> Result<Response<Body>, String> {
 		})
 	} else {
 		// Request user posts/comments from Reddit
-		match Post::fetch(&path, false).await {
+		match Post::fetch(&path, false, &setting(&req, "display_awards")).await {
 			Ok((mut posts, after)) => {
 				let (_, all_posts_filtered) = filter_posts(&mut posts, &filters);
 				let no_posts = posts.is_empty();

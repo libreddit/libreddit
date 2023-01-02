@@ -70,6 +70,11 @@
 					<input type="checkbox" name="autoplay_videos" id="autoplay_videos" {% if prefs.autoplay_videos == "on" %}checked{% endif %}>
 				</div>
 				<div class="prefs-group">
+					<label for="display_awards">Display awards</label>
+					<input type="hidden" value="off" name="display_awards">
+					<input type="checkbox" name="display_awards" id="display_awards" {% if prefs.display_awards == "on" %}checked{% endif %}>
+				</div>
+				<div class="prefs-group">
 					<label for="use_hls">Use HLS for videos</label>
 					<details id="feeds">
 						<summary>Why?</summary>

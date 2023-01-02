@@ -228,12 +228,12 @@ pub struct Post {
 	pub num_duplicates: u64,
 	pub comments: (String, String),
 	pub gallery: Vec<GalleryMedia>,
-	pub awards: Awards,
+	pub awards: Option<Awards>,
 }
 
 impl Post {
 	// Fetch posts of a user or subreddit and return a vector of posts and the "after" value
-	pub async fn fetch(path: &str, quarantine: bool) -> Result<(Vec<Self>, String), String> {
+	pub async fn fetch(path: &str, quarantine: bool, display_awards: &str) -> Result<(Vec<Self>, String), String> {
 		// Send a request to the url
 		let res = match json(path.to_string(), quarantine).await {
 			// If success, receive JSON in response
@@ -261,7 +261,11 @@ impl Post {
 
 			// Determine the type of media along with the media URL
 			let (post_type, media, gallery) = Media::parse(data).await;
-			let awards = Awards::parse(&data["all_awardings"]);
+			let mut awards: Option<Awards> = None;
+
+			if display_awards == "on" {
+				awards = Option::from(Awards::parse(&data["all_awardings"]));
+			}
 
 			// selftext_html is set for text posts when browsing.
 			let mut body = rewrite_urls(&val(post, "selftext_html"));
@@ -354,7 +358,7 @@ pub struct Comment {
 	pub edited: (String, String),
 	pub replies: Vec<Comment>,
 	pub highlighted: bool,
-	pub awards: Awards,
+	pub awards: Option<Awards>,
 	pub collapsed: bool,
 	pub is_filtered: bool,
 }
@@ -472,6 +476,7 @@ pub struct Preferences {
 	pub post_sort: String,
 	pub subscriptions: Vec<String>,
 	pub filters: Vec<String>,
+	pub display_awards: String,
 }
 
 #[derive(RustEmbed)]
@@ -504,6 +509,7 @@ impl Preferences {
 			post_sort: setting(&req, "post_sort"),
 			subscriptions: setting(&req, "subscriptions").split('+').map(String::from).filter(|s| !s.is_empty()).collect(),
 			filters: setting(&req, "filters").split('+').map(String::from).filter(|s| !s.is_empty()).collect(),
+			display_awards: setting(&req, "display_awards"),
 		}
 	}
 }
@@ -537,17 +543,22 @@ pub fn filter_posts(posts: &mut Vec<Post>, filters: &HashSet<String>) -> (u64, b
 }
 
 /// Creates a [`Post`] from a provided JSON.
-pub async fn parse_post(post: &serde_json::Value) -> Post {
+pub async fn parse_post(post: &serde_json::Value, with_awards: &str) -> Post {
 	// Grab UTC time as unix timestamp
 	let (rel_time, created) = time(post["data"]["created_utc"].as_f64().unwrap_or_default());
 	// Parse post score and upvote ratio
 	let score = post["data"]["score"].as_i64().unwrap_or_default();
 	let ratio: f64 = post["data"]["upvote_ratio"].as_f64().unwrap_or(1.0) * 100.0;
 
+
 	// Determine the type of media along with the media URL
 	let (post_type, media, gallery) = Media::parse(&post["data"]).await;
 
-	let awards: Awards = Awards::parse(&post["data"]["all_awardings"]);
+	let mut awards: Option<Awards> = None;
+
+	if with_awards == "on" {
+		awards = Option::from(Awards::parse(&post["data"]["all_awardings"]));
+	}
 
 	let permalink = val(post, "permalink");
 
