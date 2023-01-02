@@ -12,7 +12,7 @@ mod user;
 mod utils;
 
 // Import Crates
-use clap::{Arg, Command};
+use clap::{Arg, ArgAction, Command};
 
 use futures_lite::FutureExt;
 use hyper::{header::HeaderValue, Body, Request, Response};
@@ -129,8 +129,10 @@ async fn main() {
 				.short('p')
 				.long("port")
 				.value_name("PORT")
+				.env("PORT")
 				.help("Port to listen on")
 				.default_value("8080")
+				.action(ArgAction::Set)
 				.num_args(1),
 		)
 		.arg(
@@ -144,11 +146,11 @@ async fn main() {
 		)
 		.get_matches();
 
-	let address = matches.get_one("address").map(|m: &String| m.as_str()).unwrap_or("0.0.0.0");
-	let port = std::env::var("PORT").unwrap_or_else(|_| matches.get_one("port").map(|m: &String| m.as_str()).unwrap_or("8080").to_string());
+	let address = matches.get_one::<String>("address").unwrap();
+	let port = matches.get_one::<String>("port").unwrap();
 	let hsts = matches.get_one("hsts").map(|m: &String| m.as_str());
 
-	let listener = [address, ":", &port].concat();
+	let listener = [address, ":", port].concat();
 
 	println!("Starting Libreddit...");
 
