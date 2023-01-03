@@ -9,6 +9,7 @@ use regex::Regex;
 use rust_embed::RustEmbed;
 use serde_json::Value;
 use std::collections::{HashMap, HashSet};
+use std::env;
 use std::str::FromStr;
 use time::{macros::format_description, Duration, OffsetDateTime};
 use url::Url;
@@ -26,6 +27,16 @@ macro_rules! dbg_msg {
 		#[cfg(debug_assertions)]
 		dbg_msg!(format!($($x),+))
 	};
+}
+
+/// Identifies whether or not the page is a subreddit, a user page, or a post.
+/// This is used by the NSFW landing template to determine the mesage to convey
+/// to the user.
+#[derive(PartialEq, Eq)]
+pub enum ResourceType {
+	Subreddit,
+	User,
+	Post,
 }
 
 // Post flair with content, background color and foreground color
@@ -229,6 +240,7 @@ pub struct Post {
 	pub comments: (String, String),
 	pub gallery: Vec<GalleryMedia>,
 	pub awards: Awards,
+	pub nsfw: bool,
 }
 
 impl Post {
@@ -329,6 +341,7 @@ impl Post {
 				comments: format_num(data["num_comments"].as_i64().unwrap_or_default()),
 				gallery,
 				awards,
+				nsfw: post["data"]["over_18"].as_bool().unwrap_or_default(),
 			});
 		}
 
@@ -421,6 +434,27 @@ pub struct ErrorTemplate {
 	pub url: String,
 }
 
+/// Template for NSFW landing page. The landing page is displayed when a page's
+/// content is wholly NSFW, but a user has not enabled the option to view NSFW
+/// posts.
+#[derive(Template)]
+#[template(path = "nsfwlanding.html")]
+pub struct NSFWLandingTemplate {
+	/// Identifier for the resource. This is either a subreddit name or a
+	/// username. (In the case of the latter, set is_user to true.)
+	pub res: String,
+
+	/// Identifies whether or not the resource is a subreddit, a user page,
+	/// or a post.
+	pub res_type: ResourceType,
+
+	/// User preferences.
+	pub prefs: Preferences,
+
+	/// Request URL.
+	pub url: String,
+}
+
 #[derive(Default)]
 // User struct containing metadata about user
 pub struct User {
@@ -431,6 +465,7 @@ pub struct User {
 	pub created: String,
 	pub banner: String,
 	pub description: String,
+	pub nsfw: bool,
 }
 
 #[derive(Default)]
@@ -445,6 +480,7 @@ pub struct Subreddit {
 	pub members: (String, String),
 	pub active: (String, String),
 	pub wiki: bool,
+	pub nsfw: bool,
 }
 
 // Parser for query params, used in sorting (eg. /r/rust/?sort=hot)
@@ -620,6 +656,7 @@ pub async fn parse_post(post: &serde_json::Value) -> Post {
 		comments: format_num(post["data"]["num_comments"].as_i64().unwrap_or_default()),
 		gallery,
 		awards,
+		nsfw: post["data"]["over_18"].as_bool().unwrap_or_default(),
 	}
 }
 
@@ -646,8 +683,8 @@ pub fn setting(req: &Request<Body>, name: &str) -> String {
 	req
 		.cookie(name)
 		.unwrap_or_else(|| {
-			// If there is no cookie for this setting, try receiving a default from an environment variable
-			if let Ok(default) = std::env::var(format!("LIBREDDIT_DEFAULT_{}", name.to_uppercase())) {
+			// If there is no cookie for this setting, try receiving a default from the config
+			if let Some(default) = crate::config::get_setting(&format!("LIBREDDIT_DEFAULT_{}", name.to_uppercase())) {
 				Cookie::new(name, default)
 			} else {
 				Cookie::named(name)
@@ -830,6 +867,51 @@ pub async fn error(req: Request<Body>, msg: impl ToString) -> Result<Response<Bo
 	.unwrap_or_default();
 
 	Ok(Response::builder().status(404).header("content-type", "text/html").body(body.into()).unwrap_or_default())
+}
+
+/// Returns true if the config/env variable `LIBREDDIT_SFW_ONLY` carries the
+/// value `on`.
+///
+/// If this variable is set as such, the instance will operate in SFW-only
+/// mode; all NSFW content will be filtered. Attempts to access NSFW
+/// subreddits or posts or userpages for users Reddit has deemed NSFW will
+/// be denied.
+pub fn sfw_only() -> bool {
+	match crate::config::get_setting("LIBREDDIT_SFW_ONLY") {
+		Some(val) => val == "on",
+		None => false,
+	}
+}
+
+/// Renders the landing page for NSFW content when the user has not enabled
+/// "show NSFW posts" in settings.
+pub async fn nsfw_landing(req: Request<Body>) -> Result<Response<Body>, String> {
+	let res_type: ResourceType;
+	let url = req.uri().to_string();
+
+	// Determine from the request URL if the resource is a subreddit, a user
+	// page, or a post.
+	let res: String = if !req.param("name").unwrap_or_default().is_empty() {
+		res_type = ResourceType::User;
+		req.param("name").unwrap_or_default()
+	} else if !req.param("id").unwrap_or_default().is_empty() {
+		res_type = ResourceType::Post;
+		req.param("id").unwrap_or_default()
+	} else {
+		res_type = ResourceType::Subreddit;
+		req.param("sub").unwrap_or_default()
+	};
+
+	let body = NSFWLandingTemplate {
+		res,
+		res_type,
+		prefs: Preferences::new(&req),
+		url,
+	}
+	.render()
+	.unwrap_or_default();
+
+	Ok(Response::builder().status(403).header("content-type", "text/html").body(body.into()).unwrap_or_default())
 }
 
 #[cfg(test)]
