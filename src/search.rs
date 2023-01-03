@@ -1,5 +1,5 @@
 // CRATES
-use crate::utils::{catch_random, error, filter_posts, format_num, format_url, get_filters, param, redirect, setting, template, val, Post, Preferences};
+use crate::utils::{self, catch_random, error, filter_posts, format_num, format_url, get_filters, param, redirect, setting, template, val, Post, Preferences};
 use crate::{
 	client::json,
 	subreddit::{can_access_quarantine, quarantine},
@@ -54,7 +54,12 @@ static REDDIT_URL_MATCH: Lazy<Regex> = Lazy::new(|| Regex::new(r"^https?://([^\.
 
 // SERVICES
 pub async fn find(req: Request<Body>) -> Result<Response<Body>, String> {
-	let nsfw_results = if setting(&req, "show_nsfw") == "on" { "&include_over_18=on" } else { "" };
+	// This ensures that during a search, no NSFW posts are fetched at all
+	let nsfw_results = if setting(&req, "show_nsfw") == "on" && !utils::sfw_only() {
+		"&include_over_18=on"
+	} else {
+		""
+	};
 	let path = format!("{}.json?{}{}&raw_json=1", req.uri().path(), req.uri().query().unwrap_or_default(), nsfw_results);
 	let mut query = param(&path, "q").unwrap_or_default();
 	query = REDDIT_URL_MATCH.replace(&query, "").to_string();
