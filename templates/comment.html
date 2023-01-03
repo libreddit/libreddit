@@ -20,7 +20,7 @@
 			{% endif %}
 			<a href="{{ post_link }}{{ id }}/?context=3" class="created" title="{{ created }}">{{ rel_time }}</a>
 			{% if edited.0 != "".to_string() %}<span class="edited" title="{{ edited.1 }}">edited {{ edited.0 }}</span>{% endif %}
-			{% if !awards.is_empty() %}
+			{% if !awards.is_empty() && prefs.hide_awards != "on" %}
 			<span class="dot">&bull;</span>
 			{% for award in awards.clone() %}
 			<span class="award" title="{{ award.name }}">
