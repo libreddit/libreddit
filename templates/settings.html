@@ -11,76 +11,81 @@
 	<div id="settings">
 	<form action="/settings" method="POST">
 		<div class="prefs">
-			<legend>Appearance</legend>
-			<div id="theme">
-				<label for="theme">Theme:</label>
-				<select name="theme"> 
-					{% call utils::options(prefs.theme, prefs.available_themes, "system") %}
-				</select>
-			</div>
-			<legend>Interface</legend>
-			<div id="front_page">
-				<label for="front_page">Front page:</label>
-				<select name="front_page"> 
-					{% call utils::options(prefs.front_page, ["default", "popular", "all"], "default") %}
-				</select>
-			</div>
-			<div id="layout">
-				<label for="layout">Layout:</label>
-				<select name="layout"> 
-					{% call utils::options(prefs.layout, ["card", "clean", "compact"], "card") %}
-				</select>
-			</div>
-			<div id="wide">
-				<label for="wide">Wide UI:</label>
-				<input type="hidden" value="off" name="wide">
-				<input type="checkbox" name="wide" {% if prefs.wide == "on" %}checked{% endif %}>
-			</div>
-			<legend>Content</legend>
-			<div id="post_sort">
-				<label for="post_sort" title="Applies only to subreddit feeds">Default subreddit post sort:</label>
-				<select name="post_sort"> 
-					{% call utils::options(prefs.post_sort, ["hot", "new", "top", "rising", "controversial"], "hot") %}
-				</select>
-			</div>
-			<div id="comment_sort">
-				<label for="comment_sort">Default comment sort:</label>
-				<select name="comment_sort"> 
-					{% call utils::options(prefs.comment_sort, ["confidence", "top", "new", "controversial", "old"], "confidence") %}
-				</select>
-			</div>
-			{% if !crate::utils::sfw_only() %}
-			<div id="show_nsfw">
-				<label for="show_nsfw">Show NSFW posts:</label>
-				<input type="hidden" value="off" name="show_nsfw">
-				<input type="checkbox" name="show_nsfw" {% if prefs.show_nsfw == "on" %}checked{% endif %}>
-			</div>
-			<div id="blur_nsfw">
-				<label for="blur_nsfw">Blur NSFW previews:</label>
-				<input type="hidden" value="off" name="blur_nsfw">
-				<input type="checkbox" name="blur_nsfw" {% if prefs.blur_nsfw == "on" %}checked{% endif %}>
-			</div>
-			{% endif %}
-			<div id="autoplay_videos">
-				<label for="autoplay_videos">Autoplay videos</label>
-				<input type="hidden" value="off" name="autoplay_videos">
-				<input type="checkbox" name="autoplay_videos" {% if prefs.autoplay_videos == "on" %}checked{% endif %}>
-			</div>
-			<div id="use_hls">
-				<label for="use_hls">Use HLS for videos
+			<fieldset>
+				<legend>Appearance</legend>
+				<div class="prefs-group">
+					<label for="theme">Theme:</label>
+					<select name="theme" id="theme"> 
+						{% call utils::options(prefs.theme, prefs.available_themes, "system") %}
+					</select>
+				</div>
+			</fieldset>
+			<fieldset>
+				<legend>Interface</legend>
+				<div class="prefs-group">
+					<label for="front_page">Front page:</label>
+					<select name="front_page" id="front_page"> 
+						{% call utils::options(prefs.front_page, ["default", "popular", "all"], "default") %}
+					</select>
+				</div>
+				<div class="prefs-group">
+					<label for="layout">Layout:</label>
+					<select name="layout" id="layout"> 
+						{% call utils::options(prefs.layout, ["card", "clean", "compact"], "card") %}
+					</select>
+				</div>
+				<div class="prefs-group">
+					<label for="wide">Wide UI:</label>
+					<input type="hidden" value="off" name="wide">
+					<input type="checkbox" name="wide" id="wide" {% if prefs.wide == "on" %}checked{% endif %}>
+				</div>
+			</fieldset>
+			<fieldset>
+				<legend>Content</legend>
+				<div class="prefs-group">
+					<label for="post_sort" title="Applies only to subreddit feeds">Default subreddit post sort:</label>
+					<select name="post_sort"> 
+						{% call utils::options(prefs.post_sort, ["hot", "new", "top", "rising", "controversial"], "hot") %}
+					</select>
+				</div>
+				<div class="prefs-group">
+					<label for="comment_sort">Default comment sort:</label>
+					<select name="comment_sort" id="comment_sort"> 
+						{% call utils::options(prefs.comment_sort, ["confidence", "top", "new", "controversial", "old"], "confidence") %}
+					</select>
+				</div>
+        {% if !crate::utils::sfw_only() %}
+				<div class="prefs-group">
+					<label for="show_nsfw">Show NSFW posts:</label>
+					<input type="hidden" value="off" name="show_nsfw">
+					<input type="checkbox" name="show_nsfw" id="show_nsfw" {% if prefs.show_nsfw == "on" %}checked{% endif %}>
+				</div>
+				<div class="prefs-group">
+					<label for="blur_nsfw">Blur NSFW previews:</label>
+					<input type="hidden" value="off" name="blur_nsfw">
+					<input type="checkbox" name="blur_nsfw" id="blur_nsfw" {% if prefs.blur_nsfw == "on" %}checked{% endif %}>
+				</div>
+        {% endif %}
+				<div class="prefs-group">
+					<label for="autoplay_videos">Autoplay videos</label>
+					<input type="hidden" value="off" name="autoplay_videos">
+					<input type="checkbox" name="autoplay_videos" id="autoplay_videos" {% if prefs.autoplay_videos == "on" %}checked{% endif %}>
+				</div>
+				<div class="prefs-group">
+					<label for="use_hls">Use HLS for videos</label>
 					<details id="feeds">
 						<summary>Why?</summary>
 						<div id="feed_list" class="helper">Reddit videos require JavaScript (via HLS.js) to be enabled to be played with audio. Therefore, this toggle lets you either use Libreddit JS-free or utilize this feature.</div>
 					</details>
-				</label>
-				<input type="hidden" value="off" name="use_hls">
-				<input type="checkbox" name="use_hls" {% if prefs.use_hls == "on" %}checked{% endif %}>
-			</div>
-			<div id="hide_hls_notification">
-				<label for="hide_hls_notification">Hide notification about possible HLS usage</label>
-				<input type="hidden" value="off" name="hide_hls_notification">
-				<input type="checkbox" name="hide_hls_notification" {% if prefs.hide_hls_notification == "on" %}checked{% endif %}>
-			</div>
+					<input type="hidden" value="off" name="use_hls">
+					<input type="checkbox" name="use_hls" id="use_hls" {% if prefs.use_hls == "on" %}checked{% endif %}>
+				</div>
+				<div class="prefs-group">
+					<label for="hide_hls_notification">Hide notification about possible HLS usage</label>
+					<input type="hidden" value="off" name="hide_hls_notification">
+					<input type="checkbox" name="hide_hls_notification" id="hide_hls_notification" {% if prefs.hide_hls_notification == "on" %}checked{% endif %}>
+				</div>
+			</fieldset>
 			<input id="save" type="submit" value="Save">
 		</div>
 	</form>
