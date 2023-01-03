@@ -290,7 +290,7 @@ async fn main() {
 				Some("best" | "hot" | "new" | "top" | "rising" | "controversial") => subreddit::community(req).await,
 
 				// Short link for post
-				Some(id) if (5..7).contains(&id.len()) => match canonical_path(format!("/{}", id)).await {
+				Some(id) if (5..8).contains(&id.len()) => match canonical_path(format!("/{}", id)).await {
 					Ok(path_opt) => match path_opt {
 						Some(path) => Ok(redirect(path)),
 						None => error(req, "Post ID is invalid. It may point to a post on a community that has been banned.").await,

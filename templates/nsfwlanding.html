@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}NSFW content gated{% endblock %}
+{% block sortstyle %}{% endblock %}
+{% block content %}
+<div id="nsfw_landing">
+    <h1>
+        &#128561;
+        {% if res_type == crate::utils::ResourceType::Subreddit %}
+        r/{{ res }} is a NSFW community!
+        {% else if res_type == crate::utils::ResourceType::User %}
+        u/{{ res }}'s content is NSFW!
+        {% else if res_type == crate::utils::ResourceType::Post %}
+        This post is NSFW!
+        {% endif %}
+    </h1>
+    <br />
+
+    <p>
+        {% if crate::utils::sfw_only() %}
+        This instance of Libreddit is SFW-only.</p>
+        {% else %}
+        Enable "Show NSFW posts" in <a href="/settings">settings</a> to view this {% if res_type == crate::utils::ResourceType::Subreddit %}subreddit{% else if res_type == crate::utils::ResourceType::User %}user's posts or comments{% else if res_type == crate::utils::ResourceType::Post %}post{% endif %}.
+        {% endif %}
+    </p>
+</div>
+{% endblock %}
+{% block footer %}
+{% endblock %}

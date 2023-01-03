@@ -40,6 +40,9 @@
     },
     "LIBREDDIT_HIDE_HLS_NOTIFICATION": {
       "required": false
+    },
+    "LIBREDDIT_SFW_ONLY": {
+      "required": false
     }
   }
 }

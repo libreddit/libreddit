@@ -3,7 +3,7 @@ name = "libreddit"
 description = " Alternative private front-end to Reddit"
 license = "AGPL-3.0"
 repository = "https://github.com/spikecodes/libreddit"
-version = "0.25.0"
+version = "0.26.0"
 authors = ["spikecodes <19519553+spikecodes@users.noreply.github.com>"]
 edition = "2021"
 
@@ -33,3 +33,8 @@ once_cell = "1.16.0"
 [dev-dependencies]
 lipsum = "0.8.2"
 sealed_test = "1.0.0"
+
+[profile.release]
+codegen-units = 1
+lto = true
+strip = true

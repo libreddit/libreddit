@@ -160,15 +160,34 @@ main {
 	overflow: inherit;
 }
 
-footer {
+/* Body footer. */
+body > footer {
+	display: flex;
+	justify-content: center;
+	margin: 20px;
+}
+
+body > footer > div#sfw-only {
+	color: var(--green);
+	border: 1px solid var(--green);
+	padding: 5px;
+	box-sizing: border-box;
+	border-radius: 5px;
+}
+/* / Body footer. */
+
+/* Footer in content block. */
+main > * > footer {
 	display: flex;
 	justify-content: center;
 	margin-top: 20px;
 }
 
-footer > a {
+main > * > footer > a {
 	margin-right: 5px;
 }
+
+/* / Footer in content block. */
 
 button {
 	background: none;
@@ -485,7 +504,7 @@ button.submit:hover > svg { stroke: var(--accent); }
 	overflow-x: auto;
 }
 
-#sort_options, #listing_options, footer > a {
+#sort_options, #listing_options, main > * > footer > a {
 	border-radius: 5px;
 	align-items: center;
 	box-shadow: var(--shadow);
@@ -494,7 +513,7 @@ button.submit:hover > svg { stroke: var(--accent); }
 	overflow: hidden;
 }
 
-#sort_options > a, #listing_options > a, footer > a {
+#sort_options > a, #listing_options > a, main > * > footer > a {
 	color: var(--text);
 	padding: 10px 20px;
 	text-align: center;
@@ -1118,22 +1137,16 @@ summary.comment_data {
 }
 
 .prefs {
-	display: flex;
-	flex-direction: column;
-	justify-content: space-between;
-	padding: 20px;
+	padding: 10px 20px 20px;
 	background: var(--post);
 	border-radius: 5px;
 	margin-bottom: 20px;
 }
 
-.prefs > div {
-	display: flex;
-	justify-content: space-between;
-	width: 100%;
-	height: 35px;
-	align-items: center;
-	margin-top: 7px;
+.prefs fieldset {
+	border: 0;
+	padding: 10px 0;
+	margin: 0 0 5px;
 }
 
 .prefs legend {
@@ -1141,11 +1154,25 @@ summary.comment_data {
 	border-bottom: 1px solid var(--highlighted);
 	font-size: 18px;
 	padding-bottom: 10px;
+	margin-bottom: 7px;
+	width: 100%;
+	float: left; /* places the legend inside the (invisible) border, instead of vertically centered on top border*/
 }
 
-.prefs legend:not(:first-child) {
-	padding-top: 10px;
-	margin-top: 15px;
+.prefs-group {
+	display: flex;
+	width: 100%;
+	height: 35px;
+	align-items: center;
+	margin-top: 7px;
+}
+
+.prefs-group > *:not(:last-child) {
+	margin-right: 1ch;
+}
+
+.prefs-group > *:last-child {
+	margin-left: auto;
 }
 
 .prefs select {
@@ -1163,7 +1190,8 @@ aside.prefs {
 	background: var(--highlighted);
 	padding: 10px 15px;
 	border-radius: 5px;
-	margin-top: 20px;
+	margin-top: 5px;
+	width: 100%
 }
 
 input[type="submit"] {
@@ -1303,6 +1331,31 @@ td, th {
 }
 
 .listing_warn a {
+	color: var(--accent);
+}
+
+/* NSFW Landing Page */
+
+#nsfw_landing {
+	display: inline-block;
+	text-align: center;
+	width: 100%;
+}
+
+#nsfw_landing h1 {
+	display: inline-block;
+	margin-bottom: 20px;
+	text-align: center;
+	width: 100%;
+}
+
+#nsfw_landing p {
+	display: inline-block;
+	text-align: center;
+	width: 100%;
+}
+
+#nsfw_landing a {
 	color: var(--accent);
 }
 

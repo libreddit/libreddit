@@ -1,5 +1,5 @@
 // CRATES
-use crate::utils::{catch_random, error, filter_posts, format_num, format_url, get_filters, param, redirect, setting, template, val, Post, Preferences};
+use crate::utils::{self, catch_random, error, filter_posts, format_num, format_url, get_filters, param, redirect, setting, template, val, Post, Preferences};
 use crate::{
 	client::json,
 	subreddit::{can_access_quarantine, quarantine},
@@ -7,6 +7,8 @@ use crate::{
 };
 use askama::Template;
 use hyper::{Body, Request, Response};
+use once_cell::sync::Lazy;
+use regex::Regex;
 
 // STRUCTS
 struct SearchParams {
@@ -44,13 +46,23 @@ struct SearchTemplate {
 	all_posts_filtered: bool,
 	/// Whether all posts were hidden because they are NSFW (and user has disabled show NSFW)
 	all_posts_hidden_nsfw: bool,
+	no_posts: bool,
 }
+
+// Regex matched against search queries to determine if they are reddit urls.
+static REDDIT_URL_MATCH: Lazy<Regex> = Lazy::new(|| Regex::new(r"^https?://([^\./]+\.)*reddit.com/").unwrap());
 
 // SERVICES
 pub async fn find(req: Request<Body>) -> Result<Response<Body>, String> {
-	let nsfw_results = if setting(&req, "show_nsfw") == "on" { "&include_over_18=on" } else { "" };
+	// This ensures that during a search, no NSFW posts are fetched at all
+	let nsfw_results = if setting(&req, "show_nsfw") == "on" && !utils::sfw_only() {
+		"&include_over_18=on"
+	} else {
+		""
+	};
 	let path = format!("{}.json?{}{}&raw_json=1", req.uri().path(), req.uri().query().unwrap_or_default(), nsfw_results);
-	let query = param(&path, "q").unwrap_or_default();
+	let mut query = param(&path, "q").unwrap_or_default();
+	query = REDDIT_URL_MATCH.replace(&query, "").to_string();
 
 	if query.is_empty() {
 		return Ok(redirect("/".to_string()));
@@ -103,12 +115,14 @@ pub async fn find(req: Request<Body>) -> Result<Response<Body>, String> {
 			is_filtered: true,
 			all_posts_filtered: false,
 			all_posts_hidden_nsfw: false,
+			no_posts: false,
 		})
 	} else {
 		match Post::fetch(&path, quarantined).await {
 			Ok((mut posts, after)) => {
 				let (_, all_posts_filtered) = filter_posts(&mut posts, &filters);
-				let all_posts_hidden_nsfw = posts.iter().all(|p| p.flags.nsfw) && setting(&req, "show_nsfw") != "on";
+				let no_posts = posts.is_empty();
+				let all_posts_hidden_nsfw = !no_posts && (posts.iter().all(|p| p.flags.nsfw) && setting(&req, "show_nsfw") != "on");
 				template(SearchTemplate {
 					posts,
 					subreddits,
@@ -127,6 +141,7 @@ pub async fn find(req: Request<Body>) -> Result<Response<Body>, String> {
 					is_filtered: false,
 					all_posts_filtered,
 					all_posts_hidden_nsfw,
+					no_posts,
 				})
 			}
 			Err(msg) => {

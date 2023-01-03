@@ -1,6 +1,6 @@
 // CRATES
 use crate::utils::{
-	catch_random, error, filter_posts, format_num, format_url, get_filters, param, redirect, rewrite_urls, setting, template, val, Post, Preferences, Subreddit,
+	catch_random, error, filter_posts, format_num, format_url, get_filters, nsfw_landing, param, redirect, rewrite_urls, setting, template, val, Post, Preferences, Subreddit,
 };
 use crate::{client::json, server::ResponseExt, RequestExt};
 use askama::Template;
@@ -26,6 +26,7 @@ struct SubredditTemplate {
 	all_posts_filtered: bool,
 	/// Whether all posts were hidden because they are NSFW (and user has disabled show NSFW)
 	all_posts_hidden_nsfw: bool,
+	no_posts: bool,
 }
 
 #[derive(Template)]
@@ -96,6 +97,12 @@ pub async fn community(req: Request<Body>) -> Result<Response<Body>, String> {
 		}
 	};
 
+	// Return landing page if this post if this is NSFW community but the user
+	// has disabled the display of NSFW content or if the instance is SFW-only.
+	if sub.nsfw && (setting(&req, "show_nsfw") != "on" || crate::utils::sfw_only()) {
+		return Ok(nsfw_landing(req).await.unwrap_or_default());
+	}
+
 	let path = format!("/r/{}/{}.json?{}&raw_json=1", sub_name.clone(), sort, req.uri().query().unwrap_or_default());
 	let url = String::from(req.uri().path_and_query().map_or("", |val| val.as_str()));
 	let redirect_url = url[1..].replace('?', "%3F").replace('&', "%26").replace('+', "%2B");
@@ -114,12 +121,14 @@ pub async fn community(req: Request<Body>) -> Result<Response<Body>, String> {
 			is_filtered: true,
 			all_posts_filtered: false,
 			all_posts_hidden_nsfw: false,
+			no_posts: false,
 		})
 	} else {
 		match Post::fetch(&path, quarantined).await {
 			Ok((mut posts, after)) => {
 				let (_, all_posts_filtered) = filter_posts(&mut posts, &filters);
-				let all_posts_hidden_nsfw = posts.iter().all(|p| p.flags.nsfw) && setting(&req, "show_nsfw") != "on";
+				let no_posts = posts.is_empty();
+				let all_posts_hidden_nsfw = !no_posts && (posts.iter().all(|p| p.flags.nsfw) && setting(&req, "show_nsfw") != "on");
 				template(SubredditTemplate {
 					sub,
 					posts,
@@ -131,6 +140,7 @@ pub async fn community(req: Request<Body>) -> Result<Response<Body>, String> {
 					is_filtered: false,
 					all_posts_filtered,
 					all_posts_hidden_nsfw,
+					no_posts,
 				})
 			}
 			Err(msg) => match msg.as_str() {
@@ -420,5 +430,6 @@ async fn subreddit(sub: &str, quarantined: bool) -> Result<Subreddit, String> {
 		members: format_num(members),
 		active: format_num(active),
 		wiki: res["data"]["wiki_enabled"].as_bool().unwrap_or_default(),
+		nsfw: res["data"]["over18"].as_bool().unwrap_or_default(),
 	})
 }
