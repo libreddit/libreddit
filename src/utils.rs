@@ -680,8 +680,8 @@ pub fn setting(req: &Request<Body>, name: &str) -> String {
 	req
 		.cookie(name)
 		.unwrap_or_else(|| {
-			// If there is no cookie for this setting, try receiving a default from an environment variable
-			if let Ok(default) = std::env::var(format!("LIBREDDIT_DEFAULT_{}", name.to_uppercase())) {
+			// If there is no cookie for this setting, try receiving a default from the config
+			if let Some(default) = crate::config::get_setting(&format!("LIBREDDIT_DEFAULT_{}", name.to_uppercase())) {
 				Cookie::new(name, default)
 			} else {
 				Cookie::named(name)
@@ -866,7 +866,7 @@ pub async fn error(req: Request<Body>, msg: impl ToString) -> Result<Response<Bo
 	Ok(Response::builder().status(404).header("content-type", "text/html").body(body.into()).unwrap_or_default())
 }
 
-/// Returns true if the environment variable `LIBREDDIT_SFW_ONLY` carries the
+/// Returns true if the config/env variable `LIBREDDIT_SFW_ONLY` carries the
 /// value `on`.
 ///
 /// If this variable is set as such, the instance will operate in SFW-only
@@ -874,9 +874,9 @@ pub async fn error(req: Request<Body>, msg: impl ToString) -> Result<Response<Bo
 /// subreddits or posts or userpages for users Reddit has deemed NSFW will
 /// be denied.
 pub fn sfw_only() -> bool {
-	match env::var("LIBREDDIT_SFW_ONLY") {
-		Ok(val) => val == "on",
-		Err(_) => false,
+	match crate::config::get_setting("LIBREDDIT_SFW_ONLY") {
+		Some(val) => val == "on",
+		None => false,
 	}
 }
 

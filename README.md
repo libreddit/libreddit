@@ -208,6 +208,13 @@ Assign a default value for each user-modifiable setting by passing environment v
 | `HIDE_HLS_NOTIFICATION` | `["on", "off"]`                                                                                     | `off`         |
 | `AUTOPLAY_VIDEOS`       | `["on", "off"]`                                                                                     | `off`         |
 
+You can also configure Libreddit with a configuration file. An example `libreddit.toml` can be found below:
+
+```toml
+LIBREDDIT_DEFAULT_WIDE = "on"
+LIBREDDIT_DEFAULT_USE_HLS = "on"
+```
+
 ### Examples
 
 ```bash
