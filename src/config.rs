@@ -100,7 +100,7 @@ pub(crate) fn get_setting(name: &str) -> Option<String> {
 use {sealed_test::prelude::*, std::fs::write};
 
 #[test]
-#[sealed_test(env = [("LIBREDDIT_SFW_ONLY", "1")])]
+#[sealed_test(env = [("LIBREDDIT_SFW_ONLY", "on")])]
 fn test_env_var() {
 	assert!(crate::utils::sfw_only())
 }
