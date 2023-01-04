@@ -12,3 +12,8 @@
 	--visited: #555;
 	--shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
+
+html:has(> .light) {
+  /* Hint color theme to browser for scrollbar */
+  color-scheme: light;
+}
