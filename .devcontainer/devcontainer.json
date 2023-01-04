@@ -1,0 +1,14 @@
+{
+    "name": "Rust",
+    "image": "mcr.microsoft.com/devcontainers/rust:0-1-bullseye",
+    "features": {
+        "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+    },
+    "portsAttributes": {
+        "8080": {
+            "label": "libreddit",
+            "onAutoForward": "notify"
+        }
+    },
+    "postCreateCommand": "cargo build"
+}
