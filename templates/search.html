@@ -10,7 +10,7 @@
 {% block content %}
 	<div id="column_one">
 		<form id="search_sort">
-			<input id="search" type="text" name="q" placeholder="Search" value="{{ params.q }}" title="Search libreddit">
+			<input id="search" type="text" name="q" placeholder="Search" value="{{ params.q|safe }}" title="Search libreddit">
 			{% if sub != "" %}
 			<div id="inside">
 				<input type="checkbox" name="restrict_sr" id="restrict_sr" {% if params.restrict_sr != "" %}checked{% endif %}>
