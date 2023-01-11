@@ -66,6 +66,11 @@
 		</main>
 		{% endblock %}
 		{% block footer %}
+			<footer>
+				<div>
+					<a href="/instance-info">View instance information</a>
+				</div>
+			</footer>
 			{% if crate::utils::sfw_only() %}
 			<footer><div id="sfw-only">This instance of Libreddit is SFW-only.</div></footer>
 			{% endif %}

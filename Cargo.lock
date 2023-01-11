@@ -150,6 +150,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "build_html"
+version = "2.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f3ef018b44d829e1b3364b4969059c098743595ec57a7eed176fbc9d909ac217"
+
+[[package]]
 name = "bumpalo"
 version = "3.11.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -663,6 +669,7 @@ version = "0.27.0"
 dependencies = [
  "askama",
  "brotli",
+ "build_html",
  "cached",
  "clap",
  "cookie",

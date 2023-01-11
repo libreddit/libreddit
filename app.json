@@ -43,6 +43,12 @@
     },
     "LIBREDDIT_SFW_ONLY": {
       "required": false
+    },
+    "LIBREDDIT_DEFAULT_HIDE_AWARDS": {
+      "required": false
+    }
+    "LIBREDDIT_BANNER": {
+      "required": false
     }
   }
 }

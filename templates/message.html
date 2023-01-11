@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block sortstyle %}{% endblock %}
+{% block content %}
+	<div id="message">
+		<h1>{{ title }}</h1>
+		<br>
+		{{ body|safe }}
+	</div>
+{% endblock %}
