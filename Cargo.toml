@@ -10,7 +10,7 @@ edition = "2021"
 [dependencies]
 askama = { version = "0.11.1", default-features = false }
 cached = "0.40.0"
-clap = { version = "4.0.24", default-features = false, features = ["std"] }
+clap = { version = "4.0.24", default-features = false, features = ["std", "env"] }
 regex = "1.7.0"
 serde = { version = "1.0.147", features = ["derive"] }
 cookie = "0.16.1"
