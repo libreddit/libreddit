@@ -11,3 +11,8 @@
 	--highlighted: #fbf1c7;
 	--shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
 }
+
+html:has(> .gruvboxlight) {
+	/* Hint color theme to browser for scrollbar */
+	color-scheme: light;
+}
