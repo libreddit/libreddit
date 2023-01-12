@@ -20,7 +20,7 @@ hyper-rustls = "0.23.0"
 percent-encoding = "2.2.0"
 route-recognizer = "0.3.1"
 serde_json = "1.0.87"
-tokio = { version = "1.21.2", features = ["full"] }
+tokio = { version = "1.23.1", features = ["full"] }
 time = "0.3.17"
 url = "2.3.1"
 rust-embed = { version = "6.4.2", features = ["include-exclude"] }
