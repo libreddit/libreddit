@@ -79,6 +79,11 @@
 				<input type="hidden" value="off" name="hide_hls_notification">
 				<input type="checkbox" name="hide_hls_notification" {% if prefs.hide_hls_notification == "on" %}checked{% endif %}>
 			</div>
+			<div id="disable_visit_reddit_confirmation">
+				<label for="disable_visit_reddit_confirmation">Do not confirm before visiting content on Reddit</label>
+				<input type="hidden" value="off" name="disable_visit_reddit_confirmation">
+				<input type="checkbox" name="disable_visit_reddit_confirmation" {% if prefs.disable_visit_reddit_confirmation == "on" %}checked{% endif %}>
+			</div>
 			<input id="save" type="submit" value="Save">
 		</div>
 	</form>
