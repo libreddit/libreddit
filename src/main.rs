@@ -295,8 +295,8 @@ async fn main() {
 	app.at("/about").get(|req| error(req, "About pages aren't added yet".to_string()).boxed());
 
 	// Instance info page
-	app.at("/instance-info").get(|r| instance_info::instance_info(r).boxed());
-	app.at("/instance-info.:extension").get(|r| instance_info::instance_info(r).boxed());
+	app.at("/info").get(|r| instance_info::instance_info(r).boxed());
+	app.at("/info.:extension").get(|r| instance_info::instance_info(r).boxed());
 
 	app.at("/:id").get(|req: Request<Body>| {
 		Box::pin(async move {

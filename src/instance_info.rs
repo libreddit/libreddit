@@ -1,7 +1,7 @@
 use crate::{
 	config::{Config, CONFIG},
 	server::RequestExt,
-	utils::Preferences,
+	utils::{ErrorTemplate, Preferences},
 };
 use askama::Template;
 use build_html::{Container, Html, HtmlContainer, Table};
@@ -21,10 +21,20 @@ pub async fn instance_info(req: Request<Body>) -> Result<Response<Body>, String>
 	// simply become the last option, an HTML page.
 	let extension = req.param("extension").unwrap_or(String::new());
 	let response = match extension.as_str() {
-		"yaml" => info_yaml(),
+		"yaml" | "yml" => info_yaml(),
 		"txt" => info_txt(),
 		"json" => info_json(),
-		"html" | _ => info_html(req),
+		"html" | "" => info_html(req),
+		_ => {
+			let error = ErrorTemplate {
+				msg: "Error: Invalid info extension".into(),
+				prefs: Preferences::new(&req),
+				url: req.uri().to_string(),
+			}
+			.render()
+			.unwrap();
+			Response::builder().status(404).header("content-type", "text/html; charset=utf-8").body(error.into())
+		}
 	};
 	response.map_err(|err| format!("{err}"))
 }
@@ -83,31 +93,41 @@ impl InstanceInfo {
 	}
 	fn to_table(&self) -> String {
 		let mut container = Container::default();
-		let convert = |o: &Option<String>| -> String { o.clone().unwrap_or("Unset".to_owned()) };
-		container.add_header(3, "Instance banner");
+		let convert = |o: &Option<String>| -> String { o.clone().unwrap_or("<span class=\"unset\"><i>Unset</i></span>".to_owned()) };
+		if let Some(banner) = &self.config.banner {
+			container.add_header(3, "Instance banner");
+			container.add_raw("<br />");
+			container.add_paragraph(banner);
+			container.add_raw("<br />");
+		}
+		container.add_table(
+			Table::from([
+				["Crate version", &self.crate_version],
+				["Git commit", &self.git_commit],
+				["Deploy date", &self.deploy_date],
+				["Deploy timestamp", &self.deploy_unix_ts.to_string()],
+				["Compile mode", &self.compile_mode],
+			])
+			.with_header_row(["Settings"]),
+		);
 		container.add_raw("<br />");
-		container.add_paragraph(convert(&self.config.banner));
-		container.add_raw("<br />");
-		container.add_table(Table::from([
-			["Crate version", &self.crate_version],
-			["Git commit", &self.git_commit],
-			["Deploy date", &self.deploy_date],
-			["Deploy timestamp", &self.deploy_unix_ts.to_string()],
-			["Compile mode", &self.compile_mode],
-			["<b>Settings</b>", "<b>Settings</b>"],
-			["SFW only", &convert(&self.config.sfw_only)],
-			["Hide awards", &convert(&self.config.default_hide_awards)],
-			["Default theme", &convert(&self.config.default_theme)],
-			["Default front page", &convert(&self.config.default_front_page)],
-			["Default layout", &convert(&self.config.default_layout)],
-			["Default wide", &convert(&self.config.default_wide)],
-			["Default comment sort", &convert(&self.config.default_comment_sort)],
-			["Default post sort", &convert(&self.config.default_post_sort)],
-			["Default show NSFW", &convert(&self.config.default_show_nsfw)],
-			["Default blur NSFW", &convert(&self.config.default_blur_nsfw)],
-			["Default use HLS", &convert(&self.config.default_use_hls)],
-			["Default hide HLS notification", &convert(&self.config.default_hide_hls_notification)],
-		]));
+		container.add_table(
+			Table::from([
+				["SFW only", &convert(&self.config.sfw_only)],
+				["Hide awards", &convert(&self.config.default_hide_awards)],
+				["Default theme", &convert(&self.config.default_theme)],
+				["Default front page", &convert(&self.config.default_front_page)],
+				["Default layout", &convert(&self.config.default_layout)],
+				["Default wide", &convert(&self.config.default_wide)],
+				["Default comment sort", &convert(&self.config.default_comment_sort)],
+				["Default post sort", &convert(&self.config.default_post_sort)],
+				["Default show NSFW", &convert(&self.config.default_show_nsfw)],
+				["Default blur NSFW", &convert(&self.config.default_blur_nsfw)],
+				["Default use HLS", &convert(&self.config.default_use_hls)],
+				["Default hide HLS notification", &convert(&self.config.default_hide_hls_notification)],
+			])
+			.with_header_row(["Default preferences"]),
+		);
 		container.to_html_string()
 	}
 	fn to_string(&self, string_type: StringType) -> String {
