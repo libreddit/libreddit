@@ -824,6 +824,17 @@ a.search_subreddit:hover {
 	font-weight: bold;
 }
 
+#comment_count {
+	font-weight: 500;
+	opacity: 0.9;
+}
+
+#comment_count > #sorted_by {
+	font-weight: normal;
+	opacity: 0.7;
+	margin-right: 7px;
+}
+
 #post_links {
 	display: flex;
 	list-style: none;
