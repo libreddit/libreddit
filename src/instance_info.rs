@@ -40,21 +40,35 @@ pub async fn instance_info(req: Request<Body>) -> Result<Response<Body>, String>
 }
 
 fn info_json() -> Result<Response<Body>, Error> {
-	let body = serde_json::to_string(&*INSTANCE_INFO).unwrap_or("Error serializing JSON.".into());
-	Response::builder().status(200).header("content-type", "application/json").body(body.into())
+	if let Ok(body) = serde_json::to_string(&*INSTANCE_INFO) {
+		Response::builder().status(200).header("content-type", "application/json").body(body.into())
+	} else {
+		Response::builder()
+			.status(500)
+			.header("content-type", "text/plain")
+			.body(Body::from("Error serializing JSON"))
+	}
 }
 
 fn info_yaml() -> Result<Response<Body>, Error> {
-	let body = serde_yaml::to_string(&*INSTANCE_INFO).unwrap_or("Error serializing YAML.".into());
-	// https://github.com/ietf-wg-httpapi/mediatypes/blob/main/draft-ietf-httpapi-yaml-mediatypes.md
-	Response::builder().status(200).header("content-type", "application/yaml").body(body.into())
+	if let Ok(body) = serde_yaml::to_string(&*INSTANCE_INFO) {
+		// We can use `application/yaml` as media type, though there is no guarantee
+		// that browsers will honor it. But we'll do it anyway. See:
+		// https://github.com/ietf-wg-httpapi/mediatypes/blob/main/draft-ietf-httpapi-yaml-mediatypes.md#media-type-applicationyaml-application-yaml
+		Response::builder().status(200).header("content-type", "application/yaml").body(body.into())
+	} else {
+		Response::builder()
+			.status(500)
+			.header("content-type", "text/plain")
+			.body(Body::from("Error serializing YAML."))
+	}
 }
 
 fn info_txt() -> Result<Response<Body>, Error> {
 	Response::builder()
 		.status(200)
 		.header("content-type", "text/plain")
-		.body(INSTANCE_INFO.to_string(StringType::Raw).into())
+		.body(Body::from(INSTANCE_INFO.to_string(StringType::Raw)))
 }
 fn info_html(req: Request<Body>) -> Result<Response<Body>, Error> {
 	let message = MessageTemplate {
@@ -65,7 +79,7 @@ fn info_html(req: Request<Body>) -> Result<Response<Body>, Error> {
 	}
 	.render()
 	.unwrap();
-	Response::builder().status(200).header("content-type", "text/html; charset=utf8").body(message.into())
+	Response::builder().status(200).header("content-type", "text/html; charset=utf8").body(Body::from(message))
 }
 #[derive(Serialize, Deserialize, Default)]
 pub(crate) struct InstanceInfo {
@@ -107,28 +121,28 @@ impl InstanceInfo {
 				["Deploy date", &self.deploy_date],
 				["Deploy timestamp", &self.deploy_unix_ts.to_string()],
 				["Compile mode", &self.compile_mode],
+				["SFW only", &convert(&self.config.sfw_only)],
 			])
 			.with_header_row(["Settings"]),
 		);
 		container.add_raw("<br />");
 		container.add_table(
 			Table::from([
-				["SFW only", &convert(&self.config.sfw_only)],
 				["Hide awards", &convert(&self.config.default_hide_awards)],
-				["Default theme", &convert(&self.config.default_theme)],
-				["Default front page", &convert(&self.config.default_front_page)],
-				["Default layout", &convert(&self.config.default_layout)],
-				["Default wide", &convert(&self.config.default_wide)],
-				["Default comment sort", &convert(&self.config.default_comment_sort)],
-				["Default post sort", &convert(&self.config.default_post_sort)],
-				["Default show NSFW", &convert(&self.config.default_show_nsfw)],
-				["Default blur NSFW", &convert(&self.config.default_blur_nsfw)],
-				["Default use HLS", &convert(&self.config.default_use_hls)],
-				["Default hide HLS notification", &convert(&self.config.default_hide_hls_notification)],
+				["Theme", &convert(&self.config.default_theme)],
+				["Front page", &convert(&self.config.default_front_page)],
+				["Layout", &convert(&self.config.default_layout)],
+				["Wide", &convert(&self.config.default_wide)],
+				["Comment sort", &convert(&self.config.default_comment_sort)],
+				["Post sort", &convert(&self.config.default_post_sort)],
+				["Show NSFW", &convert(&self.config.default_show_nsfw)],
+				["Blur NSFW", &convert(&self.config.default_blur_nsfw)],
+				["Use HLS", &convert(&self.config.default_use_hls)],
+				["Hide HLS notification", &convert(&self.config.default_hide_hls_notification)],
 			])
 			.with_header_row(["Default preferences"]),
 		);
-		container.to_html_string()
+		container.to_html_string().replace("<th>", "<th colspan=\"2\">")
 	}
 	fn to_string(&self, string_type: StringType) -> String {
 		match string_type {
