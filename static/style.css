@@ -26,6 +26,9 @@
 	--highlighted: #333;
 	--visited: #aaa;
 	--shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+
+	/* Hint color theme to browser for scrollbar */
+	color-scheme: dark;
 }
 
 /* Browser-defined light theme */
@@ -42,6 +45,9 @@
 		--highlighted: white;
 		--visited: #555;
 		--shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+		/* Hint color theme to browser for scrollbar */
+		color-scheme: light;
 	}
 }
 
@@ -161,20 +167,40 @@ main {
 }
 
 #column_one {
+	width: 100%;
 	max-width: 750px;
 	border-radius: 5px;
 	overflow: inherit;
 }
 
-footer {
+/* Body footer. */
+body > footer {
+	display: flex;
+	justify-content: center;
+	margin: 20px;
+}
+
+body > footer > div#sfw-only {
+	color: var(--green);
+	border: 1px solid var(--green);
+	padding: 5px;
+	box-sizing: border-box;
+	border-radius: 5px;
+}
+/* / Body footer. */
+
+/* Footer in content block. */
+main > * > footer {
 	display: flex;
 	justify-content: center;
 	margin-top: 20px;
 }
 
-footer > a {
+main > * > footer > a {
 	margin-right: 5px;
 }
+
+/* / Footer in content block. */
 
 button {
 	background: none;
@@ -487,7 +513,11 @@ button.submit:hover > svg { stroke: var(--accent); }
 	margin-bottom: 20px;
 }
 
-#sort_options, #listing_options, footer > a {
+#listing_options {
+	overflow-x: auto;
+}
+
+#sort_options, #listing_options, main > * > footer > a {
 	border-radius: 5px;
 	align-items: center;
 	box-shadow: var(--shadow);
@@ -496,7 +526,7 @@ button.submit:hover > svg { stroke: var(--accent); }
 	overflow: hidden;
 }
 
-#sort_options > a, #listing_options > a, footer > a {
+#sort_options > a, #listing_options > a, main > * > footer > a {
 	color: var(--text);
 	padding: 10px 20px;
 	text-align: center;
@@ -719,22 +749,39 @@ a.search_subreddit:hover {
 	font-weight: bold;
 }
 
-.post_media_image, .post .__NoScript_PlaceHolder__, .post_media_video, .gallery {
+.post_media_content, .post .__NoScript_PlaceHolder__, .gallery {
 	max-width: calc(100% - 40px);
 	grid-area: post_media;
 	margin: 15px auto 5px auto;
+	width: auto;
 	height: auto;
+	overflow: hidden;
 }
 
-
-.post_media_video.short {
-	max-height: 512px;
+.post_media_video {
 	width: auto;
+	height: auto;
+	max-width: 100%;
+	max-height: 512px;
+	display: block;
+	margin: auto;
 }
 
 .post_media_image.short svg, .post_media_image.short img{
-	max-height: 512px;
 	width: auto;
+	height: auto;
+	max-width: 100%;
+	max-height: 512px;
+	display: block;
+	margin: auto;
+}
+
+.post_nsfw_blur {
+	filter: blur(1.5rem);
+}
+
+.post_nsfw_blur:hover {
+	filter: none;
 }
 
 .post_media_image svg{
@@ -809,6 +856,17 @@ a.search_subreddit:hover {
 	font-weight: bold;
 }
 
+#comment_count {
+	font-weight: 500;
+	opacity: 0.9;
+}
+
+#comment_count > #sorted_by {
+	font-weight: normal;
+	opacity: 0.7;
+	margin-right: 7px;
+}
+
 #post_links {
 	display: flex;
 	list-style: none;
@@ -818,6 +876,16 @@ a.search_subreddit:hover {
 
 #post_links > li {
 	margin-right: 15px;
+}
+
+#post_links > li.desktop_item {
+	display: auto;
+}
+
+@media screen and (min-width: 480px) {
+	#post_links > li.mobile_item {
+			display: none;
+	}
 }
 
 .post_thumbnail {
@@ -830,13 +898,25 @@ a.search_subreddit:hover {
 	margin: 5px;
 }
 
-.post_thumbnail svg {
+.post_thumbnail div {
 	grid-area: 1 / 1 / 2 / 2;
-	width: 100%;
-	height: auto;
 	object-fit: cover;
 	align-self: center;
 	justify-self: center;
+	overflow: hidden;
+}
+
+.post_thumbnail div svg {
+	width: 100%;
+	height: auto;
+}
+
+.post_thumbnail span {
+	z-index: 0;
+}
+
+.thumb_nsfw_blur {
+	filter: blur(0.3rem)
 }
 
 .post_thumbnail.no_thumbnail {
@@ -1081,22 +1161,16 @@ summary.comment_data {
 }
 
 .prefs {
-	display: flex;
-	flex-direction: column;
-	justify-content: space-between;
-	padding: 20px;
+	padding: 10px 20px 20px;
 	background: var(--post);
 	border-radius: 5px;
 	margin-bottom: 20px;
 }
 
-.prefs > div {
-	display: flex;
-	justify-content: space-between;
-	width: 100%;
-	height: 35px;
-	align-items: center;
-	margin-top: 7px;
+.prefs fieldset {
+	border: 0;
+	padding: 10px 0;
+	margin: 0 0 5px;
 }
 
 .prefs legend {
@@ -1104,11 +1178,25 @@ summary.comment_data {
 	border-bottom: 1px solid var(--highlighted);
 	font-size: 18px;
 	padding-bottom: 10px;
+	margin-bottom: 7px;
+	width: 100%;
+	float: left; /* places the legend inside the (invisible) border, instead of vertically centered on top border*/
 }
 
-.prefs legend:not(:first-child) {
-	padding-top: 10px;
-	margin-top: 15px;
+.prefs-group {
+	display: flex;
+	width: 100%;
+	height: 35px;
+	align-items: center;
+	margin-top: 7px;
+}
+
+.prefs-group > *:not(:last-child) {
+	margin-right: 1ch;
+}
+
+.prefs-group > *:last-child {
+	margin-left: auto;
 }
 
 .prefs select {
@@ -1126,7 +1214,8 @@ aside.prefs {
 	background: var(--highlighted);
 	padding: 10px 15px;
 	border-radius: 5px;
-	margin-top: 20px;
+	margin-top: 5px;
+	width: 100%
 }
 
 input[type="submit"] {
@@ -1185,14 +1274,19 @@ input[type="submit"] {
 	color: var(--accent);
 }
 
-.md .md-spoiler-text {
+.md .md-spoiler-text, .md-spoiler-text a {
 	background: var(--highlighted);
 	color: transparent;
 }
 
-.md .md-spoiler-text:hover {
+.md-spoiler-text:hover {
 	background: var(--foreground);
 	color: var(--text);
+}
+
+.md-spoiler-text:hover a {
+	background: var(--foreground);
+	color: var(--accent);
 }
 
 .md li { margin: 10px 0; }
@@ -1240,6 +1334,54 @@ td, th {
 #error h1 { margin-bottom: 10px; }
 #error h3 { opacity: 0.85; }
 #error a { color: var(--accent); }
+
+/* Messages */
+
+#duplicates_msg h3 {
+	display: inline-block;
+	margin-top: 10px;
+	margin-bottom: 10px;
+	text-align: center;
+	width: 100%;
+}
+
+/* Warnings */
+
+.listing_warn {
+	display: inline-block;
+	margin: 10px;
+	text-align: center;
+	width: 100%;
+}
+
+.listing_warn a {
+	color: var(--accent);
+}
+
+/* NSFW Landing Page */
+
+#nsfw_landing {
+	display: inline-block;
+	text-align: center;
+	width: 100%;
+}
+
+#nsfw_landing h1 {
+	display: inline-block;
+	margin-bottom: 20px;
+	text-align: center;
+	width: 100%;
+}
+
+#nsfw_landing p {
+	display: inline-block;
+	text-align: center;
+	width: 100%;
+}
+
+#nsfw_landing a {
+	color: var(--accent);
+}
 
 /* Mobile */
 
@@ -1341,4 +1483,9 @@ td, th {
 		padding: 7px 0px;
 		margin-right: -5px;
 	}
+
+	#post_links > li { margin-right: 10px }
+	#post_links > li.desktop_item { display: none }
+	#post_links > li.mobile_item { display: auto }
+	.post_footer > p > span#upvoted { display: none }
 }

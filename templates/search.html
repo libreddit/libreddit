@@ -10,7 +10,7 @@
 {% block content %}
 	<div id="column_one">
 		<form id="search_sort">
-			<input id="search" type="text" name="q" placeholder="Search" value="{{ params.q }}" title="Search libreddit">
+			<input id="search" type="text" name="q" placeholder="Search" value="{{ params.q|safe }}" title="Search libreddit">
 			{% if sub != "" %}
 			<div id="inside">
 				<input type="checkbox" name="restrict_sr" id="restrict_sr" {% if params.restrict_sr != "" %}checked{% endif %}>
@@ -56,10 +56,19 @@
 		</div>
 		{% endif %}
 		{% endif %}
+
+		{% if all_posts_hidden_nsfw %}
+		<span class="listing_warn">All posts are hidden because they are NSFW. Enable "Show NSFW posts" in settings to view.</span>
+		{% endif %}
+
+		{% if no_posts %}
+			<center>No posts were found.</center>
+		{% endif %}
+
 		{% if all_posts_filtered %}
-			<center>(All content on this page has been filtered)</center>
+			<span class="listing_warn">(All content on this page has been filtered)</span>
 		{% else if is_filtered %}
-			<center>(Content from r/{{ sub }} has been filtered)</center>
+			<span class="listing_warn">(Content from r/{{ sub }} has been filtered)</span>
 		{% else if params.typed != "sr_user" %}
 			{% for post in posts %}
 				{% if post.flags.nsfw && prefs.show_nsfw != "on" %}

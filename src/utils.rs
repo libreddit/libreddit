@@ -9,9 +9,35 @@ use regex::Regex;
 use rust_embed::RustEmbed;
 use serde_json::Value;
 use std::collections::{HashMap, HashSet};
+use std::env;
 use std::str::FromStr;
 use time::{macros::format_description, Duration, OffsetDateTime};
 use url::Url;
+
+/// Write a message to stderr on debug mode. This function is a no-op on
+/// release code.
+#[macro_export]
+macro_rules! dbg_msg {
+	($x:expr) => {
+		#[cfg(debug_assertions)]
+		eprintln!("{}:{}: {}", file!(), line!(), $x.to_string())
+	};
+
+	($($x:expr),+) => {
+		#[cfg(debug_assertions)]
+		dbg_msg!(format!($($x),+))
+	};
+}
+
+/// Identifies whether or not the page is a subreddit, a user page, or a post.
+/// This is used by the NSFW landing template to determine the mesage to convey
+/// to the user.
+#[derive(PartialEq, Eq)]
+pub enum ResourceType {
+	Subreddit,
+	User,
+	Post,
+}
 
 // Post flair with content, background color and foreground color
 pub struct Flair {
@@ -210,9 +236,11 @@ pub struct Post {
 	pub domain: String,
 	pub rel_time: String,
 	pub created: String,
+	pub num_duplicates: u64,
 	pub comments: (String, String),
 	pub gallery: Vec<GalleryMedia>,
 	pub awards: Awards,
+	pub nsfw: bool,
 }
 
 impl Post {
@@ -304,14 +332,16 @@ impl Post {
 				},
 				flags: Flags {
 					nsfw: data["over_18"].as_bool().unwrap_or_default(),
-					stickied: data["stickied"].as_bool().unwrap_or_default(),
+					stickied: data["stickied"].as_bool().unwrap_or_default() || data["pinned"].as_bool().unwrap_or_default(),
 				},
 				permalink: val(post, "permalink"),
 				rel_time,
 				created,
+				num_duplicates: post["data"]["num_duplicates"].as_u64().unwrap_or(0),
 				comments: format_num(data["num_comments"].as_i64().unwrap_or_default()),
 				gallery,
 				awards,
+				nsfw: post["data"]["over_18"].as_bool().unwrap_or_default(),
 			});
 		}
 
@@ -340,6 +370,7 @@ pub struct Comment {
 	pub awards: Awards,
 	pub collapsed: bool,
 	pub is_filtered: bool,
+	pub prefs: Preferences,
 }
 
 #[derive(Default, Clone)]
@@ -403,6 +434,27 @@ pub struct ErrorTemplate {
 	pub url: String,
 }
 
+/// Template for NSFW landing page. The landing page is displayed when a page's
+/// content is wholly NSFW, but a user has not enabled the option to view NSFW
+/// posts.
+#[derive(Template)]
+#[template(path = "nsfwlanding.html")]
+pub struct NSFWLandingTemplate {
+	/// Identifier for the resource. This is either a subreddit name or a
+	/// username. (In the case of the latter, set is_user to true.)
+	pub res: String,
+
+	/// Identifies whether or not the resource is a subreddit, a user page,
+	/// or a post.
+	pub res_type: ResourceType,
+
+	/// User preferences.
+	pub prefs: Preferences,
+
+	/// Request URL.
+	pub url: String,
+}
+
 #[derive(Default)]
 // User struct containing metadata about user
 pub struct User {
@@ -413,6 +465,7 @@ pub struct User {
 	pub created: String,
 	pub banner: String,
 	pub description: String,
+	pub nsfw: bool,
 }
 
 #[derive(Default)]
@@ -427,6 +480,7 @@ pub struct Subreddit {
 	pub members: (String, String),
 	pub active: (String, String),
 	pub wiki: bool,
+	pub nsfw: bool,
 }
 
 // Parser for query params, used in sorting (eg. /r/rust/?sort=hot)
@@ -447,6 +501,7 @@ pub struct Preferences {
 	pub layout: String,
 	pub wide: String,
 	pub show_nsfw: String,
+	pub blur_nsfw: String,
 	pub hide_hls_notification: String,
 	pub use_hls: String,
 	pub autoplay_videos: String,
@@ -455,6 +510,7 @@ pub struct Preferences {
 	pub post_sort: String,
 	pub subscriptions: Vec<String>,
 	pub filters: Vec<String>,
+	pub hide_awards: String,
 }
 
 #[derive(RustEmbed)]
@@ -464,7 +520,7 @@ pub struct ThemeAssets;
 
 impl Preferences {
 	// Build preferences from cookies
-	pub fn new(req: Request<Body>) -> Self {
+	pub fn new(req: &Request<Body>) -> Self {
 		// Read available theme names from embedded css files.
 		// Always make the default "system" theme available.
 		let mut themes = vec!["system".to_string()];
@@ -479,6 +535,7 @@ impl Preferences {
 			layout: setting(&req, "layout"),
 			wide: setting(&req, "wide"),
 			show_nsfw: setting(&req, "show_nsfw"),
+			blur_nsfw: setting(&req, "blur_nsfw"),
 			use_hls: setting(&req, "use_hls"),
 			hide_hls_notification: setting(&req, "hide_hls_notification"),
 			autoplay_videos: setting(&req, "autoplay_videos"),
@@ -487,6 +544,7 @@ impl Preferences {
 			post_sort: setting(&req, "post_sort"),
 			subscriptions: setting(&req, "subscriptions").split('+').map(String::from).filter(|s| !s.is_empty()).collect(),
 			filters: setting(&req, "filters").split('+').map(String::from).filter(|s| !s.is_empty()).collect(),
+			hide_awards: setting(&req, "hide_awards"),
 		}
 	}
 }
@@ -496,15 +554,111 @@ pub fn get_filters(req: &Request<Body>) -> HashSet<String> {
 	setting(req, "filters").split('+').map(String::from).filter(|s| !s.is_empty()).collect::<HashSet<String>>()
 }
 
-/// Filters a `Vec<Post>` by the given `HashSet` of filters (each filter being a subreddit name or a user name). If a
-/// `Post`'s subreddit or author is found in the filters, it is removed. Returns `true` if _all_ posts were filtered
-/// out, or `false` otherwise.
-pub fn filter_posts(posts: &mut Vec<Post>, filters: &HashSet<String>) -> bool {
+/// Filters a `Vec<Post>` by the given `HashSet` of filters (each filter being
+/// a subreddit name or a user name). If a `Post`'s subreddit or author is
+/// found in the filters, it is removed.
+///
+/// The first value of the return tuple is the number of posts filtered. The
+/// second return value is `true` if all posts were filtered.
+pub fn filter_posts(posts: &mut Vec<Post>, filters: &HashSet<String>) -> (u64, bool) {
+	// This is the length of the Vec<Post> prior to applying the filter.
+	let lb: u64 = posts.len().try_into().unwrap_or(0);
+
 	if posts.is_empty() {
-		false
+		(0, false)
 	} else {
-		posts.retain(|p| !filters.contains(&p.community) && !filters.contains(&["u_", &p.author.name].concat()));
-		posts.is_empty()
+		posts.retain(|p| !(filters.contains(&p.community) || filters.contains(&["u_", &p.author.name].concat())));
+
+		// Get the length of the Vec<Post> after applying the filter.
+		// If lb > la, then at least one post was removed.
+		let la: u64 = posts.len().try_into().unwrap_or(0);
+
+		(lb - la, posts.is_empty())
+	}
+}
+
+/// Creates a [`Post`] from a provided JSON.
+pub async fn parse_post(post: &serde_json::Value) -> Post {
+	// Grab UTC time as unix timestamp
+	let (rel_time, created) = time(post["data"]["created_utc"].as_f64().unwrap_or_default());
+	// Parse post score and upvote ratio
+	let score = post["data"]["score"].as_i64().unwrap_or_default();
+	let ratio: f64 = post["data"]["upvote_ratio"].as_f64().unwrap_or(1.0) * 100.0;
+
+	// Determine the type of media along with the media URL
+	let (post_type, media, gallery) = Media::parse(&post["data"]).await;
+
+	let awards: Awards = Awards::parse(&post["data"]["all_awardings"]);
+
+	let permalink = val(post, "permalink");
+
+	let body = if val(post, "removed_by_category") == "moderator" {
+		format!(
+			"<div class=\"md\"><p>[removed] — <a href=\"https://www.unddit.com{}\">view removed post</a></p></div>",
+			permalink
+		)
+	} else {
+		rewrite_urls(&val(post, "selftext_html"))
+	};
+
+	// Build a post using data parsed from Reddit post API
+	Post {
+		id: val(post, "id"),
+		title: val(post, "title"),
+		community: val(post, "subreddit"),
+		body,
+		author: Author {
+			name: val(post, "author"),
+			flair: Flair {
+				flair_parts: FlairPart::parse(
+					post["data"]["author_flair_type"].as_str().unwrap_or_default(),
+					post["data"]["author_flair_richtext"].as_array(),
+					post["data"]["author_flair_text"].as_str(),
+				),
+				text: val(post, "link_flair_text"),
+				background_color: val(post, "author_flair_background_color"),
+				foreground_color: val(post, "author_flair_text_color"),
+			},
+			distinguished: val(post, "distinguished"),
+		},
+		permalink,
+		score: format_num(score),
+		upvote_ratio: ratio as i64,
+		post_type,
+		media,
+		thumbnail: Media {
+			url: format_url(val(post, "thumbnail").as_str()),
+			alt_url: String::new(),
+			width: post["data"]["thumbnail_width"].as_i64().unwrap_or_default(),
+			height: post["data"]["thumbnail_height"].as_i64().unwrap_or_default(),
+			poster: String::new(),
+		},
+		flair: Flair {
+			flair_parts: FlairPart::parse(
+				post["data"]["link_flair_type"].as_str().unwrap_or_default(),
+				post["data"]["link_flair_richtext"].as_array(),
+				post["data"]["link_flair_text"].as_str(),
+			),
+			text: val(post, "link_flair_text"),
+			background_color: val(post, "link_flair_background_color"),
+			foreground_color: if val(post, "link_flair_text_color") == "dark" {
+				"black".to_string()
+			} else {
+				"white".to_string()
+			},
+		},
+		flags: Flags {
+			nsfw: post["data"]["over_18"].as_bool().unwrap_or_default(),
+			stickied: post["data"]["stickied"].as_bool().unwrap_or_default() || post["data"]["pinned"].as_bool().unwrap_or(false),
+		},
+		domain: val(post, "domain"),
+		rel_time,
+		created,
+		num_duplicates: post["data"]["num_duplicates"].as_u64().unwrap_or(0),
+		comments: format_num(post["data"]["num_comments"].as_i64().unwrap_or_default()),
+		gallery,
+		awards,
+		nsfw: post["data"]["over_18"].as_bool().unwrap_or_default(),
 	}
 }
 
@@ -531,8 +685,8 @@ pub fn setting(req: &Request<Body>, name: &str) -> String {
 	req
 		.cookie(name)
 		.unwrap_or_else(|| {
-			// If there is no cookie for this setting, try receiving a default from an environment variable
-			if let Ok(default) = std::env::var(format!("LIBREDDIT_DEFAULT_{}", name.to_uppercase())) {
+			// If there is no cookie for this setting, try receiving a default from the config
+			if let Some(default) = crate::config::get_setting(&format!("LIBREDDIT_DEFAULT_{}", name.to_uppercase())) {
 				Cookie::new(name, default)
 			} else {
 				Cookie::named(name)
@@ -713,11 +867,12 @@ pub fn redirect(path: String) -> Response<Body> {
 		.unwrap_or_default()
 }
 
-pub async fn error(req: Request<Body>, msg: String) -> Result<Response<Body>, String> {
+/// Renders a generic error landing page.
+pub async fn error(req: Request<Body>, msg: impl ToString) -> Result<Response<Body>, String> {
 	let url = req.uri().to_string();
 	let body = ErrorTemplate {
-		msg,
-		prefs: Preferences::new(req),
+		msg: msg.to_string(),
+		prefs: Preferences::new(&req),
 		url,
 	}
 	.render()
@@ -726,10 +881,54 @@ pub async fn error(req: Request<Body>, msg: String) -> Result<Response<Body>, St
 	Ok(Response::builder().status(404).header("content-type", "text/html").body(body.into()).unwrap_or_default())
 }
 
+/// Returns true if the config/env variable `LIBREDDIT_SFW_ONLY` carries the
+/// value `on`.
+///
+/// If this variable is set as such, the instance will operate in SFW-only
+/// mode; all NSFW content will be filtered. Attempts to access NSFW
+/// subreddits or posts or userpages for users Reddit has deemed NSFW will
+/// be denied.
+pub fn sfw_only() -> bool {
+	match crate::config::get_setting("LIBREDDIT_SFW_ONLY") {
+		Some(val) => val == "on",
+		None => false,
+	}
+}
+
+/// Renders the landing page for NSFW content when the user has not enabled
+/// "show NSFW posts" in settings.
+pub async fn nsfw_landing(req: Request<Body>) -> Result<Response<Body>, String> {
+	let res_type: ResourceType;
+	let url = req.uri().to_string();
+
+	// Determine from the request URL if the resource is a subreddit, a user
+	// page, or a post.
+	let res: String = if !req.param("name").unwrap_or_default().is_empty() {
+		res_type = ResourceType::User;
+		req.param("name").unwrap_or_default()
+	} else if !req.param("id").unwrap_or_default().is_empty() {
+		res_type = ResourceType::Post;
+		req.param("id").unwrap_or_default()
+	} else {
+		res_type = ResourceType::Subreddit;
+		req.param("sub").unwrap_or_default()
+	};
+
+	let body = NSFWLandingTemplate {
+		res,
+		res_type,
+		prefs: Preferences::new(&req),
+		url,
+	}
+	.render()
+	.unwrap_or_default();
+
+	Ok(Response::builder().status(403).header("content-type", "text/html").body(body.into()).unwrap_or_default())
+}
+
 #[cfg(test)]
 mod tests {
-	use super::format_num;
-	use super::rewrite_urls;
+	use super::{format_num, format_url, rewrite_urls};
 
 	#[test]
 	fn format_num_works() {
@@ -748,5 +947,34 @@ mod tests {
 			rewrite_urls(comment_body_html),
 			r#"<a href="https://www.reddit.com/r/linux_gaming/comments/x/just_a_test/">https://www.reddit.com/r/linux_gaming/comments/x/just_a_test/</a>"#
 		)
+	}
+
+	#[test]
+	fn test_format_url() {
+		assert_eq!(format_url("https://a.thumbs.redditmedia.com/XYZ.jpg"), "/thumb/a/XYZ.jpg");
+		assert_eq!(format_url("https://emoji.redditmedia.com/a/b"), "/emoji/a/b");
+
+		assert_eq!(
+			format_url("https://external-preview.redd.it/foo.jpg?auto=webp&s=bar"),
+			"/preview/external-pre/foo.jpg?auto=webp&s=bar"
+		);
+
+		assert_eq!(format_url("https://i.redd.it/foobar.jpg"), "/img/foobar.jpg");
+		assert_eq!(
+			format_url("https://preview.redd.it/qwerty.jpg?auto=webp&s=asdf"),
+			"/preview/pre/qwerty.jpg?auto=webp&s=asdf"
+		);
+		assert_eq!(format_url("https://v.redd.it/foo/DASH_360.mp4?source=fallback"), "/vid/foo/360.mp4");
+		assert_eq!(
+			format_url("https://v.redd.it/foo/HLSPlaylist.m3u8?a=bar&v=1&f=sd"),
+			"/hls/foo/HLSPlaylist.m3u8?a=bar&v=1&f=sd"
+		);
+		assert_eq!(format_url("https://www.redditstatic.com/gold/awards/icon/icon.png"), "/static/gold/awards/icon/icon.png");
+
+		assert_eq!(format_url(""), "");
+		assert_eq!(format_url("self"), "");
+		assert_eq!(format_url("default"), "");
+		assert_eq!(format_url("nsfw"), "");
+		assert_eq!(format_url("spoiler"), "");
 	}
 }

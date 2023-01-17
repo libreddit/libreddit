@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% import "utils.html" as utils %}
+
+{% block title %}{{ post.title }} - r/{{ post.community }}{% endblock %}
+
+{% block search %}
+	{% call utils::search(["/r/", post.community.as_str()].concat(), "") %}
+{% endblock %}
+
+{% block root %}/r/{{ post.community }}{% endblock %}{% block location %}r/{{ post.community }}{% endblock %}
+{% block head %}
+	{% call super() %}
+{% endblock %}
+
+{% block subscriptions %}
+	{% call utils::sub_list(post.community.as_str()) %}
+{% endblock %}
+
+{% block content %}
+    <div id="column_one">
+		{% call utils::post(post) %}
+
+        <!-- DUPLICATES -->
+        {% if post.num_duplicates == 0 %}
+            <span class="listing_warn">(No duplicates found)</span>
+        {% else if post.flags.nsfw && prefs.show_nsfw != "on" %}
+            <span class="listing_warn">(Enable "Show NSFW posts" in <a href="/settings">settings</a> to show duplicates)</span>
+        {% else %}
+            <div id="duplicates_msg"><h3>Duplicates</h3></div>
+            {% if num_posts_filtered > 0 %}
+            <span class="listing_warn">
+                {% if all_posts_filtered %}
+                    (All posts have been filtered)
+                {% else %}
+                    (Some posts have been filtered)
+                {% endif %}
+            </span>
+            {% endif %}
+
+            <div id="sort">
+                <div id="sort_options">
+                    <a {% if params.sort.is_empty() || params.sort.eq("num_comments") %}class="selected"{% endif %} href="?sort=num_comments">
+                        Number of comments
+                    </a>
+                    <a {% if params.sort.eq("new") %}class="selected"{% endif %} href="?sort=new">
+                        New
+                    </a>
+                </div>
+            </div>
+
+            <div id="posts">
+            {% for post in duplicates -%}
+                {# TODO: utils::post should be reworked to permit a truncated display of a post as below #}
+                {% if !(post.flags.nsfw) || prefs.show_nsfw == "on" %}
+                <div class="post {% if post.flags.stickied %}stickied{% endif %}" id="{{ post.id }}">
+                        <p class="post_header">
+                            {% let community -%}
+                            {% if post.community.starts_with("u_") -%}
+                                {% let community = format!("u/{}", &post.community[2..]) -%}
+                            {% else -%}
+                                {% let community = format!("r/{}", post.community) -%}
+                            {% endif -%}
+                            <a class="post_subreddit" href="/r/{{ post.community }}">{{ post.community }}</a>
+                            <span class="dot">&bull;</span>
+                            <a class="post_author {{ post.author.distinguished }}" href="/u/{{ post.author.name }}">u/{{ post.author.name }}</a>
+                            <span class="dot">&bull;</span>
+                            <span class="created" title="{{ post.created }}">{{ post.rel_time }}</span>
+                            {% if !post.awards.is_empty() && prefs.hide_awards != "on" %}
+                                {% for award in post.awards.clone() %}
+                                <span class="award" title="{{ award.name }}">
+                                    <img alt="{{ award.name }}" src="{{ award.icon_url }}" width="16" height="16"/>
+                                </span>
+                                {% endfor %}
+                            {% endif %}
+                        </p>
+                        <h2 class="post_title">
+                            {% if post.flair.flair_parts.len() > 0 %}
+                                <a href="/r/{{ post.community }}/search?q=flair_name%3A%22{{ post.flair.text }}%22&restrict_sr=on"
+                                    class="post_flair"
+                                    style="color:{{ post.flair.foreground_color }}; background:{{ post.flair.background_color }};"
+                                    dir="ltr">{% call utils::render_flair(post.flair.flair_parts) %}</a>
+                            {% endif %}
+                            <a href="{{ post.permalink }}">{{ post.title }}</a>{% if post.flags.nsfw %} <small class="nsfw">NSFW</small>{% endif %}
+                        </h2>
+
+                        <div class="post_score" title="{{ post.score.1 }}">{{ post.score.0 }}<span class="label"> Upvotes</span></div>
+                        <div class="post_footer">
+                            <a href="{{ post.permalink }}" class="post_comments" title="{{ post.comments.1 }} comments">{{ post.comments.0 }} comments</a>
+                        </div>
+
+                </div>
+                {% endif %}
+            {%- endfor %}
+            </div>
+
+            <footer>
+                {% if params.before != "" %}
+                <a href="?before={{ params.before }}{% if !params.sort.is_empty() %}&sort={{ params.sort }}{% endif %}" accesskey="P">PREV</a>
+                {% endif %}
+
+                {% if params.after != "" %}
+                <a href="?after={{ params.after }}{% if !params.sort.is_empty() %}&sort={{ params.sort }}{% endif %}" accesskey="N">NEXT</a>
+                {% endif %}
+            </footer>
+        {% endif %}
+    </div>
+{% endblock %}

@@ -29,91 +29,17 @@ I appreciate any donations! Your support allows me to continue developing Libred
 
 # Instances
 
-Feel free to [open an issue](https://github.com/spikecodes/libreddit/issues/new) to have your [selfhosted instance](#deployment) listed here!
-
 🔗 **Want to automatically redirect Reddit links to Libreddit? Use [LibRedirect](https://github.com/libredirect/libredirect) or [Privacy Redirect](https://github.com/SimonBrazell/privacy-redirect)!**
 
-| Website | Country | Cloudflare |
-|-|-|-|
-| [libredd.it](https://libredd.it) (official) | 🇺🇸 US |  |
-| [libreddit.spike.codes](https://libreddit.spike.codes) (official) | 🇺🇸 US |  |
-| [libreddit.dothq.co](https://libreddit.dothq.co) | 🇩🇪 DE | ✅ |
-| [libreddit.kavin.rocks](https://libreddit.kavin.rocks) | 🇮🇳 IN |  |
-| [libreddit.40two.app](https://libreddit.40two.app) | 🇳🇱 NL |  |
-| [reddit.invak.id](https://reddit.invak.id) | 🇧🇬 BG |  |
-| [reddit.phii.me](https://reddit.phii.me) | 🇺🇸 US |  |
-| [lr.riverside.rocks](https://lr.riverside.rocks) | 🇺🇸 US |  |
-| [libreddit.strongthany.cc](https://libreddit.strongthany.cc) | 🇺🇸 US |  |
-| [libreddit.database.red](https://libreddit.database.red) | 🇺🇸 US | ✅ |
-| [libreddit.privacy.com.de](https://libreddit.privacy.com.de) | 🇩🇪 DE |  |
-| [libreddit.domain.glass](https://libreddit.domain.glass) | 🇺🇸 US | ✅ |
-| [libreddit.sugoma.tk](https://libreddit.sugoma.tk) | 🇺🇸 US | |
-| [libreddit.jamiethalacker.dev](https://libreddit.jamiethalacker.dev) | 🇺🇸 US | ✅ |
-| [reddit.artemislena.eu](https://reddit.artemislena.eu) | 🇩🇪 DE |  |
-| [r.nf](https://r.nf) | 🇩🇪 DE | ✅ |
-| [libreddit.awesomehub.io](https://libreddit.awesomehub.io) | 🇫🇮 FI |  |
-| [libreddit.some-things.org](https://libreddit.some-things.org) | 🇨🇭 CH |  |
-| [reddit.stuehieyr.com](https://reddit.stuehieyr.com) | 🇩🇪 DE  |  |
-| [lr.mint.lgbt](https://lr.mint.lgbt) | 🇨🇦 CA |  |
-| [libreddit.alefvanoon.xyz](https://libreddit.alefvanoon.xyz) | 🇺🇸 US | ✅ |
-| [libreddit.igna.rocks](https://libreddit.igna.rocks) | 🇺🇸 US | |
-| [libreddit.autarkic.org](https://libreddit.autarkic.org) | 🇺🇸 US | |
-| [libreddit.flux.industries](https://libreddit.flux.industries) | 🇩🇪 DE | ✅ |
-| [libreddit.drivet.xyz](https://libreddit.drivet.xyz) | 🇵🇱 PL |  |
-| [lr.oversold.host](https://lr.oversold.host) | 🇱🇺 LU | |
-| [libreddit.de](https://libreddit.de) | 🇩🇪 DE |  |
-| [libreddit.pussthecat.org](https://libreddit.pussthecat.org) | 🇩🇪 DE |  |
-| [libreddit.mutahar.rocks](https://libreddit.mutahar.rocks) | 🇫🇷 FR |  |
-| [libreddit.northboot.xyz](https://libreddit.northboot.xyz) | 🇩🇪 DE |  |
-| [leddit.xyz](https://leddit.xyz) | 🇺🇸 US |  |
-| [de.leddit.xyz](https://de.leddit.xyz) | 🇩🇪 DE |  |
-| [lr.cowfee.moe](https://lr.cowfee.moe) | 🇺🇸 US |  |
-| [libreddit.hu](https://libreddit.hu) | 🇫🇮 FI | ✅ |
-| [libreddit.totaldarkness.net](https://libreddit.totaldarkness.net) | 🇨🇦 CA |  |
-| [libreddit.esmailelbob.xyz](https://libreddit.esmailelbob.xyz) | 🇨🇦 CA |  |
-| [lr.vern.cc](https://lr.vern.cc) | 🇵🇱 PL |  |
-| [libreddit.nl](https://libreddit.nl) | 🇳🇱 NL |  |
-| [lr.stilic.ml](https://lr.stilic.ml) | 🇫🇷 FR | ✅ |
-| [reddi.tk](https://reddi.tk) | 🇺🇸 US | ✅ |
-| [libreddit.bus-hit.me](https://libreddit.bus-hit.me) | 🇨🇦 CA |  |
-| [libreddit.datatunnel.xyz](https://libreddit.datatunnel.xyz) | 🇫🇮 FI |  |
-| [libreddit.crewz.me](https://libreddit.crewz.me) | 🇳🇱 NL | ✅ |
-| [r.walkx.org](https://r.walkx.org) | 🇳🇱 NL | ✅ |
-| [libreddit.kylrth.com](https://libreddit.kylrth.com) | 🇨🇦 CA |  |
-| [libreddit.yonalee.eu](https://libreddit.yonalee.eu) | 🇱🇺 LU | ✅ |
-| [libreddit.winscloud.net](https://libreddit.winscloud.net) | 🇹🇭 TH | ✅ |
-| [libreddit.tiekoetter.com](https://libreddit.tiekoetter.com) | 🇩🇪 DE |  |
-| [reddit.rtrace.io](https://reddit.rtrace.io) | 🇩🇪 DE |  |
-| [libreddit.lunar.icu](https://libreddit.lunar.icu) | 🇩🇪 DE | ✅ |
-| [libreddit.privacydev.net](https://libreddit.privacydev.net) | 🇺🇸 US |  |
-| [libreddit.notyourcomputer.net](https://libreddit.notyourcomputer.net) | 🇺🇸 US |  |
-| [r.ahwx.org](https://r.ahwx.org) | 🇳🇱 NL | ✅ |
-| [bob.fr.to](https://bob.fr.to) | 🇺🇸 US |  |
-| [reddit.beparanoid.de](https://reddit.beparanoid.de) | 🇨🇭 CH |  |
-| [libreddit.dcs0.hu](https://libreddit.dcs0.hu) | 🇭🇺 HU |  |
-| [reddit.dr460nf1r3.org](https://reddit.dr460nf1r3.org) | 🇩🇪 DE | ✅ |
-| [spjmllawtheisznfs7uryhxumin26ssv2draj7oope3ok3wuhy43eoyd.onion](http://spjmllawtheisznfs7uryhxumin26ssv2draj7oope3ok3wuhy43eoyd.onion) | 🇮🇳 IN |  |
-| [fwhhsbrbltmrct5hshrnqlqygqvcgmnek3cnka55zj4y7nuus5muwyyd.onion](http://fwhhsbrbltmrct5hshrnqlqygqvcgmnek3cnka55zj4y7nuus5muwyyd.onion) | 🇩🇪 DE |  |
-| [kphht2jcflojtqte4b4kyx7p2ahagv4debjj32nre67dxz7y57seqwyd.onion](http://kphht2jcflojtqte4b4kyx7p2ahagv4debjj32nre67dxz7y57seqwyd.onion) | 🇳🇱 NL |  |
-| [inytumdgnri7xsqtvpntjevaelxtgbjqkuqhtf6txxhwbll2fwqtakqd.onion](http://inytumdgnri7xsqtvpntjevaelxtgbjqkuqhtf6txxhwbll2fwqtakqd.onion) | 🇨🇭 CH |  |
-| [liredejj74h5xjqr2dylnl5howb2bpikfowqoveub55ru27x43357iid.onion](http://liredejj74h5xjqr2dylnl5howb2bpikfowqoveub55ru27x43357iid.onion) | 🇩🇪 DE |  |
-| [kzhfp3nvb4qp575vy23ccbrgfocezjtl5dx66uthgrhu7nscu6rcwjyd.onion](http://kzhfp3nvb4qp575vy23ccbrgfocezjtl5dx66uthgrhu7nscu6rcwjyd.onion) | 🇺🇸 US |  |
-| [ecue64ybzvn6vjzl37kcsnwt4ycmbsyf74nbttyg7rkc3t3qwnj7mcyd.onion](http://ecue64ybzvn6vjzl37kcsnwt4ycmbsyf74nbttyg7rkc3t3qwnj7mcyd.onion) | 🇩🇪 DE |  |
-| [ledditqo2mxfvlgobxnlhrkq4dh34jss6evfkdkb2thlvy6dn4f4gpyd.onion](http://ledditqo2mxfvlgobxnlhrkq4dh34jss6evfkdkb2thlvy6dn4f4gpyd.onion) | 🇺🇸 US |  |
-| [libredoxhxwnmsb6dvzzd35hmgzmawsq5i764es7witwhddvpc2razid.onion](http://libredoxhxwnmsb6dvzzd35hmgzmawsq5i764es7witwhddvpc2razid.onion) | 🇺🇸 US |  |
-| [libreddit.2syis2nnyytz6jnusnjurva4swlaizlnleiks5mjp46phuwjbdjqwgqd.onion](http://libreddit.2syis2nnyytz6jnusnjurva4swlaizlnleiks5mjp46phuwjbdjqwgqd.onion) | 🇪🇬 EG |  |
-| [ol5begilptoou34emq2sshf3may3hlblvipdjtybbovpb7c7zodxmtqd.onion](http://ol5begilptoou34emq2sshf3may3hlblvipdjtybbovpb7c7zodxmtqd.onion) | 🇩🇪 DE |  |
-| [lbrdtjaj7567ptdd4rv74lv27qhxfkraabnyphgcvptl64ijx2tijwid.onion](http://lbrdtjaj7567ptdd4rv74lv27qhxfkraabnyphgcvptl64ijx2tijwid.onion) | 🇨🇦 CA |  |
-| [libreddit.lqs5fjmajyp7rvp4qvyubwofzi6d4imua7vs237rkc4m5qogitqwrgyd.onion](http://libreddit.lqs5fjmajyp7rvp4qvyubwofzi6d4imua7vs237rkc4m5qogitqwrgyd.onion) | 🇨🇦 CA |  |
-| [reddit.prnoid54e44a4bduq5due64jkk7wcnkxcp5kv3juncm7veptjcqudgyd.onion](http://reddit.prnoid54e44a4bduq5due64jkk7wcnkxcp5kv3juncm7veptjcqudgyd.onion) | 🇨🇭 CH |  |
+[Follow this link](https://github.com/libreddit/libreddit-instances/blob/master/instances.md) for an up-to-date table of instances in markdown format. This list is also available as [a machine-readable JSON](https://github.com/libreddit/libreddit-instances/blob/master/instances.json).
 
-A checkmark in the "Cloudflare" category here refers to the use of the reverse proxy, [Cloudflare](https://cloudflare.com). The checkmark will not be listed for a site that uses Cloudflare DNS but rather the proxying service which grants Cloudflare the ability to monitor traffic to the website.
+Both files are part of the [libreddit-instances](https://github.com/libreddit/libreddit-instances) repository. To contribute your [self-hosted instance](#deployment) to the list, see the [libreddit-instances README](https://github.com/libreddit/libreddit-instances/blob/master/README.md).
 
 ---
 
 # About
 
-Find Libreddit on 💬 [Matrix](https://matrix.to/#/#libreddit:kde.org), 🐋 [Docker](https://hub.docker.com/r/spikecodes/libreddit), :octocat: [GitHub](https://github.com/spikecodes/libreddit), and 🦊 [GitLab](https://gitlab.com/spikecodes/libreddit).
+Find Libreddit on 💬 [Matrix](https://matrix.to/#/#libreddit:kde.org), 🐋 [Docker](https://hub.docker.com/r/libreddit/libreddit), :octocat: [GitHub](https://github.com/libreddit/libreddit), and 🦊 [GitLab](https://gitlab.com/libreddit/libreddit).
 
 ## Built with
 
@@ -125,7 +51,7 @@ Find Libreddit on 💬 [Matrix](https://matrix.to/#/#libreddit:kde.org), 🐋 [D
 ## Info
 Libreddit hopes to provide an easier way to browse Reddit, without the ads, trackers, and bloat. Libreddit was inspired by other alternative front-ends to popular services such as [Invidious](https://github.com/iv-org/invidious) for YouTube, [Nitter](https://github.com/zedeus/nitter) for Twitter, and [Bibliogram](https://sr.ht/~cadence/bibliogram/) for Instagram.
 
-Libreddit currently implements most of Reddit's (signed-out) functionalities but still lacks [a few features](https://github.com/spikecodes/libreddit/issues).
+Libreddit currently implements most of Reddit's (signed-out) functionalities but still lacks [a few features](https://github.com/libreddit/libreddit/issues).
 
 ## How does it compare to Teddit?
 
@@ -143,15 +69,15 @@ This section outlines how Libreddit compares to Reddit.
 
 ## Speed
 
-Lasted tested Jan 17, 2021.
+Lasted tested Nov 11, 2022.
 
-Results from Google Lighthouse ([Libreddit Report](https://lighthouse-dot-webdotdevsite.appspot.com/lh/html?url=https%3A%2F%2Flibredd.it), [Reddit Report](https://lighthouse-dot-webdotdevsite.appspot.com/lh/html?url=https%3A%2F%2Fwww.reddit.com%2F)).
+Results from Google PageSpeed Insights ([Libreddit Report](https://pagespeed.web.dev/report?url=https%3A%2F%2Flibreddit.spike.codes%2F), [Reddit Report](https://pagespeed.web.dev/report?url=https://www.reddit.com)).
 
-|                        | Libreddit     | Reddit     |
-|------------------------|---------------|------------|
-| Requests               | 20            | 70         |
-| Resource Size (card ui)| 1,224 KiB     | 1,690 KiB  |
-| Time to Interactive    | **1.5 s**     | **11.2 s** |
+|                        | Libreddit   | Reddit    |
+|------------------------|-------------|-----------|
+| Requests               | 60          | 83        |
+| Speed Index            | 2.0s        | 10.4s     |
+| Time to Interactive    | **2.8s**    | **12.4s** |
 
 ## Privacy
 
@@ -210,21 +136,21 @@ cargo install libreddit
 
 ## 2) Docker
 
-Deploy the [Docker image](https://hub.docker.com/r/spikecodes/libreddit) of Libreddit:
+Deploy the [Docker image](https://hub.docker.com/r/libreddit/libreddit) of Libreddit:
 ```
-docker pull spikecodes/libreddit
-docker run -d --name libreddit -p 8080:8080 spikecodes/libreddit
+docker pull libreddit/libreddit
+docker run -d --name libreddit -p 8080:8080 libreddit/libreddit
 ```
 
 Deploy using a different port (in this case, port 80):
 ```
-docker pull spikecodes/libreddit
-docker run -d --name libreddit -p 80:8080 spikecodes/libreddit
+docker pull libreddit/libreddit
+docker run -d --name libreddit -p 80:8080 libreddit/libreddit
 ```
 
-To deploy on `arm64` platforms, simply replace `spikecodes/libreddit` in the commands above with `spikecodes/libreddit:arm`.
+To deploy on `arm64` platforms, simply replace `libreddit/libreddit` in the commands above with `libreddit/libreddit:arm`.
 
-To deploy on `armv7` platforms, simply replace `spikecodes/libreddit` in the commands above with `spikecodes/libreddit:armv7`.
+To deploy on `armv7` platforms, simply replace `libreddit/libreddit` in the commands above with `libreddit/libreddit:armv7`.
 
 ## 3) AUR
 
@@ -236,14 +162,14 @@ yay -S libreddit-git
 
 ## 4) GitHub Releases
 
-If you're on Linux and none of these methods work for you, you can grab a Linux binary from [the newest release](https://github.com/spikecodes/libreddit/releases/latest).
+If you're on Linux and none of these methods work for you, you can grab a Linux binary from [the newest release](https://github.com/libreddit/libreddit/releases/latest).
 
 ## 5) Replit/Heroku/Glitch
 
 **Note:** These are free hosting options but they are *not* private and will monitor server usage to prevent abuse. If you need a free and easy setup, this method may work best for you.
 
-<a href="https://repl.it/github/spikecodes/libreddit"><img src="https://repl.it/badge/github/spikecodes/libreddit" alt="Run on Repl.it" height="32" /></a>
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/spikecodes/libreddit)
+<a href="https://repl.it/github/libreddit/libreddit"><img src="https://repl.it/badge/github/libreddit/libreddit" alt="Run on Repl.it" height="32" /></a>
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/libreddit/libreddit)
 [![Remix on Glitch](https://cdn.glitch.com/2703baf2-b643-4da7-ab91-7ee2a2d00b5b%2Fremix-button-v2.svg)](https://glitch.com/edit/#!/remix/libreddit)
 
 ---
@@ -256,23 +182,39 @@ Once installed, deploy Libreddit to `0.0.0.0:8080` by running:
 libreddit
 ```
 
-## Change Default Settings
+## Instance settings
 
-Assign a default value for each setting by passing environment variables to Libreddit in the format `LIBREDDIT_DEFAULT_{X}`. Replace `{X}` with the setting name (see list below) in capital letters.
+Assign a default value for each instance-specific setting by passing environment variables to Libreddit in the format `LIBREDDIT_{X}`. Replace `{X}` with the setting name (see list below) in capital letters.
+
+|Name|Possible values|Default value|Description|
+|-|-|-|-|
+| `SFW_ONLY` | `["on", "off"]` | `off` | Enables SFW-only mode for the instance, i.e. all NSFW content is filtered. |
+
+## Default User Settings
+
+Assign a default value for each user-modifiable setting by passing environment variables to Libreddit in the format `LIBREDDIT_DEFAULT_{Y}`. Replace `{Y}` with the setting name (see list below) in capital letters.
 
 | Name                    | Possible values                                                                                     | Default value |
 |-------------------------|-----------------------------------------------------------------------------------------------------|---------------|
-| `THEME`                 | `["system", "light", "dark", "black", "dracula", "nord", "laserwave", "violet", "gold", "rosebox"]` | `system`      |
+| `THEME`                 | `["system", "light", "dark", "black", "dracula", "nord", "laserwave", "violet", "gold", "rosebox", "gruvboxdark", "gruvboxlight"]` | `system`      |
 | `FRONT_PAGE`            | `["default", "popular", "all"]`                                                                     | `default`     |
 | `LAYOUT`                | `["card", "clean", "compact"]`                                                                      | `card`        |
 | `WIDE`                  | `["on", "off"]`                                                                                     | `off`         |
-| `COMMENT_SORT`          | `["hot", "new", "top", "rising", "controversial"]`                                                  | `hot`         |
-| `POST_SORT`             | `["confidence", "top", "new", "controversial", "old"]`                                              | `confidence`  |
+| `POST_SORT`             | `["hot", "new", "top", "rising", "controversial"]`                                                  | `hot`         |
+| `COMMENT_SORT`          | `["confidence", "top", "new", "controversial", "old"]`                                              | `confidence`  |
 | `SHOW_NSFW`             | `["on", "off"]`                                                                                     | `off`         |
+| `BLUR_NSFW`             | `["on", "off"]`                                                                                     | `off`         |
 | `USE_HLS`               | `["on", "off"]`                                                                                     | `off`         |
 | `HIDE_HLS_NOTIFICATION` | `["on", "off"]`                                                                                     | `off`         |
 | `AUTOPLAY_VIDEOS`       | `["on", "off"]`                                                                                     | `off`         |
 | `FIXED_NAVBAR`          | `["on", "off"]`                                                                                     | `on`          |
+
+You can also configure Libreddit with a configuration file. An example `libreddit.toml` can be found below:
+
+```toml
+LIBREDDIT_DEFAULT_WIDE = "on"
+LIBREDDIT_DEFAULT_USE_HLS = "on"
+```
 
 ### Examples
 
@@ -286,7 +228,7 @@ LIBREDDIT_DEFAULT_WIDE=on LIBREDDIT_DEFAULT_THEME=dark libreddit -r
 
 ## Proxying using NGINX
 
-**NOTE** If you're [proxying Libreddit through an NGINX Reverse Proxy](https://github.com/spikecodes/libreddit/issues/122#issuecomment-782226853), add
+**NOTE** If you're [proxying Libreddit through an NGINX Reverse Proxy](https://github.com/libreddit/libreddit/issues/122#issuecomment-782226853), add
 ```nginx
 proxy_http_version 1.1;
 ```
@@ -314,7 +256,7 @@ Before=nginx.service
 ## Building
 
 ```
-git clone https://github.com/spikecodes/libreddit
+git clone https://github.com/libreddit/libreddit
 cd libreddit
 cargo run
 ```

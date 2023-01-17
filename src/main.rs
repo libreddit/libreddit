@@ -3,6 +3,8 @@
 #![allow(clippy::cmp_owned)]
 
 // Reference local files
+mod config;
+mod duplicates;
 mod post;
 mod search;
 mod settings;
@@ -11,13 +13,13 @@ mod user;
 mod utils;
 
 // Import Crates
-use clap::{Arg, Command};
+use clap::{Arg, ArgAction, Command};
 
 use futures_lite::FutureExt;
 use hyper::{header::HeaderValue, Body, Request, Response};
 
 mod client;
-use client::proxy;
+use client::{canonical_path, proxy};
 use server::RequestExt;
 use utils::{error, redirect, ThemeAssets};
 
@@ -112,7 +114,7 @@ async fn main() {
 				.short('r')
 				.long("redirect-https")
 				.help("Redirect all HTTP requests to HTTPS (no longer functional)")
-				.takes_value(false),
+				.num_args(0),
 		)
 		.arg(
 			Arg::new("address")
@@ -121,16 +123,18 @@ async fn main() {
 				.value_name("ADDRESS")
 				.help("Sets address to listen on")
 				.default_value("0.0.0.0")
-				.takes_value(true),
+				.num_args(1),
 		)
 		.arg(
 			Arg::new("port")
 				.short('p')
 				.long("port")
 				.value_name("PORT")
+				.env("PORT")
 				.help("Port to listen on")
 				.default_value("8080")
-				.takes_value(true),
+				.action(ArgAction::Set)
+				.num_args(1),
 		)
 		.arg(
 			Arg::new("hsts")
@@ -139,15 +143,15 @@ async fn main() {
 				.value_name("EXPIRE_TIME")
 				.help("HSTS header to tell browsers that this site should only be accessed over HTTPS")
 				.default_value("604800")
-				.takes_value(true),
+				.num_args(1),
 		)
 		.get_matches();
 
-	let address = matches.value_of("address").unwrap_or("0.0.0.0");
-	let port = std::env::var("PORT").unwrap_or_else(|_| matches.value_of("port").unwrap_or("8080").to_string());
-	let hsts = matches.value_of("hsts");
+	let address = matches.get_one::<String>("address").unwrap();
+	let port = matches.get_one::<String>("port").unwrap();
+	let hsts = matches.get_one("hsts").map(|m: &String| m.as_str());
 
-	let listener = [address, ":", &port].concat();
+	let listener = [address, ":", port].concat();
 
 	println!("Starting Libreddit...");
 
@@ -238,6 +242,16 @@ async fn main() {
 	app.at("/r/:sub/comments/:id").get(|r| post::item(r).boxed());
 	app.at("/r/:sub/comments/:id/:title").get(|r| post::item(r).boxed());
 	app.at("/r/:sub/comments/:id/:title/:comment_id").get(|r| post::item(r).boxed());
+	app.at("/comments/:id").get(|r| post::item(r).boxed());
+	app.at("/comments/:id/comments").get(|r| post::item(r).boxed());
+	app.at("/comments/:id/comments/:comment_id").get(|r| post::item(r).boxed());
+	app.at("/comments/:id/:title").get(|r| post::item(r).boxed());
+	app.at("/comments/:id/:title/:comment_id").get(|r| post::item(r).boxed());
+
+	app.at("/r/:sub/duplicates/:id").get(|r| duplicates::item(r).boxed());
+	app.at("/r/:sub/duplicates/:id/:title").get(|r| duplicates::item(r).boxed());
+	app.at("/duplicates/:id").get(|r| duplicates::item(r).boxed());
+	app.at("/duplicates/:id/:title").get(|r| duplicates::item(r).boxed());
 
 	app.at("/r/:sub/search").get(|r| search::find(r).boxed());
 
@@ -253,9 +267,6 @@ async fn main() {
 	app.at("/r/:sub/about/sidebar").get(|r| subreddit::sidebar(r).boxed());
 
 	app.at("/r/:sub/:sort").get(|r| subreddit::community(r).boxed());
-
-	// Comments handler
-	app.at("/comments/:id").get(|r| post::item(r).boxed());
 
 	// Front page
 	app.at("/").get(|r| subreddit::community(r).boxed());
@@ -274,13 +285,25 @@ async fn main() {
 	// Handle about pages
 	app.at("/about").get(|req| error(req, "About pages aren't added yet".to_string()).boxed());
 
-	app.at("/:id").get(|req: Request<Body>| match req.param("id").as_deref() {
-		// Sort front page
-		Some("best" | "hot" | "new" | "top" | "rising" | "controversial") => subreddit::community(req).boxed(),
-		// Short link for post
-		Some(id) if id.len() > 4 && id.len() < 7 => post::item(req).boxed(),
-		// Error message for unknown pages
-		_ => error(req, "Nothing here".to_string()).boxed(),
+	app.at("/:id").get(|req: Request<Body>| {
+		Box::pin(async move {
+			match req.param("id").as_deref() {
+				// Sort front page
+				Some("best" | "hot" | "new" | "top" | "rising" | "controversial") => subreddit::community(req).await,
+
+				// Short link for post
+				Some(id) if (5..8).contains(&id.len()) => match canonical_path(format!("/{}", id)).await {
+					Ok(path_opt) => match path_opt {
+						Some(path) => Ok(redirect(path)),
+						None => error(req, "Post ID is invalid. It may point to a post on a community that has been banned.").await,
+					},
+					Err(e) => error(req, e).await,
+				},
+
+				// Error message for unknown pages
+				_ => error(req, "Nothing here".to_string()).await,
+			}
+		})
 	});
 
 	// Default service in case no routes match

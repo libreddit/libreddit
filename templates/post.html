@@ -13,16 +13,25 @@
 	<!-- Meta Tags -->
 	<meta name="author" content="u/{{ post.author.name }}">
 	<meta name="title" content="{{ post.title }} - r/{{ post.community }}">
-	<meta property="og:type" content="website">
-	<meta property="og:url" content="{{ post.permalink }}">
 	<meta property="og:title" content="{{ post.title }} - r/{{ post.community }}">
 	<meta property="og:description" content="View on Libreddit, an alternative private front-end to Reddit.">
-	<meta property="og:image" content="{{ post.thumbnail.url }}">
-	<meta property="twitter:card" content="summary_large_image">
+	<meta property="og:url" content="{{ post.permalink }}">
 	<meta property="twitter:url" content="{{ post.permalink }}">
 	<meta property="twitter:title" content="{{ post.title }} - r/{{ post.community }}">
 	<meta property="twitter:description" content="View on Libreddit, an alternative private front-end to Reddit.">
+	{% if post.post_type == "image" %}
+	<meta property="og:type" content="image">
+	<meta property="og:image" content="{{ post.thumbnail.url }}">
+	<meta property="twitter:card" content="summary_large_image">
 	<meta property="twitter:image" content="{{ post.thumbnail.url }}">
+	{% else if post.post_type == "video" || post.post_type == "gif" %}
+	<meta property="twitter:card" content="video">
+	<meta property="og:type" content="video">
+	<meta property="og:video" content="{{ post.media.url }}">
+	<meta property="og:video:type" content="video/mp4">
+	{% else %}
+	<meta property="og:type" content="website">
+	{% endif %}
 {% endblock %}
 
 {% block subscriptions %}
@@ -31,98 +40,11 @@
 
 {% block content %}
 	<div id="column_one">
-
-		<!-- POST CONTENT -->
-		<div class="post highlighted">
-			<p class="post_header">
-				<a class="post_subreddit" href="/r/{{ post.community }}">r/{{ post.community }}</a>
-				<span class="dot">&bull;</span>
-				<a class="post_author {{ post.author.distinguished }}" href="/user/{{ post.author.name }}">u/{{ post.author.name }}</a>
-				{% if post.author.flair.flair_parts.len() > 0 %}
-					<small class="author_flair">{% call utils::render_flair(post.author.flair.flair_parts) %}</small>
-				{% endif %}
-				<span class="dot">&bull;</span>
-				<span class="created" title="{{ post.created }}">{{ post.rel_time }}</span>
-				{% if !post.awards.is_empty() %}
-				<span class="dot">&bull;</span>
-				<span class="awards">
-					{% for award in post.awards.clone() %}
-					<span class="award" title="{{ award.name }}">
-						<img alt="{{ award.name }}" src="{{ award.icon_url }}" width="16" height="16"/>
-						{{ award.count }}
-					</span>
-					{% endfor %}
-				</span>
-				{% endif %}
-			</p>
-			<h1 class="post_title">
-				{{ post.title }}
-				{% if post.flair.flair_parts.len() > 0 %}
-					<a href="/r/{{ post.community }}/search?q=flair_name%3A%22{{ post.flair.text }}%22&restrict_sr=on"
-						class="post_flair"
-						style="color:{{ post.flair.foreground_color }}; background:{{ post.flair.background_color }};">{% call utils::render_flair(post.flair.flair_parts) %}</a>
-				{% endif %}
-				{% if post.flags.nsfw %} <small class="nsfw">NSFW</small>{% endif %}
-			</h1>
-
-			<!-- POST MEDIA -->
-			<!-- post_type: {{ post.post_type }} -->
-			{% if post.post_type == "image" %}
-			<a href="{{ post.media.url }}" class="post_media_image" >
-				<svg
-					width="{{ post.media.width }}px" 
-					height="{{ post.media.height }}px" 
-					xmlns="http://www.w3.org/2000/svg">
-						<image width="100%" height="100%" href="{{ post.media.url }}"/>
-						<desc>
-							<img loading="lazy" alt="Post image" src="{{ post.media.url }}"/>
-						</desc>
-				</svg>
-			</a>
-			{% else if post.post_type == "video" || post.post_type == "gif" %}
-			{% if prefs.use_hls == "on" && !post.media.alt_url.is_empty() %}
-			<script src="/hls.min.js"></script>
-			<video class="post_media_video short {% if prefs.autoplay_videos == "on" %}hls_autoplay{% endif %}" width="{{ post.media.width }}" height="{{ post.media.height }}" poster="{{ post.media.poster }}" preload="none" controls>
-				<source src="{{ post.media.alt_url }}" type="application/vnd.apple.mpegurl" />
-				<source src="{{ post.media.url }}" type="video/mp4" />
-			</video>
-			<script src="/playHLSVideo.js"></script>
-			{% else %}
-			<video class="post_media_video" src="{{ post.media.url }}" controls {% if prefs.autoplay_videos == "on" %}autoplay{% endif %} loop><a href={{ post.media.url }}>Video</a></video>
-			{% call utils::render_hls_notification(post.permalink[1..]) %}
-			{% endif %}
-			{% else if post.post_type == "gallery" %}
-			<div class="gallery">
-			{% for image in post.gallery -%}
-				<figure>
-					<a href="{{ image.url }}" ><img loading="lazy" alt="Gallery image" src="{{ image.url }}"/></a>
-					<figcaption>
-						<p>{{ image.caption }}</p>
-						{% if image.outbound_url.len() > 0 %}
-						<p><a class="outbound_url" href="{{ image.outbound_url }}" rel="nofollow">{{ image.outbound_url }}</a>
-						{% endif %}
-					</figcaption>
-				</figure>
-			{%- endfor %}
-			</div>			
-			{% else if post.post_type == "link" %}
-			<a id="post_url" href="{{ post.media.url }}" rel="nofollow">{{ post.media.url }}</a>
-			{% endif %}
-
-			<!-- POST BODY -->
-			<div class="post_body">{{ post.body|safe }}</div>
-			<div class="post_score" title="{{ post.score.1 }}">{{ post.score.0 }}<span class="label"> Upvotes</span></div>
-			<div class="post_footer">
-				<ul id="post_links">
-					<li><a href="/{{ post.id }}">permalink</a></li>
-					<li><a href="https://reddit.com/{{ post.id }}" rel="nofollow">reddit</a></li>
-				</ul>
-				<p>{{ post.upvote_ratio }}% Upvoted</p>
-			</div>
-		</div>
+		{% call utils::post(post) %}
 
 		<!-- SORT FORM -->
 		<form id="sort">
+			<p id="comment_count">{{post.comments.0}} {% if post.comments.0 == "1" %}comment{% else %}comments{% endif %} <span id="sorted_by">sorted by </span></p>
 			<select name="sort" title="Sort comments by"> 
 				{% call utils::options(sort, ["confidence", "top", "new", "controversial", "old"], "confidence") %}
 			</select><button id="sort_submit" class="submit">
@@ -138,7 +60,7 @@
 		{% for c in comments -%}
 		<div class="thread">
 			{% if single_thread %}
-			<p class="thread_nav"><a href="/{{ post.id }}">View all comments</a></p>
+			<p class="thread_nav"><a href="{{ post.permalink }}">View all comments</a></p>
 			{% if c.parent_kind == "t1" %}
 			<p class="thread_nav"><a href="?context=9999">Show parent comments</a></p>
 			{% endif %}

@@ -19,7 +19,7 @@ struct SettingsTemplate {
 
 // CONSTANTS
 
-const PREFS: [&str; 11] = [
+const PREFS: [&str; 13] = [
 	"theme",
 	"front_page",
 	"layout",
@@ -27,10 +27,12 @@ const PREFS: [&str; 11] = [
 	"comment_sort",
 	"post_sort",
 	"show_nsfw",
+	"blur_nsfw",
 	"use_hls",
 	"hide_hls_notification",
 	"autoplay_videos",
 	"fixed_navbar",
+	"hide_awards",
 ];
 
 // FUNCTIONS
@@ -39,7 +41,7 @@ const PREFS: [&str; 11] = [
 pub async fn get(req: Request<Body>) -> Result<Response<Body>, String> {
 	let url = req.uri().to_string();
 	template(SettingsTemplate {
-		prefs: Preferences::new(req),
+		prefs: Preferences::new(&req),
 		url,
 	})
 }

@@ -1,6 +1,6 @@
 // CRATES
 use crate::utils::{
-	catch_random, error, filter_posts, format_num, format_url, get_filters, param, redirect, rewrite_urls, setting, template, val, Post, Preferences, Subreddit,
+	catch_random, error, filter_posts, format_num, format_url, get_filters, nsfw_landing, param, redirect, rewrite_urls, setting, template, val, Post, Preferences, Subreddit,
 };
 use crate::{client::json, server::ResponseExt, RequestExt};
 use askama::Template;
@@ -24,6 +24,9 @@ struct SubredditTemplate {
 	/// Whether all fetched posts are filtered (to differentiate between no posts fetched in the first place,
 	/// and all fetched posts being filtered).
 	all_posts_filtered: bool,
+	/// Whether all posts were hidden because they are NSFW (and user has disabled show NSFW)
+	all_posts_hidden_nsfw: bool,
+	no_posts: bool,
 }
 
 #[derive(Template)]
@@ -94,6 +97,12 @@ pub async fn community(req: Request<Body>) -> Result<Response<Body>, String> {
 		}
 	};
 
+	// Return landing page if this post if this is NSFW community but the user
+	// has disabled the display of NSFW content or if the instance is SFW-only.
+	if sub.nsfw && (setting(&req, "show_nsfw") != "on" || crate::utils::sfw_only()) {
+		return Ok(nsfw_landing(req).await.unwrap_or_default());
+	}
+
 	let path = format!("/r/{}/{}.json?{}&raw_json=1", sub_name.clone(), sort, req.uri().query().unwrap_or_default());
 	let url = String::from(req.uri().path_and_query().map_or("", |val| val.as_str()));
 	let redirect_url = url[1..].replace('?', "%3F").replace('&', "%26").replace('+', "%2B");
@@ -106,27 +115,32 @@ pub async fn community(req: Request<Body>) -> Result<Response<Body>, String> {
 			posts: Vec::new(),
 			sort: (sort, param(&path, "t").unwrap_or_default()),
 			ends: (param(&path, "after").unwrap_or_default(), "".to_string()),
-			prefs: Preferences::new(req),
+			prefs: Preferences::new(&req),
 			url,
 			redirect_url,
 			is_filtered: true,
 			all_posts_filtered: false,
+			all_posts_hidden_nsfw: false,
+			no_posts: false,
 		})
 	} else {
 		match Post::fetch(&path, quarantined).await {
 			Ok((mut posts, after)) => {
-				let all_posts_filtered = filter_posts(&mut posts, &filters);
-
+				let (_, all_posts_filtered) = filter_posts(&mut posts, &filters);
+				let no_posts = posts.is_empty();
+				let all_posts_hidden_nsfw = !no_posts && (posts.iter().all(|p| p.flags.nsfw) && setting(&req, "show_nsfw") != "on");
 				template(SubredditTemplate {
 					sub,
 					posts,
 					sort: (sort, param(&path, "t").unwrap_or_default()),
 					ends: (param(&path, "after").unwrap_or_default(), after),
-					prefs: Preferences::new(req),
+					prefs: Preferences::new(&req),
 					url,
 					redirect_url,
 					is_filtered: false,
 					all_posts_filtered,
+					all_posts_hidden_nsfw,
+					no_posts,
 				})
 			}
 			Err(msg) => match msg.as_str() {
@@ -145,7 +159,7 @@ pub fn quarantine(req: Request<Body>, sub: String) -> Result<Response<Body>, Str
 		msg: "Please click the button below to continue to this subreddit.".to_string(),
 		url: req.uri().to_string(),
 		sub,
-		prefs: Preferences::new(req),
+		prefs: Preferences::new(&req),
 	};
 
 	Ok(
@@ -192,7 +206,7 @@ pub async fn subscriptions_filters(req: Request<Body>) -> Result<Response<Body>,
 
 	let query = req.uri().query().unwrap_or_default().to_string();
 
-	let preferences = Preferences::new(req);
+	let preferences = Preferences::new(&req);
 	let mut sub_list = preferences.subscriptions;
 	let mut filters = preferences.filters;
 
@@ -305,7 +319,7 @@ pub async fn wiki(req: Request<Body>) -> Result<Response<Body>, String> {
 			sub,
 			wiki: rewrite_urls(response["data"]["content_html"].as_str().unwrap_or("<h3>Wiki not found</h3>")),
 			page,
-			prefs: Preferences::new(req),
+			prefs: Preferences::new(&req),
 			url,
 		}),
 		Err(msg) => {
@@ -343,7 +357,7 @@ pub async fn sidebar(req: Request<Body>) -> Result<Response<Body>, String> {
 			// ),
 			sub,
 			page: "Sidebar".to_string(),
-			prefs: Preferences::new(req),
+			prefs: Preferences::new(&req),
 			url,
 		}),
 		Err(msg) => {
@@ -416,5 +430,6 @@ async fn subreddit(sub: &str, quarantined: bool) -> Result<Subreddit, String> {
 		members: format_num(members),
 		active: format_num(active),
 		wiki: res["data"]["wiki_enabled"].as_bool().unwrap_or_default(),
+		nsfw: res["data"]["over18"].as_bool().unwrap_or_default(),
 	})
 }

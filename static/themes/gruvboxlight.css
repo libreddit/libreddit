@@ -1,0 +1,18 @@
+/* Gruvbox-Light theme setting */
+.gruvboxlight {
+	--accent: #427b58;
+	--green: #79740e;
+	--text: #3c3836;
+	--foreground: #ebdbb2;
+	--background: #fbf1c7;
+	--outside: #ebdbb2;
+	--post: #ebdbb2;
+	--panel-border: 1px solid #d5c4a1;
+	--highlighted: #fbf1c7;
+	--shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+}
+
+html:has(> .gruvboxlight) {
+	/* Hint color theme to browser for scrollbar */
+	color-scheme: light;
+}

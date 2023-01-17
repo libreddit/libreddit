@@ -1,0 +1,14 @@
+/* Dark theme setting */
+.dark{
+	--accent: aqua;
+	--green: #5cff85;
+	--text: white;
+	--foreground: #222;
+	--background: #0f0f0f;
+	--outside: #1f1f1f;
+	--post: #161616;
+	--panel-border: 1px solid #333;
+	--highlighted: #333;
+	--visited: #aaa;
+	--shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
