@@ -166,7 +166,8 @@ If you're on Linux and none of these methods work for you, you can grab a Linux 
 
 ## 5) Replit/Heroku/Glitch
 
-**Note:** These are free hosting options but they are *not* private and will monitor server usage to prevent abuse. If you need a free and easy setup, this method may work best for you.
+> **Warning**
+> These are free hosting options but they are *not* private and will monitor server usage to prevent abuse. If you need a free and easy setup, this method may work best for you.
 
 <a href="https://repl.it/github/libreddit/libreddit"><img src="https://repl.it/badge/github/libreddit/libreddit" alt="Run on Repl.it" height="32" /></a>
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/libreddit/libreddit)
@@ -227,11 +228,12 @@ LIBREDDIT_DEFAULT_WIDE=on LIBREDDIT_DEFAULT_THEME=dark libreddit -r
 
 ## Proxying using NGINX
 
-**NOTE** If you're [proxying Libreddit through an NGINX Reverse Proxy](https://github.com/libreddit/libreddit/issues/122#issuecomment-782226853), add
-```nginx
-proxy_http_version 1.1;
-```
-to your NGINX configuration file above your `proxy_pass` line.
+> **Note**
+> If you're [proxying Libreddit through an NGINX Reverse Proxy](https://github.com/libreddit/libreddit/issues/122#issuecomment-782226853), add
+> ```nginx
+> proxy_http_version 1.1;
+> ```
+> to your NGINX configuration file above your `proxy_pass` line.
 
 ## systemd
 
