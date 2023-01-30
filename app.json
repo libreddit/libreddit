@@ -50,13 +50,10 @@
     "LIBREDDIT_BANNER": {
       "required": false
     },
-    "LIBREDDIT_ROBOTS_DISABLE_INDEXING":  {
-        "required": false
-    },
     "LIBREDDIT_DEFAULT_SUBSCRIPTIONS": {
       "required": false
     },
-    "LIBREDDIT_DEFAULT_DISABLE_VISIT_REDDIT_CONFIRMATION": {
+    "LIBREDDIT_PUSHSHIFT_FRONTEND": {
       "required": false
     }
   }

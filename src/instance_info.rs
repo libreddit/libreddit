@@ -122,6 +122,7 @@ impl InstanceInfo {
 				["Deploy timestamp", &self.deploy_unix_ts.to_string()],
 				["Compile mode", &self.compile_mode],
 				["SFW only", &convert(&self.config.sfw_only)],
+				["Pushshift frontend", &convert(&Some(self.config.pushshift.clone()))],
 			])
 			.with_header_row(["Settings"]),
 		);
@@ -155,6 +156,7 @@ impl InstanceInfo {
                 Deploy timestamp: {}\n
                 Compile mode: {}\n
 				SFW only: {:?}\n
+				Pushshift frontend: {:?}\n
                 Config:\n
                     Banner: {:?}\n
                     Hide awards: {:?}\n
@@ -175,6 +177,7 @@ impl InstanceInfo {
 					self.deploy_unix_ts,
 					self.compile_mode,
 					self.config.sfw_only,
+					self.config.pushshift,
 					self.config.banner,
 					self.config.default_hide_awards,
 					self.config.default_theme,
