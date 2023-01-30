@@ -3,7 +3,7 @@ name = "libreddit"
 description = " Alternative private front-end to Reddit"
 license = "AGPL-3.0"
 repository = "https://github.com/spikecodes/libreddit"
-version = "0.27.1"
+version = "0.27.2"
 authors = ["spikecodes <19519553+spikecodes@users.noreply.github.com>"]
 edition = "2021"
 
@@ -20,7 +20,7 @@ hyper-rustls = "0.23.2"
 percent-encoding = "2.2.0"
 route-recognizer = "0.3.1"
 serde_json = "1.0.91"
-tokio = { version = "1.24.1", features = ["full"] }
+tokio = { version = "1.24.2", features = ["full"] }
 time = { version = "0.3.17", features = ["local-offset"] }
 url = "2.3.1"
 rust-embed = { version = "6.4.2", features = ["include-exclude"] }
@@ -38,4 +38,4 @@ sealed_test = "1.0.0"
 [profile.release]
 codegen-units = 1
 lto = true
-strip = true
+strip = "symbols"
