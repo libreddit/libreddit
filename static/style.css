@@ -169,7 +169,7 @@ main {
 /* Body footer. */
 body > footer {
 	display: flex;
-	justify-content: end;
+	justify-content: center;
 	margin: 20px;
 }
 
@@ -180,7 +180,13 @@ body > footer {
 	color: var(--text);
 	cursor: pointer;
 	display: inline-flex;
+	font-size: 300%;
+	font-weight: bold;
 	padding: 0.5em;
+}
+
+.info-button > a:hover {
+	text-decoration: none;
 }
 
 /* / Body footer. */
