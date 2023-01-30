@@ -46,8 +46,14 @@
     },
     "LIBREDDIT_DEFAULT_HIDE_AWARDS": {
       "required": false
-    }
+    },
     "LIBREDDIT_BANNER": {
+      "required": false
+    },
+    "LIBREDDIT_DEFAULT_SUBSCRIPTIONS": {
+      "required": false
+    },
+    "LIBREDDIT_PUSHSHIFT_FRONTEND": {
       "required": false
     }
   }

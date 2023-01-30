@@ -52,8 +52,14 @@ pub struct Config {
 	#[serde(rename = "LIBREDDIT_DEFAULT_HIDE_AWARDS")]
 	pub(crate) default_hide_awards: Option<String>,
 
+	#[serde(rename = "LIBREDDIT_DEFAULT_SUBSCRIPTIONS")]
+	pub(crate) default_subscriptions: Option<String>,
+
 	#[serde(rename = "LIBREDDIT_BANNER")]
 	pub(crate) banner: Option<String>,
+
+	#[serde(rename = "LIBREDDIT_PUSHSHIFT_FRONTEND")]
+	pub(crate) pushshift: String,
 }
 
 impl Config {
@@ -68,6 +74,11 @@ impl Config {
 		// environment variables with "LIBREDDIT", then check the config, then if
 		// both are `None`, return a `None` via the `map_or_else` function
 		let parse = |key: &str| -> Option<String> { var(key).ok().map_or_else(|| get_setting_from_config(key, &config), Some) };
+
+		// This serves as the frontend for the Pushshift API - on removed comments, this URL will
+		// be the base of a link, to display removed content (on another site).
+		let default_pushshift_frontend = String::from("www.unddit.com");
+
 		Self {
 			sfw_only: parse("LIBREDDIT_SFW_ONLY"),
 			default_theme: parse("LIBREDDIT_DEFAULT_THEME"),
@@ -81,7 +92,9 @@ impl Config {
 			default_use_hls: parse("LIBREDDIT_DEFAULT_USE_HLS"),
 			default_hide_hls_notification: parse("LIBREDDIT_DEFAULT_HIDE_HLS"),
 			default_hide_awards: parse("LIBREDDIT_DEFAULT_HIDE_AWARDS"),
+			default_subscriptions: parse("LIBREDDIT_DEFAULT_SUBSCRIPTIONS"),
 			banner: parse("LIBREDDIT_BANNER"),
+			pushshift: parse("LIBREDDIT_PUSHSHIFT_FRONTEND").unwrap_or(default_pushshift_frontend),
 		}
 	}
 }
@@ -100,7 +113,9 @@ fn get_setting_from_config(name: &str, config: &Config) -> Option<String> {
 		"LIBREDDIT_DEFAULT_HIDE_HLS_NOTIFICATION" => config.default_hide_hls_notification.clone(),
 		"LIBREDDIT_DEFAULT_WIDE" => config.default_wide.clone(),
 		"LIBREDDIT_DEFAULT_HIDE_AWARDS" => config.default_hide_awards.clone(),
+		"LIBREDDIT_DEFAULT_SUBSCRIPTIONS" => config.default_subscriptions.clone(),
 		"LIBREDDIT_BANNER" => config.banner.clone(),
+		"LIBREDDIT_PUSHSHIFT_FRONTEND" => Some(config.pushshift.clone()),
 		_ => None,
 	}
 }
