@@ -189,7 +189,8 @@ Assign a default value for each instance-specific setting by passing environment
 
 |Name|Possible values|Default value|Description|
 |-|-|-|-|
-| `SFW_ONLY` | `["on", "off"]` | `off` | Enables SFW-only mode for the instance, i.e. all NSFW content is filtered. |
+| `SFW_ONLY` | `["on", "off"]` | `off`   | Enables SFW-only mode for the instance, i.e. all NSFW content is filtered. |
+| `BANNER`   | String          | (empty) | Allows the server to set a banner to be displayed. Currently this is displayed on the instance info page. | 
 
 ## Default User Settings
 
@@ -208,6 +209,7 @@ Assign a default value for each user-modifiable setting by passing environment v
 | `USE_HLS`               | `["on", "off"]`                                                                                     | `off`         |
 | `HIDE_HLS_NOTIFICATION` | `["on", "off"]`                                                                                     | `off`         |
 | `AUTOPLAY_VIDEOS`       | `["on", "off"]`                                                                                     | `off`         |
+| `HIDE_AWARDS`           | `["on", "off"]`                                                                                     | `off`
 
 You can also configure Libreddit with a configuration file. An example `libreddit.toml` can be found below:
 

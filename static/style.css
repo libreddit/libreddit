@@ -173,13 +173,22 @@ body > footer {
 	margin: 20px;
 }
 
-body > footer > div#sfw-only {
-	color: var(--green);
-	border: 1px solid var(--green);
-	padding: 5px;
+.info-button {
+	align-items: center;
+	border-radius: .25rem;
 	box-sizing: border-box;
-	border-radius: 5px;
+	color: var(--text);
+	cursor: pointer;
+	display: inline-flex;
+	font-size: 300%;
+	font-weight: bold;
+	padding: 0.5em;
 }
+
+.info-button > a:hover {
+	text-decoration: none;
+}
+
 /* / Body footer. */
 
 /* Footer in content block. */
@@ -1237,6 +1246,10 @@ input[type="submit"] {
 	padding: 10px;
 	width: 250px;
 	background: var(--highlighted) !important;
+}
+/* Info page */
+.unset {
+	color: lightslategrey;
 }
 
 /* Markdown */

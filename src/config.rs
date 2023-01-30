@@ -1,4 +1,5 @@
 use once_cell::sync::Lazy;
+use serde::{Deserialize, Serialize};
 use std::{env::var, fs::read_to_string};
 
 // Waiting for https://github.com/rust-lang/rust/issues/74465 to land, so we
@@ -6,44 +7,53 @@ use std::{env::var, fs::read_to_string};
 //
 // This is the local static that is initialized at runtime (technically at
 // first request) and contains the instance settings.
-static CONFIG: Lazy<Config> = Lazy::new(Config::load);
+pub(crate) static CONFIG: Lazy<Config> = Lazy::new(Config::load);
 
 /// Stores the configuration parsed from the environment variables and the
 /// config file. `Config::Default()` contains None for each setting.
-#[derive(Default, serde::Deserialize)]
+/// When adding more config settings, add it to `Config::load`,
+/// `get_setting_from_config`, both below, as well as
+/// instance_info::InstanceInfo.to_string(), README.md and app.json.
+#[derive(Default, Serialize, Deserialize, Clone)]
 pub struct Config {
 	#[serde(rename = "LIBREDDIT_SFW_ONLY")]
-	sfw_only: Option<String>,
+	pub(crate) sfw_only: Option<String>,
 
 	#[serde(rename = "LIBREDDIT_DEFAULT_THEME")]
-	default_theme: Option<String>,
+	pub(crate) default_theme: Option<String>,
 
 	#[serde(rename = "LIBREDDIT_DEFAULT_FRONT_PAGE")]
-	default_front_page: Option<String>,
+	pub(crate) default_front_page: Option<String>,
 
 	#[serde(rename = "LIBREDDIT_DEFAULT_LAYOUT")]
-	default_layout: Option<String>,
+	pub(crate) default_layout: Option<String>,
 
 	#[serde(rename = "LIBREDDIT_DEFAULT_WIDE")]
-	default_wide: Option<String>,
+	pub(crate) default_wide: Option<String>,
 
 	#[serde(rename = "LIBREDDIT_DEFAULT_COMMENT_SORT")]
-	default_comment_sort: Option<String>,
+	pub(crate) default_comment_sort: Option<String>,
 
 	#[serde(rename = "LIBREDDIT_DEFAULT_POST_SORT")]
-	default_post_sort: Option<String>,
+	pub(crate) default_post_sort: Option<String>,
 
 	#[serde(rename = "LIBREDDIT_DEFAULT_SHOW_NSFW")]
-	default_show_nsfw: Option<String>,
+	pub(crate) default_show_nsfw: Option<String>,
 
 	#[serde(rename = "LIBREDDIT_DEFAULT_BLUR_NSFW")]
-	default_blur_nsfw: Option<String>,
+	pub(crate) default_blur_nsfw: Option<String>,
 
 	#[serde(rename = "LIBREDDIT_DEFAULT_USE_HLS")]
-	default_use_hls: Option<String>,
+	pub(crate) default_use_hls: Option<String>,
 
 	#[serde(rename = "LIBREDDIT_DEFAULT_HIDE_HLS_NOTIFICATION")]
-	default_hide_hls_notification: Option<String>,
+	pub(crate) default_hide_hls_notification: Option<String>,
+
+	#[serde(rename = "LIBREDDIT_DEFAULT_HIDE_AWARDS")]
+	pub(crate) default_hide_awards: Option<String>,
+
+	#[serde(rename = "LIBREDDIT_BANNER")]
+	pub(crate) banner: Option<String>,
 }
 
 impl Config {
@@ -70,6 +80,8 @@ impl Config {
 			default_blur_nsfw: parse("LIBREDDIT_DEFAULT_BLUR_NSFW"),
 			default_use_hls: parse("LIBREDDIT_DEFAULT_USE_HLS"),
 			default_hide_hls_notification: parse("LIBREDDIT_DEFAULT_HIDE_HLS"),
+			default_hide_awards: parse("LIBREDDIT_DEFAULT_HIDE_AWARDS"),
+			banner: parse("LIBREDDIT_BANNER"),
 		}
 	}
 }
@@ -87,6 +99,8 @@ fn get_setting_from_config(name: &str, config: &Config) -> Option<String> {
 		"LIBREDDIT_DEFAULT_USE_HLS" => config.default_use_hls.clone(),
 		"LIBREDDIT_DEFAULT_HIDE_HLS_NOTIFICATION" => config.default_hide_hls_notification.clone(),
 		"LIBREDDIT_DEFAULT_WIDE" => config.default_wide.clone(),
+		"LIBREDDIT_DEFAULT_HIDE_AWARDS" => config.default_hide_awards.clone(),
+		"LIBREDDIT_BANNER" => config.banner.clone(),
 		_ => None,
 	}
 }
