@@ -514,17 +514,13 @@ button.submit:hover > svg { stroke: var(--accent); }
 	margin-bottom: 20px;
 }
 
-#listing_options {
-	overflow-x: auto;
-}
-
 #sort_options, #listing_options, main > * > footer > a {
 	border-radius: 5px;
 	align-items: center;
 	box-shadow: var(--shadow);
 	background: var(--outside);
 	display: flex;
-	overflow: hidden;
+	overflow-y: hidden;
 }
 
 #sort_options > a, #listing_options > a, main > * > footer > a {
