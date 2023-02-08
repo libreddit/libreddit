@@ -156,13 +156,31 @@
 			<li class="desktop_item"><a href="/r/{{ post.community }}/duplicates/{{ post.id }}">duplicates</a></li>
 			<li class="mobile_item"><a href="/r/{{ post.community }}/duplicates/{{ post.id }}">dupes</a></li>
 			{% endif %}
-			<li class="desktop_item"><a href="https://reddit.com{{ post.permalink }}" rel="nofollow">reddit</a></li>
-			<li class="mobile_item"><a href="https://reddit.com{{ post.permalink }}" rel="nofollow">reddit</a></li>
+			{% call external_reddit_link(post.permalink) %}
 		</ul>
 		<p>{{ post.upvote_ratio }}%<span id="upvoted"> Upvoted</span></p>
 	</div>
 </div>
 {%- endmacro %}
+
+{% macro external_reddit_link(permalink) %}
+{% for dev_type in ["desktop", "mobile"] %}
+<li class="{{ dev_type }}_item">
+	<a
+		{% if prefs.disable_visit_reddit_confirmation != "on" %}
+		href="#popup"
+		{% else %}
+		href="https://reddit.com{{ permalink }}"
+		rel="nofollow"
+		{% endif %}
+	>reddit</a>
+
+	{% if prefs.disable_visit_reddit_confirmation != "on" %}
+		{% call visit_reddit_confirmation(permalink) %}
+	{% endif %}
+</li>
+{% endfor %}
+{% endmacro %}
 
 {% macro post_in_list(post) -%}
 <div class="post {% if post.flags.stickied %}stickied{% endif %}" id="{{ post.id }}">
@@ -256,6 +274,28 @@
 	</div>
 	<div class="post_footer">
 		<a href="{{ post.permalink }}" class="post_comments" title="{{ post.comments.1 }} {% if post.comments.1 == "1" %}comment{% else %}comments{% endif %}">{{ post.comments.0 }} {% if post.comments.1 == "1" %}comment{% else %}comments{% endif %}</a>
+	</div>
+</div>
+{%- endmacro %}
+
+{% macro visit_reddit_confirmation(url) -%}
+<div class="popup" id="popup">
+	<div class="popup-inner">
+		<h1>You are about to leave Libreddit</h1>
+		<p>Do you want to continue?</p>
+		<p id="reddit_url">https://www.reddit.com{{ url }}</p>
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 639.24 563">
+			<defs>
+				<style>.cls-1{fill:#000000;}.cls-2{fill:#f8aa00;}</style>
+			</defs>
+			<path class="cls-2" d="M322.03,0c1.95,2.5,4.88,.9,7.33,1.65,10.5,3.21,17.65,10.39,22.83,19.35,93.64,162.06,186.98,324.29,280.25,486.56,15.73,20.19,2.49,51.27-22.92,54.37-1.21,.19-2.72-.54-3.49,1.08H239.03c-70.33-2.43-141.6,.79-212.08-1.74-17.49-4.92-23.16-15.88-26.91-32.26l-.04-1.97C88.74,354.76,194.49,188.2,289.92,18.43c6.2-10.66,15.03-16.94,27.61-17.36,.95-.03,2.05,.18,2.51-1.07h2Zm-2.43,545c94.95-.02,189.9,.04,284.85-.02,11.84-.73,20.75-13.19,16.68-23.55C523.83,355.97,430.74,187.62,332.05,23.07c-7.93-9.02-22.2-6.58-27.23,3.22C230.28,156.11,155.21,285.64,80.41,415.31c-19.88,34.41-39.31,69.07-59.78,103.14-2.43,4.05-4.24,8.8-1.68,14.18,3.92,8.24,9.59,12.37,18.82,12.37,93.95,0,187.9,0,281.85,0Z"/>
+			<path class="cls-1" d="M319.61,545c-93.95,0-187.9,0-281.85,0-9.22,0-14.89-4.13-18.82-12.37-2.56-5.38-.75-10.13,1.68-14.18,20.47-34.07,39.9-68.73,59.78-103.14C155.21,285.64,230.28,156.11,304.82,26.29c5.03-9.8,19.3-12.24,27.23-3.22,98.7,164.55,191.79,332.9,289.1,498.35,4.06,10.36-4.85,22.82-16.68,23.55-94.94,.06-189.9,0-284.85,.02Zm.44-462.31C238.88,223.22,158.17,362.95,77.28,503h485.54c-80.94-140.13-161.61-279.79-242.77-420.31Z"/>
+			<path class="cls-2" d="M320.05,82.69c81.16,140.52,161.83,280.18,242.77,420.31H77.28C158.17,362.95,238.88,223.22,320.05,82.69Zm36.05,118.99c-.14-46.75-68.32-52.32-74.66-4.76,.73,51.49,9.2,102.97,12.63,154.49,1.18,13.14,10.53,21.81,23.32,22.76,13.12,.97,23.89-9.13,24.96-21.58,4.44-49.99,9.4-101.22,13.76-150.91Zm-36.56,271.4c48.8,.76,49.24-74.7-.31-75.47-53.45,3-46.02,78.12,.31,75.47Z"/>
+			<path class="cls-1" d="M356.1,201.67c-4.36,49.69-9.31,100.91-13.76,150.91-1.07,12.45-11.84,22.56-24.96,21.58-12.79-.95-22.14-9.63-23.31-22.76-3.43-51.52-11.9-103-12.63-154.49,6.33-47.53,74.51-42.03,74.66,4.76Z"/>
+			<path class="cls-1" d="M319.54,473.08c-46.34,2.64-53.75-72.47-.31-75.47,49.56,.78,49.1,76.24,.31,75.47Z"/>
+		</svg>
+		<a id="goback" href="#">No, go back!</a>
+		<a id="toreddit" href="https://www.reddit.com{{ url }}" rel="nofollow">Yes, take me to Reddit</a>
 	</div>
 </div>
 {%- endmacro %}

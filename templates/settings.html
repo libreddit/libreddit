@@ -90,6 +90,11 @@
 					<input type="hidden" value="off" name="hide_awards">
 					<input type="checkbox" name="hide_awards" id="hide_awards" {% if prefs.hide_awards == "on" %}checked{% endif %}>
 				</div>
+				<div class="prefs-group">
+					<label for="disable_visit_reddit_confirmation">Do not confirm before visiting content on Reddit</label>
+					<input type="hidden" value="off" name="disable_visit_reddit_confirmation">
+					<input type="checkbox" name="disable_visit_reddit_confirmation" {% if prefs.disable_visit_reddit_confirmation == "on" %}checked{% endif %}>
+				</div>
 			</fieldset>
 			<input id="save" type="submit" value="Save">
 		</div>
@@ -127,7 +132,7 @@
 
 	<div id="settings_note">
 		<p><b>Note:</b> settings and subscriptions are saved in browser cookies. Clearing your cookies will reset them.</p><br>
-        <p>You can restore your current settings and subscriptions after clearing your cookies using <a href="/settings/restore/?theme={{ prefs.theme }}&front_page={{ prefs.front_page }}&layout={{ prefs.layout }}&wide={{ prefs.wide }}&post_sort={{ prefs.post_sort }}&comment_sort={{ prefs.comment_sort }}&show_nsfw={{ prefs.show_nsfw }}&blur_nsfw={{ prefs.blur_nsfw }}&use_hls={{ prefs.use_hls }}&hide_hls_notification={{ prefs.hide_hls_notification }}&hide_awards={{ prefs.hide_awards }}&subscriptions={{ prefs.subscriptions.join("%2B") }}&autoplay_videos={{ prefs.autoplay_videos }}&filters={{ prefs.filters.join("%2B") }}">this link</a>.</p>
+        <p>You can restore your current settings and subscriptions after clearing your cookies using <a href="/settings/restore/?theme={{ prefs.theme }}&front_page={{ prefs.front_page }}&layout={{ prefs.layout }}&wide={{ prefs.wide }}&post_sort={{ prefs.post_sort }}&comment_sort={{ prefs.comment_sort }}&show_nsfw={{ prefs.show_nsfw }}&blur_nsfw={{ prefs.blur_nsfw }}&use_hls={{ prefs.use_hls }}&hide_hls_notification={{ prefs.hide_hls_notification }}&hide_awards={{ prefs.hide_awards }}&disable_visit_reddit_confirmation={{ prefs.disable_visit_reddit_confirmation }}&subscriptions={{ prefs.subscriptions.join("%2B") }}&autoplay_videos={{ prefs.autoplay_videos }}&filters={{ prefs.filters.join("%2B") }}">this link</a>.</p>
 	</div>
 </div>
 
