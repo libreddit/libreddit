@@ -302,7 +302,7 @@ body > footer {
 	color: var(--text);
 	cursor: pointer;
 	display: inline-flex;
-	font-size: 300%;
+	font-size: 150%;
 	padding: 0.5em;
 }
 
