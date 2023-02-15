@@ -1613,10 +1613,9 @@ td, th {
 
 	.popup {
 		width: auto;
-		bottom: 10vh;
 	}
 
-	.popup-inner > a, h1, p, img {
-		width: 100%;
+	.popup-inner {
+		max-width: 80%;
 	}
 }
