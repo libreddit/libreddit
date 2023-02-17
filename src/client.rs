@@ -140,7 +140,7 @@ fn request(method: &'static Method, path: String, redirect: bool, quarantine: bo
 		.header("Accept-Encoding", if method == Method::GET { "gzip" } else { "identity" })
 		.header("Accept-Language", "en-US,en;q=0.5")
 		.header("Connection", "keep-alive")
-		.header("Cookie", if quarantine { "_options=%7B%22pref_quarantine_optin%22%3A%20true%7D" } else { "" })
+		.header("Cookie", if quarantine { "_options=%7B%22pref_quarantine_optin%22%3A%20true%2C%20%22pref_gated_sr_optin%22%3A%20true%7D" } else { "" })
 		.body(Body::empty());
 
 	async move {

@@ -144,7 +144,7 @@ pub async fn community(req: Request<Body>) -> Result<Response<Body>, String> {
 				})
 			}
 			Err(msg) => match msg.as_str() {
-				"quarantined" => quarantine(req, sub_name),
+				"quarantined" | "gated" => quarantine(req, sub_name),
 				"private" => error(req, format!("r/{} is a private community", sub_name)).await,
 				"banned" => error(req, format!("r/{} has been banned from Reddit", sub_name)).await,
 				_ => error(req, msg).await,
