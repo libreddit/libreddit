@@ -78,7 +78,7 @@ pub async fn item(req: Request<Body>) -> Result<Response<Body>, String> {
 		}
 		// If the Reddit API returns an error, exit and send error page to user
 		Err(msg) => {
-			if msg == "quarantined" {
+			if msg == "quarantined" || msg == "gated" {
 				let sub = req.param("sub").unwrap_or_default();
 				quarantine(req, sub, msg)
 			} else {

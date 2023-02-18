@@ -323,7 +323,7 @@ pub async fn wiki(req: Request<Body>) -> Result<Response<Body>, String> {
 			url,
 		}),
 		Err(msg) => {
-			if msg == "quarantined" {
+			if msg == "quarantined" || msg == "gated" {
 				quarantine(req, sub, msg)
 			} else {
 				error(req, msg).await
@@ -361,7 +361,7 @@ pub async fn sidebar(req: Request<Body>) -> Result<Response<Body>, String> {
 			url,
 		}),
 		Err(msg) => {
-			if msg == "quarantined" {
+			if msg == "quarantined" || msg == "gated" {
 				quarantine(req, sub, msg)
 			} else {
 				error(req, msg).await
