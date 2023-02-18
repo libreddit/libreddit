@@ -144,7 +144,7 @@ pub async fn community(req: Request<Body>) -> Result<Response<Body>, String> {
 				})
 			}
 			Err(msg) => match msg.as_str() {
-				"quarantined" | "gated" => quarantine(req, sub_name),
+				"quarantined" | "gated" => quarantine(req, sub_name, msg),
 				"private" => error(req, format!("r/{} is a private community", sub_name)).await,
 				"banned" => error(req, format!("r/{} has been banned from Reddit", sub_name)).await,
 				_ => error(req, msg).await,
@@ -153,9 +153,9 @@ pub async fn community(req: Request<Body>) -> Result<Response<Body>, String> {
 	}
 }
 
-pub fn quarantine(req: Request<Body>, sub: String) -> Result<Response<Body>, String> {
+pub fn quarantine(req: Request<Body>, sub: String, restriction: String) -> Result<Response<Body>, String> {
 	let wall = WallTemplate {
-		title: format!("r/{} is quarantined", sub),
+		title: format!("r/{} is {}", sub, restriction),
 		msg: "Please click the button below to continue to this subreddit.".to_string(),
 		url: req.uri().to_string(),
 		sub,
@@ -324,7 +324,7 @@ pub async fn wiki(req: Request<Body>) -> Result<Response<Body>, String> {
 		}),
 		Err(msg) => {
 			if msg == "quarantined" {
-				quarantine(req, sub)
+				quarantine(req, sub, msg)
 			} else {
 				error(req, msg).await
 			}
@@ -362,7 +362,7 @@ pub async fn sidebar(req: Request<Body>) -> Result<Response<Body>, String> {
 		}),
 		Err(msg) => {
 			if msg == "quarantined" {
-				quarantine(req, sub)
+				quarantine(req, sub, msg)
 			} else {
 				error(req, msg).await
 			}

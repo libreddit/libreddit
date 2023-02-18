@@ -80,7 +80,7 @@ pub async fn item(req: Request<Body>) -> Result<Response<Body>, String> {
 		Err(msg) => {
 			if msg == "quarantined" {
 				let sub = req.param("sub").unwrap_or_default();
-				quarantine(req, sub)
+				quarantine(req, sub, msg)
 			} else {
 				error(req, msg).await
 			}
