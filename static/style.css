@@ -142,12 +142,6 @@ nav #links svg {
 	display: none;
 }
 
-nav #version {
-	opacity: 50%;
-	vertical-align: -2px;
-	margin-right: 10px;
-}
-
 nav #libreddit {
 	vertical-align: -2px;
 }
@@ -292,22 +286,22 @@ main {
 body > footer {
 	display: flex;
 	justify-content: center;
-	margin: 20px;
+	align-items: center;
+	width: 100vw;
+	position: absolute;
+	bottom: 0;
+	background: var(--post);
 }
 
-.info-button {
+.footer-button {
 	align-items: center;
 	border-radius: .25rem;
 	box-sizing: border-box;
 	color: var(--text);
 	cursor: pointer;
 	display: inline-flex;
-	font-size: 150%;
-	padding: 0.5em;
-}
-
-.info-button > a:hover {
-	text-decoration: none;
+	padding-left: 1em;
+	opacity: 0.8;
 }
 
 /* / Body footer. */
@@ -1551,7 +1545,6 @@ td, th {
 
 @media screen and (max-width: 480px) {
 	body { padding-top: 100px; }
-	#version { display: none; }
 
 	.post {
 		grid-template: 	"post_header post_header post_thumbnail" auto
