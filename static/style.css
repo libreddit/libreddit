@@ -99,6 +99,8 @@ body {
 	background: var(--background);
 	font-size: 15px;
 	padding-top: 60px;
+	min-height: calc(100vh - 60px);
+	position: relative;
 }
 
 nav {
@@ -264,6 +266,7 @@ main {
 	max-width: 1000px;
 	padding: 10px 20px;
 	margin: 0 auto;
+	padding-bottom: 4em;
 }
 
 .wide main {
@@ -288,9 +291,9 @@ body > footer {
 	justify-content: center;
 	align-items: center;
 	width: 100vw;
+	background: var(--post);
 	position: absolute;
 	bottom: 0;
-	background: var(--post);
 }
 
 .footer-button {
