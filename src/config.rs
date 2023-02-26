@@ -147,3 +147,8 @@ fn test_alt_env_config_precedence() {
 	write("libreddit.toml", config_to_write).unwrap();
 	assert_eq!(get_setting("LIBREDDIT_DEFAULT_COMMENT_SORT"), Some("top".into()))
 }
+#[test]
+#[sealed_test(env = [("LIBREDDIT_DEFAULT_SUBSCRIPTIONS", "news+bestof")])]
+fn test_default_subscriptions() {
+	assert_eq!(get_setting("LIBREDDIT_DEFAULT_SUBSCRIPTIONS"), Some("news+bestof".into()));
+}
