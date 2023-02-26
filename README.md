@@ -159,12 +159,26 @@ For ArchLinux users, Libreddit is available from the AUR as [`libreddit-git`](ht
 ```
 yay -S libreddit-git
 ```
+## 4) NetBSD/pkgsrc
 
-## 4) GitHub Releases
+For NetBSD users, Libreddit is available from the official repositories.
+
+```
+pkgin install libreddit
+```
+
+Or, if you prefer to build from source
+
+```
+cd /usr/pkgsrc/libreddit
+make install
+```
+
+## 5) GitHub Releases
 
 If you're on Linux and none of these methods work for you, you can grab a Linux binary from [the newest release](https://github.com/libreddit/libreddit/releases/latest).
 
-## 5) Replit/Heroku/Glitch
+## 6) Replit/Heroku/Glitch
 
 > **Warning**
 > These are free hosting options but they are *not* private and will monitor server usage to prevent abuse. If you need a free and easy setup, this method may work best for you.
