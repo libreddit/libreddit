@@ -1,15 +1,23 @@
 use cached::proc_macro::cached;
 use futures_lite::{future::Boxed, FutureExt};
-use hyper::{body, body::Buf, client, header, Body, Method, Request, Response, Uri};
+use hyper::{body, body::Buf, client, header, Body, Method, Request, Response, Uri, Client};
 use libflate::gzip;
 use percent_encoding::{percent_encode, CONTROLS};
 use serde_json::Value;
 use std::{io, result::Result};
+use hyper::client::HttpConnector;
+use hyper_rustls::HttpsConnector;
+use once_cell::sync::Lazy;
 
 use crate::dbg_msg;
 use crate::server::RequestExt;
 
 const REDDIT_URL_BASE: &str = "https://www.reddit.com";
+
+static CLIENT: Lazy<Client<HttpsConnector<HttpConnector>>> = Lazy::new(||{
+	let https = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_only().enable_http1().build();
+	client::Client::builder().build(https)
+});
 
 /// Gets the canonical path for a resource on Reddit. This is accomplished by
 /// making a `HEAD` request to Reddit at the path given in `path`.
@@ -66,11 +74,8 @@ async fn stream(url: &str, req: &Request<Body>) -> Result<Response<Body>, String
 	// First parameter is target URL (mandatory).
 	let uri = url.parse::<Uri>().map_err(|_| "Couldn't parse URL".to_string())?;
 
-	// Prepare the HTTPS connector.
-	let https = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_only().enable_http1().build();
-
 	// Build the hyper client from the HTTPS connector.
-	let client: client::Client<_, hyper::Body> = client::Client::builder().build(https);
+	let client: client::Client<_, hyper::Body> = CLIENT.clone();
 
 	let mut builder = Request::get(uri);
 
@@ -123,11 +128,8 @@ fn request(method: &'static Method, path: String, redirect: bool, quarantine: bo
 	// Build Reddit URL from path.
 	let url = format!("{}{}", REDDIT_URL_BASE, path);
 
-	// Prepare the HTTPS connector.
-	let https = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build();
-
 	// Construct the hyper client from the HTTPS connector.
-	let client: client::Client<_, hyper::Body> = client::Client::builder().build(https);
+	let client: client::Client<_, hyper::Body> = CLIENT.clone();
 
 	// Build request to Reddit. When making a GET, request gzip compression.
 	// (Reddit doesn't do brotli yet.)
