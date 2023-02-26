@@ -209,7 +209,8 @@ Assign a default value for each user-modifiable setting by passing environment v
 | `USE_HLS`               | `["on", "off"]`                                                                                     | `off`         |
 | `HIDE_HLS_NOTIFICATION` | `["on", "off"]`                                                                                     | `off`         |
 | `AUTOPLAY_VIDEOS`       | `["on", "off"]`                                                                                     | `off`         |
-| `HIDE_AWARDS`           | `["on", "off"]`                                                                                     | `off`
+| `HIDE_AWARDS`           | `["on", "off"]`                                                                                     | `off`         |
+| `SUBSCRIPTIONS`         | Array of subreddit names (`["sub1", "sub2"]`)                                                       | `[]`          | 
 
 You can also configure Libreddit with a configuration file. An example `libreddit.toml` can be found below:
 

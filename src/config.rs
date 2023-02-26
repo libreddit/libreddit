@@ -52,6 +52,9 @@ pub struct Config {
 	#[serde(rename = "LIBREDDIT_DEFAULT_HIDE_AWARDS")]
 	pub(crate) default_hide_awards: Option<String>,
 
+	#[serde(rename = "LIBREDDIT_DEFAULT_SUBSCRIPTIONS")]
+	pub(crate) default_subscriptions: Option<String>,
+
 	#[serde(rename = "LIBREDDIT_BANNER")]
 	pub(crate) banner: Option<String>,
 }
@@ -81,6 +84,7 @@ impl Config {
 			default_use_hls: parse("LIBREDDIT_DEFAULT_USE_HLS"),
 			default_hide_hls_notification: parse("LIBREDDIT_DEFAULT_HIDE_HLS"),
 			default_hide_awards: parse("LIBREDDIT_DEFAULT_HIDE_AWARDS"),
+			default_subscriptions: parse("LIBREDDIT_DEFAULT_SUBSCRIPTIONS"),
 			banner: parse("LIBREDDIT_BANNER"),
 		}
 	}
@@ -100,6 +104,7 @@ fn get_setting_from_config(name: &str, config: &Config) -> Option<String> {
 		"LIBREDDIT_DEFAULT_HIDE_HLS_NOTIFICATION" => config.default_hide_hls_notification.clone(),
 		"LIBREDDIT_DEFAULT_WIDE" => config.default_wide.clone(),
 		"LIBREDDIT_DEFAULT_HIDE_AWARDS" => config.default_hide_awards.clone(),
+		"LIBREDDIT_DEFAULT_SUBSCRIPTIONS" => config.default_subscriptions.clone(),
 		"LIBREDDIT_BANNER" => config.banner.clone(),
 		_ => None,
 	}

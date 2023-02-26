@@ -139,6 +139,7 @@ impl InstanceInfo {
 				["Blur NSFW", &convert(&self.config.default_blur_nsfw)],
 				["Use HLS", &convert(&self.config.default_use_hls)],
 				["Hide HLS notification", &convert(&self.config.default_hide_hls_notification)],
+				["Subscriptions", &convert(&self.config.default_subscriptions)],
 			])
 			.with_header_row(["Default preferences"]),
 		);
@@ -153,10 +154,10 @@ impl InstanceInfo {
                 Deploy date: {}\n
                 Deploy timestamp: {}\n
                 Compile mode: {}\n
+				SFW only: {:?}\n
                 Config:\n
                     Banner: {:?}\n
                     Hide awards: {:?}\n
-                    SFW only: {:?}\n
                     Default theme: {:?}\n
                     Default front page: {:?}\n
                     Default layout: {:?}\n
@@ -166,15 +167,16 @@ impl InstanceInfo {
                     Default show NSFW: {:?}\n
                     Default blur NSFW: {:?}\n
                     Default use HLS: {:?}\n
-                    Default hide HLS notification: {:?}\n",
+                    Default hide HLS notification: {:?}\n
+                    Default subscriptions: {:?}\n",
 					self.crate_version,
 					self.git_commit,
 					self.deploy_date,
 					self.deploy_unix_ts,
 					self.compile_mode,
+					self.config.sfw_only,
 					self.config.banner,
 					self.config.default_hide_awards,
-					self.config.sfw_only,
 					self.config.default_theme,
 					self.config.default_front_page,
 					self.config.default_layout,
@@ -184,7 +186,8 @@ impl InstanceInfo {
 					self.config.default_show_nsfw,
 					self.config.default_blur_nsfw,
 					self.config.default_use_hls,
-					self.config.default_hide_hls_notification
+					self.config.default_hide_hls_notification,
+					self.config.default_subscriptions,
 				)
 			}
 			StringType::Html => self.to_table(),
