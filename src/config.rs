@@ -52,6 +52,9 @@ pub struct Config {
 	#[serde(rename = "LIBREDDIT_DEFAULT_HIDE_AWARDS")]
 	pub(crate) default_hide_awards: Option<String>,
 
+	#[serde(rename = "LIBREDDIT_DEFAULT_DISABLE_VISIT_REDDIT_CONFIRMATION")]
+	pub(crate) default_disable_visit_reddit_confirmation: Option<String>,
+
 	#[serde(rename = "LIBREDDIT_BANNER")]
 	pub(crate) banner: Option<String>,
 }
@@ -81,6 +84,7 @@ impl Config {
 			default_use_hls: parse("LIBREDDIT_DEFAULT_USE_HLS"),
 			default_hide_hls_notification: parse("LIBREDDIT_DEFAULT_HIDE_HLS"),
 			default_hide_awards: parse("LIBREDDIT_DEFAULT_HIDE_AWARDS"),
+			default_disable_visit_reddit_confirmation: parse("LIBREDDIT_DEFAULT_DISABLE_VISIT_REDDIT_CONFIRMATION"),
 			banner: parse("LIBREDDIT_BANNER"),
 		}
 	}
@@ -100,6 +104,7 @@ fn get_setting_from_config(name: &str, config: &Config) -> Option<String> {
 		"LIBREDDIT_DEFAULT_HIDE_HLS_NOTIFICATION" => config.default_hide_hls_notification.clone(),
 		"LIBREDDIT_DEFAULT_WIDE" => config.default_wide.clone(),
 		"LIBREDDIT_DEFAULT_HIDE_AWARDS" => config.default_hide_awards.clone(),
+		"LIBREDDIT_DEFAULT_DISABLE_VISIT_REDDIT_CONFIRMATION" => config.default_disable_visit_reddit_confirmation.clone(),
 		"LIBREDDIT_BANNER" => config.banner.clone(),
 		_ => None,
 	}
