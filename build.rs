@@ -1,5 +1,6 @@
 use std::{
 	os::unix::process::ExitStatusExt,
+	os::windows::process::ExitStatusExt,
 	process::{Command, ExitStatus, Output},
 };
 fn main() {
