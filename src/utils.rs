@@ -204,10 +204,17 @@ impl GalleryMedia {
 				// For each image in gallery
 				let media_id = item["media_id"].as_str().unwrap_or_default();
 				let image = &metadata[media_id]["s"];
+				let image_type = &metadata[media_id]["m"];
+
+				let url = if image_type == "image/gif" {
+					image["gif"].as_str().unwrap_or_default()
+				} else {
+					image["u"].as_str().unwrap_or_default()
+				};
 
 				// Construct gallery items
 				Self {
-					url: format_url(image["u"].as_str().unwrap_or_default()),
+					url: format_url(url),
 					width: image["x"].as_i64().unwrap_or_default(),
 					height: image["y"].as_i64().unwrap_or_default(),
 					caption: item["caption"].as_str().unwrap_or_default().to_string(),
