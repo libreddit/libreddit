@@ -508,7 +508,9 @@ pub struct Preferences {
 	pub disable_visit_reddit_confirmation: String,
 	pub comment_sort: String,
 	pub post_sort: String,
+	/// List of subscribed subreddits in *lower-case*.
 	pub subscriptions: Vec<String>,
+	/// List of filtered subreddits in *lower-case*.
 	pub filters: Vec<String>,
 	pub hide_awards: String,
 }
@@ -542,8 +544,8 @@ impl Preferences {
 			disable_visit_reddit_confirmation: setting(req, "disable_visit_reddit_confirmation"),
 			comment_sort: setting(req, "comment_sort"),
 			post_sort: setting(req, "post_sort"),
-			subscriptions: setting(req, "subscriptions").split('+').map(String::from).filter(|s| !s.is_empty()).collect(),
-			filters: setting(req, "filters").split('+').map(String::from).filter(|s| !s.is_empty()).collect(),
+			subscriptions: setting(req, "subscriptions").split('+').filter(|s| !s.is_empty()).map(str::to_lowercase).collect(),
+			filters: setting(req, "filters").split('+').filter(|s| !s.is_empty()).map(str::to_lowercase).collect(),
 			hide_awards: setting(req, "hide_awards"),
 		}
 	}

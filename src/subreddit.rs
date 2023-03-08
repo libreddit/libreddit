@@ -210,37 +210,8 @@ pub async fn subscriptions_filters(req: Request<Body>) -> Result<Response<Body>,
 	let mut sub_list = preferences.subscriptions;
 	let mut filters = preferences.filters;
 
-	// Retrieve list of posts for these subreddits to extract display names
-	let posts = json(format!("/r/{}/hot.json?raw_json=1", sub), true).await?;
-	let display_lookup: Vec<(String, &str)> = posts["data"]["children"]
-		.as_array()
-		.map(|list| {
-			list
-				.iter()
-				.map(|post| {
-					let display_name = post["data"]["subreddit"].as_str().unwrap_or_default();
-					(display_name.to_lowercase(), display_name)
-				})
-				.collect::<Vec<_>>()
-		})
-		.unwrap_or_default();
-
 	// Find each subreddit name (separated by '+') in sub parameter
-	for part in sub.split('+').filter(|x| x != &"") {
-		// Retrieve display name for the subreddit
-		let display;
-		let part = if part.starts_with("u_") {
-			part
-		} else if let Some(&(_, display)) = display_lookup.iter().find(|x| x.0 == part.to_lowercase()) {
-			// This is already known, doesn't require separate request
-			display
-		} else {
-			// This subreddit display name isn't known, retrieve it
-			let path: String = format!("/r/{}/about.json?raw_json=1", part);
-			display = json(path, true).await?;
-			display["data"]["display_name"].as_str().ok_or_else(|| "Failed to query subreddit name".to_string())?
-		};
-
+	for part in sub.split('+').filter(|x| x != &"").map(str::to_lowercase) {
 		// Modify sub list based on action
 		if action.contains(&"subscribe".to_string()) && !sub_list.contains(&part.to_owned()) {
 			// Add each sub name to the subscribed list

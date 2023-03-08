@@ -107,8 +107,9 @@
 						<div title="{{ sub.active.1 }}">{{ sub.active.0 }}</div>
 					</div>
 					<div id="sub_actions">
+						{% let lowercase_name = sub.name.to_lowercase() %}
 						<div id="sub_subscription">
-							{% if prefs.subscriptions.contains(sub.name) %}
+							{% if prefs.subscriptions.contains(lowercase_name) %}
 								<form action="/r/{{ sub.name }}/unsubscribe?redirect={{ redirect_url }}" method="POST">
 									<button class="unsubscribe">Unsubscribe</button>
 								</form>
@@ -119,7 +120,7 @@
 							{% endif %}
 						</div>
 						<div id="sub_filter">
-							{% if prefs.filters.contains(sub.name) %}
+							{% if prefs.filters.contains(lowercase_name) %}
 								<form action="/r/{{ sub.name }}/unfilter?redirect={{ redirect_url }}" method="POST">
 									<button class="unfilter">Unfilter</button>
 								</form>
