@@ -107,6 +107,13 @@ fn parse_comments(json: &serde_json::Value, post_link: &str, post_author: &str, 
 
 			let score = data["score"].as_i64().unwrap_or(0);
 
+			// The JSON API only provides comments up to some threshold.
+			// Further comments have to be loaded by subsequent requests.
+			// The "kind" value will be "more" and the "count"
+			// shows how many more (sub-)comments exist in the respective nesting level.
+			// Note that in certain (seemingly random) cases, the count is simply wrong.
+			let more_count = data["count"].as_i64().unwrap_or_default();
+
 			// If this comment contains replies, handle those too
 			let replies: Vec<Comment> = if data["replies"].is_object() {
 				parse_comments(&data["replies"], post_link, post_author, highlighted_comment, filters, req)
@@ -177,6 +184,7 @@ fn parse_comments(json: &serde_json::Value, post_link: &str, post_author: &str, 
 				awards,
 				collapsed,
 				is_filtered,
+				more_count,
 				prefs: Preferences::new(req),
 			}
 		})

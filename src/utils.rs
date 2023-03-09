@@ -377,6 +377,7 @@ pub struct Comment {
 	pub awards: Awards,
 	pub collapsed: bool,
 	pub is_filtered: bool,
+	pub more_count: i64,
 	pub prefs: Preferences,
 }
 
