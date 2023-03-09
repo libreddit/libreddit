@@ -50,6 +50,9 @@
     "LIBREDDIT_BANNER": {
       "required": false
     },
+    "LIBREDDIT_DEFAULT_SUBSCRIPTIONS": {
+      "required": false
+    },
     "LIBREDDIT_DEFAULT_DISABLE_VISIT_REDDIT_CONFIRMATION": {
       "required": false
     }

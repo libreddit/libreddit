@@ -1,20 +1,20 @@
 use cached::proc_macro::cached;
 use futures_lite::{future::Boxed, FutureExt};
-use hyper::{body, body::Buf, client, header, Body, Method, Request, Response, Uri, Client};
+use hyper::client::HttpConnector;
+use hyper::{body, body::Buf, client, header, Body, Client, Method, Request, Response, Uri};
+use hyper_rustls::HttpsConnector;
 use libflate::gzip;
+use once_cell::sync::Lazy;
 use percent_encoding::{percent_encode, CONTROLS};
 use serde_json::Value;
 use std::{io, result::Result};
-use hyper::client::HttpConnector;
-use hyper_rustls::HttpsConnector;
-use once_cell::sync::Lazy;
 
 use crate::dbg_msg;
 use crate::server::RequestExt;
 
 const REDDIT_URL_BASE: &str = "https://www.reddit.com";
 
-static CLIENT: Lazy<Client<HttpsConnector<HttpConnector>>> = Lazy::new(||{
+static CLIENT: Lazy<Client<HttpsConnector<HttpConnector>>> = Lazy::new(|| {
 	let https = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_only().enable_http1().build();
 	client::Client::builder().build(https)
 });
@@ -142,7 +142,14 @@ fn request(method: &'static Method, path: String, redirect: bool, quarantine: bo
 		.header("Accept-Encoding", if method == Method::GET { "gzip" } else { "identity" })
 		.header("Accept-Language", "en-US,en;q=0.5")
 		.header("Connection", "keep-alive")
-		.header("Cookie", if quarantine { "_options=%7B%22pref_quarantine_optin%22%3A%20true%2C%20%22pref_gated_sr_optin%22%3A%20true%7D" } else { "" })
+		.header(
+			"Cookie",
+			if quarantine {
+				"_options=%7B%22pref_quarantine_optin%22%3A%20true%2C%20%22pref_gated_sr_optin%22%3A%20true%7D"
+			} else {
+				""
+			},
+		)
 		.body(Body::empty());
 
 	async move {

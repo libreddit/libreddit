@@ -161,7 +161,7 @@ async fn main() {
 	let mut app = server::Server::new();
 
 	// Force evaluation of statics. In instance_info case, we need to evaluate
-	// the timestamp so deploy date is accurate - in config case, we need to 
+	// the timestamp so deploy date is accurate - in config case, we need to
 	// evaluate the configuration to avoid paying penalty at first request.
 
 	Lazy::force(&config::CONFIG);
