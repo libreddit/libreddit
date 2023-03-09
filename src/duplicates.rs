@@ -210,9 +210,9 @@ pub async fn item(req: Request<Body>) -> Result<Response<Body>, String> {
 
 		// Process error.
 		Err(msg) => {
-			if msg == "quarantined" {
+			if msg == "quarantined" || msg == "gated" {
 				let sub = req.param("sub").unwrap_or_default();
-				quarantine(req, sub)
+				quarantine(req, sub, msg)
 			} else {
 				error(req, msg).await
 			}

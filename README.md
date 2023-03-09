@@ -114,13 +114,21 @@ Results from Google PageSpeed Insights ([Libreddit Report](https://pagespeed.web
 
 For transparency, I hope to describe all the ways Libreddit handles user privacy.
 
-**Logging:** In production (when running the binary, hosting with docker, or using the official instances), Libreddit logs nothing. When debugging (running from source without `--release`), Libreddit logs post IDs fetched to aid with troubleshooting.
+#### Server
 
-**DNS:** Both official domains (`libredd.it` and `libreddit.spike.codes`) use Cloudflare as the DNS resolver. Though, the sites are not proxied through Cloudflare meaning Cloudflare doesn't have access to user traffic.
+* **Logging:** In production (when running the binary, hosting with docker, or using the official instances), Libreddit logs nothing. When debugging (running from source without `--release`), Libreddit logs post IDs fetched to aid with troubleshooting.
 
-**Cookies:** Libreddit uses optional cookies to store any configured settings in [the settings menu](https://libreddit.spike.codes/settings). These are not cross-site cookies and the cookies hold no personal data.
+* **Cookies:** Libreddit uses optional cookies to store any configured settings in [the settings menu](https://libreddit.spike.codes/settings). These are not cross-site cookies and the cookies hold no personal data.
 
-**Hosting:** The official instances are hosted on [Replit](https://replit.com/) which monitors usage to prevent abuse. I can understand if this invalidates certain users' threat models and therefore, self-hosting, using unofficial instances, and browsing through Tor are welcomed.
+#### Official instance (libreddit.spike.codes)
+
+The official instance is hosted at https://libreddit.spike.codes.
+
+* **Server:** The official instance runs a production binary, and thus logs nothing.
+
+* **DNS:** The domain for the official instance uses Cloudflare as the DNS resolver. However, this site is not proxied through Cloudflare, and thus Cloudflare doesn't have access to user traffic.
+
+* **Hosting:** The official instance is hosted on [Replit](https://replit.com/), which monitors usage to prevent abuse. I can understand if this invalidates certain users' threat models, and therefore, self-hosting, using unofficial instances, and browsing through Tor are welcomed.
 
 ---
 
@@ -159,12 +167,26 @@ For ArchLinux users, Libreddit is available from the AUR as [`libreddit-git`](ht
 ```
 yay -S libreddit-git
 ```
+## 4) NetBSD/pkgsrc
 
-## 4) GitHub Releases
+For NetBSD users, Libreddit is available from the official repositories.
+
+```
+pkgin install libreddit
+```
+
+Or, if you prefer to build from source
+
+```
+cd /usr/pkgsrc/libreddit
+make install
+```
+
+## 5) GitHub Releases
 
 If you're on Linux and none of these methods work for you, you can grab a Linux binary from [the newest release](https://github.com/libreddit/libreddit/releases/latest).
 
-## 5) Replit/Heroku/Glitch
+## 6) Replit/Heroku/Glitch
 
 > **Warning**
 > These are free hosting options but they are *not* private and will monitor server usage to prevent abuse. If you need a free and easy setup, this method may work best for you.
@@ -210,7 +232,9 @@ Assign a default value for each user-modifiable setting by passing environment v
 | `HIDE_HLS_NOTIFICATION` | `["on", "off"]`                                                                                     | `off`         |
 | `AUTOPLAY_VIDEOS`       | `["on", "off"]`                                                                                     | `off`         |
 | `HIDE_AWARDS`           | `["on", "off"]`                                                                                     | `off`         |
-| `SUBSCRIPTIONS`         | Array of subreddit names (`["sub1", "sub2"]`)                                                       | `[]`          | 
+| `SUBSCRIPTIONS`         | `+`-delimited list of subreddits (`sub1+sub2+sub3+...`)                                                       | _(none)_          | 
+| `HIDE_AWARDS`           | `["on", "off"]`                                                                                     | `off`
+| `DISABLE_VISIT_REDDIT_CONFIRMATION`     | `["on", "off"]`                                                                                     | `off`         |
 
 You can also configure Libreddit with a configuration file. An example `libreddit.toml` can be found below:
 

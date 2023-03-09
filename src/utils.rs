@@ -204,10 +204,17 @@ impl GalleryMedia {
 				// For each image in gallery
 				let media_id = item["media_id"].as_str().unwrap_or_default();
 				let image = &metadata[media_id]["s"];
+				let image_type = &metadata[media_id]["m"];
+
+				let url = if image_type == "image/gif" {
+					image["gif"].as_str().unwrap_or_default()
+				} else {
+					image["u"].as_str().unwrap_or_default()
+				};
 
 				// Construct gallery items
 				Self {
-					url: format_url(image["u"].as_str().unwrap_or_default()),
+					url: format_url(url),
 					width: image["x"].as_i64().unwrap_or_default(),
 					height: image["y"].as_i64().unwrap_or_default(),
 					caption: item["caption"].as_str().unwrap_or_default().to_string(),
@@ -370,6 +377,7 @@ pub struct Comment {
 	pub awards: Awards,
 	pub collapsed: bool,
 	pub is_filtered: bool,
+	pub more_count: i64,
 	pub prefs: Preferences,
 }
 
@@ -505,6 +513,7 @@ pub struct Preferences {
 	pub hide_hls_notification: String,
 	pub use_hls: String,
 	pub autoplay_videos: String,
+	pub disable_visit_reddit_confirmation: String,
 	pub comment_sort: String,
 	pub post_sort: String,
 	pub subscriptions: Vec<String>,
@@ -538,6 +547,7 @@ impl Preferences {
 			use_hls: setting(&req, "use_hls"),
 			hide_hls_notification: setting(&req, "hide_hls_notification"),
 			autoplay_videos: setting(&req, "autoplay_videos"),
+			disable_visit_reddit_confirmation: setting(&req, "disable_visit_reddit_confirmation"),
 			comment_sort: setting(&req, "comment_sort"),
 			post_sort: setting(&req, "post_sort"),
 			subscriptions: setting(&req, "subscriptions").split('+').map(String::from).filter(|s| !s.is_empty()).collect(),

@@ -1,3 +1,5 @@
+{% import "utils.html" as utils %}
+
 <!DOCTYPE html>
 <html lang="en">
 	<head>
@@ -35,12 +37,16 @@
 			</div>
 			{% block search %}{% endblock %}
 			<div id="links">
-				<a id="reddit_link" href="https://www.reddit.com{{ url }}" rel="nofollow">
+				<a id="reddit_link" {% if prefs.disable_visit_reddit_confirmation != "on" %}href="#popup"{% else %}href="https://www.reddit.com{{ url }}" rel="nofollow"{% endif %}>
 					<span>reddit</span>
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-						<path d="M23 12.0737C23 10.7308 21.9222 9.64226 20.5926 9.64226C19.9435 9.64226 19.3557 9.90274 18.923 10.3244C17.2772 9.12492 15.0099 8.35046 12.4849 8.26135L13.5814 3.05002L17.1643 3.8195C17.2081 4.73947 17.9539 5.47368 18.8757 5.47368C19.8254 5.47368 20.5951 4.69626 20.5951 3.73684C20.5951 2.77769 19.8254 2 18.8758 2C18.2001 2 17.6214 2.39712 17.3404 2.96952L13.3393 2.11066C13.2279 2.08679 13.1116 2.10858 13.016 2.17125C12.9204 2.23393 12.8533 2.33235 12.8295 2.44491L11.6051 8.25987C9.04278 8.33175 6.73904 9.10729 5.07224 10.3201C4.63988 9.90099 4.05398 9.64226 3.40757 9.64226C2.0781 9.64226 1 10.7308 1 12.0737C1 13.0618 1.58457 13.9105 2.4225 14.2909C2.38466 14.5342 2.36545 14.78 2.36505 15.0263C2.36505 18.7673 6.67626 21.8 11.9945 21.8C17.3131 21.8 21.6243 18.7673 21.6243 15.0263C21.6243 14.7794 21.6043 14.5359 21.5678 14.2957C22.4109 13.9175 23 13.0657 23 12.0737Z"/>
+						<path d="M22 2L12 22"/>
+						<path d="M2 6.70587C3.33333 8.07884 3.33333 11.5971 3.33333 11.5971M3.33333 19.647V11.5971M3.33333 11.5971C3.33333 11.5971 5.125 7.47817 8 7.47817C10.875 7.47817 12 8.85114 12 8.85114"/>
 					</svg>
 				</a>
+				{% if prefs.disable_visit_reddit_confirmation != "on" %}
+					{% call utils::visit_reddit_confirmation(url) %}
+				{% endif %}
 				<a id="settings_link" href="/settings">
 					<span>settings</span>
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
