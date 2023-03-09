@@ -32,7 +32,6 @@
 		<nav>
 			<div id="logo">
 				<a id="libreddit" href="/"><span id="lib">lib</span><span id="reddit">reddit.</span></a>
-				<span id="version">v{{ env!("CARGO_PKG_VERSION") }}</span>
 				{% block subscriptions %}{% endblock %}
 			</div>
 			{% block search %}{% endblock %}
@@ -54,13 +53,6 @@
 						<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
 					</svg>
 				</a>
-				<a id="code" href="https://github.com/libreddit/libreddit" target="_blank" rel="noopener noreferrer">
-					<span>code</span>
-					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-						<title>code</title>
-						<polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
-					</svg>
-				</a>
 			</div>
 		</nav>
 		
@@ -71,10 +63,16 @@
 			{% endblock %}
 		</main>
 		{% endblock %}
+
+		<!-- FOOTER -->
 		{% block footer %}
 			<footer>
-				<div class="info-button">
-					<a href="/info" title="View instance information">&#x24D8;</a>
+				<p id="version">v{{ env!("CARGO_PKG_VERSION") }}</p>
+				<div class="footer-button">
+					<a href="/info" title="View instance information">ⓘ View instance info</a>
+				</div>
+				<div class="footer-button">
+					<a href="https://github.com/libreddit/libreddit" title="View code on GitHub">&lt;&gt; Code</a>
 				</div>
 			</footer>
 		{% endblock %}
