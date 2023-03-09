@@ -112,7 +112,7 @@ fn parse_comments(json: &serde_json::Value, post_link: &str, post_author: &str, 
 			// The "kind" value will be "more" and the "count"
 			// shows how many more (sub-)comments exist in the respective nesting level.
 			// Note that in certain (seemingly random) cases, the count is simply wrong.
-			let more_count = data["count"].as_i64().unwrap_or(0);
+			let more_count = data["count"].as_i64().unwrap_or_default();
 
 			// If this comment contains replies, handle those too
 			let replies: Vec<Comment> = if data["replies"].is_object() {
