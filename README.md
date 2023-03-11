@@ -231,7 +231,6 @@ Assign a default value for each user-modifiable setting by passing environment v
 | `USE_HLS`               | `["on", "off"]`                                                                                     | `off`         |
 | `HIDE_HLS_NOTIFICATION` | `["on", "off"]`                                                                                     | `off`         |
 | `AUTOPLAY_VIDEOS`       | `["on", "off"]`                                                                                     | `off`         |
-| `HIDE_AWARDS`           | `["on", "off"]`                                                                                     | `off`         |
 | `SUBSCRIPTIONS`         | `+`-delimited list of subreddits (`sub1+sub2+sub3+...`)                                                       | _(none)_          | 
 | `HIDE_AWARDS`           | `["on", "off"]`                                                                                     | `off`
 | `DISABLE_VISIT_REDDIT_CONFIRMATION`     | `["on", "off"]`                                                                                     | `off`         |
