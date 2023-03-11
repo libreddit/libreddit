@@ -26,6 +26,8 @@
 	--popup-goback-background: var(--popup-red);
 	--popup-goback-text: #222;
 	--popup-border: 1px solid var(--popup-red);
+
+	--footer-height: 30px;
 }
 
 @font-face {
@@ -99,6 +101,7 @@ body {
 	background: var(--background);
 	font-size: 15px;
 	padding-top: 60px;
+	padding-bottom: var(--footer-height);
 	min-height: calc(100vh - 60px);
 	position: relative;
 }
@@ -1505,7 +1508,10 @@ td, th {
 /* Mobile */
 
 @media screen and (max-width: 800px) {
-	body { padding-top: 120px }
+	body {
+		padding-top: 120px;
+		padding-bottom: var(--footer-height);
+	}
 
 	main {
 		flex-direction: column-reverse;
@@ -1547,7 +1553,10 @@ td, th {
 }
 
 @media screen and (max-width: 480px) {
-	body { padding-top: 100px; }
+	body {
+		padding-top: 100px;
+		padding-bottom: var(--footer-height);
+	}
 
 	.post {
 		grid-template: 	"post_header post_header post_thumbnail" auto
