@@ -224,15 +224,15 @@ Assign a default value for each user-modifiable setting by passing environment v
 | `FRONT_PAGE`            | `["default", "popular", "all"]`                                                                     | `default`     |
 | `LAYOUT`                | `["card", "clean", "compact"]`                                                                      | `card`        |
 | `WIDE`                  | `["on", "off"]`                                                                                     | `off`         |
-| `POST_SORT`             | `["hot", "new", "top", "rising", "controversial"]`                                                  | `hot`         |
 | `COMMENT_SORT`          | `["confidence", "top", "new", "controversial", "old"]`                                              | `confidence`  |
+| `POST_SORT`             | `["hot", "new", "top", "rising", "controversial"]`                                                  | `hot`         |
 | `SHOW_NSFW`             | `["on", "off"]`                                                                                     | `off`         |
 | `BLUR_NSFW`             | `["on", "off"]`                                                                                     | `off`         |
 | `USE_HLS`               | `["on", "off"]`                                                                                     | `off`         |
 | `HIDE_HLS_NOTIFICATION` | `["on", "off"]`                                                                                     | `off`         |
+| `HIDE_AWARDS`           | `["on", "off"]`                                                                                     | `off`
 | `AUTOPLAY_VIDEOS`       | `["on", "off"]`                                                                                     | `off`         |
 | `SUBSCRIPTIONS`         | `+`-delimited list of subreddits (`sub1+sub2+sub3+...`)                                                       | _(none)_          | 
-| `HIDE_AWARDS`           | `["on", "off"]`                                                                                     | `off`
 | `DISABLE_VISIT_REDDIT_CONFIRMATION`     | `["on", "off"]`                                                                                     | `off`         |
 
 You can also configure Libreddit with a configuration file. An example `libreddit.toml` can be found below:
