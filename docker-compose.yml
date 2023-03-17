@@ -7,7 +7,7 @@ services:
     container_name: "libreddit"
     ports:
       - 8080:8080
-    user: 65534:65534
+    user: 65534:65534  # equivalent to the `nobody` user
     read_only: true
     security_opt:
       - no-new-privileges:true
