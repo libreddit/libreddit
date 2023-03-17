@@ -7,6 +7,10 @@ services:
     container_name: "libreddit"
     ports:
       - 8080:8080
+    cap_drop:
+      - ALL
+    security_opt:
+      - seccomp="seccomp-libreddit.json"
     healthcheck:
       test: ["CMD", "wget", "--spider", "-q", "--tries=1", "http://localhost:8080/settings"]
       interval: 5m
