@@ -96,6 +96,62 @@ pub struct Author {
 	pub distinguished: String,
 }
 
+pub struct Poll {
+	pub poll_options: Vec<PollOption>,
+	pub voting_end_timestamp: (String, String),
+	pub total_vote_count: u64,
+}
+
+impl Poll {
+	pub fn parse(poll_data: &Value) -> Option<Self> {
+		if poll_data.as_object().is_none() { return None };
+		
+		let total_vote_count = poll_data["total_vote_count"].as_u64()?;
+		// voting_end_timestamp is in the format of milliseconds
+		let voting_end_timestamp = time(poll_data["voting_end_timestamp"].as_f64()? / 1000.0);
+		let poll_options = PollOption::parse(&poll_data["options"]);
+
+		Some(Self {
+			poll_options,
+			total_vote_count,
+			voting_end_timestamp
+		})
+	}
+
+	pub fn most_votes(&self) -> u64 {
+		self.poll_options.iter().map(|o| o.vote_count).max().unwrap_or(0)
+	}
+}
+
+pub struct PollOption {
+	pub id: u64,
+	pub text: String,
+	pub vote_count: u64
+}
+
+impl PollOption {
+	pub fn parse(options: &Value) -> Vec<Self> {
+		options
+		.as_array()
+		.unwrap_or(&Vec::new())
+		.iter()
+		.map(|option| {
+			// For each poll option
+			let id = option["id"].as_u64().unwrap_or_default();
+			let text = option["text"].as_str().unwrap_or_default().to_owned();
+			let vote_count = option["vote_count"].as_u64().unwrap_or_default();
+
+			// Construct PollOption items
+			Self {
+				id,
+				text,
+				vote_count
+			}
+		})
+		.collect::<Vec<Self>>()
+	}
+}
+
 // Post flags with nsfw and stickied
 pub struct Flags {
 	pub nsfw: bool,
@@ -233,6 +289,7 @@ pub struct Post {
 	pub body: String,
 	pub author: Author,
 	pub permalink: String,
+	pub poll: Option<Poll>,
 	pub score: (String, String),
 	pub upvote_ratio: i64,
 	pub post_type: String,
@@ -342,6 +399,7 @@ impl Post {
 					stickied: data["stickied"].as_bool().unwrap_or_default() || data["pinned"].as_bool().unwrap_or_default(),
 				},
 				permalink: val(post, "permalink"),
+				poll: Poll::parse(&data["poll_data"]),
 				rel_time,
 				created,
 				num_duplicates: post["data"]["num_duplicates"].as_u64().unwrap_or(0),
@@ -600,6 +658,8 @@ pub async fn parse_post(post: &serde_json::Value) -> Post {
 
 	let permalink = val(post, "permalink");
 
+	let poll = Poll::parse(&post["data"]["poll_data"]);
+
 	let body = if val(post, "removed_by_category") == "moderator" {
 		format!(
 			"<div class=\"md\"><p>[removed] — <a href=\"https://www.unddit.com{}\">view removed post</a></p></div>",
@@ -630,6 +690,7 @@ pub async fn parse_post(post: &serde_json::Value) -> Post {
 			distinguished: val(post, "distinguished"),
 		},
 		permalink,
+		poll,
 		score: format_num(score),
 		upvote_ratio: ratio as i64,
 		post_type,
