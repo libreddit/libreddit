@@ -815,19 +815,27 @@ pub fn format_num(num: i64) -> (String, String) {
 // Parse a relative and absolute time from a UNIX timestamp
 pub fn time(created: f64) -> (String, String) {
 	let time = OffsetDateTime::from_unix_timestamp(created.round() as i64).unwrap_or(OffsetDateTime::UNIX_EPOCH);
-	let time_delta = OffsetDateTime::now_utc() - time;
+	let min = time.min(OffsetDateTime::now_utc());
+	let max = time.max(OffsetDateTime::now_utc());
+	let time_delta = max - min;
 
 	// If the time difference is more than a month, show full date
-	let rel_time = if time_delta > Duration::days(30) {
+	let mut rel_time = if time_delta > Duration::days(30) {
 		time.format(format_description!("[month repr:short] [day] '[year repr:last_two]")).unwrap_or_default()
 	// Otherwise, show relative date/time
 	} else if time_delta.whole_days() > 0 {
-		format!("{}d ago", time_delta.whole_days())
+		format!("{}d", time_delta.whole_days())
 	} else if time_delta.whole_hours() > 0 {
-		format!("{}h ago", time_delta.whole_hours())
+		format!("{}h", time_delta.whole_hours())
 	} else {
-		format!("{}m ago", time_delta.whole_minutes())
+		format!("{}m", time_delta.whole_minutes())
 	};
+
+	if OffsetDateTime::now_utc() < time {
+		rel_time += " left";
+	} else {
+		rel_time += " ago";
+	}
 
 	(
 		rel_time,
