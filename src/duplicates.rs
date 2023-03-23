@@ -67,12 +67,12 @@ pub async fn item(req: Request<Body>) -> Result<Response<Body>, String> {
 		Ok(response) => {
 			let post = parse_post(&response[0]["data"]["children"][0]).await;
 
-            let req_url = req.uri().to_string();
+			let req_url = req.uri().to_string();
 			// Return landing page if this post if this Reddit deems this post
 			// NSFW, but we have also disabled the display of NSFW content
 			// or if the instance is SFW-only
 			if post.nsfw && crate::utils::should_be_nsfw_gated(&req, &req_url) {
-			return Ok(nsfw_landing(req, req_url).await.unwrap_or_default());
+				return Ok(nsfw_landing(req, req_url).await.unwrap_or_default());
 			}
 
 			let filters = get_filters(&req);
@@ -234,4 +234,3 @@ async fn parse_duplicates(json: &serde_json::Value, filters: &HashSet<String>) -
 	let (num_posts_filtered, all_posts_filtered) = filter_posts(&mut duplicates, filters);
 	(duplicates, num_posts_filtered, all_posts_filtered)
 }
-

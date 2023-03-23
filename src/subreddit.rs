@@ -97,7 +97,7 @@ pub async fn community(req: Request<Body>) -> Result<Response<Body>, String> {
 		}
 	};
 
-    let req_url = req.uri().to_string();
+	let req_url = req.uri().to_string();
 	// Return landing page if this post if this is NSFW community but the user
 	// has disabled the display of NSFW content or if the instance is SFW-only.
 	if sub.nsfw && crate::utils::should_be_nsfw_gated(&req, &req_url) {
@@ -434,4 +434,3 @@ async fn subreddit(sub: &str, quarantined: bool) -> Result<Subreddit, String> {
 		nsfw: res["data"]["over18"].as_bool().unwrap_or_default(),
 	})
 }
-

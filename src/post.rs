@@ -56,7 +56,7 @@ pub async fn item(req: Request<Body>) -> Result<Response<Body>, String> {
 			// Parse the JSON into Post and Comment structs
 			let post = parse_post(&response[0]["data"]["children"][0]).await;
 
-            let req_url = req.uri().to_string();
+			let req_url = req.uri().to_string();
 			// Return landing page if this post if this Reddit deems this post
 			// NSFW, but we have also disabled the display of NSFW content
 			// or if the instance is SFW-only.
@@ -190,4 +190,3 @@ fn parse_comments(json: &serde_json::Value, post_link: &str, post_author: &str, 
 		})
 		.collect()
 }
-

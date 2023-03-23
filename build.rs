@@ -1,6 +1,4 @@
-use std::{
-	process::{Command, ExitStatus, Output},
-};
+use std::process::{Command, ExitStatus, Output};
 
 #[cfg(not(target_os = "windows"))]
 use std::os::unix::process::ExitStatusExt;
