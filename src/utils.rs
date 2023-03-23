@@ -519,6 +519,7 @@ pub struct Preferences {
 	pub subscriptions: Vec<String>,
 	pub filters: Vec<String>,
 	pub hide_awards: String,
+	pub hide_score: String,
 }
 
 #[derive(RustEmbed)]
@@ -553,6 +554,7 @@ impl Preferences {
 			subscriptions: setting(&req, "subscriptions").split('+').map(String::from).filter(|s| !s.is_empty()).collect(),
 			filters: setting(&req, "filters").split('+').map(String::from).filter(|s| !s.is_empty()).collect(),
 			hide_awards: setting(&req, "hide_awards"),
+			hide_score: setting(&req, "hide_score"),
 		}
 	}
 }

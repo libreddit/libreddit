@@ -47,6 +47,9 @@
     "LIBREDDIT_DEFAULT_HIDE_AWARDS": {
       "required": false
     },
+    "LIBREDDIT_DEFAULT_HIDE_SCORE": {
+      "required": false
+    },
     "LIBREDDIT_BANNER": {
       "required": false
     },
