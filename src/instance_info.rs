@@ -179,7 +179,7 @@ impl InstanceInfo {
 					self.config.sfw_only,
 					self.config.banner,
 					self.config.default_hide_awards,
-                    self.config.default_hide_score,
+					self.config.default_hide_score,
 					self.config.default_theme,
 					self.config.default_front_page,
 					self.config.default_layout,

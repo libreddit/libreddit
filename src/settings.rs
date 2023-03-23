@@ -32,7 +32,7 @@ const PREFS: [&str; 14] = [
 	"hide_hls_notification",
 	"autoplay_videos",
 	"hide_awards",
-    "hide_score",
+	"hide_score",
 	"disable_visit_reddit_confirmation",
 ];
 
