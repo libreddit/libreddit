@@ -899,7 +899,7 @@ pub fn should_be_nsfw_gated(req: &Request<Body>, req_url: &String) -> bool {
 	let gate_nsfw = (setting(&req, "show_nsfw") != "on") || sfw_instance;
 
 	// Nsfw landing gate should not be bypassed on a sfw only instance,
-	let bypass_gate = !sfw_instance && req_url.ends_with("&bypass_nsfw_landing");
+	let bypass_gate = !sfw_instance && req_url.contains("&bypass_nsfw_landing");
 
 	gate_nsfw && !bypass_gate
 }
