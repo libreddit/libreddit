@@ -219,7 +219,7 @@ Assign a default value for each instance-specific setting by passing environment
 Assign a default value for each user-modifiable setting by passing environment variables to Libreddit in the format `LIBREDDIT_DEFAULT_{Y}`. Replace `{Y}` with the setting name (see list below) in capital letters.
 
 | Name                    | Possible values                                                                                     | Default value |
-|------------------------|-----------------------------------------------------------------------------------------------------|---------------|
+|-------------------------|-----------------------------------------------------------------------------------------------------|---------------|
 | `THEME`                 | `["system", "light", "dark", "black", "dracula", "nord", "laserwave", "violet", "gold", "rosebox", "gruvboxdark", "gruvboxlight"]` | `system`      |
 | `FRONT_PAGE`            | `["default", "popular", "all"]`                                                                     | `default`     |
 | `LAYOUT`                | `["card", "clean", "compact"]`                                                                      | `card`        |

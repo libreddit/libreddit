@@ -147,9 +147,9 @@
 
 	<!-- POST BODY -->
 	<div class="post_body">{{ post.body|safe }}</div>
-  {% if prefs.hide_score != "on" %}
+    {% if prefs.hide_score != "on" %}
 	<div class="post_score" title="{{ post.score.1 }}">{{ post.score.0 }}<span class="label"> Upvotes</span></div>
-  {% endif %}
+    {% endif %}
 	<div class="post_footer">
 		<ul id="post_links">
 			<li class="desktop_item"><a href="{{ post.permalink }}">permalink</a></li>
@@ -269,9 +269,9 @@
 		<span>{% if post.post_type == "link" %}{{ post.domain }}{% else %}{{ post.post_type }}{% endif %}</span>
 	</a>
 	{% endif %}
-  {% if prefs.hide_score != "on" %}
+    {% if prefs.hide_score != "on" %}
 	<div class="post_score" title="{{ post.score.1 }}">{{ post.score.0 }}<span class="label"> Upvotes</span></div>
-  {% endif %}
+    {% endif %}
 	<div class="post_body post_preview">
 		{{ post.body|safe }}
 	</div>
