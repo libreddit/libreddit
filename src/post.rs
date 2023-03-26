@@ -104,7 +104,7 @@ pub async fn item(req: Request<Body>) -> Result<Response<Body>, String> {
 	}
 }
 
-/* COMMENTS */
+// COMMENTS
 
 fn parse_comments(json: &serde_json::Value, post_link: &str, post_author: &str, highlighted_comment: &str, filters: &HashSet<String>, req: &Request<Body>) -> Vec<Comment> {
 	// Parse the comment JSON into a Vector of Comments
@@ -118,7 +118,7 @@ fn parse_comments(json: &serde_json::Value, post_link: &str, post_author: &str, 
 			let replies: Vec<Comment> = if data["replies"].is_object() {
 				parse_comments(&data["replies"], post_link, post_author, highlighted_comment, filters, req)
 			} else {
-				Vec::with_capacity(0)
+				Vec::new()
 			};
 			build_comment(&comment, data, replies, post_link, post_author, highlighted_comment, filters, req)
 		})
@@ -145,7 +145,7 @@ fn query_comments(
 			results.append(&mut query_comments(&data["replies"], post_link, post_author, highlighted_comment, filters, query, req))
 		}
 
-		let c = build_comment(&comment, data, Vec::with_capacity(0), post_link, post_author, highlighted_comment, filters, req);
+		let c = build_comment(&comment, data, Vec::new(), post_link, post_author, highlighted_comment, filters, req);
 		if c.body.to_lowercase().contains(&query.to_lowercase()) {
 			results.push(c);
 		}
