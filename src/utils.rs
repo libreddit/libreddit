@@ -892,10 +892,12 @@ pub fn time(created: f64) -> (String, String) {
 		format!("{}m", time_delta.whole_minutes())
 	};
 
-	if OffsetDateTime::now_utc() < time {
-		rel_time += " left";
-	} else {
-		rel_time += " ago";
+	if time_delta <= Duration::days(30) {
+		if OffsetDateTime::now_utc() < time {
+			rel_time += " left";
+		} else {
+			rel_time += " ago";
+		}
 	}
 
 	(
