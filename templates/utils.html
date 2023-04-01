@@ -315,14 +315,20 @@
 				<span>{{ poll.voting_end_timestamp.0 }}</span>
 				{% for option in poll.poll_options %}
 				<div class="poll_option">
-					{# Posts without vote_count (all open polls) will show up as having 0 votes.
+					{# Posts without vote_count (all open polls) will show up without votes.
 						This is an issue with Reddit API, it doesn't work on Old Reddit either. #}
-					{% if option.vote_count == widest %}
-						<div class="poll_chart most_voted" style="width: 100%"></div>
-					{% else %}
-						<div class="poll_chart" style="width: {{ (option.vote_count * 100) / widest }}%"></div>
-					{% endif %}
-					<span>{{ option.vote_count }}</span>
+					{% match option.vote_count %}
+						{% when Some with (vote_count) %}
+							{% if vote_count.eq(widest) || widest == 0 %}
+								<div class="poll_chart most_voted" style="width: 100%"></div>
+							{% else %}
+								<div class="poll_chart" style="width: {{ (vote_count * 100) / widest }}%"></div>
+							{% endif %}
+							<span>{{ vote_count }}</span>
+						{% when None %}
+							<div class="poll_chart most_voted" style="width: 100%"></div>
+							<span></span>
+					{% endmatch %}
 					<span>{{ option.text }}</span>
 				</div>
 				{% endfor %}

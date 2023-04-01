@@ -104,12 +104,12 @@ pub struct Poll {
 
 impl Poll {
 	pub fn parse(poll_data: &Value) -> Option<Self> {
-		if poll_data.as_object().is_none() { return None };
+		poll_data.as_object()?;
 		
 		let total_vote_count = poll_data["total_vote_count"].as_u64()?;
 		// voting_end_timestamp is in the format of milliseconds
 		let voting_end_timestamp = time(poll_data["voting_end_timestamp"].as_f64()? / 1000.0);
-		let poll_options = PollOption::parse(&poll_data["options"]);
+		let poll_options = PollOption::parse(&poll_data["options"])?;
 
 		Some(Self {
 			poll_options,
@@ -119,36 +119,38 @@ impl Poll {
 	}
 
 	pub fn most_votes(&self) -> u64 {
-		self.poll_options.iter().map(|o| o.vote_count).max().unwrap_or(0)
+		self.poll_options.iter().map(|o| o.vote_count).flatten().max().unwrap_or(0)
 	}
 }
 
 pub struct PollOption {
 	pub id: u64,
 	pub text: String,
-	pub vote_count: u64
+	pub vote_count: Option<u64>
 }
 
 impl PollOption {
-	pub fn parse(options: &Value) -> Vec<Self> {
-		options
-		.as_array()
-		.unwrap_or(&Vec::new())
+	pub fn parse(options: &Value) -> Option<Vec<Self>> {
+		Some(options
+		.as_array()?
 		.iter()
 		.map(|option| {
 			// For each poll option
-			let id = option["id"].as_u64().unwrap_or_default();
-			let text = option["text"].as_str().unwrap_or_default().to_owned();
-			let vote_count = option["vote_count"].as_u64().unwrap_or_default();
+
+			// we can't just use as_u64() because "id": String("...") and serde would parse it as None
+			let id = option["id"].as_str()?.parse::<u64>().ok()?;
+			let text = option["text"].as_str()?.to_owned();
+			let vote_count = option["vote_count"].as_u64();
 
 			// Construct PollOption items
-			Self {
+			Some(Self {
 				id,
 				text,
 				vote_count
-			}
+			})
 		})
-		.collect::<Vec<Self>>()
+		.flatten()
+		.collect::<Vec<Self>>())
 	}
 }
 
