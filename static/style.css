@@ -988,6 +988,7 @@ a.search_subreddit:hover {
 
 .most_voted {
 	opacity: 0.45;
+	width: 100%;
 }
 
 /* Used only for text post preview */

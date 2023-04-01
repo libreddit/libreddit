@@ -311,8 +311,8 @@
 		{% when Some with (poll) %}
 			{% let widest = poll.most_votes() %}
 			<div class="post_poll">
-				<span>{{ poll.total_vote_count }} votes</span>
-				<span>{{ poll.voting_end_timestamp.0 }}</span>
+				<span>{{ poll.total_vote_count }} votes,</span>
+				<span title="{{ poll.voting_end_timestamp.1 }}">{{ poll.voting_end_timestamp.0 }}</span>
 				{% for option in poll.poll_options %}
 				<div class="poll_option">
 					{# Posts without vote_count (all open polls) will show up without votes.
@@ -320,13 +320,13 @@
 					{% match option.vote_count %}
 						{% when Some with (vote_count) %}
 							{% if vote_count.eq(widest) || widest == 0 %}
-								<div class="poll_chart most_voted" style="width: 100%"></div>
+								<div class="poll_chart most_voted"></div>
 							{% else %}
 								<div class="poll_chart" style="width: {{ (vote_count * 100) / widest }}%"></div>
 							{% endif %}
 							<span>{{ vote_count }}</span>
 						{% when None %}
-							<div class="poll_chart most_voted" style="width: 100%"></div>
+							<div class="poll_chart most_voted"></div>
 							<span></span>
 					{% endmatch %}
 					<span>{{ option.text }}</span>
