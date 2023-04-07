@@ -293,7 +293,7 @@ body > footer {
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	width: 100vw;
+	width: 100%;
 	background: var(--post);
 	position: absolute;
 	bottom: 0;
