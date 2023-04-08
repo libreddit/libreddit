@@ -119,7 +119,7 @@ impl Poll {
 	}
 
 	pub fn most_votes(&self) -> u64 {
-		self.poll_options.iter().map(|o| o.vote_count).flatten().max().unwrap_or(0)
+		self.poll_options.iter().filter_map(|o| o.vote_count).max().unwrap_or(0)
 	}
 }
 
@@ -134,7 +134,7 @@ impl PollOption {
 		Some(options
 		.as_array()?
 		.iter()
-		.map(|option| {
+		.filter_map(|option| {
 			// For each poll option
 
 			// we can't just use as_u64() because "id": String("...") and serde would parse it as None
@@ -149,7 +149,6 @@ impl PollOption {
 				vote_count
 			})
 		})
-		.flatten()
 		.collect::<Vec<Self>>())
 	}
 }
