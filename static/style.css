@@ -293,7 +293,7 @@ body > footer {
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	width: 100vw;
+	width: 100%;
 	background: var(--post);
 	position: absolute;
 	bottom: 0;
@@ -627,6 +627,15 @@ button.submit:hover > svg { stroke: var(--accent); }
 	border-left: 2px solid var(--background);
 	box-shadow: none;
 	background: transparent;
+}
+
+#commentQueryForms { 
+  display: flex; 
+  justify-content: space-between;
+}
+
+#allCommentsLink {
+  color: var(--green);
 }
 
 #sort, #search_sort {
@@ -1550,6 +1559,7 @@ td, th {
 	#user, #sidebar { margin: 20px 0;	}
 	#logo, #links { margin-bottom: 5px; }
 	#searchbox { width: calc(100vw - 35px); }
+
 }
 
 @media screen and (max-width: 480px) {
@@ -1623,4 +1633,9 @@ td, th {
 	.popup-inner {
 		max-width: 80%;
 	}
+
+    #commentQueryForms { 
+      display: initial;
+      justify-content: initial;
+    }
 }
