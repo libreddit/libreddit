@@ -893,11 +893,21 @@ pub fn sfw_only() -> bool {
 	}
 }
 
+// Determines if a request shoud redirect to a nsfw landing gate.
+pub fn should_be_nsfw_gated(req: &Request<Body>, req_url: &String) -> bool {
+	let sfw_instance = sfw_only();
+	let gate_nsfw = (setting(&req, "show_nsfw") != "on") || sfw_instance;
+
+	// Nsfw landing gate should not be bypassed on a sfw only instance,
+	let bypass_gate = !sfw_instance && req_url.contains("&bypass_nsfw_landing");
+
+	gate_nsfw && !bypass_gate
+}
+
 /// Renders the landing page for NSFW content when the user has not enabled
 /// "show NSFW posts" in settings.
-pub async fn nsfw_landing(req: Request<Body>) -> Result<Response<Body>, String> {
+pub async fn nsfw_landing(req: Request<Body>, req_url: String) -> Result<Response<Body>, String> {
 	let res_type: ResourceType;
-	let url = req.uri().to_string();
 
 	// Determine from the request URL if the resource is a subreddit, a user
 	// page, or a post.
@@ -916,7 +926,7 @@ pub async fn nsfw_landing(req: Request<Body>) -> Result<Response<Body>, String> 
 		res,
 		res_type,
 		prefs: Preferences::new(&req),
-		url,
+		url: req_url,
 	}
 	.render()
 	.unwrap_or_default();

@@ -63,11 +63,12 @@ pub async fn item(req: Request<Body>) -> Result<Response<Body>, String> {
 			// Parse the JSON into Post and Comment structs
 			let post = parse_post(&response[0]["data"]["children"][0]).await;
 
+			let req_url = req.uri().to_string();
 			// Return landing page if this post if this Reddit deems this post
 			// NSFW, but we have also disabled the display of NSFW content
 			// or if the instance is SFW-only.
-			if post.nsfw && (setting(&req, "show_nsfw") != "on" || crate::utils::sfw_only()) {
-				return Ok(nsfw_landing(req).await.unwrap_or_default());
+			if post.nsfw && crate::utils::should_be_nsfw_gated(&req, &req_url) {
+				return Ok(nsfw_landing(req, req_url).await.unwrap_or_default());
 			}
 
 			let query = match COMMENT_SEARCH_CAPTURE.captures(&url) {
@@ -88,7 +89,7 @@ pub async fn item(req: Request<Body>) -> Result<Response<Body>, String> {
 				sort,
 				prefs: Preferences::new(&req),
 				single_thread,
-				url,
+				url: req_url,
 				comment_query: query,
 			})
 		}
