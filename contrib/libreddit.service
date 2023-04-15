@@ -5,8 +5,8 @@ After=network.service
 [Service]
 DynamicUser=yes
 # Default Values
-Environment=ADDRESS=0.0.0.0
-Environment=PORT=8080
+#Environment=ADDRESS=0.0.0.0
+#Environment=PORT=8080
 # Optional Override
 EnvironmentFile=-/etc/libreddit.conf
 ExecStart=/usr/bin/libreddit -a ${ADDRESS} -p ${PORT}
