@@ -129,6 +129,7 @@ impl InstanceInfo {
 		container.add_table(
 			Table::from([
 				["Hide awards", &convert(&self.config.default_hide_awards)],
+				["Hide score", &convert(&self.config.default_hide_score)],
 				["Theme", &convert(&self.config.default_theme)],
 				["Front page", &convert(&self.config.default_front_page)],
 				["Layout", &convert(&self.config.default_layout)],
@@ -158,6 +159,7 @@ impl InstanceInfo {
                 Config:\n
                     Banner: {:?}\n
                     Hide awards: {:?}\n
+                    Hide score: {:?}\n
                     Default theme: {:?}\n
                     Default front page: {:?}\n
                     Default layout: {:?}\n
@@ -177,6 +179,7 @@ impl InstanceInfo {
 					self.config.sfw_only,
 					self.config.banner,
 					self.config.default_hide_awards,
+					self.config.default_hide_score,
 					self.config.default_theme,
 					self.config.default_front_page,
 					self.config.default_layout,

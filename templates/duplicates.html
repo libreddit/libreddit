@@ -82,8 +82,14 @@
                             {% endif %}
                             <a href="{{ post.permalink }}">{{ post.title }}</a>{% if post.flags.nsfw %} <small class="nsfw">NSFW</small>{% endif %}
                         </h2>
-
-                        <div class="post_score" title="{{ post.score.1 }}">{{ post.score.0 }}<span class="label"> Upvotes</span></div>
+      
+                        <div class="post_score" title="{{ post.score.1 }}">
+                          {% if prefs.hide_score != "on" %}
+                          {{ post.score.0 }}
+                          {% else %}
+                          &#x2022;
+                          {% endif %}
+                        <span class="label"> Upvotes</span></div>
                         <div class="post_footer">
                             <a href="{{ post.permalink }}" class="post_comments" title="{{ post.comments.1 }} comments">{{ post.comments.0 }} comments</a>
                         </div>

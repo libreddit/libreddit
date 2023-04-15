@@ -77,7 +77,13 @@
 				{% else %}
 					<div class="comment">
 						<div class="comment_left">
-							<p class="comment_score" title="{{ post.score.1 }}">{{ post.score.0 }}</p>
+							<p class="comment_score" title="{{ post.score.1 }}">
+                            {% if prefs.hide_score != "on" %}
+                            {{ post.score.0 }}
+                            {% else %}
+                            &#x2022;
+                            {% endif %}
+                            </p>
 							<div class="line"></div>
 						</div>
 						<details class="comment_right" open>

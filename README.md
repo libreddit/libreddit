@@ -233,6 +233,7 @@ Assign a default value for each user-modifiable setting by passing environment v
 | `AUTOPLAY_VIDEOS`       | `["on", "off"]`                                                                                     | `off`         |
 | `SUBSCRIPTIONS`         | `+`-delimited list of subreddits (`sub1+sub2+sub3+...`)                                                       | _(none)_          | 
 | `HIDE_AWARDS`           | `["on", "off"]`                                                                                     | `off`
+| `HIDE_SCORE`            | `["on", "off"]`                                                                                     | `off`
 | `DISABLE_VISIT_REDDIT_CONFIRMATION`     | `["on", "off"]`                                                                                     | `off`         |
 
 You can also configure Libreddit with a configuration file. An example `libreddit.toml` can be found below:
