@@ -253,7 +253,7 @@ impl Server {
 							.boxed()
 						}
 						// If there was a routing error
-						Err(e) => async move { new_boilerplate(def_headers, req_headers, 404, e.into()).await }.boxed(),
+						Err(e) => new_boilerplate(def_headers, req_headers, 404, e.into()).boxed(),
 					}
 				}))
 			}
@@ -379,7 +379,7 @@ fn determine_compressor(accept_encoding: String) -> Option<CompressionType> {
 
 	// This loop reads the requested compressors and keeps track of whichever
 	// one has the highest priority per our heuristic.
-	for val in accept_encoding.to_string().split(',') {
+	for val in accept_encoding.split(',') {
 		let mut q: f64 = 1.0;
 
 		// The compressor and q-value (if the latter is defined)
