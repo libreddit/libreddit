@@ -96,6 +96,61 @@ pub struct Author {
 	pub distinguished: String,
 }
 
+pub struct Poll {
+	pub poll_options: Vec<PollOption>,
+	pub voting_end_timestamp: (String, String),
+	pub total_vote_count: u64,
+}
+
+impl Poll {
+	pub fn parse(poll_data: &Value) -> Option<Self> {
+		poll_data.as_object()?;
+
+		let total_vote_count = poll_data["total_vote_count"].as_u64()?;
+		// voting_end_timestamp is in the format of milliseconds
+		let voting_end_timestamp = time(poll_data["voting_end_timestamp"].as_f64()? / 1000.0);
+		let poll_options = PollOption::parse(&poll_data["options"])?;
+
+		Some(Self {
+			poll_options,
+			total_vote_count,
+			voting_end_timestamp,
+		})
+	}
+
+	pub fn most_votes(&self) -> u64 {
+		self.poll_options.iter().filter_map(|o| o.vote_count).max().unwrap_or(0)
+	}
+}
+
+pub struct PollOption {
+	pub id: u64,
+	pub text: String,
+	pub vote_count: Option<u64>,
+}
+
+impl PollOption {
+	pub fn parse(options: &Value) -> Option<Vec<Self>> {
+		Some(
+			options
+				.as_array()?
+				.iter()
+				.filter_map(|option| {
+					// For each poll option
+
+					// we can't just use as_u64() because "id": String("...") and serde would parse it as None
+					let id = option["id"].as_str()?.parse::<u64>().ok()?;
+					let text = option["text"].as_str()?.to_owned();
+					let vote_count = option["vote_count"].as_u64();
+
+					// Construct PollOption items
+					Some(Self { id, text, vote_count })
+				})
+				.collect::<Vec<Self>>(),
+		)
+	}
+}
+
 // Post flags with nsfw and stickied
 pub struct Flags {
 	pub nsfw: bool,
@@ -233,6 +288,7 @@ pub struct Post {
 	pub body: String,
 	pub author: Author,
 	pub permalink: String,
+	pub poll: Option<Poll>,
 	pub score: (String, String),
 	pub upvote_ratio: i64,
 	pub post_type: String,
@@ -342,6 +398,7 @@ impl Post {
 					stickied: data["stickied"].as_bool().unwrap_or_default() || data["pinned"].as_bool().unwrap_or_default(),
 				},
 				permalink: val(post, "permalink"),
+				poll: Poll::parse(&data["poll_data"]),
 				rel_time,
 				created,
 				num_duplicates: post["data"]["num_duplicates"].as_u64().unwrap_or(0),
@@ -600,6 +657,8 @@ pub async fn parse_post(post: &serde_json::Value) -> Post {
 
 	let permalink = val(post, "permalink");
 
+	let poll = Poll::parse(&post["data"]["poll_data"]);
+
 	let body = if val(post, "removed_by_category") == "moderator" {
 		format!(
 			"<div class=\"md\"><p>[removed] — <a href=\"https://www.unddit.com{}\">view removed post</a></p></div>",
@@ -630,6 +689,7 @@ pub async fn parse_post(post: &serde_json::Value) -> Post {
 			distinguished: val(post, "distinguished"),
 		},
 		permalink,
+		poll,
 		score: format_num(score),
 		upvote_ratio: ratio as i64,
 		post_type,
@@ -815,19 +875,30 @@ pub fn format_num(num: i64) -> (String, String) {
 // Parse a relative and absolute time from a UNIX timestamp
 pub fn time(created: f64) -> (String, String) {
 	let time = OffsetDateTime::from_unix_timestamp(created.round() as i64).unwrap_or(OffsetDateTime::UNIX_EPOCH);
-	let time_delta = OffsetDateTime::now_utc() - time;
+	let now = OffsetDateTime::now_utc();
+	let min = time.min(now);
+	let max = time.max(now);
+	let time_delta = max - min;
 
 	// If the time difference is more than a month, show full date
-	let rel_time = if time_delta > Duration::days(30) {
+	let mut rel_time = if time_delta > Duration::days(30) {
 		time.format(format_description!("[month repr:short] [day] '[year repr:last_two]")).unwrap_or_default()
 	// Otherwise, show relative date/time
 	} else if time_delta.whole_days() > 0 {
-		format!("{}d ago", time_delta.whole_days())
+		format!("{}d", time_delta.whole_days())
 	} else if time_delta.whole_hours() > 0 {
-		format!("{}h ago", time_delta.whole_hours())
+		format!("{}h", time_delta.whole_hours())
 	} else {
-		format!("{}m ago", time_delta.whole_minutes())
+		format!("{}m", time_delta.whole_minutes())
 	};
+
+	if time_delta <= Duration::days(30) {
+		if now < time {
+			rel_time += " left";
+		} else {
+			rel_time += " ago";
+		}
+	}
 
 	(
 		rel_time,

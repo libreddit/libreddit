@@ -148,6 +148,9 @@
 	<!-- POST BODY -->
 	<div class="post_body">{{ post.body|safe }}</div>
 	<div class="post_score" title="{{ post.score.1 }}">{{ post.score.0 }}<span class="label"> Upvotes</span></div>
+
+	{% call poll(post) %}
+
 	<div class="post_footer">
 		<ul id="post_links">
 			<li class="desktop_item"><a href="{{ post.permalink }}">permalink</a></li>
@@ -272,6 +275,9 @@
 	<div class="post_body post_preview">
 		{{ post.body|safe }}
 	</div>
+
+	{% call poll(post) %}
+
 	<div class="post_footer">
 		<a href="{{ post.permalink }}" class="post_comments" title="{{ post.comments.1 }} {% if post.comments.1 == "1" %}comment{% else %}comments{% endif %}">{{ post.comments.0 }} {% if post.comments.1 == "1" %}comment{% else %}comments{% endif %}</a>
 	</div>
@@ -298,4 +304,35 @@
 		<a id="toreddit" href="https://www.reddit.com{{ url }}" rel="nofollow">Yes, take me to Reddit</a>
 	</div>
 </div>
+{%- endmacro %}
+
+{% macro poll(post) -%}
+	{% match post.poll %}
+		{% when Some with (poll) %}
+			{% let widest = poll.most_votes() %}
+			<div class="post_poll">
+				<span>{{ poll.total_vote_count }} votes,</span>
+				<span title="{{ poll.voting_end_timestamp.1 }}">{{ poll.voting_end_timestamp.0 }}</span>
+				{% for option in poll.poll_options %}
+				<div class="poll_option">
+					{# Posts without vote_count (all open polls) will show up without votes.
+						This is an issue with Reddit API, it doesn't work on Old Reddit either. #}
+					{% match option.vote_count %}
+						{% when Some with (vote_count) %}
+							{% if vote_count.eq(widest) || widest == 0 %}
+								<div class="poll_chart most_voted"></div>
+							{% else %}
+								<div class="poll_chart" style="width: {{ (vote_count * 100) / widest }}%"></div>
+							{% endif %}
+							<span>{{ vote_count }}</span>
+						{% when None %}
+							<div class="poll_chart most_voted"></div>
+							<span></span>
+					{% endmatch %}
+					<span>{{ option.text }}</span>
+				</div>
+				{% endfor %}
+			</div>
+		{% when None %}
+	{% endmatch %}
 {%- endmacro %}

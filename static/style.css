@@ -761,6 +761,7 @@ a.search_subreddit:hover {
 			"post_score post_title  post_thumbnail" 1fr
 			"post_score post_media  post_thumbnail" auto
 			"post_score post_body   post_thumbnail" auto
+			"post_score post_poll   post_thumbnail" auto
 			"post_score post_notification post_thumbnail" auto
 			"post_score post_footer post_thumbnail" auto
 			/ minmax(40px, auto) minmax(0, 1fr) fit-content(min(20%, 152px));
@@ -959,6 +960,44 @@ a.search_subreddit:hover {
 	grid-area: post_body;
 	width: calc(100% - 30px);
 	overflow-wrap: anywhere;
+}
+
+.post_poll {
+	grid-area: post_poll;
+	padding: 5px 15px 5px 12px;
+}
+
+.poll_option {
+	position: relative;
+	margin-right: 15px;
+	margin-top: 14px;
+	z-index: 0;
+	display: flex;
+	align-items: center;
+}
+
+.poll_chart {
+	padding: 14px 0;
+	background-color: var(--accent);
+	opacity: 0.2;
+	border-radius: 5px;
+	z-index: -1;
+	position: absolute;
+}
+
+.poll_option span {
+	margin-left: 8px;
+	color: var(--text);
+}
+
+.poll_option span:nth-of-type(1) {
+	min-width: 10%;
+	font-weight: bold;
+}
+
+.most_voted {
+	opacity: 0.45;
+	width: 100%;
 }
 
 /* Used only for text post preview */
@@ -1573,6 +1612,7 @@ td, th {
 				"post_title  post_title  post_thumbnail" 1fr
 				"post_media  post_media  post_thumbnail" auto
 				"post_body   post_body   post_thumbnail" auto
+				"post_poll   post_poll   post_thumbnail" auto
 				"post_notification post_notification post_thumbnail" auto
 				"post_score  post_footer post_thumbnail" auto
 				/ auto 1fr fit-content(min(20%, 152px));
@@ -1581,6 +1621,10 @@ td, th {
 	.post_score {
 		margin: 5px 0px 20px 15px;
 		padding: 0;
+	}
+
+	.post_poll {
+		padding: 5px 15px 10px 12px;
 	}
 	
 	.compact .post_score { padding: 0; }
