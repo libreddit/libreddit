@@ -105,7 +105,7 @@ pub struct Poll {
 impl Poll {
 	pub fn parse(poll_data: &Value) -> Option<Self> {
 		poll_data.as_object()?;
-		
+
 		let total_vote_count = poll_data["total_vote_count"].as_u64()?;
 		// voting_end_timestamp is in the format of milliseconds
 		let voting_end_timestamp = time(poll_data["voting_end_timestamp"].as_f64()? / 1000.0);
@@ -114,7 +114,7 @@ impl Poll {
 		Some(Self {
 			poll_options,
 			total_vote_count,
-			voting_end_timestamp
+			voting_end_timestamp,
 		})
 	}
 
@@ -126,30 +126,28 @@ impl Poll {
 pub struct PollOption {
 	pub id: u64,
 	pub text: String,
-	pub vote_count: Option<u64>
+	pub vote_count: Option<u64>,
 }
 
 impl PollOption {
 	pub fn parse(options: &Value) -> Option<Vec<Self>> {
-		Some(options
-		.as_array()?
-		.iter()
-		.filter_map(|option| {
-			// For each poll option
+		Some(
+			options
+				.as_array()?
+				.iter()
+				.filter_map(|option| {
+					// For each poll option
 
-			// we can't just use as_u64() because "id": String("...") and serde would parse it as None
-			let id = option["id"].as_str()?.parse::<u64>().ok()?;
-			let text = option["text"].as_str()?.to_owned();
-			let vote_count = option["vote_count"].as_u64();
+					// we can't just use as_u64() because "id": String("...") and serde would parse it as None
+					let id = option["id"].as_str()?.parse::<u64>().ok()?;
+					let text = option["text"].as_str()?.to_owned();
+					let vote_count = option["vote_count"].as_u64();
 
-			// Construct PollOption items
-			Some(Self {
-				id,
-				text,
-				vote_count
-			})
-		})
-		.collect::<Vec<Self>>())
+					// Construct PollOption items
+					Some(Self { id, text, vote_count })
+				})
+				.collect::<Vec<Self>>(),
+		)
 	}
 }
 
@@ -877,8 +875,9 @@ pub fn format_num(num: i64) -> (String, String) {
 // Parse a relative and absolute time from a UNIX timestamp
 pub fn time(created: f64) -> (String, String) {
 	let time = OffsetDateTime::from_unix_timestamp(created.round() as i64).unwrap_or(OffsetDateTime::UNIX_EPOCH);
-	let min = time.min(OffsetDateTime::now_utc());
-	let max = time.max(OffsetDateTime::now_utc());
+	let now = OffsetDateTime::now_utc();
+	let min = time.min(now);
+	let max = time.max(now);
 	let time_delta = max - min;
 
 	// If the time difference is more than a month, show full date
@@ -894,7 +893,7 @@ pub fn time(created: f64) -> (String, String) {
 	};
 
 	if time_delta <= Duration::days(30) {
-		if OffsetDateTime::now_utc() < time {
+		if now < time {
 			rel_time += " left";
 		} else {
 			rel_time += " ago";
