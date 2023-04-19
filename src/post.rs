@@ -72,7 +72,7 @@ pub async fn item(req: Request<Body>) -> Result<Response<Body>, String> {
 			}
 
 			let query = match COMMENT_SEARCH_CAPTURE.captures(&url) {
-				Some(captures) => captures.get(1).unwrap().as_str().replace("%20", " ").replace("+", " "),
+				Some(captures) => captures.get(1).unwrap().as_str().replace("%20", " ").replace('+', " "),
 				None => String::new(),
 			};
 
@@ -154,7 +154,7 @@ fn query_comments(
 
 	results
 }
-
+#[allow(clippy::too_many_arguments)]
 fn build_comment(
 	comment: &serde_json::Value,
 	data: &serde_json::Value,
@@ -165,15 +165,15 @@ fn build_comment(
 	filters: &HashSet<String>,
 	req: &Request<Body>,
 ) -> Comment {
-	let id = val(&comment, "id");
+	let id = val(comment, "id");
 
-	let body = if (val(&comment, "author") == "[deleted]" && val(&comment, "body") == "[removed]") || val(&comment, "body") == "[ Removed by Reddit ]" {
+	let body = if (val(comment, "author") == "[deleted]" && val(comment, "body") == "[removed]") || val(comment, "body") == "[ Removed by Reddit ]" {
 		format!(
 			"<div class=\"md\"><p>[removed] — <a href=\"https://www.unddit.com{}{}\">view removed comment</a></p></div>",
 			post_link, id
 		)
 	} else {
-		rewrite_urls(&val(&comment, "body_html"))
+		rewrite_urls(&val(comment, "body_html"))
 	};
 	let kind = comment["kind"].as_str().unwrap_or_default().to_string();
 
@@ -193,24 +193,24 @@ fn build_comment(
 
 	let awards: Awards = Awards::parse(&data["all_awardings"]);
 
-	let parent_kind_and_id = val(&comment, "parent_id");
+	let parent_kind_and_id = val(comment, "parent_id");
 	let parent_info = parent_kind_and_id.split('_').collect::<Vec<&str>>();
 
 	let highlighted = id == highlighted_comment;
 
 	let author = Author {
-		name: val(&comment, "author"),
+		name: val(comment, "author"),
 		flair: Flair {
 			flair_parts: FlairPart::parse(
 				data["author_flair_type"].as_str().unwrap_or_default(),
 				data["author_flair_richtext"].as_array(),
 				data["author_flair_text"].as_str(),
 			),
-			text: val(&comment, "link_flair_text"),
-			background_color: val(&comment, "author_flair_background_color"),
-			foreground_color: val(&comment, "author_flair_text_color"),
+			text: val(comment, "link_flair_text"),
+			background_color: val(comment, "author_flair_background_color"),
+			foreground_color: val(comment, "author_flair_text_color"),
 		},
-		distinguished: val(&comment, "distinguished"),
+		distinguished: val(comment, "distinguished"),
 	};
 	let is_filtered = filters.contains(&["u_", author.name.as_str()].concat());
 
@@ -222,7 +222,7 @@ fn build_comment(
 	let is_stickied = data["stickied"].as_bool().unwrap_or_default();
 	let collapsed = (is_moderator_comment && is_stickied) || is_filtered;
 
-	return Comment {
+	Comment {
 		id,
 		kind,
 		parent_id: parent_info[1].to_string(),
@@ -245,6 +245,6 @@ fn build_comment(
 		collapsed,
 		is_filtered,
 		more_count,
-		prefs: Preferences::new(&req),
-	};
+		prefs: Preferences::new(req),
+	}
 }

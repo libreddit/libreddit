@@ -965,9 +965,9 @@ pub fn sfw_only() -> bool {
 }
 
 // Determines if a request shoud redirect to a nsfw landing gate.
-pub fn should_be_nsfw_gated(req: &Request<Body>, req_url: &String) -> bool {
+pub fn should_be_nsfw_gated(req: &Request<Body>, req_url: &str) -> bool {
 	let sfw_instance = sfw_only();
-	let gate_nsfw = (setting(&req, "show_nsfw") != "on") || sfw_instance;
+	let gate_nsfw = (setting(req, "show_nsfw") != "on") || sfw_instance;
 
 	// Nsfw landing gate should not be bypassed on a sfw only instance,
 	let bypass_gate = !sfw_instance && req_url.contains("&bypass_nsfw_landing");
