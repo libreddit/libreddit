@@ -5,6 +5,7 @@ use crate::{client::json, server::RequestExt};
 use askama::Template;
 use cookie::Cookie;
 use hyper::{Body, Request, Response};
+use once_cell::sync::Lazy;
 use regex::Regex;
 use rust_embed::RustEmbed;
 use serde_json::Value;
@@ -777,6 +778,21 @@ pub async fn catch_random(sub: &str, additional: &str) -> Result<Response<Body>,
 	}
 }
 
+static REGEX_URL_WWW: Lazy<Regex> = Lazy::new(|| Regex::new(r"https://www\.reddit\.com/(.*)").unwrap());
+static REGEX_URL_OLD: Lazy<Regex> = Lazy::new(|| Regex::new(r"https://old\.reddit\.com/(.*)").unwrap());
+static REGEX_URL_NP: Lazy<Regex> = Lazy::new(|| Regex::new(r"https://np\.reddit\.com/(.*)").unwrap());
+static REGEX_URL_PLAIN: Lazy<Regex> = Lazy::new(|| Regex::new(r"https://reddit\.com/(.*)").unwrap());
+static REGEX_URL_VIDEOS: Lazy<Regex> = Lazy::new(|| Regex::new(r"https://v\.redd\.it/(.*)/DASH_([0-9]{2,4}(\.mp4|$|\?source=fallback))").unwrap());
+static REGEX_URL_VIDEOS_HLS: Lazy<Regex> = Lazy::new(|| Regex::new(r"https://v\.redd\.it/(.+)/(HLSPlaylist\.m3u8.*)$").unwrap());
+static REGEX_URL_IMAGES: Lazy<Regex> = Lazy::new(|| Regex::new(r"https://i\.redd\.it/(.*)").unwrap());
+static REGEX_URL_THUMBS_A: Lazy<Regex> = Lazy::new(|| Regex::new(r"https://a\.thumbs\.redditmedia\.com/(.*)").unwrap());
+static REGEX_URL_THUMBS_B: Lazy<Regex> = Lazy::new(|| Regex::new(r"https://b\.thumbs\.redditmedia\.com/(.*)").unwrap());
+static REGEX_URL_EMOJI: Lazy<Regex> = Lazy::new(|| Regex::new(r"https://emoji\.redditmedia\.com/(.*)/(.*)").unwrap());
+static REGEX_URL_PREVIEW: Lazy<Regex> = Lazy::new(|| Regex::new(r"https://preview\.redd\.it/(.*)").unwrap());
+static REGEX_URL_EXTERNAL_PREVIEW: Lazy<Regex> = Lazy::new(|| Regex::new(r"https://external\-preview\.redd\.it/(.*)").unwrap());
+static REGEX_URL_STYLES: Lazy<Regex> = Lazy::new(|| Regex::new(r"https://styles\.redditmedia\.com/(.*)").unwrap());
+static REGEX_URL_STATIC_MEDIA: Lazy<Regex> = Lazy::new(|| Regex::new(r"https://www\.redditstatic\.com/(.*)").unwrap());
+
 // Direct urls to proxy if proxy is enabled
 pub fn format_url(url: &str) -> String {
 	if url.is_empty() || url == "self" || url == "default" || url == "nsfw" || url == "spoiler" {
@@ -785,13 +801,11 @@ pub fn format_url(url: &str) -> String {
 		Url::parse(url).map_or(url.to_string(), |parsed| {
 			let domain = parsed.domain().unwrap_or_default();
 
-			let capture = |regex: &str, format: &str, segments: i16| {
-				Regex::new(regex).map_or(String::new(), |re| {
-					re.captures(url).map_or(String::new(), |caps| match segments {
-						1 => [format, &caps[1]].join(""),
-						2 => [format, &caps[1], "/", &caps[2]].join(""),
-						_ => String::new(),
-					})
+			let capture = |regex: &Regex, format: &str, segments: i16| {
+				regex.captures(url).map_or(String::new(), |caps| match segments {
+					1 => [format, &caps[1]].join(""),
+					2 => [format, &caps[1], "/", &caps[2]].join(""),
+					_ => String::new(),
 				})
 			};
 
@@ -817,44 +831,46 @@ pub fn format_url(url: &str) -> String {
 			}
 
 			match domain {
-				"www.reddit.com" => capture(r"https://www\.reddit\.com/(.*)", "/", 1),
-				"old.reddit.com" => capture(r"https://old\.reddit\.com/(.*)", "/", 1),
-				"np.reddit.com" => capture(r"https://np\.reddit\.com/(.*)", "/", 1),
-				"reddit.com" => capture(r"https://reddit\.com/(.*)", "/", 1),
-				"v.redd.it" => chain!(
-					capture(r"https://v\.redd\.it/(.*)/DASH_([0-9]{2,4}(\.mp4|$|\?source=fallback))", "/vid/", 2),
-					capture(r"https://v\.redd\.it/(.+)/(HLSPlaylist\.m3u8.*)$", "/hls/", 2)
-				),
-				"i.redd.it" => capture(r"https://i\.redd\.it/(.*)", "/img/", 1),
-				"a.thumbs.redditmedia.com" => capture(r"https://a\.thumbs\.redditmedia\.com/(.*)", "/thumb/a/", 1),
-				"b.thumbs.redditmedia.com" => capture(r"https://b\.thumbs\.redditmedia\.com/(.*)", "/thumb/b/", 1),
-				"emoji.redditmedia.com" => capture(r"https://emoji\.redditmedia\.com/(.*)/(.*)", "/emoji/", 2),
-				"preview.redd.it" => capture(r"https://preview\.redd\.it/(.*)", "/preview/pre/", 1),
-				"external-preview.redd.it" => capture(r"https://external\-preview\.redd\.it/(.*)", "/preview/external-pre/", 1),
-				"styles.redditmedia.com" => capture(r"https://styles\.redditmedia\.com/(.*)", "/style/", 1),
-				"www.redditstatic.com" => capture(r"https://www\.redditstatic\.com/(.*)", "/static/", 1),
+				"www.reddit.com" => capture(&REGEX_URL_WWW, "/", 1),
+				"old.reddit.com" => capture(&REGEX_URL_OLD, "/", 1),
+				"np.reddit.com" => capture(&REGEX_URL_NP, "/", 1),
+				"reddit.com" => capture(&REGEX_URL_PLAIN, "/", 1),
+				"v.redd.it" => chain!(capture(&REGEX_URL_VIDEOS, "/vid/", 2), capture(&REGEX_URL_VIDEOS_HLS, "/hls/", 2)),
+				"i.redd.it" => capture(&REGEX_URL_IMAGES, "/img/", 1),
+				"a.thumbs.redditmedia.com" => capture(&REGEX_URL_THUMBS_A, "/thumb/a/", 1),
+				"b.thumbs.redditmedia.com" => capture(&REGEX_URL_THUMBS_B, "/thumb/b/", 1),
+				"emoji.redditmedia.com" => capture(&REGEX_URL_EMOJI, "/emoji/", 2),
+				"preview.redd.it" => capture(&REGEX_URL_PREVIEW, "/preview/pre/", 1),
+				"external-preview.redd.it" => capture(&REGEX_URL_EXTERNAL_PREVIEW, "/preview/external-pre/", 1),
+				"styles.redditmedia.com" => capture(&REGEX_URL_STYLES, "/style/", 1),
+				"www.redditstatic.com" => capture(&REGEX_URL_STATIC_MEDIA, "/static/", 1),
 				_ => url.to_string(),
 			}
 		})
 	}
 }
 
+static REDDIT_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r#"href="(https|http|)://(www\.|old\.|np\.|amp\.|)(reddit\.com|redd\.it)/"#).unwrap());
+static REDDIT_PREVIEW_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r"https://external-preview\.redd\.it(.*)[^?]").unwrap());
+
 // Rewrite Reddit links to Libreddit in body of text
 pub fn rewrite_urls(input_text: &str) -> String {
-	let text1 = Regex::new(r#"href="(https|http|)://(www\.|old\.|np\.|amp\.|)(reddit\.com|redd\.it)/"#)
-		.map_or(String::new(), |re| re.replace_all(input_text, r#"href="/"#).to_string())
-		// Remove (html-encoded) "\" from URLs.
-		.replace("%5C", "")
-		.replace('\\', "");
+	let text1 =
+		// Rewrite Reddit links to Libreddit
+		REDDIT_REGEX.replace_all(input_text, r#"href="/"#)
+			.to_string()
+			// Remove (html-encoded) "\" from URLs.
+			.replace("%5C", "")
+			.replace('\\', "");
 
 	// Rewrite external media previews to Libreddit
-	Regex::new(r"https://external-preview\.redd\.it(.*)[^?]").map_or(String::new(), |re| {
-		if re.is_match(&text1) {
-			re.replace_all(&text1, format_url(re.find(&text1).map(|x| x.as_str()).unwrap_or_default())).to_string()
-		} else {
-			text1
-		}
-	})
+	if REDDIT_PREVIEW_REGEX.is_match(&text1) {
+		REDDIT_PREVIEW_REGEX
+			.replace_all(&text1, format_url(REDDIT_PREVIEW_REGEX.find(&text1).map(|x| x.as_str()).unwrap_or_default()))
+			.to_string()
+	} else {
+		text1
+	}
 }
 
 // Format vote count to a string that will be displayed.
