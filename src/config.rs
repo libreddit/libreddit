@@ -60,6 +60,9 @@ pub struct Config {
 
 	#[serde(rename = "LIBREDDIT_BANNER")]
 	pub(crate) banner: Option<String>,
+
+	#[serde(rename = "LIBREDDIT_ROBOTS_DISABLE_INDEXING")]
+	pub(crate) robots_disable_indexing: Option<String>,
 }
 
 impl Config {
@@ -90,6 +93,7 @@ impl Config {
 			default_subscriptions: parse("LIBREDDIT_DEFAULT_SUBSCRIPTIONS"),
 			default_disable_visit_reddit_confirmation: parse("LIBREDDIT_DEFAULT_DISABLE_VISIT_REDDIT_CONFIRMATION"),
 			banner: parse("LIBREDDIT_BANNER"),
+			robots_disable_indexing: parse("LIBREDDIT_ROBOTS_DISABLE_INDEXING"),
 		}
 	}
 }
@@ -111,6 +115,7 @@ fn get_setting_from_config(name: &str, config: &Config) -> Option<String> {
 		"LIBREDDIT_DEFAULT_SUBSCRIPTIONS" => config.default_subscriptions.clone(),
 		"LIBREDDIT_DEFAULT_DISABLE_VISIT_REDDIT_CONFIRMATION" => config.default_disable_visit_reddit_confirmation.clone(),
 		"LIBREDDIT_BANNER" => config.banner.clone(),
+		"LIBREDDIT_ROBOTS_DISABLE_INDEXING" => config.robots_disable_indexing.clone(),
 		_ => None,
 	}
 }

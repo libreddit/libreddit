@@ -213,6 +213,7 @@ Assign a default value for each instance-specific setting by passing environment
 |-|-|-|-|
 | `SFW_ONLY` | `["on", "off"]` | `off`   | Enables SFW-only mode for the instance, i.e. all NSFW content is filtered. |
 | `BANNER`   | String          | (empty) | Allows the server to set a banner to be displayed. Currently this is displayed on the instance info page. | 
+| `ROBOTS_DISABLE_INDEXING` | `["on", "off"]` | `off` | Disables indexing of the instance by search engines. |
 
 ## Default User Settings
 
