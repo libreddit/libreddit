@@ -778,20 +778,20 @@ pub async fn catch_random(sub: &str, additional: &str) -> Result<Response<Body>,
 	}
 }
 
-static REGEX_FORMAT_1: Lazy<Regex> = Lazy::new(|| Regex::new(r"https://www\.reddit\.com/(.*)").unwrap());
-static REGEX_FORMAT_2: Lazy<Regex> = Lazy::new(|| Regex::new(r"https://old\.reddit\.com/(.*)").unwrap());
-static REGEX_FORMAT_3: Lazy<Regex> = Lazy::new(|| Regex::new(r"https://np\.reddit\.com/(.*)").unwrap());
-static REGEX_FORMAT_4: Lazy<Regex> = Lazy::new(|| Regex::new(r"https://reddit\.com/(.*)").unwrap());
-static REGEX_FORMAT_5: Lazy<Regex> = Lazy::new(|| Regex::new(r"https://v\.redd\.it/(.*)/DASH_([0-9]{2,4}(\.mp4|$|\?source=fallback))").unwrap());
-static REGEX_FORMAT_6: Lazy<Regex> = Lazy::new(|| Regex::new(r"https://v\.redd\.it/(.+)/(HLSPlaylist\.m3u8.*)$").unwrap());
-static REGEX_FORMAT_7: Lazy<Regex> = Lazy::new(|| Regex::new(r"https://i\.redd\.it/(.*)").unwrap());
-static REGEX_FORMAT_8: Lazy<Regex> = Lazy::new(|| Regex::new(r"https://a\.thumbs\.redditmedia\.com/(.*)").unwrap());
-static REGEX_FORMAT_9: Lazy<Regex> = Lazy::new(|| Regex::new(r"https://b\.thumbs\.redditmedia\.com/(.*)").unwrap());
-static REGEX_FORMAT_10: Lazy<Regex> = Lazy::new(|| Regex::new(r"https://emoji\.redditmedia\.com/(.*)/(.*)").unwrap());
-static REGEX_FORMAT_11: Lazy<Regex> = Lazy::new(|| Regex::new(r"https://preview\.redd\.it/(.*)").unwrap());
-static REGEX_FORMAT_12: Lazy<Regex> = Lazy::new(|| Regex::new(r"https://external\-preview\.redd\.it/(.*)").unwrap());
-static REGEX_FORMAT_13: Lazy<Regex> = Lazy::new(|| Regex::new(r"https://styles\.redditmedia\.com/(.*)").unwrap());
-static REGEX_FORMAT_14: Lazy<Regex> = Lazy::new(|| Regex::new(r"https://www\.redditstatic\.com/(.*)").unwrap());
+static REGEX_URL_WWW: Lazy<Regex> = Lazy::new(|| Regex::new(r"https://www\.reddit\.com/(.*)").unwrap());
+static REGEX_URL_OLD: Lazy<Regex> = Lazy::new(|| Regex::new(r"https://old\.reddit\.com/(.*)").unwrap());
+static REGEX_URL_NP: Lazy<Regex> = Lazy::new(|| Regex::new(r"https://np\.reddit\.com/(.*)").unwrap());
+static REGEX_URL_PLAIN: Lazy<Regex> = Lazy::new(|| Regex::new(r"https://reddit\.com/(.*)").unwrap());
+static REGEX_URL_VIDEOS: Lazy<Regex> = Lazy::new(|| Regex::new(r"https://v\.redd\.it/(.*)/DASH_([0-9]{2,4}(\.mp4|$|\?source=fallback))").unwrap());
+static REGEX_URL_VIDEOS_HLS: Lazy<Regex> = Lazy::new(|| Regex::new(r"https://v\.redd\.it/(.+)/(HLSPlaylist\.m3u8.*)$").unwrap());
+static REGEX_URL_IMAGES: Lazy<Regex> = Lazy::new(|| Regex::new(r"https://i\.redd\.it/(.*)").unwrap());
+static REGEX_URL_THUMBS_A: Lazy<Regex> = Lazy::new(|| Regex::new(r"https://a\.thumbs\.redditmedia\.com/(.*)").unwrap());
+static REGEX_URL_THUMBS_B: Lazy<Regex> = Lazy::new(|| Regex::new(r"https://b\.thumbs\.redditmedia\.com/(.*)").unwrap());
+static REGEX_URL_EMOJI: Lazy<Regex> = Lazy::new(|| Regex::new(r"https://emoji\.redditmedia\.com/(.*)/(.*)").unwrap());
+static REGEX_URL_PREVIEW: Lazy<Regex> = Lazy::new(|| Regex::new(r"https://preview\.redd\.it/(.*)").unwrap());
+static REGEX_URL_EXTERNAL_PREVIEW: Lazy<Regex> = Lazy::new(|| Regex::new(r"https://external\-preview\.redd\.it/(.*)").unwrap());
+static REGEX_URL_STYLES: Lazy<Regex> = Lazy::new(|| Regex::new(r"https://styles\.redditmedia\.com/(.*)").unwrap());
+static REGEX_URL_STATIC_MEDIA: Lazy<Regex> = Lazy::new(|| Regex::new(r"https://www\.redditstatic\.com/(.*)").unwrap());
 
 // Direct urls to proxy if proxy is enabled
 pub fn format_url(url: &str) -> String {
@@ -831,19 +831,19 @@ pub fn format_url(url: &str) -> String {
 			}
 
 			match domain {
-				"www.reddit.com" => capture(&REGEX_FORMAT_1, "/", 1),
-				"old.reddit.com" => capture(&REGEX_FORMAT_2, "/", 1),
-				"np.reddit.com" => capture(&REGEX_FORMAT_3, "/", 1),
-				"reddit.com" => capture(&REGEX_FORMAT_4, "/", 1),
-				"v.redd.it" => chain!(capture(&REGEX_FORMAT_5, "/vid/", 2), capture(&REGEX_FORMAT_6, "/hls/", 2)),
-				"i.redd.it" => capture(&REGEX_FORMAT_7, "/img/", 1),
-				"a.thumbs.redditmedia.com" => capture(&REGEX_FORMAT_8, "/thumb/a/", 1),
-				"b.thumbs.redditmedia.com" => capture(&REGEX_FORMAT_9, "/thumb/b/", 1),
-				"emoji.redditmedia.com" => capture(&REGEX_FORMAT_10, "/emoji/", 2),
-				"preview.redd.it" => capture(&REGEX_FORMAT_11, "/preview/pre/", 1),
-				"external-preview.redd.it" => capture(&REGEX_FORMAT_12, "/preview/external-pre/", 1),
-				"styles.redditmedia.com" => capture(&REGEX_FORMAT_13, "/style/", 1),
-				"www.redditstatic.com" => capture(&REGEX_FORMAT_14, "/static/", 1),
+				"www.reddit.com" => capture(&REGEX_URL_WWW, "/", 1),
+				"old.reddit.com" => capture(&REGEX_URL_OLD, "/", 1),
+				"np.reddit.com" => capture(&REGEX_URL_NP, "/", 1),
+				"reddit.com" => capture(&REGEX_URL_PLAIN, "/", 1),
+				"v.redd.it" => chain!(capture(&REGEX_URL_VIDEOS, "/vid/", 2), capture(&REGEX_URL_VIDEOS_HLS, "/hls/", 2)),
+				"i.redd.it" => capture(&REGEX_URL_IMAGES, "/img/", 1),
+				"a.thumbs.redditmedia.com" => capture(&REGEX_URL_THUMBS_A, "/thumb/a/", 1),
+				"b.thumbs.redditmedia.com" => capture(&REGEX_URL_THUMBS_B, "/thumb/b/", 1),
+				"emoji.redditmedia.com" => capture(&REGEX_URL_EMOJI, "/emoji/", 2),
+				"preview.redd.it" => capture(&REGEX_URL_PREVIEW, "/preview/pre/", 1),
+				"external-preview.redd.it" => capture(&REGEX_URL_EXTERNAL_PREVIEW, "/preview/external-pre/", 1),
+				"styles.redditmedia.com" => capture(&REGEX_URL_STYLES, "/style/", 1),
+				"www.redditstatic.com" => capture(&REGEX_URL_STATIC_MEDIA, "/static/", 1),
 				_ => url.to_string(),
 			}
 		})
