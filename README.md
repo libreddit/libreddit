@@ -9,7 +9,7 @@
 **10 second pitch:** Libreddit is a portmanteau of "libre" (meaning freedom) and "Reddit". It is a private front-end like [Invidious](https://github.com/iv-org/invidious) but for Reddit. Browse the coldest takes of [r/unpopularopinion](https://libreddit.spike.codes/r/unpopularopinion) without being [tracked](#reddit).
 
 - 🚀 Fast: written in Rust for blazing-fast speeds and memory safety
-- ☁️ Light: no JavaScript, no ads, no tracking, no bloat
+- ☁️ Light: minimal JavaScript, no ads, no tracking, no bloat
 - 🕵 Private: all requests are proxied through the server, including media
 - 🔒 Secure: strong [Content Security Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP) prevents browser requests to Reddit
 
