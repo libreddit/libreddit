@@ -58,5 +58,5 @@ jobs:
           toolchain: stable
           components: clippy
 
-      - name: Run cargo fmt
+      - name: Run cargo clippy
         run: cargo clippy -- -D warnings
