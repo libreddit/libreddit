@@ -18,7 +18,8 @@ jobs:
           - { platform: 'linux/arm64', tag: 'latest-arm', dockerfile: 'Dockerfile.arm' }
           - { platform: 'linux/arm/v7', tag: 'latest-armv7', dockerfile: 'Dockerfile.armv7' }
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout sources
+        uses: actions/checkout@v3
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
