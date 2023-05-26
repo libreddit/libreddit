@@ -1,7 +1,7 @@
 name: Rust Fmt
 
 on:
-   push:
+  push:
     branches:
       - 'main'
       - 'master'

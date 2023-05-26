@@ -1,7 +1,7 @@
 name: Rust Tests
 
 on:
-   push:
+  push:
     branches:
       - 'main'
       - 'master'
@@ -28,4 +28,4 @@ jobs:
       - name: Run cargo test
         uses: actions-rs/cargo@v1
         with:
-          command: test
+          command: test 

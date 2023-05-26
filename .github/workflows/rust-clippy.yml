@@ -1,7 +1,7 @@
 name: Rust Clippy
 
 on:
-   push:
+  push:
     branches:
       - 'main'
       - 'master'
