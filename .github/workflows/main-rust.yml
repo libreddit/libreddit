@@ -50,6 +50,9 @@ jobs:
           
       - name: Calculate SHA512 checksum
         run: sha512sum target/release/libreddit > libreddit.sha512
+
+      - name: Calculate SHA256 checksum
+        run: sha256sum target/release/libreddit > libreddit.sha256
         
       - name: Release
         uses: softprops/action-gh-release@v1
@@ -61,6 +64,7 @@ jobs:
           files: |
             target/release/libreddit
             libreddit.sha512
+            libreddit.sha256
           body: |
             - ${{ github.event.head_commit.message }} ${{ github.sha }}
           generate_release_notes: true
