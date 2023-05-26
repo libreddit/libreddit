@@ -50,7 +50,7 @@ jobs:
 
     steps:
       - name: Checkout sources
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Install stable toolchain with clippy component
         uses: dtolnay/rust-toolchain@stable
