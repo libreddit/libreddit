@@ -1,4 +1,4 @@
-name: Rust Fmt
+name: Rust
 
 on:
   push:
@@ -13,7 +13,7 @@ on:
     
 jobs:
   check:
-    name: Check formatting
+    name: cargo fmt --all -- --check
     runs-on: ubuntu-latest
 
     steps:

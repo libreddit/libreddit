@@ -1,4 +1,4 @@
-name: Rust Tests
+name: Rust
 
 on:
   push:
@@ -13,7 +13,7 @@ on:
 
 jobs:
   test:
-    name: Test Suite
+    name: cargo test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout sources
