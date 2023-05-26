@@ -13,9 +13,9 @@ jobs:
     strategy:
       matrix:
         config:
-          - { platform: 'linux/amd64', dockerfile: 'Dockerfile' }
-          - { platform: 'linux/arm64', dockerfile: 'Dockerfile.arm64' }
-          - { platform: 'linux/arm/v7', dockerfile: 'Dockerfile.armv7' }
+          - { platform: 'linux/amd64', tag: 'latest', dockerfile: 'Dockerfile' }
+          - { platform: 'linux/arm64', tag: 'latest-arm', dockerfile: 'Dockerfile.arm64' }
+          - { platform: 'linux/arm/v7', tag: 'latest-armv7', dockerfile: 'Dockerfile.armv7' }
     steps:
       - uses: actions/checkout@v3
 
@@ -51,6 +51,6 @@ jobs:
           file: ./${{ matrix.config.dockerfile }}
           platforms: ${{ matrix.config.platform }}
           push: true
-          tags: libreddit/libreddit:latest-${{ matrix.config.platform }}
+          tags: libreddit/libreddit:${{ matrix.config.tag }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
