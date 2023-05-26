@@ -5,7 +5,8 @@ on:
     paths-ignore:
       - "**.md"
     branches:
-      - master
+      - 'main'
+      - 'master'
 
 jobs:
   build-docker:
