@@ -552,6 +552,10 @@ select, #search {
 	border-radius: 5px 0px 0px 5px;
 }
 
+.commentQuery {
+    background: var(--post);
+}
+
 #searchbox {
 	grid-area: searchbox;
 	display: flex;
