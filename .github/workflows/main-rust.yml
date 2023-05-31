@@ -24,7 +24,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Cache Packages
-        uses: Swatinem/rust-cache@2
+        uses: Swatinem/rust-cache@v2
 
       - name: Install stable toolchain
         uses: dtolnay/rust-toolchain@stable
