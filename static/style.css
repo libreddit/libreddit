@@ -329,6 +329,7 @@ button {
 	background: none;
 	border: none;
 	font-weight: bold;
+	cursor: pointer;
 }
 
 hr {
@@ -540,6 +541,7 @@ select, #search, #sort_options, #listing_options, #inside, #searchbox > *, #sort
 select {
 	background: var(--outside);
 	transition: 0.2s background;
+	cursor: pointer;
 }
 
 select, #search {
