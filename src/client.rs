@@ -10,6 +10,7 @@ use serde_json::Value;
 use std::{io, result::Result};
 
 use crate::dbg_msg;
+use crate::instance_info::INSTANCE_INFO;
 use crate::server::RequestExt;
 
 const REDDIT_URL_BASE: &str = "https://www.reddit.com";
@@ -125,6 +126,9 @@ fn reddit_head(path: String, quarantine: bool) -> Boxed<Result<Response<Body>, S
 /// will recurse on the URL that Reddit provides in the Location HTTP header
 /// in its response.
 fn request(method: &'static Method, path: String, redirect: bool, quarantine: bool) -> Boxed<Result<Response<Body>, String>> {
+	// Increment reddit request count. This will include head requests.
+	INSTANCE_INFO.reddit_requests.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
+
 	// Build Reddit URL from path.
 	let url = format!("{}{}", REDDIT_URL_BASE, path);
 

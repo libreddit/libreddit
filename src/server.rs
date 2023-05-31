@@ -23,7 +23,7 @@ use std::{
 };
 use time::Duration;
 
-use crate::dbg_msg;
+use crate::{dbg_msg, instance_info::INSTANCE_INFO};
 
 type BoxResponse = Pin<Box<dyn Future<Output = Result<Response<Body>, String>> + Send>>;
 
@@ -234,6 +234,8 @@ impl Server {
 					match router.recognize(&format!("/{}{}", req.method().as_str(), path)) {
 						// If a route was configured for this path
 						Ok(found) => {
+							// Add to total_requests count
+							INSTANCE_INFO.total_requests.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
 							let mut parammed = req;
 							parammed.set_params(found.params().clone());
 

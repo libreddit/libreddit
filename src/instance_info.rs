@@ -1,3 +1,5 @@
+use std::sync::atomic::AtomicU32;
+
 use crate::{
 	config::{Config, CONFIG},
 	server::RequestExt,
@@ -88,6 +90,8 @@ pub(crate) struct InstanceInfo {
 	deploy_date: String,
 	compile_mode: String,
 	deploy_unix_ts: i64,
+	pub(crate) reddit_requests: AtomicU32,
+	pub(crate) total_requests: AtomicU32,
 	config: Config,
 }
 
@@ -103,6 +107,8 @@ impl InstanceInfo {
 			compile_mode: "Release".into(),
 			deploy_unix_ts: OffsetDateTime::now_local().unwrap_or_else(|_| OffsetDateTime::now_utc()).unix_timestamp(),
 			config: CONFIG.clone(),
+			reddit_requests: AtomicU32::new(0),
+			total_requests: AtomicU32::new(0),
 		}
 	}
 	fn to_table(&self) -> String {
