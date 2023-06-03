@@ -58,11 +58,10 @@ jobs:
         with:
           name: libreddit
           path: |
-          target/release/libreddit
-          target/x86_64-unknown-linux-musl/release/libreddit-musl
-          *.sha512
-          *.sha256
-        
+            target/release/libreddit
+            target/x86_64-unknown-linux-musl/release/libreddit-musl
+            *.sha512
+            *.sha256        
       - name: Versions
         id: version
         run: echo "VERSION=$(cargo metadata --format-version 1 --no-deps | jq .packages[0].version -r | sed 's/^/v/')" >> "$GITHUB_OUTPUT"
