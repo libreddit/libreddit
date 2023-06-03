@@ -1,6 +1,6 @@
 // CRATES
 use crate::client::json;
-use crate::config::{get_setting, DEFAULT_PUSHSHIFT_FRONTEND};
+use crate::config::get_setting;
 use crate::server::RequestExt;
 use crate::subreddit::{can_access_quarantine, quarantine};
 use crate::utils::{
@@ -126,7 +126,7 @@ fn parse_comments(json: &serde_json::Value, post_link: &str, post_author: &str, 
 			let body = if (val(&comment, "author") == "[deleted]" && val(&comment, "body") == "[removed]") || val(&comment, "body") == "[ Removed by Reddit ]" {
 				format!(
 					"<div class=\"md\"><p>[removed] — <a href=\"https://{}{}{}\">view removed comment</a></p></div>",
-					get_setting("LIBREDDIT_PUSHSHIFT_FRONTEND").unwrap_or(String::from(DEFAULT_PUSHSHIFT_FRONTEND)),
+					get_setting("LIBREDDIT_PUSHSHIFT_FRONTEND").unwrap_or(String::from(crate::config::DEFAULT_PUSHSHIFT_FRONTEND)),
 					post_link,
 					id
 				)
