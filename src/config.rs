@@ -14,7 +14,7 @@ pub(crate) static CONFIG: Lazy<Config> = Lazy::new(Config::load);
 /// When adding more config settings, add it to `Config::load`,
 /// `get_setting_from_config`, both below, as well as
 /// instance_info::InstanceInfo.to_string(), README.md and app.json.
-#[derive(Default, Serialize, Deserialize, Clone)]
+#[derive(Default, Serialize, Deserialize, Clone, Debug)]
 pub struct Config {
 	#[serde(rename = "LIBREDDIT_SFW_ONLY")]
 	pub(crate) sfw_only: Option<String>,
@@ -129,12 +129,16 @@ pub(crate) fn get_setting(name: &str) -> Option<String> {
 use {sealed_test::prelude::*, std::fs::write};
 
 #[test]
+fn test_deserialize() { // Must handle empty input
+	let result = toml::from_str::<Config>("");
+	assert!(result.is_ok(), "Error: {}", result.unwrap_err());
+}
+
 #[sealed_test(env = [("LIBREDDIT_SFW_ONLY", "on")])]
 fn test_env_var() {
 	assert!(crate::utils::sfw_only())
 }
 
-#[test]
 #[sealed_test]
 fn test_config() {
 	let config_to_write = r#"LIBREDDIT_DEFAULT_COMMENT_SORT = "best""#;
@@ -142,7 +146,6 @@ fn test_config() {
 	assert_eq!(get_setting("LIBREDDIT_DEFAULT_COMMENT_SORT"), Some("best".into()));
 }
 
-#[test]
 #[sealed_test(env = [("LIBREDDIT_DEFAULT_COMMENT_SORT", "top")])]
 fn test_env_config_precedence() {
 	let config_to_write = r#"LIBREDDIT_DEFAULT_COMMENT_SORT = "best""#;
@@ -150,7 +153,6 @@ fn test_env_config_precedence() {
 	assert_eq!(get_setting("LIBREDDIT_DEFAULT_COMMENT_SORT"), Some("top".into()))
 }
 
-#[test]
 #[sealed_test(env = [("LIBREDDIT_DEFAULT_COMMENT_SORT", "top")])]
 fn test_alt_env_config_precedence() {
 	let config_to_write = r#"LIBREDDIT_DEFAULT_COMMENT_SORT = "best""#;
