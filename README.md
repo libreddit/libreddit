@@ -213,6 +213,7 @@ Assign a default value for each instance-specific setting by passing environment
 |-|-|-|-|
 | `SFW_ONLY` | `["on", "off"]` | `off`   | Enables SFW-only mode for the instance, i.e. all NSFW content is filtered. |
 | `BANNER`   | String          | (empty) | Allows the server to set a banner to be displayed. Currently this is displayed on the instance info page. | 
+| `ROBOTS_DISABLE_INDEXING` | `["on", "off"]` | `off` | Disables indexing of the instance by search engines. |
 | `PUSHSHIFT_FRONTEND` | String | `www.unddit.com` | Allows the server to set the Pushshift frontend to be used with "removed" links.
 
 ## Default User Settings
@@ -232,8 +233,9 @@ Assign a default value for each user-modifiable setting by passing environment v
 | `USE_HLS`               | `["on", "off"]`                                                                                     | `off`         |
 | `HIDE_HLS_NOTIFICATION` | `["on", "off"]`                                                                                     | `off`         |
 | `AUTOPLAY_VIDEOS`       | `["on", "off"]`                                                                                     | `off`         |
-| `HIDE_AWARDS`           | `["on", "off"]`                                                                                     | `off`         |
-| `SUBSCRIPTIONS`         | Array of subreddit names (`["sub1", "sub2"]`)                                                       | `[]`          | 
+| `SUBSCRIPTIONS`         | `+`-delimited list of subreddits (`sub1+sub2+sub3+...`)                                                       | _(none)_          | 
+| `HIDE_AWARDS`           | `["on", "off"]`                                                                                     | `off`
+| `DISABLE_VISIT_REDDIT_CONFIRMATION`     | `["on", "off"]`                                                                                     | `off`         |
 
 You can also configure Libreddit with a configuration file. An example `libreddit.toml` can be found below:
 

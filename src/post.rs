@@ -147,16 +147,11 @@ fn query_comments(
 			results.append(&mut query_comments(&data["replies"], post_link, post_author, highlighted_comment, filters, query, req))
 		}
 
-			let body = if (val(&comment, "author") == "[deleted]" && val(&comment, "body") == "[removed]") || val(&comment, "body") == "[ Removed by Reddit ]" {
-				format!(
-					"<div class=\"md\"><p>[removed] — <a href=\"https://{}{}{}\">view removed comment</a></p></div>",
-					get_setting("LIBREDDIT_PUSHSHIFT_FRONTEND").unwrap_or(String::from(crate::config::DEFAULT_PUSHSHIFT_FRONTEND)),
-					post_link,
-					id
-				)
-			} else {
-				rewrite_urls(&val(&comment, "body_html"))
-			};
+		let c = build_comment(&comment, data, Vec::new(), post_link, post_author, highlighted_comment, filters, req);
+		if c.body.to_lowercase().contains(&query.to_lowercase()) {
+			results.push(c);
+		}
+	});
 
 	results
 }
@@ -175,8 +170,10 @@ fn build_comment(
 
 	let body = if (val(comment, "author") == "[deleted]" && val(comment, "body") == "[removed]") || val(comment, "body") == "[ Removed by Reddit ]" {
 		format!(
-			"<div class=\"md\"><p>[removed] — <a href=\"https://www.unddit.com{}{}\">view removed comment</a></p></div>",
-			post_link, id
+			"<div class=\"md\"><p>[removed] — <a href=\"https://{}{}{}\">view removed comment</a></p></div>",
+			get_setting("LIBREDDIT_PUSHSHIFT_FRONTEND").unwrap_or(String::from(crate::config::DEFAULT_PUSHSHIFT_FRONTEND)),
+			post_link,
+			id
 		)
 	} else {
 		rewrite_urls(&val(comment, "body_html"))
