@@ -664,11 +664,7 @@ pub async fn parse_post(post: &serde_json::Value) -> Post {
 	let body = if val(post, "removed_by_category") == "moderator" {
 		format!(
 			"<div class=\"md\"><p>[removed] — <a href=\"https://{}{}\">view removed post</a></p></div>",
-			// Safe to unwrap: The get_setting function only returns an option by design,
-			// for this specific setting, it is a String, not an Option<String>. See
-			// get_setting_from_config() in config.rs - when requesting this specific
-			// setting, it wraps it in a Some, just to match the type signature.
-			get_setting("LIBREDDIT_PUSHSHIFT_FRONTEND").unwrap(),
+			get_setting("LIBREDDIT_PUSHSHIFT_FRONTEND").unwrap_or(String::from(crate::config::DEFAULT_PUSHSHIFT_FRONTEND)),
 			permalink
 		)
 	} else {

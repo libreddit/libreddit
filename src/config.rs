@@ -9,6 +9,10 @@ use std::{env::var, fs::read_to_string};
 // first request) and contains the instance settings.
 pub(crate) static CONFIG: Lazy<Config> = Lazy::new(Config::load);
 
+// This serves as the frontend for the Pushshift API - on removed comments, this URL will
+// be the base of a link, to display removed content (on another site).
+pub(crate) static DEFAULT_PUSHSHIFT_FRONTEND: &str = "www.unddit.com";
+
 /// Stores the configuration parsed from the environment variables and the
 /// config file. `Config::Default()` contains None for each setting.
 /// When adding more config settings, add it to `Config::load`,
@@ -59,7 +63,7 @@ pub struct Config {
 	pub(crate) banner: Option<String>,
 
 	#[serde(rename = "LIBREDDIT_PUSHSHIFT_FRONTEND")]
-	pub(crate) pushshift: String,
+	pub(crate) pushshift: Option<String>,
 }
 
 impl Config {
@@ -75,9 +79,6 @@ impl Config {
 		// both are `None`, return a `None` via the `map_or_else` function
 		let parse = |key: &str| -> Option<String> { var(key).ok().map_or_else(|| get_setting_from_config(key, &config), Some) };
 
-		// This serves as the frontend for the Pushshift API - on removed comments, this URL will
-		// be the base of a link, to display removed content (on another site).
-		let default_pushshift_frontend = String::from("www.unddit.com");
 
 		Self {
 			sfw_only: parse("LIBREDDIT_SFW_ONLY"),
@@ -94,7 +95,7 @@ impl Config {
 			default_hide_awards: parse("LIBREDDIT_DEFAULT_HIDE_AWARDS"),
 			default_subscriptions: parse("LIBREDDIT_DEFAULT_SUBSCRIPTIONS"),
 			banner: parse("LIBREDDIT_BANNER"),
-			pushshift: parse("LIBREDDIT_PUSHSHIFT_FRONTEND").unwrap_or(default_pushshift_frontend),
+			pushshift: parse("LIBREDDIT_PUSHSHIFT_FRONTEND"),
 		}
 	}
 }
@@ -115,7 +116,7 @@ fn get_setting_from_config(name: &str, config: &Config) -> Option<String> {
 		"LIBREDDIT_DEFAULT_HIDE_AWARDS" => config.default_hide_awards.clone(),
 		"LIBREDDIT_DEFAULT_SUBSCRIPTIONS" => config.default_subscriptions.clone(),
 		"LIBREDDIT_BANNER" => config.banner.clone(),
-		"LIBREDDIT_PUSHSHIFT_FRONTEND" => Some(config.pushshift.clone()),
+		"LIBREDDIT_PUSHSHIFT_FRONTEND" => config.pushshift.clone(),
 		_ => None,
 	}
 }
