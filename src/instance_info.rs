@@ -122,7 +122,7 @@ impl InstanceInfo {
 				["Deploy timestamp", &self.deploy_unix_ts.to_string()],
 				["Compile mode", &self.compile_mode],
 				["SFW only", &convert(&self.config.sfw_only)],
-				["Pushshift frontend", &convert(&Some(self.config.pushshift.clone()))],
+				["Pushshift frontend", &convert(&self.config.pushshift)],
 			])
 			.with_header_row(["Settings"]),
 		);

@@ -1,6 +1,6 @@
 // CRATES
 use crate::client::json;
-use crate::config::get_setting;
+use crate::config::{get_setting, DEFAULT_PUSHSHIFT_FRONTEND};
 use crate::server::RequestExt;
 use crate::subreddit::{can_access_quarantine, quarantine};
 use crate::utils::{
@@ -126,11 +126,7 @@ fn parse_comments(json: &serde_json::Value, post_link: &str, post_author: &str, 
 			let body = if (val(&comment, "author") == "[deleted]" && val(&comment, "body") == "[removed]") || val(&comment, "body") == "[ Removed by Reddit ]" {
 				format!(
 					"<div class=\"md\"><p>[removed] — <a href=\"https://{}{}{}\">view removed comment</a></p></div>",
-					// Safe to unwrap: The get_setting function only returns an option by design,
-					// for this specific setting, it is a String, not an Option<String>. See
-					// get_setting_from_config() in config.rs - when requesting this specific
-					// setting, it wraps it in a Some, just to match the type signature.
-					get_setting("LIBREDDIT_PUSHSHIFT_FRONTEND").unwrap(),
+					get_setting("LIBREDDIT_PUSHSHIFT_FRONTEND").unwrap_or(String::from(DEFAULT_PUSHSHIFT_FRONTEND)),
 					post_link,
 					id
 				)
