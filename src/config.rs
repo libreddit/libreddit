@@ -11,7 +11,7 @@ pub(crate) static CONFIG: Lazy<Config> = Lazy::new(Config::load);
 
 // This serves as the frontend for the Pushshift API - on removed comments, this URL will
 // be the base of a link, to display removed content (on another site).
-pub(crate) static DEFAULT_PUSHSHIFT_FRONTEND: &str = "www.unddit.com";
+pub(crate) const DEFAULT_PUSHSHIFT_FRONTEND: &str = "www.unddit.com";
 
 /// Stores the configuration parsed from the environment variables and the
 /// config file. `Config::Default()` contains None for each setting.
@@ -79,7 +79,6 @@ impl Config {
 		// both are `None`, return a `None` via the `map_or_else` function
 		let parse = |key: &str| -> Option<String> { var(key).ok().map_or_else(|| get_setting_from_config(key, &config), Some) };
 
-
 		Self {
 			sfw_only: parse("LIBREDDIT_SFW_ONLY"),
 			default_theme: parse("LIBREDDIT_DEFAULT_THEME"),
@@ -130,7 +129,8 @@ pub(crate) fn get_setting(name: &str) -> Option<String> {
 use {sealed_test::prelude::*, std::fs::write};
 
 #[test]
-fn test_deserialize() { // Must handle empty input
+fn test_deserialize() {
+	// Must handle empty input
 	let result = toml::from_str::<Config>("");
 	assert!(result.is_ok(), "Error: {}", result.unwrap_err());
 }
