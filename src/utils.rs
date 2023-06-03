@@ -1,3 +1,4 @@
+use crate::config::get_setting;
 //
 // CRATES
 //
@@ -662,7 +663,8 @@ pub async fn parse_post(post: &serde_json::Value) -> Post {
 
 	let body = if val(post, "removed_by_category") == "moderator" {
 		format!(
-			"<div class=\"md\"><p>[removed] — <a href=\"https://www.unddit.com{}\">view removed post</a></p></div>",
+			"<div class=\"md\"><p>[removed] — <a href=\"https://{}{}\">view removed post</a></p></div>",
+			get_setting("LIBREDDIT_PUSHSHIFT_FRONTEND").unwrap_or(String::from(crate::config::DEFAULT_PUSHSHIFT_FRONTEND)),
 			permalink
 		)
 	} else {

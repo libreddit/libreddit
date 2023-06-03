@@ -58,6 +58,9 @@
     },
     "LIBREDDIT_DEFAULT_DISABLE_VISIT_REDDIT_CONFIRMATION": {
       "required": false
+    },
+    "LIBREDDIT_PUSHSHIFT_FRONTEND": {
+      "required": false
     }
   }
 }
