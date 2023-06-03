@@ -145,11 +145,13 @@ fn test_deserialize() {
 	assert!(result.is_ok(), "Error: {}", result.unwrap_err());
 }
 
+#[test]
 #[sealed_test(env = [("LIBREDDIT_SFW_ONLY", "on")])]
 fn test_env_var() {
 	assert!(crate::utils::sfw_only())
 }
 
+#[test]
 #[sealed_test]
 fn test_config() {
 	let config_to_write = r#"LIBREDDIT_DEFAULT_COMMENT_SORT = "best""#;
@@ -157,6 +159,7 @@ fn test_config() {
 	assert_eq!(get_setting("LIBREDDIT_DEFAULT_COMMENT_SORT"), Some("best".into()));
 }
 
+#[test]
 #[sealed_test(env = [("LIBREDDIT_DEFAULT_COMMENT_SORT", "top")])]
 fn test_env_config_precedence() {
 	let config_to_write = r#"LIBREDDIT_DEFAULT_COMMENT_SORT = "best""#;
@@ -164,6 +167,7 @@ fn test_env_config_precedence() {
 	assert_eq!(get_setting("LIBREDDIT_DEFAULT_COMMENT_SORT"), Some("top".into()))
 }
 
+#[test]
 #[sealed_test(env = [("LIBREDDIT_DEFAULT_COMMENT_SORT", "top")])]
 fn test_alt_env_config_precedence() {
 	let config_to_write = r#"LIBREDDIT_DEFAULT_COMMENT_SORT = "best""#;
