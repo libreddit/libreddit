@@ -1,33 +1,44 @@
-name: Rust
+name: Rust Build & Publish
 
 on:
   push:
     paths-ignore:
       - "**.md"
+  
     branches:
-      - master
+      - 'main'
+      - 'master'
+  
+  release:
+    types: [published]
 
 env:
   CARGO_TERM_COLOR: always
 
 jobs:
   build:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout sources
+        uses: actions/checkout@v3
 
       - name: Cache Packages
-        uses: Swatinem/rust-cache@v1.0.1
+        uses: Swatinem/rust-cache@v2
+
+      - name: Install stable toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
 
       - name: Build
         run: cargo build --release
 
       - name: Publish to crates.io
-        continue-on-error: true
+        if: github.event_name == 'release'
         run: cargo publish --no-verify --token ${{ secrets.CARGO_REGISTRY_TOKEN }}
       
-      - uses: actions/upload-artifact@v2.2.1
+      - uses: actions/upload-artifact@v3
         name: Upload a Build Artifact
         with:
           name: libreddit
@@ -35,23 +46,25 @@ jobs:
         
       - name: Versions
         id: version
-        run: |
-          echo "::set-output name=version::$(cargo metadata --format-version 1 --no-deps | jq .packages[0].version -r | sed 's/^/v/')"
-          echo "::set-output name=tag::$(git describe --tags)"
+        run: echo "VERSION=$(cargo metadata --format-version 1 --no-deps | jq .packages[0].version -r | sed 's/^/v/')" >> "$GITHUB_OUTPUT"
           
       - name: Calculate SHA512 checksum
         run: sha512sum target/release/libreddit > libreddit.sha512
+
+      - name: Calculate SHA256 checksum
+        run: sha256sum target/release/libreddit > libreddit.sha256
         
       - name: Release
         uses: softprops/action-gh-release@v1
         if: github.base_ref != 'master'
         with:
-          tag_name: ${{ steps.version.outputs.version }}
-          name: ${{ steps.version.outputs.version }} - ${{ github.event.head_commit.message }}
+          tag_name: ${{ steps.version.outputs.VERSION }}
+          name: ${{ steps.version.outputs.VERSION }} - ${{ github.event.head_commit.message }}
           draft: true
           files: |
             target/release/libreddit
             libreddit.sha512
+            libreddit.sha256
           body: |
             - ${{ github.event.head_commit.message }} ${{ github.sha }}
           generate_release_notes: true

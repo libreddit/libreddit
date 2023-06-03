@@ -1,0 +1,62 @@
+name: Pull Request
+
+on:
+  push:
+    branches:
+      - 'main'
+      - 'master'
+
+  pull_request:
+    branches:
+      - 'main'
+      - 'master'
+    
+jobs:
+  test:
+    name: cargo test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v3
+      
+      - name: Install stable toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+      
+      - name: Run cargo test
+        run: cargo test
+
+  format:
+    name: cargo fmt --all -- --check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v3
+      
+      - name: Install stable toolchain with rustfmt component
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+          components: rustfmt
+
+      - name: Run cargo fmt
+        run: cargo fmt --all -- --check
+
+  clippy:
+    name: cargo clippy -- -D warnings
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v3
+
+      - name: Install stable toolchain with clippy component
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+          components: clippy
+
+      - name: Run cargo clippy
+        run: cargo clippy -- -D warnings

@@ -1,7 +1,11 @@
-use std::{
-	os::unix::process::ExitStatusExt,
-	process::{Command, ExitStatus, Output},
-};
+use std::process::{Command, ExitStatus, Output};
+
+#[cfg(not(target_os = "windows"))]
+use std::os::unix::process::ExitStatusExt;
+
+#[cfg(target_os = "windows")]
+use std::os::windows::process::ExitStatusExt;
+
 fn main() {
 	let output = String::from_utf8(
 		Command::new("git")

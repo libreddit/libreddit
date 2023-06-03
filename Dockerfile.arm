@@ -7,6 +7,10 @@ RUN apk add --no-cache g++ git
 
 WORKDIR /usr/src/libreddit
 
+# cache dependencies in their own layer
+COPY Cargo.lock Cargo.toml .
+RUN mkdir src && echo "fn main() {}" > src/main.rs && cargo install --config net.git-fetch-with-cli=true --path . && rm -rf ./src
+
 COPY . .
 
 # net.git-fetch-with-cli is specified in order to prevent a potential OOM kill
