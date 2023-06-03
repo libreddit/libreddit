@@ -33,7 +33,7 @@ jobs:
 
       # Building actions
       - name: Build
-        run: RUSTFLAGS='-C target-feature=+crt-static' cargo build --release
+        run: RUSTFLAGS='-C target-feature=+crt-static' cargo build --release --target x86_64-unknown-linux-gnu
 
       - name: Calculate SHA512 checksum
         run: sha512sum target/release/libreddit > libreddit.sha512
