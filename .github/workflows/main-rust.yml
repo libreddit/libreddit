@@ -30,11 +30,10 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: stable
-          targets: "x86_64-unknown-linux-gnu,x86_64-unknown-linux-musl"
 
       # Building actions
       - name: Build
-        run: cargo build --release
+        run: RUSTFLAGS='-C target-feature=+crt-static' cargo build --release
 
       - name: Calculate SHA512 checksum
         run: sha512sum target/release/libreddit > libreddit.sha512
@@ -42,27 +41,14 @@ jobs:
       - name: Calculate SHA256 checksum
         run: sha256sum target/release/libreddit > libreddit.sha256
 
-      - name: Build MUSL
-        run: cargo build --release --target x86_64-unknown-linux-musl
-
-      - name: Calculate MUSL SHA512 checksum
-        run: sha512sum target/x86_64-unknown-linux-musl/release/libreddit > libreddit-musl.sha512
-
-      - name: Calculate MUSL SHA256 checksum
-        run: sha256sum target/x86_64-unknown-linux-musl/release/libreddit > libreddit-musl.sha256
-
-      - name: Move MUSL binary
-        run: mv target/x86_64-unknown-linux-musl/release/libreddit target/x86_64-unknown-linux-musl/release/libreddit-musl
-      
       - uses: actions/upload-artifact@v3
         name: Upload a Build Artifact
         with:
           name: libreddit
           path: |
             target/release/libreddit
-            target/x86_64-unknown-linux-musl/release/libreddit-musl
-            *.sha512
-            *.sha256
+            libreddit.sha512
+            libreddit.sha256
         
       - name: Versions
         id: version
@@ -85,9 +71,6 @@ jobs:
             target/release/libreddit
             libreddit.sha512
             libreddit.sha256
-            target/x86_64-unknown-linux-musl/release/libreddit-musl
-            libreddit-musl.sha512
-            libreddit-musl.sha256
           body: |
             - ${{ github.event.head_commit.message }} ${{ github.sha }}
           generate_release_notes: true
