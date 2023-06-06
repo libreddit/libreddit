@@ -208,3 +208,14 @@ impl Device {
 		}
 	}
 }
+
+#[tokio::test]
+async fn test_oauth_client() {
+	initialize().await;
+}
+
+#[tokio::test]
+async fn test_oauth_client_refresh() {
+	initialize().await;
+	OAUTH_CLIENT.write().await.refresh().await.unwrap();
+}

@@ -434,3 +434,8 @@ async fn subreddit(sub: &str, quarantined: bool) -> Result<Subreddit, String> {
 		nsfw: res["data"]["over18"].as_bool().unwrap_or_default(),
 	})
 }
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 1)]
+async fn test_fetching_subreddit() {
+	subreddit("rust", false).await.unwrap();
+}

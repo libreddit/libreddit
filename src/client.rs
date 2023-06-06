@@ -137,13 +137,13 @@ fn request(method: &'static Method, path: String, redirect: bool, quarantine: bo
 	let client: client::Client<_, hyper::Body> = CLIENT.clone();
 
 	let (token, vendor_id, device_id, user_agent, loid) = {
-		let client = OAUTH_CLIENT.blocking_read();
+		let client = tokio::task::block_in_place(move || OAUTH_CLIENT.blocking_read());
 		(
 			client.token.clone(),
 			client.headers_map.get("Client-Vendor-Id").unwrap().clone(),
 			client.headers_map.get("X-Reddit-Device-Id").unwrap().clone(),
 			client.headers_map.get("User-Agent").unwrap().clone(),
-			client.headers_map.get("x-reddit-loid").unwrap().clone(),
+			client.headers_map.get("x-reddit-loid").cloned().unwrap_or_default(),
 		)
 	};
 	// Build request to Reddit. When making a GET, request gzip compression.
