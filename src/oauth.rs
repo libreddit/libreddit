@@ -153,23 +153,37 @@ struct Device {
 
 impl Device {
 	fn android() -> Self {
+		// Generate uuid
 		let uuid = uuid::Uuid::new_v4().to_string();
+
+		// Select random user agent from ANDROID_USER_AGENT
 		let android_user_agent = ANDROID_USER_AGENT[fastrand::usize(..ANDROID_USER_AGENT.len())].to_string();
+
+		// Android device headers
 		let headers = HashMap::from([
 			("Client-Vendor-Id".into(), uuid.clone()),
 			("X-Reddit-Device-Id".into(), uuid.clone()),
 			("User-Agent".into(), android_user_agent),
 		]);
+
 		info!("Spoofing Android client with headers: {headers:?}, uuid: \"{uuid}\", and OAuth ID \"{REDDIT_ANDROID_OAUTH_CLIENT_ID}\"");
+
 		Device {
 			oauth_id: REDDIT_ANDROID_OAUTH_CLIENT_ID.to_string(),
 			headers,
 		}
 	}
 	fn ios() -> Self {
+		// Generate uuid
 		let uuid = uuid::Uuid::new_v4().to_string();
+
+		// Select random user agent from IOS_USER_AGENT
 		let ios_user_agent = IOS_USER_AGENT[fastrand::usize(..IOS_USER_AGENT.len())].to_string();
+
+		// Select random iOS device from IOS_DEVICES
 		let ios_device = IOS_DEVICES[fastrand::usize(..IOS_DEVICES.len())].to_string();
+
+		// iOS device headers
 		let headers = HashMap::from([
 			("X-Reddit-DPR".into(), "2".into()),
 			("Device-Name".into(), ios_device.clone()),
@@ -177,7 +191,9 @@ impl Device {
 			("User-Agent".into(), ios_user_agent),
 			("Client-Vendor-Id".into(), uuid.clone()),
 		]);
+
 		info!("Spoofing iOS client {ios_device} with headers: {headers:?}, uuid: \"{uuid}\", and OAuth ID \"{REDDIT_IOS_OAUTH_CLIENT_ID}\"");
+
 		Device {
 			oauth_id: REDDIT_IOS_OAUTH_CLIENT_ID.to_string(),
 			headers,
