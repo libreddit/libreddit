@@ -7,11 +7,12 @@ use libflate::gzip;
 use once_cell::sync::Lazy;
 use percent_encoding::{percent_encode, CONTROLS};
 use serde_json::Value;
-use std::sync::RwLock;
+use std::sync::Arc;
 use std::{io, result::Result};
+use tokio::sync::RwLock;
 
 use crate::dbg_msg;
-use crate::oauth::{Oauth, USER_AGENT};
+use crate::oauth::Oauth;
 use crate::server::RequestExt;
 
 const REDDIT_URL_BASE: &str = "https://oauth.reddit.com";
@@ -21,7 +22,7 @@ pub(crate) static CLIENT: Lazy<Client<HttpsConnector<HttpConnector>>> = Lazy::ne
 	client::Client::builder().build(https)
 });
 
-pub(crate) static OAUTH_CLIENT: Lazy<RwLock<Oauth>> = Lazy::new(|| RwLock::new(Oauth::new()));
+pub(crate) static OAUTH_CLIENT: Lazy<Arc<RwLock<Oauth>>> = Lazy::new(|| Arc::new(RwLock::new(Oauth::new())));
 
 /// Gets the canonical path for a resource on Reddit. This is accomplished by
 /// making a `HEAD` request to Reddit at the path given in `path`.
@@ -135,12 +136,14 @@ fn request(method: &'static Method, path: String, redirect: bool, quarantine: bo
 	// Construct the hyper client from the HTTPS connector.
 	let client: client::Client<_, hyper::Body> = CLIENT.clone();
 
-	let (token, vendor_id, device_id) = {
-		let client = OAUTH_CLIENT.read().unwrap();
+	let (token, vendor_id, device_id, user_agent, loid) = {
+		let client = OAUTH_CLIENT.blocking_read();
 		(
 			client.token.clone(),
 			client.headers_map.get("Client-Vendor-Id").unwrap().clone(),
 			client.headers_map.get("X-Reddit-Device-Id").unwrap().clone(),
+			client.headers_map.get("User-Agent").unwrap().clone(),
+			client.headers_map.get("x-reddit-loid").unwrap().clone(),
 		)
 	};
 	// Build request to Reddit. When making a GET, request gzip compression.
@@ -148,9 +151,10 @@ fn request(method: &'static Method, path: String, redirect: bool, quarantine: bo
 	let builder = Request::builder()
 		.method(method)
 		.uri(&url)
-		.header("User-Agent", USER_AGENT)
+		.header("User-Agent", user_agent)
 		.header("Client-Vendor-Id", vendor_id)
 		.header("X-Reddit-Device-Id", device_id)
+		.header("x-reddit-loid", loid)
 		.header("Host", "oauth.reddit.com")
 		.header("Authorization", &format!("Bearer {}", token))
 		.header("Accept-Encoding", if method == Method::GET { "gzip" } else { "identity" })

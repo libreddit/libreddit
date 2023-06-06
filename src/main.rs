@@ -26,8 +26,6 @@ use once_cell::sync::Lazy;
 use server::RequestExt;
 use utils::{error, redirect, ThemeAssets};
 
-use crate::client::OAUTH_CLIENT;
-
 mod server;
 
 // Create Services
@@ -111,6 +109,12 @@ async fn style() -> Result<Response<Body>, String> {
 
 #[tokio::main]
 async fn main() {
+	// Load environment variables
+	dotenvy::dotenv().unwrap();
+
+	// Initialize logger
+	pretty_env_logger::init();
+
 	let matches = Command::new("Libreddit")
 		.version(env!("CARGO_PKG_VERSION"))
 		.about("Private front-end for Reddit written in Rust ")
@@ -170,10 +174,8 @@ async fn main() {
 	Lazy::force(&config::CONFIG);
 	Lazy::force(&instance_info::INSTANCE_INFO);
 
-	// Force login of Oauth client
-	#[allow(clippy::await_holding_lock)]
-	// We don't care if we are awaiting a lock here - it's just locked once at init.
-	OAUTH_CLIENT.write().unwrap().login().await;
+	// Initialize OAuth client spoofing
+	oauth::initialize().await;
 
 	// Define default headers (added to all responses)
 	app.default_headers = headers! {
