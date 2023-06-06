@@ -7,17 +7,21 @@ use libflate::gzip;
 use once_cell::sync::Lazy;
 use percent_encoding::{percent_encode, CONTROLS};
 use serde_json::Value;
+use std::sync::RwLock;
 use std::{io, result::Result};
 
 use crate::dbg_msg;
+use crate::oauth::{Oauth, USER_AGENT};
 use crate::server::RequestExt;
 
-const REDDIT_URL_BASE: &str = "https://www.reddit.com";
+const REDDIT_URL_BASE: &str = "https://oauth.reddit.com";
 
-static CLIENT: Lazy<Client<HttpsConnector<HttpConnector>>> = Lazy::new(|| {
+pub(crate) static CLIENT: Lazy<Client<HttpsConnector<HttpConnector>>> = Lazy::new(|| {
 	let https = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_only().enable_http1().build();
 	client::Client::builder().build(https)
 });
+
+pub(crate) static OAUTH_CLIENT: Lazy<RwLock<Oauth>> = Lazy::new(|| RwLock::new(Oauth::new()));
 
 /// Gets the canonical path for a resource on Reddit. This is accomplished by
 /// making a `HEAD` request to Reddit at the path given in `path`.
@@ -136,9 +140,9 @@ fn request(method: &'static Method, path: String, redirect: bool, quarantine: bo
 	let builder = Request::builder()
 		.method(method)
 		.uri(&url)
-		.header("User-Agent", format!("web:libreddit:{}", env!("CARGO_PKG_VERSION")))
-		.header("Host", "www.reddit.com")
-		.header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8")
+		.header("User-Agent", USER_AGENT)
+		.header("Host", "oauth.reddit.com")
+		.header("Authorization", &format!("Bearer {}", OAUTH_CLIENT.read().unwrap().token))
 		.header("Accept-Encoding", if method == Method::GET { "gzip" } else { "identity" })
 		.header("Accept-Language", "en-US,en;q=0.5")
 		.header("Connection", "keep-alive")

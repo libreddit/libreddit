@@ -30,6 +30,8 @@ toml = "0.7.4"
 once_cell = "1.17.0"
 serde_yaml = "0.9.16"
 build_html = "2.2.0"
+uuid = { version = "1.3.3", features = ["v4"] }
+base64 = "0.21.2"
 
 [dev-dependencies]
 lipsum = "0.9.0"
