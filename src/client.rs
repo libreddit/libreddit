@@ -135,14 +135,24 @@ fn request(method: &'static Method, path: String, redirect: bool, quarantine: bo
 	// Construct the hyper client from the HTTPS connector.
 	let client: client::Client<_, hyper::Body> = CLIENT.clone();
 
+	let (token, vendor_id, device_id) = {
+		let client = OAUTH_CLIENT.read().unwrap();
+		(
+			client.token.clone(),
+			client.headers_map.get("Client-Vendor-Id").unwrap().clone(),
+			client.headers_map.get("X-Reddit-Device-Id").unwrap().clone(),
+		)
+	};
 	// Build request to Reddit. When making a GET, request gzip compression.
 	// (Reddit doesn't do brotli yet.)
 	let builder = Request::builder()
 		.method(method)
 		.uri(&url)
 		.header("User-Agent", USER_AGENT)
+		.header("Client-Vendor-Id", vendor_id)
+		.header("X-Reddit-Device-Id", device_id)
 		.header("Host", "oauth.reddit.com")
-		.header("Authorization", &format!("Bearer {}", OAUTH_CLIENT.read().unwrap().token))
+		.header("Authorization", &format!("Bearer {}", token))
 		.header("Accept-Encoding", if method == Method::GET { "gzip" } else { "identity" })
 		.header("Accept-Language", "en-US,en;q=0.5")
 		.header("Connection", "keep-alive")
