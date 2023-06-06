@@ -110,7 +110,7 @@ async fn style() -> Result<Response<Body>, String> {
 #[tokio::main]
 async fn main() {
 	// Load environment variables
-	dotenvy::dotenv().unwrap();
+	_ = dotenvy::dotenv();
 
 	// Initialize logger
 	pretty_env_logger::init();
