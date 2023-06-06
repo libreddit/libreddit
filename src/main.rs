@@ -171,7 +171,7 @@ async fn main() {
 	Lazy::force(&instance_info::INSTANCE_INFO);
 
 	// Force login of Oauth client
-	#[allow(clippy::await_holding_lock)] 
+	#[allow(clippy::await_holding_lock)]
 	// We don't care if we are awaiting a lock here - it's just locked once at init.
 	OAUTH_CLIENT.write().unwrap().login().await;
 
