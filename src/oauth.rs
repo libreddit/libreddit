@@ -157,7 +157,7 @@ impl Device {
 		let uuid = uuid::Uuid::new_v4().to_string();
 
 		// Select random user agent from ANDROID_USER_AGENT
-		let android_user_agent = ANDROID_USER_AGENT[fastrand::usize(..ANDROID_USER_AGENT.len())].to_string();
+		let android_user_agent = choose(&ANDROID_USER_AGENT).to_string();
 
 		// Android device headers
 		let headers = HashMap::from([
@@ -178,10 +178,10 @@ impl Device {
 		let uuid = uuid::Uuid::new_v4().to_string();
 
 		// Select random user agent from IOS_USER_AGENT
-		let ios_user_agent = IOS_USER_AGENT[fastrand::usize(..IOS_USER_AGENT.len())].to_string();
+		let ios_user_agent = choose(&IOS_USER_AGENT).to_string();
 
 		// Select random iOS device from IOS_DEVICES
-		let ios_device = IOS_DEVICES[fastrand::usize(..IOS_DEVICES.len())].to_string();
+		let ios_device = choose(&IOS_DEVICES).to_string();
 
 		// iOS device headers
 		let headers = HashMap::from([
@@ -207,6 +207,12 @@ impl Device {
 			Device::ios()
 		}
 	}
+}
+
+// Waiting on fastrand 2.0.0 for the `choose` function
+// https://github.com/smol-rs/fastrand/pull/59/
+fn choose<T: Copy>(list: &[T]) -> T {
+	list[fastrand::usize(..list.len())]
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
