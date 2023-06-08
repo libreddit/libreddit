@@ -22,9 +22,12 @@ use hyper::{header::HeaderValue, Body, Request, Response};
 
 mod client;
 use client::{canonical_path, proxy};
+use log::info;
 use once_cell::sync::Lazy;
 use server::RequestExt;
 use utils::{error, redirect, ThemeAssets};
+
+use crate::client::OAUTH_CLIENT;
 
 mod server;
 
@@ -169,13 +172,16 @@ async fn main() {
 
 	// Force evaluation of statics. In instance_info case, we need to evaluate
 	// the timestamp so deploy date is accurate - in config case, we need to
-	// evaluate the configuration to avoid paying penalty at first request.
+	// evaluate the configuration to avoid paying penalty at first request -
+	// in OAUTH case, we need to retrieve the token to avoid paying penalty
+	// at first request
 
+	info!("Evaluating config.");
 	Lazy::force(&config::CONFIG);
+	info!("Evaluating instance info.");
 	Lazy::force(&instance_info::INSTANCE_INFO);
-
-	// Initialize OAuth client spoofing
-	oauth::initialize().await;
+	info!("Creating OAUTH client.");
+	Lazy::force(&OAUTH_CLIENT);
 
 	// Define default headers (added to all responses)
 	app.default_headers = headers! {

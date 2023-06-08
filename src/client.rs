@@ -1,4 +1,5 @@
 use cached::proc_macro::cached;
+use futures_lite::future::block_on;
 use futures_lite::{future::Boxed, FutureExt};
 use hyper::client::HttpConnector;
 use hyper::{body, body::Buf, client, header, Body, Client, Method, Request, Response, Uri};
@@ -7,12 +8,12 @@ use libflate::gzip;
 use once_cell::sync::Lazy;
 use percent_encoding::{percent_encode, CONTROLS};
 use serde_json::Value;
-use std::sync::Arc;
+
 use std::{io, result::Result};
 use tokio::sync::RwLock;
 
 use crate::dbg_msg;
-use crate::oauth::Oauth;
+use crate::oauth::{token_daemon, Oauth};
 use crate::server::RequestExt;
 
 const REDDIT_URL_BASE: &str = "https://oauth.reddit.com";
@@ -22,7 +23,11 @@ pub(crate) static CLIENT: Lazy<Client<HttpsConnector<HttpConnector>>> = Lazy::ne
 	client::Client::builder().build(https)
 });
 
-pub(crate) static OAUTH_CLIENT: Lazy<Arc<RwLock<Oauth>>> = Lazy::new(|| Arc::new(RwLock::new(Oauth::new())));
+pub(crate) static OAUTH_CLIENT: Lazy<RwLock<Oauth>> = Lazy::new(|| {
+	let client = block_on(Oauth::new());
+	tokio::spawn(token_daemon());
+	RwLock::new(client)
+});
 
 /// Gets the canonical path for a resource on Reddit. This is accomplished by
 /// making a `HEAD` request to Reddit at the path given in `path`.
@@ -137,12 +142,12 @@ fn request(method: &'static Method, path: String, redirect: bool, quarantine: bo
 	let client: client::Client<_, hyper::Body> = CLIENT.clone();
 
 	let (token, vendor_id, device_id, user_agent, loid) = {
-		let client = tokio::task::block_in_place(move || OAUTH_CLIENT.blocking_read());
+		let client = block_on(OAUTH_CLIENT.read());
 		(
 			client.token.clone(),
-			client.headers_map.get("Client-Vendor-Id").unwrap().clone(),
-			client.headers_map.get("X-Reddit-Device-Id").unwrap().clone(),
-			client.headers_map.get("User-Agent").unwrap().clone(),
+			client.headers_map.get("Client-Vendor-Id").cloned().unwrap_or_default(),
+			client.headers_map.get("X-Reddit-Device-Id").cloned().unwrap_or_default(),
+			client.headers_map.get("User-Agent").cloned().unwrap_or_default(),
 			client.headers_map.get("x-reddit-loid").cloned().unwrap_or_default(),
 		)
 	};

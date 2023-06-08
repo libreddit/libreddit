@@ -4,6 +4,7 @@ use crate::client::{CLIENT, OAUTH_CLIENT};
 use base64::{engine::general_purpose, Engine as _};
 use hyper::{client, Body, Method, Request};
 use log::info;
+
 use serde_json::json;
 
 static REDDIT_ANDROID_OAUTH_CLIENT_ID: &str = "ohXpoqrZYub1kg";
@@ -25,9 +26,10 @@ pub(crate) static IOS_USER_AGENT: [&str; 3] = [
 	"Reddit/Version 2023.22.0/Build 613580/iOS Version 16.5",
 ];
 // Various iOS device codes. iPhone 11 displays as `iPhone12,1`
-// This is a bit of a hack, but I just changed the number a few times
+// I just changed the number a few times for some plausible values
 pub(crate) static IOS_DEVICES: [&str; 5] = ["iPhone8,1", "iPhone11,1", "iPhone12,1", "iPhone13,1", "iPhone14,1"];
 
+#[derive(Debug, Clone, Default)]
 pub(crate) struct Oauth {
 	// Currently unused, may be necessary if we decide to support GQL in the future
 	pub(crate) headers_map: HashMap<String, String>,
@@ -37,7 +39,12 @@ pub(crate) struct Oauth {
 }
 
 impl Oauth {
-	pub(crate) fn new() -> Self {
+	pub(crate) async fn new() -> Self {
+		let mut oauth = Oauth::default();
+		oauth.login().await;
+		oauth
+	}
+	pub(crate) fn default() -> Self {
 		// Generate a random device to spoof
 		let device = Device::random();
 		let headers = device.headers.clone();
@@ -81,7 +88,6 @@ impl Oauth {
 
 		// Build request
 		let request = builder.body(body).unwrap();
-		info!("Request: {request:?}");
 
 		// Send request
 		let client: client::Client<_, hyper::Body> = CLIENT.clone();
@@ -94,7 +100,6 @@ impl Oauth {
 			self.headers_map.insert("x-reddit-loid".to_owned(), header.to_str().ok()?.to_string());
 		}
 
-		info!("OAuth response: {resp:?}");
 		// Serialize response
 		let body_bytes = hyper::body::to_bytes(resp.into_body()).await.ok()?;
 		let json: serde_json::Value = serde_json::from_slice(&body_bytes).ok()?;
@@ -104,7 +109,7 @@ impl Oauth {
 		self.expires_in = json.get("expires_in")?.as_u64()?;
 		self.headers_map.insert("Authorization".to_owned(), format!("Bearer {}", self.token));
 
-		info!("Retrieved token {}, expires in {}", self.token, self.expires_in);
+		info!("✅ Success - Retrieved token \"{}...\", expires in {}", &self.token[..32], self.expires_in);
 
 		Some(())
 	}
@@ -117,23 +122,18 @@ impl Oauth {
 		refresh
 	}
 }
-// Initialize the OAuth client and launch a thread to monitor subsequent token refreshes.
-pub(crate) async fn initialize() {
-	// Initial login
-	OAUTH_CLIENT.write().await.login().await.unwrap();
-	// Spawn token daemon in background - we want the initial login to be blocked upon, but the
-	// daemon to be launched in the background.
-	// Initial login blocks libreddit start-up because we _need_ the oauth token.
-	tokio::spawn(token_daemon());
-}
-async fn token_daemon() {
+
+pub(crate) async fn token_daemon() {
 	// Monitor for refreshing token
 	loop {
 		// Get expiry time - be sure to not hold the read lock
-		let expires_in = OAUTH_CLIENT.read().await.expires_in;
+		let expires_in = { OAUTH_CLIENT.read().await.expires_in };
 
 		// sleep for the expiry time minus 2 minutes
 		let duration = Duration::from_secs(expires_in - 120);
+
+		info!("Waiting for {duration:?} seconds before refreshing OAuth token...");
+
 		tokio::time::sleep(duration).await;
 
 		info!("[{duration:?} ELAPSED] Refreshing OAuth token...");
@@ -145,7 +145,7 @@ async fn token_daemon() {
 		}
 	}
 }
-#[derive(Debug)]
+#[derive(Debug, Clone, Default)]
 struct Device {
 	oauth_id: String,
 	headers: HashMap<String, String>,
@@ -209,13 +209,12 @@ impl Device {
 	}
 }
 
-#[tokio::test]
+#[tokio::test(flavor = "multi_thread", worker_threads = 1)]
 async fn test_oauth_client() {
-	initialize().await;
+	assert!(!OAUTH_CLIENT.read().await.token.is_empty());
 }
 
-#[tokio::test]
+#[tokio::test(flavor = "multi_thread", worker_threads = 1)]
 async fn test_oauth_client_refresh() {
-	initialize().await;
 	OAUTH_CLIENT.write().await.refresh().await.unwrap();
 }
