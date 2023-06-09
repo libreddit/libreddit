@@ -1,4 +1,4 @@
-use std::sync::atomic::AtomicU32;
+use std::sync::atomic::{AtomicU32, Ordering::SeqCst};
 
 use crate::{
 	config::{Config, CONFIG},
@@ -128,8 +128,9 @@ impl InstanceInfo {
 				["Deploy timestamp", &self.deploy_unix_ts.to_string()],
 				["Compile mode", &self.compile_mode],
 				["SFW only", &convert(&self.config.sfw_only)],
-				["Reddit request count", &self.reddit_requests.load(std::sync::atomic::Ordering::SeqCst).to_string()],
-				["Total request count", &self.total_requests.load(std::sync::atomic::Ordering::SeqCst).to_string()],
+				["Disable stats collection", &convert(&self.config.disable_stats_collection)],
+				["Reddit request count", &self.reddit_requests.load(SeqCst).to_string()],
+				["Total request count", &self.total_requests.load(SeqCst).to_string()],
 			])
 			.with_header_row(["Settings"]),
 		);
@@ -163,6 +164,7 @@ impl InstanceInfo {
                 Deploy timestamp: {}\n
                 Compile mode: {}\n
 				SFW only: {:?}\n
+				Disable stats collection: {:?}\n
 				Reddit request count: {}\n
 				Total request count: {}\n
                 Config:\n
@@ -185,8 +187,9 @@ impl InstanceInfo {
 					self.deploy_unix_ts,
 					self.compile_mode,
 					self.config.sfw_only,
-					self.reddit_requests.load(std::sync::atomic::Ordering::SeqCst),
-					self.total_requests.load(std::sync::atomic::Ordering::SeqCst),
+					self.config.disable_stats_collection,
+					self.reddit_requests.load(SeqCst),
+					self.total_requests.load(SeqCst),
 					self.config.banner,
 					self.config.default_hide_awards,
 					self.config.default_theme,
