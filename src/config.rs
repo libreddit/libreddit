@@ -70,7 +70,7 @@ pub struct Config {
 
 	#[serde(rename = "LIBREDDIT_DISABLE_STATS_COLLECTION")]
 	pub(crate) disable_stats_collection: Option<String>,
-  
+
 	#[serde(rename = "LIBREDDIT_PUSHSHIFT_FRONTEND")]
 	pub(crate) pushshift: Option<String>,
 }
