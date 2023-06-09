@@ -6,7 +6,7 @@
 
 ---
 
-**10 second pitch:** Libreddit is a portmanteau of "libre" (meaning freedom) and "Reddit". It is a private front-end like [Invidious](https://github.com/iv-org/invidious) but for Reddit. Browse the coldest takes of [r/unpopularopinion](https://libreddit.spike.codes/r/unpopularopinion) without being [tracked](#reddit).
+**10-second pitch:** Libreddit is a portmanteau of "libre" (meaning freedom) and "Reddit". It is a private front-end like [Invidious](https://github.com/iv-org/invidious) but for Reddit. Browse the coldest takes of [r/unpopularopinion](https://libreddit.spike.codes/r/unpopularopinion) without being [tracked](#reddit).
 
 - 🚀 Fast: written in Rust for blazing-fast speeds and memory safety
 - ☁️ Light: no JavaScript, no ads, no tracking, no bloat
@@ -31,7 +31,7 @@ I appreciate any donations! Your support allows me to continue developing Libred
 
 🔗 **Want to automatically redirect Reddit links to Libreddit? Use [LibRedirect](https://github.com/libredirect/libredirect) or [Privacy Redirect](https://github.com/SimonBrazell/privacy-redirect)!**
 
-[Follow this link](https://github.com/libreddit/libreddit-instances/blob/master/instances.md) for an up-to-date table of instances in markdown format. This list is also available as [a machine-readable JSON](https://github.com/libreddit/libreddit-instances/blob/master/instances.json).
+[Follow this link](https://github.com/libreddit/libreddit-instances/blob/master/instances.md) for an up-to-date table of instances in Markdown format. This list is also available as [a machine-readable JSON](https://github.com/libreddit/libreddit-instances/blob/master/instances.json).
 
 Both files are part of the [libreddit-instances](https://github.com/libreddit/libreddit-instances) repository. To contribute your [self-hosted instance](#deployment) to the list, see the [libreddit-instances README](https://github.com/libreddit/libreddit-instances/blob/master/README.md).
 
@@ -55,7 +55,7 @@ Libreddit currently implements most of Reddit's (signed-out) functionalities but
 
 ## How does it compare to Teddit?
 
-Teddit is another awesome open source project designed to provide an alternative frontend to Reddit. There is no connection between the two and you're welcome to use whichever one you favor. Competition fosters innovation and Teddit's release has motivated me to build Libreddit into an even more polished product.
+Teddit is another awesome open source project designed to provide an alternative frontend to Reddit. There is no connection between the two, and you're welcome to use whichever one you favor. Competition fosters innovation and Teddit's release has motivated me to build Libreddit into an even more polished product.
 
 If you are looking to compare, the biggest differences I have noticed are:
 - Libreddit is themed around Reddit's redesign whereas Teddit appears to stick much closer to Reddit's old design. This may suit some users better as design is always subjective.
@@ -189,7 +189,7 @@ If you're on Linux and none of these methods work for you, you can grab a Linux 
 ## 6) Replit/Heroku/Glitch
 
 > **Warning**
-> These are free hosting options but they are *not* private and will monitor server usage to prevent abuse. If you need a free and easy setup, this method may work best for you.
+> These are free hosting options, but they are *not* private and will monitor server usage to prevent abuse. If you need a free and easy setup, this method may work best for you.
 
 <a href="https://repl.it/github/libreddit/libreddit"><img src="https://repl.it/badge/github/libreddit/libreddit" alt="Run on Repl.it" height="32" /></a>
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/libreddit/libreddit)
@@ -209,33 +209,34 @@ libreddit
 
 Assign a default value for each instance-specific setting by passing environment variables to Libreddit in the format `LIBREDDIT_{X}`. Replace `{X}` with the setting name (see list below) in capital letters.
 
-|Name|Possible values|Default value|Description|
-|-|-|-|-|
-| `SFW_ONLY` | `["on", "off"]` | `off`   | Enables SFW-only mode for the instance, i.e. all NSFW content is filtered. |
-| `BANNER`   | String          | (empty) | Allows the server to set a banner to be displayed. Currently this is displayed on the instance info page. | 
-| `ROBOTS_DISABLE_INDEXING` | `["on", "off"]` | `off` | Disables indexing of the instance by search engines. |
+| Name                      | Possible values | Default value    | Description                                                                                               |
+|---------------------------|-----------------|------------------|-----------------------------------------------------------------------------------------------------------|
+| `SFW_ONLY`                | `["on", "off"]` | `off`            | Enables SFW-only mode for the instance, i.e. all NSFW content is filtered.                                |
+| `BANNER`                  | String          | (empty)          | Allows the server to set a banner to be displayed. Currently this is displayed on the instance info page. | 
+| `ROBOTS_DISABLE_INDEXING` | `["on", "off"]` | `off`            | Disables indexing of the instance by search engines.                                                      |
+| `PUSHSHIFT_FRONTEND`      | String          | `www.unddit.com` | Allows the server to set the Pushshift frontend to be used with "removed" links.                          |
 
 ## Default User Settings
 
 Assign a default value for each user-modifiable setting by passing environment variables to Libreddit in the format `LIBREDDIT_DEFAULT_{Y}`. Replace `{Y}` with the setting name (see list below) in capital letters.
 
-| Name                    | Possible values                                                                                     | Default value |
-|-------------------------|-----------------------------------------------------------------------------------------------------|---------------|
-| `THEME`                 | `["system", "light", "dark", "black", "dracula", "nord", "laserwave", "violet", "gold", "rosebox", "gruvboxdark", "gruvboxlight"]` | `system`      |
-| `FRONT_PAGE`            | `["default", "popular", "all"]`                                                                     | `default`     |
-| `LAYOUT`                | `["card", "clean", "compact"]`                                                                      | `card`        |
-| `WIDE`                  | `["on", "off"]`                                                                                     | `off`         |
-| `POST_SORT`             | `["hot", "new", "top", "rising", "controversial"]`                                                  | `hot`         |
-| `COMMENT_SORT`          | `["confidence", "top", "new", "controversial", "old"]`                                              | `confidence`  |
-| `SHOW_NSFW`             | `["on", "off"]`                                                                                     | `off`         |
-| `BLUR_NSFW`             | `["on", "off"]`                                                                                     | `off`         |
-| `USE_HLS`               | `["on", "off"]`                                                                                     | `off`         |
-| `HIDE_HLS_NOTIFICATION` | `["on", "off"]`                                                                                     | `off`         |
-| `AUTOPLAY_VIDEOS`       | `["on", "off"]`                                                                                     | `off`         |
-| `SUBSCRIPTIONS`         | `+`-delimited list of subreddits (`sub1+sub2+sub3+...`)                                                       | _(none)_          | 
-| `HIDE_AWARDS`           | `["on", "off"]`                                                                                     | `off`
-| `DISABLE_VISIT_REDDIT_CONFIRMATION`     | `["on", "off"]`                                                                                     | `off`         |
-| `DISABLE_STATS_COLLECTION | Any string to disable                                                                             | _(none)_      |
+| Name                                | Possible values                                                                                                                    | Default value |
+|-------------------------------------|------------------------------------------------------------------------------------------------------------------------------------|---------------|
+| `THEME`                             | `["system", "light", "dark", "black", "dracula", "nord", "laserwave", "violet", "gold", "rosebox", "gruvboxdark", "gruvboxlight"]` | `system`      |
+| `FRONT_PAGE`                        | `["default", "popular", "all"]`                                                                                                    | `default`     |
+| `LAYOUT`                            | `["card", "clean", "compact"]`                                                                                                     | `card`        |
+| `WIDE`                              | `["on", "off"]`                                                                                                                    | `off`         |
+| `POST_SORT`                         | `["hot", "new", "top", "rising", "controversial"]`                                                                                 | `hot`         |
+| `COMMENT_SORT`                      | `["confidence", "top", "new", "controversial", "old"]`                                                                             | `confidence`  |
+| `SHOW_NSFW`                         | `["on", "off"]`                                                                                                                    | `off`         |
+| `BLUR_NSFW`                         | `["on", "off"]`                                                                                                                    | `off`         |
+| `USE_HLS`                           | `["on", "off"]`                                                                                                                    | `off`         |
+| `HIDE_HLS_NOTIFICATION`             | `["on", "off"]`                                                                                                                    | `off`         |
+| `AUTOPLAY_VIDEOS`                   | `["on", "off"]`                                                                                                                    | `off`         |
+| `SUBSCRIPTIONS`                     | `+`-delimited list of subreddits (`sub1+sub2+sub3+...`)                                                                            | _(none)_      | 
+| `HIDE_AWARDS`                       | `["on", "off"]`                                                                                                                    | `off`         |
+| `DISABLE_VISIT_REDDIT_CONFIRMATION` | `["on", "off"]`                                                                                                                    | `off`         |
+| `DISABLE_STATS_COLLECTION           |  Any string to disable                                                                                                             | _(none)_      |
 
 You can also configure Libreddit with a configuration file. An example `libreddit.toml` can be found below:
 

@@ -131,6 +131,8 @@ impl InstanceInfo {
 				["Disable stats collection", &convert(&self.config.disable_stats_collection)],
 				["Reddit request count", &self.reddit_requests.load(SeqCst).to_string()],
 				["Total request count", &self.total_requests.load(SeqCst).to_string()],
+				["Pushshift frontend", &convert(&self.config.pushshift)],
+				//TODO: fallback to crate::config::DEFAULT_PUSHSHIFT_FRONTEND
 			])
 			.with_header_row(["Settings"]),
 		);
@@ -167,6 +169,7 @@ impl InstanceInfo {
 				Disable stats collection: {:?}\n
 				Reddit request count: {}\n
 				Total request count: {}\n
+				Pushshift frontend: {:?}\n
                 Config:\n
                     Banner: {:?}\n
                     Hide awards: {:?}\n
@@ -190,6 +193,7 @@ impl InstanceInfo {
 					self.config.disable_stats_collection,
 					self.reddit_requests.load(SeqCst),
 					self.total_requests.load(SeqCst),
+					self.config.pushshift,
 					self.config.banner,
 					self.config.default_hide_awards,
 					self.config.default_theme,

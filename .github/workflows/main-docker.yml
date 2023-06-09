@@ -1,44 +1,58 @@
-name: Docker amd64 Build
+name: Docker Build
 
 on:
   push:
     paths-ignore:
       - "**.md"
     branches:
-      - master
+      - 'main'
+      - 'master'
 
 jobs:
   build-docker:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        config:
+          - { platform: 'linux/amd64', tag: 'latest', dockerfile: 'Dockerfile' }
+          - { platform: 'linux/arm64', tag: 'latest-arm', dockerfile: 'Dockerfile.arm' }
+          - { platform: 'linux/arm/v7', tag: 'latest-armv7', dockerfile: 'Dockerfile.armv7' }
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout sources
+        uses: actions/checkout@v3
+
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
+        uses: docker/setup-qemu-action@v2
         with:
           platforms: all
+
       - name: Set up Docker Buildx
         id: buildx
-        uses: docker/setup-buildx-action@v1
+        uses: docker/setup-buildx-action@v2
         with:
           version: latest
+
       - name: Login to DockerHub
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
+
       - name: Docker Hub Description
         uses: peter-evans/dockerhub-description@v3
+        if: matrix.config.platform == 'linux/amd64'
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
           repository: libreddit/libreddit
+
       - name: Build and push
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v4
         with:
           context: .
-          file: ./Dockerfile
-          platforms: linux/amd64
+          file: ./${{ matrix.config.dockerfile }}
+          platforms: ${{ matrix.config.platform }}
           push: true
-          tags: libreddit/libreddit:latest
+          tags: libreddit/libreddit:${{ matrix.config.tag }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
