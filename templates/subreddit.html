@@ -88,7 +88,8 @@
 				<center>(Content from r/{{ sub.name }} has been filtered)</center>
 			{% endif %}
 			{% if !sub.name.is_empty() && sub.name != "all" && sub.name != "popular" && !sub.name.contains("+") %}
-			<div class="panel" id="subreddit">
+			<details class="panel" id="subreddit" open>
+				<summary id="subreddit_label">Subreddit</summary>
 				{% if sub.wiki %}
 				<div id="top">
 					<div>Posts</div>
@@ -131,7 +132,7 @@
 						</div>
 					</div>
 				</div>
-			</div>
+			</details>
 			<details class="panel" id="sidebar">
 				<summary id="sidebar_label">Sidebar</summary>
 				<div id="sidebar_contents">

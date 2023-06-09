@@ -380,13 +380,17 @@ aside {
 	border-radius: 5px;
 	overflow: hidden;
 }
+#subreddit, #sidebar { min-width: 350px; }
 
 #user *, #subreddit * { text-align: center; }
 
 #user, #sub_meta, #sidebar_contents { padding: 20px; }
 
 #sidebar, #sidebar_contents { margin-top: 10px; }
-#sidebar_label { padding: 10px; }
+#sidebar_label, #subreddit_label {
+	padding: 10px;
+	text-align: left;
+}
 
 #user_icon, #sub_icon {
 	width: 100px;
