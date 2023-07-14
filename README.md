@@ -2,6 +2,9 @@
 
 > An alternative private front-end to Reddit
 
+# ⚠️ SHUT DOWN ⚠️
+## As of July 12th, 2023, Reddit's API changes, that were designed to kill third-party apps and content scrapers who don't pay [large fees](https://www.theverge.com/2023/5/31/23743993/reddit-apollo-client-api-cost), went into effect for projects like Libreddit. [Read the full announcement here.](https://github.com/libreddit/libreddit/issues/840)
+
 ![screenshot](https://i.ibb.co/QYbqTQt/libreddit-rust.png)
 
 ---
