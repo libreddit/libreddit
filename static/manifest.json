@@ -5,6 +5,7 @@
 	"background_color": "#1f1f1f",
 	"description": "An alternative private front-end to Reddit",
 	"theme_color": "#1f1f1f",
+	"start_url": "/",
 	"icons": [
 		{
 			"src": "logo.png",
