@@ -18,6 +18,7 @@ use clap::{Arg, ArgAction, Command};
 
 use futures_lite::FutureExt;
 use hyper::{header::HeaderValue, Body, Request, Response};
+use url::Url;
 
 mod client;
 use client::{canonical_path, proxy};
@@ -309,7 +310,32 @@ async fn main() {
 	// Instance info page
 	app.at("/info").get(|r| instance_info::instance_info(r).boxed());
 	app.at("/info.:extension").get(|r| instance_info::instance_info(r).boxed());
+	
+	// Handle obfuscated share links. 
+	// Note that this still forces the server to follow the share link to get to the post, so maybe this wants to be updated with a warning before it follow it
+	app.at("/r/:sub/s/:id").get(|req: Request<Body>| {
+		Box::pin(async move {
+			let sub = req.param("sub").unwrap_or_default();
+			match req.param("id").as_deref() {
+				
+				// Share link
+				Some(id) if (8..12).contains(&id.len()) => match canonical_path(format!("/r/{}/s/{}", sub, id)).await {
+					Ok(path_opt) => match path_opt {
+						Some(path) => match Url::parse(&path) {
+							Ok(parsed_path) => Ok(redirect(parsed_path.path().to_string())),
+							_ => error(req, "Bad response from reddit.com").await,
+						},	
+						None => error(req, "Post ID is invalid. It may point to a post on a community that has been banned.").await,
+					},
+					Err(e) => error(req, e).await,
+				},
 
+				// Error message for unknown pages
+				_ => error(req, "Nothing here".to_string()).await,
+			}
+		})
+	});
+	
 	app.at("/:id").get(|req: Request<Body>| {
 		Box::pin(async move {
 			match req.param("id").as_deref() {
