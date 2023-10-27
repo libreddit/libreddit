@@ -34,28 +34,25 @@ static CLIENT: Lazy<Client<HttpsConnector<HttpConnector>>> = Lazy::new(|| {
 #[cached(size = 1024, time = 600, result = true)]
 pub async fn canonical_path(path: String) -> Result<Option<String>, String> {
 	let res = reddit_head(path.clone(), true).await?;
+	let status = res.status().as_u16();
 
-	if res.status() == 429 {
-		return Err("Too many requests.".to_string());
-	};
+	match status {
+		429 => return Err("Too many requests.".to_string()),
 
-	// If Reddit responds with a 2xx, then the path is already canonical.
-	if res.status().to_string().starts_with('2') {
-		return Ok(Some(path));
+		// If Reddit responds with a 2xx, then the path is already canonical.
+		200..=299 => return Ok(Some(path)),
+
+		// If Reddit responds with anything other than 3xx (except for the 2xx as
+		// above), return a None.
+		300..=399 => return Ok(None),
+
+		_ => Ok(
+			res
+				.headers()
+				.get(header::LOCATION)
+				.map(|val| percent_encode(val.as_bytes(), CONTROLS).to_string().trim_start_matches(REDDIT_URL_BASE).to_string()),
+		),
 	}
-
-	// If Reddit responds with anything other than 3xx (except for the 2xx as
-	// above), return a None.
-	if !res.status().to_string().starts_with('3') {
-		return Ok(None);
-	}
-
-	Ok(
-		res
-			.headers()
-			.get(header::LOCATION)
-			.map(|val| percent_encode(val.as_bytes(), CONTROLS).to_string().trim_start_matches(REDDIT_URL_BASE).to_string()),
-	)
 }
 
 pub async fn proxy(req: Request<Body>, format: &str) -> Result<Response<Body>, String> {
@@ -136,7 +133,7 @@ fn request(method: &'static Method, path: String, redirect: bool, quarantine: bo
 	let builder = Request::builder()
 		.method(method)
 		.uri(&url)
-		.header("User-Agent", format!("web:libreddit:{}", env!("CARGO_PKG_VERSION")))
+		.header("User-Agent", concat!("web:libreddit:", env!("CARGO_PKG_VERSION")))
 		.header("Host", "www.reddit.com")
 		.header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8")
 		.header("Accept-Encoding", if method == Method::GET { "gzip" } else { "identity" })
@@ -158,7 +155,7 @@ fn request(method: &'static Method, path: String, redirect: bool, quarantine: bo
 				Ok(mut response) => {
 					// Reddit may respond with a 3xx. Decide whether or not to
 					// redirect based on caller params.
-					if response.status().to_string().starts_with('3') {
+					if response.status().is_redirection() {
 						if !redirect {
 							return Ok(response);
 						};
