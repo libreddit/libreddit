@@ -18,7 +18,6 @@ use clap::{Arg, ArgAction, Command};
 
 use futures_lite::FutureExt;
 use hyper::{header::HeaderValue, Body, Request, Response};
-use url::Url;
 
 mod client;
 use client::{canonical_path, proxy};
@@ -320,13 +319,8 @@ async fn main() {
 				
 				// Share link
 				Some(id) if (8..12).contains(&id.len()) => match canonical_path(format!("/r/{}/s/{}", sub, id)).await {
-					Ok(path_opt) => match path_opt {
-						Some(path) => match Url::parse(&path) {
-							Ok(parsed_path) => Ok(redirect(parsed_path.path().to_string())),
-							_ => error(req, "Bad response from reddit.com").await,
-						},	
-						None => error(req, "Post ID is invalid. It may point to a post on a community that has been banned.").await,
-					},
+					Ok(Some(path)) => Ok(redirect(path.split('?').next().unwrap_or_default().to_string())),
+					Ok(None) => error(req, "Post ID is invalid. It may point to a post on a community that has been banned.").await,
 					Err(e) => error(req, e).await,
 				},
 
