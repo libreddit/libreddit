@@ -104,6 +104,8 @@ async fn stream(url: &str, req: &Request<Body>) -> Result<Response<Body>, String
 			rm("x-cdn-server-region");
 			rm("x-reddit-cdn");
 			rm("x-reddit-video-features");
+			rm("Nel");
+			rm("Report-To");
 
 			res
 		})
