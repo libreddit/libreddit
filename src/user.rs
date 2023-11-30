@@ -129,3 +129,10 @@ async fn user(name: &str) -> Result<User, String> {
 		}
 	})
 }
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 1)]
+async fn test_fetching_user() {
+	let user = user("spez").await;
+	assert!(user.is_ok());
+	assert!(user.unwrap().karma > 100);
+}

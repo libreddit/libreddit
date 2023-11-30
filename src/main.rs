@@ -6,6 +6,7 @@
 mod config;
 mod duplicates;
 mod instance_info;
+mod oauth;
 mod post;
 mod search;
 mod settings;
@@ -21,9 +22,12 @@ use hyper::{header::HeaderValue, Body, Request, Response};
 
 mod client;
 use client::{canonical_path, proxy};
+use log::info;
 use once_cell::sync::Lazy;
 use server::RequestExt;
 use utils::{error, redirect, ThemeAssets};
+
+use crate::client::OAUTH_CLIENT;
 
 mod server;
 
@@ -108,6 +112,12 @@ async fn style() -> Result<Response<Body>, String> {
 
 #[tokio::main]
 async fn main() {
+	// Load environment variables
+	_ = dotenvy::dotenv();
+
+	// Initialize logger
+	pretty_env_logger::init();
+
 	let matches = Command::new("Libreddit")
 		.version(env!("CARGO_PKG_VERSION"))
 		.about("Private front-end for Reddit written in Rust ")
@@ -162,10 +172,16 @@ async fn main() {
 
 	// Force evaluation of statics. In instance_info case, we need to evaluate
 	// the timestamp so deploy date is accurate - in config case, we need to
-	// evaluate the configuration to avoid paying penalty at first request.
+	// evaluate the configuration to avoid paying penalty at first request -
+	// in OAUTH case, we need to retrieve the token to avoid paying penalty
+	// at first request
 
+	info!("Evaluating config.");
 	Lazy::force(&config::CONFIG);
+	info!("Evaluating instance info.");
 	Lazy::force(&instance_info::INSTANCE_INFO);
+	info!("Creating OAUTH client.");
+	Lazy::force(&OAUTH_CLIENT);
 
 	// Define default headers (added to all responses)
 	app.default_headers = headers! {
