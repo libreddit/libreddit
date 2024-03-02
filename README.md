@@ -2,11 +2,15 @@
 
 > An alternative private front-end to Reddit
 
+# ⚠️ Why do I get TOO MANY REQUESTS errors? ⚠️
+## As of July 12th, 2023, Libreddit is currently not operational as Reddit's API changes, that were designed to kill third-party apps and content scrapers who don't pay [large fees](https://www.theverge.com/2023/5/31/23743993/reddit-apollo-client-api-cost), went into effect. [Read the full announcement here.](https://github.com/libreddit/libreddit/issues/840)
+## One of the project maintainers is working towards keeping this project alive to some extent: https://github.com/libreddit/libreddit/issues/836
+
 ![screenshot](https://i.ibb.co/QYbqTQt/libreddit-rust.png)
 
 ---
 
-**10 second pitch:** Libreddit is a portmanteau of "libre" (meaning freedom) and "Reddit". It is a private front-end like [Invidious](https://github.com/iv-org/invidious) but for Reddit. Browse the coldest takes of [r/unpopularopinion](https://libreddit.spike.codes/r/unpopularopinion) without being [tracked](#reddit).
+**10-second pitch:** Libreddit is a portmanteau of "libre" (meaning freedom) and "Reddit". It is a private front-end like [Invidious](https://github.com/iv-org/invidious) but for Reddit. Browse the coldest takes of [r/unpopularopinion](https://libreddit.spike.codes/r/unpopularopinion) without being [tracked](#reddit).
 
 - 🚀 Fast: written in Rust for blazing-fast speeds and memory safety
 - ☁️ Light: no JavaScript, no ads, no tracking, no bloat
@@ -31,7 +35,7 @@ I appreciate any donations! Your support allows me to continue developing Libred
 
 🔗 **Want to automatically redirect Reddit links to Libreddit? Use [LibRedirect](https://github.com/libredirect/libredirect) or [Privacy Redirect](https://github.com/SimonBrazell/privacy-redirect)!**
 
-[Follow this link](https://github.com/libreddit/libreddit-instances/blob/master/instances.md) for an up-to-date table of instances in markdown format. This list is also available as [a machine-readable JSON](https://github.com/libreddit/libreddit-instances/blob/master/instances.json).
+[Follow this link](https://github.com/libreddit/libreddit-instances/blob/master/instances.md) for an up-to-date table of instances in Markdown format. This list is also available as [a machine-readable JSON](https://github.com/libreddit/libreddit-instances/blob/master/instances.json).
 
 Both files are part of the [libreddit-instances](https://github.com/libreddit/libreddit-instances) repository. To contribute your [self-hosted instance](#deployment) to the list, see the [libreddit-instances README](https://github.com/libreddit/libreddit-instances/blob/master/README.md).
 
@@ -55,7 +59,7 @@ Libreddit currently implements most of Reddit's (signed-out) functionalities but
 
 ## How does it compare to Teddit?
 
-Teddit is another awesome open source project designed to provide an alternative frontend to Reddit. There is no connection between the two and you're welcome to use whichever one you favor. Competition fosters innovation and Teddit's release has motivated me to build Libreddit into an even more polished product.
+Teddit is another awesome open source project designed to provide an alternative frontend to Reddit. There is no connection between the two, and you're welcome to use whichever one you favor. Competition fosters innovation and Teddit's release has motivated me to build Libreddit into an even more polished product.
 
 If you are looking to compare, the biggest differences I have noticed are:
 - Libreddit is themed around Reddit's redesign whereas Teddit appears to stick much closer to Reddit's old design. This may suit some users better as design is always subjective.
@@ -114,13 +118,21 @@ Results from Google PageSpeed Insights ([Libreddit Report](https://pagespeed.web
 
 For transparency, I hope to describe all the ways Libreddit handles user privacy.
 
-**Logging:** In production (when running the binary, hosting with docker, or using the official instances), Libreddit logs nothing. When debugging (running from source without `--release`), Libreddit logs post IDs fetched to aid with troubleshooting.
+#### Server
 
-**DNS:** Both official domains (`libredd.it` and `libreddit.spike.codes`) use Cloudflare as the DNS resolver. Though, the sites are not proxied through Cloudflare meaning Cloudflare doesn't have access to user traffic.
+* **Logging:** In production (when running the binary, hosting with docker, or using the official instances), Libreddit logs nothing. When debugging (running from source without `--release`), Libreddit logs post IDs fetched to aid with troubleshooting.
 
-**Cookies:** Libreddit uses optional cookies to store any configured settings in [the settings menu](https://libreddit.spike.codes/settings). These are not cross-site cookies and the cookies hold no personal data.
+* **Cookies:** Libreddit uses optional cookies to store any configured settings in [the settings menu](https://libreddit.spike.codes/settings). These are not cross-site cookies and the cookies hold no personal data.
 
-**Hosting:** The official instances are hosted on [Replit](https://replit.com/) which monitors usage to prevent abuse. I can understand if this invalidates certain users' threat models and therefore, self-hosting, using unofficial instances, and browsing through Tor are welcomed.
+#### Official instance (libreddit.spike.codes)
+
+The official instance is hosted at https://libreddit.spike.codes.
+
+* **Server:** The official instance runs a production binary, and thus logs nothing.
+
+* **DNS:** The domain for the official instance uses Cloudflare as the DNS resolver. However, this site is not proxied through Cloudflare, and thus Cloudflare doesn't have access to user traffic.
+
+* **Hosting:** The official instance is hosted on [Replit](https://replit.com/), which monitors usage to prevent abuse. I can understand if this invalidates certain users' threat models, and therefore, self-hosting, using unofficial instances, and browsing through Tor are welcomed.
 
 ---
 
@@ -159,14 +171,29 @@ For ArchLinux users, Libreddit is available from the AUR as [`libreddit-git`](ht
 ```
 yay -S libreddit-git
 ```
+## 4) NetBSD/pkgsrc
 
-## 4) GitHub Releases
+For NetBSD users, Libreddit is available from the official repositories.
+
+```
+pkgin install libreddit
+```
+
+Or, if you prefer to build from source
+
+```
+cd /usr/pkgsrc/libreddit
+make install
+```
+
+## 5) GitHub Releases
 
 If you're on Linux and none of these methods work for you, you can grab a Linux binary from [the newest release](https://github.com/libreddit/libreddit/releases/latest).
 
-## 5) Replit/Heroku/Glitch
+## 6) Replit/Heroku/Glitch
 
-**Note:** These are free hosting options but they are *not* private and will monitor server usage to prevent abuse. If you need a free and easy setup, this method may work best for you.
+> **Warning**
+> These are free hosting options, but they are *not* private and will monitor server usage to prevent abuse. If you need a free and easy setup, this method may work best for you.
 
 <a href="https://repl.it/github/libreddit/libreddit"><img src="https://repl.it/badge/github/libreddit/libreddit" alt="Run on Repl.it" height="32" /></a>
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/libreddit/libreddit)
@@ -186,28 +213,34 @@ libreddit
 
 Assign a default value for each instance-specific setting by passing environment variables to Libreddit in the format `LIBREDDIT_{X}`. Replace `{X}` with the setting name (see list below) in capital letters.
 
-|Name|Possible values|Default value|Description|
-|-|-|-|-|
-| `SFW_ONLY` | `["on", "off"]` | `off` | Enables SFW-only mode for the instance, i.e. all NSFW content is filtered. |
+| Name                      | Possible values | Default value    | Description                                                                                               |
+|---------------------------|-----------------|------------------|-----------------------------------------------------------------------------------------------------------|
+| `SFW_ONLY`                | `["on", "off"]` | `off`            | Enables SFW-only mode for the instance, i.e. all NSFW content is filtered.                                |
+| `BANNER`                  | String          | (empty)          | Allows the server to set a banner to be displayed. Currently this is displayed on the instance info page. | 
+| `ROBOTS_DISABLE_INDEXING` | `["on", "off"]` | `off`            | Disables indexing of the instance by search engines.                                                      |
+| `PUSHSHIFT_FRONTEND`      | String          | `www.unddit.com` | Allows the server to set the Pushshift frontend to be used with "removed" links.                          |
 
 ## Default User Settings
 
 Assign a default value for each user-modifiable setting by passing environment variables to Libreddit in the format `LIBREDDIT_DEFAULT_{Y}`. Replace `{Y}` with the setting name (see list below) in capital letters.
 
-| Name                    | Possible values                                                                                     | Default value |
-|-------------------------|-----------------------------------------------------------------------------------------------------|---------------|
-| `THEME`                 | `["system", "light", "dark", "black", "dracula", "nord", "laserwave", "violet", "gold", "rosebox", "gruvboxdark", "gruvboxlight"]` | `system`      |
-| `FRONT_PAGE`            | `["default", "popular", "all"]`                                                                     | `default`     |
-| `LAYOUT`                | `["card", "clean", "compact"]`                                                                      | `card`        |
-| `WIDE`                  | `["on", "off"]`                                                                                     | `off`         |
-| `POST_SORT`             | `["hot", "new", "top", "rising", "controversial"]`                                                  | `hot`         |
-| `COMMENT_SORT`          | `["confidence", "top", "new", "controversial", "old"]`                                              | `confidence`  |
-| `SHOW_NSFW`             | `["on", "off"]`                                                                                     | `off`         |
-| `BLUR_NSFW`             | `["on", "off"]`                                                                                     | `off`         |
-| `USE_HLS`               | `["on", "off"]`                                                                                     | `off`         |
-| `HIDE_HLS_NOTIFICATION` | `["on", "off"]`                                                                                     | `off`         |
-| `AUTOPLAY_VIDEOS`       | `["on", "off"]`                                                                                     | `off`         |
-| `FIXED_NAVBAR`          | `["on", "off"]`                                                                                     | `on`          |
+| Name                                | Possible values                                                                                                                    | Default value |
+|-------------------------------------|------------------------------------------------------------------------------------------------------------------------------------|---------------|
+| `THEME`                             | `["system", "light", "dark", "black", "dracula", "nord", "laserwave", "violet", "gold", "rosebox", "gruvboxdark", "gruvboxlight"]` | `system`      |
+| `FRONT_PAGE`                        | `["default", "popular", "all"]`                                                                                                    | `default`     |
+| `LAYOUT`                            | `["card", "clean", "compact"]`                                                                                                     | `card`        |
+| `WIDE`                              | `["on", "off"]`                                                                                                                    | `off`         |
+| `POST_SORT`                         | `["hot", "new", "top", "rising", "controversial"]`                                                                                 | `hot`         |
+| `COMMENT_SORT`                      | `["confidence", "top", "new", "controversial", "old"]`                                                                             | `confidence`  |
+| `SHOW_NSFW`                         | `["on", "off"]`                                                                                                                    | `off`         |
+| `BLUR_NSFW`                         | `["on", "off"]`                                                                                                                    | `off`         |
+| `USE_HLS`                           | `["on", "off"]`                                                                                                                    | `off`         |
+| `HIDE_HLS_NOTIFICATION`             | `["on", "off"]`                                                                                                                    | `off`         |
+| `AUTOPLAY_VIDEOS`                   | `["on", "off"]`                                                                                                                    | `off`         |
+| `SUBSCRIPTIONS`                     | `+`-delimited list of subreddits (`sub1+sub2+sub3+...`)                                                                            | _(none)_      | 
+| `HIDE_AWARDS`                       | `["on", "off"]`                                                                                                                    | `off`         |
+| `DISABLE_VISIT_REDDIT_CONFIRMATION` | `["on", "off"]`                                                                                                                    | `off`         |
+| `FIXED_NAVBAR`                      | `["on", "off"]`                                                                                                                    | `on`          |
 
 You can also configure Libreddit with a configuration file. An example `libreddit.toml` can be found below:
 
@@ -228,11 +261,12 @@ LIBREDDIT_DEFAULT_WIDE=on LIBREDDIT_DEFAULT_THEME=dark libreddit -r
 
 ## Proxying using NGINX
 
-**NOTE** If you're [proxying Libreddit through an NGINX Reverse Proxy](https://github.com/libreddit/libreddit/issues/122#issuecomment-782226853), add
-```nginx
-proxy_http_version 1.1;
-```
-to your NGINX configuration file above your `proxy_pass` line.
+> **Note**
+> If you're [proxying Libreddit through an NGINX Reverse Proxy](https://github.com/libreddit/libreddit/issues/122#issuecomment-782226853), add
+> ```nginx
+> proxy_http_version 1.1;
+> ```
+> to your NGINX configuration file above your `proxy_pass` line.
 
 ## systemd
 

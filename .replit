@@ -1,2 +1,2 @@
-run = "while :; do set -ex; curl -o./libreddit -fsSL -- https://github.com/libreddit/libreddit/releases/latest/download/libreddit ; chmod +x libreddit; set +e; ./libreddit -H 63115200; sleep 1; done"
+run = "while :; do set -ex; nix-env -iA nixpkgs.unzip; curl -o./libreddit.zip -fsSL -- https://nightly.link/libreddit/libreddit/workflows/main-rust/master/libreddit.zip; unzip -n libreddit.zip; mv target/x86_64-unknown-linux-gnu/release/libreddit .; chmod +x libreddit; set +e; ./libreddit -H 63115200; sleep 1; done"
 language = "bash"

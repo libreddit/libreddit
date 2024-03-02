@@ -5,6 +5,7 @@
 // Reference local files
 mod config;
 mod duplicates;
+mod instance_info;
 mod post;
 mod search;
 mod settings;
@@ -20,6 +21,7 @@ use hyper::{header::HeaderValue, Body, Request, Response};
 
 mod client;
 use client::{canonical_path, proxy};
+use once_cell::sync::Lazy;
 use server::RequestExt;
 use utils::{error, redirect, ThemeAssets};
 
@@ -158,6 +160,13 @@ async fn main() {
 	// Begin constructing a server
 	let mut app = server::Server::new();
 
+	// Force evaluation of statics. In instance_info case, we need to evaluate
+	// the timestamp so deploy date is accurate - in config case, we need to
+	// evaluate the configuration to avoid paying penalty at first request.
+
+	Lazy::force(&config::CONFIG);
+	Lazy::force(&instance_info::INSTANCE_INFO);
+
 	// Define default headers (added to all responses)
 	app.default_headers = headers! {
 		"Referrer-Policy" => "no-referrer",
@@ -177,9 +186,21 @@ async fn main() {
 	app
 		.at("/manifest.json")
 		.get(|_| resource(include_str!("../static/manifest.json"), "application/json", false).boxed());
-	app
-		.at("/robots.txt")
-		.get(|_| resource("User-agent: *\nDisallow: /u/\nDisallow: /user/", "text/plain", true).boxed());
+	app.at("/robots.txt").get(|_| {
+		resource(
+			if match config::get_setting("LIBREDDIT_ROBOTS_DISABLE_INDEXING") {
+				Some(val) => val == "on",
+				None => false,
+			} {
+				"User-agent: *\nDisallow: /"
+			} else {
+				"User-agent: *\nDisallow: /u/\nDisallow: /user/"
+			},
+			"text/plain",
+			true,
+		)
+		.boxed()
+	});
 	app.at("/favicon.ico").get(|_| favicon().boxed());
 	app.at("/logo.png").get(|_| pwa_logo().boxed());
 	app.at("/Inter.var.woff2").get(|_| font().boxed());
@@ -284,6 +305,10 @@ async fn main() {
 
 	// Handle about pages
 	app.at("/about").get(|req| error(req, "About pages aren't added yet".to_string()).boxed());
+
+	// Instance info page
+	app.at("/info").get(|r| instance_info::instance_info(r).boxed());
+	app.at("/info.:extension").get(|r| instance_info::instance_info(r).boxed());
 
 	app.at("/:id").get(|req: Request<Body>| {
 		Box::pin(async move {

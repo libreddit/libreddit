@@ -3,7 +3,7 @@
 use crate::client::json;
 use crate::server::RequestExt;
 use crate::subreddit::{can_access_quarantine, quarantine};
-use crate::utils::{error, filter_posts, get_filters, nsfw_landing, parse_post, setting, template, Post, Preferences};
+use crate::utils::{error, filter_posts, get_filters, nsfw_landing, parse_post, template, Post, Preferences};
 
 use askama::Template;
 use hyper::{Body, Request, Response};
@@ -67,11 +67,12 @@ pub async fn item(req: Request<Body>) -> Result<Response<Body>, String> {
 		Ok(response) => {
 			let post = parse_post(&response[0]["data"]["children"][0]).await;
 
+			let req_url = req.uri().to_string();
 			// Return landing page if this post if this Reddit deems this post
 			// NSFW, but we have also disabled the display of NSFW content
-			// or if the instance is SFW-only.
-			if post.nsfw && (setting(&req, "show_nsfw") != "on" || crate::utils::sfw_only()) {
-				return Ok(nsfw_landing(req).await.unwrap_or_default());
+			// or if the instance is SFW-only
+			if post.nsfw && crate::utils::should_be_nsfw_gated(&req, &req_url) {
+				return Ok(nsfw_landing(req, req_url).await.unwrap_or_default());
 			}
 
 			let filters = get_filters(&req);
@@ -195,14 +196,13 @@ pub async fn item(req: Request<Body>) -> Result<Response<Body>, String> {
 					after = response[1]["data"]["after"].as_str().unwrap_or_default().to_string();
 				}
 			}
-			let url = req.uri().to_string();
 
 			template(DuplicatesTemplate {
 				params: DuplicatesParams { before, after, sort },
 				post,
 				duplicates,
 				prefs: Preferences::new(&req),
-				url,
+				url: req_url,
 				num_posts_filtered,
 				all_posts_filtered,
 			})
@@ -210,9 +210,9 @@ pub async fn item(req: Request<Body>) -> Result<Response<Body>, String> {
 
 		// Process error.
 		Err(msg) => {
-			if msg == "quarantined" {
+			if msg == "quarantined" || msg == "gated" {
 				let sub = req.param("sub").unwrap_or_default();
-				quarantine(req, sub)
+				quarantine(req, sub, msg)
 			} else {
 				error(req, msg).await
 			}

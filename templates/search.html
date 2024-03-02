@@ -29,7 +29,7 @@
 						&rarr;
 					</svg>
 				</button>
-		</form>
+ 		</form>
 
 		{% if !is_filtered %}
 		{% if subreddits.len() > 0 || params.typed == "sr_user" %}
@@ -99,13 +99,13 @@
 		{% if params.typed != "sr_user" %}
 		<footer>
 			{% if params.before != "" %}
-			<a href="?q={{ params.q }}&restrict_sr={{ params.restrict_sr }}
+			<a href="?q={{ params.q|safe }}&restrict_sr={{ params.restrict_sr }}
 				&sort={{ params.sort }}&t={{ params.t }}
 				&before={{ params.before }}" accesskey="P">PREV</a>
 			{% endif %}
 
 			{% if params.after != "" %}
-			<a href="?q={{ params.q }}&restrict_sr={{ params.restrict_sr }}
+			<a href="?q={{ params.q|safe }}&restrict_sr={{ params.restrict_sr }}
 				&sort={{ params.sort }}&t={{ params.t }}
 				&after={{ params.after }}" accesskey="N">NEXT</a>
 			{% endif %}

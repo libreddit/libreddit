@@ -1,3 +1,4 @@
+use crate::config::get_setting;
 //
 // CRATES
 //
@@ -5,6 +6,7 @@ use crate::{client::json, server::RequestExt};
 use askama::Template;
 use cookie::Cookie;
 use hyper::{Body, Request, Response};
+use once_cell::sync::Lazy;
 use regex::Regex;
 use rust_embed::RustEmbed;
 use serde_json::Value;
@@ -94,6 +96,61 @@ pub struct Author {
 	pub name: String,
 	pub flair: Flair,
 	pub distinguished: String,
+}
+
+pub struct Poll {
+	pub poll_options: Vec<PollOption>,
+	pub voting_end_timestamp: (String, String),
+	pub total_vote_count: u64,
+}
+
+impl Poll {
+	pub fn parse(poll_data: &Value) -> Option<Self> {
+		poll_data.as_object()?;
+
+		let total_vote_count = poll_data["total_vote_count"].as_u64()?;
+		// voting_end_timestamp is in the format of milliseconds
+		let voting_end_timestamp = time(poll_data["voting_end_timestamp"].as_f64()? / 1000.0);
+		let poll_options = PollOption::parse(&poll_data["options"])?;
+
+		Some(Self {
+			poll_options,
+			total_vote_count,
+			voting_end_timestamp,
+		})
+	}
+
+	pub fn most_votes(&self) -> u64 {
+		self.poll_options.iter().filter_map(|o| o.vote_count).max().unwrap_or(0)
+	}
+}
+
+pub struct PollOption {
+	pub id: u64,
+	pub text: String,
+	pub vote_count: Option<u64>,
+}
+
+impl PollOption {
+	pub fn parse(options: &Value) -> Option<Vec<Self>> {
+		Some(
+			options
+				.as_array()?
+				.iter()
+				.filter_map(|option| {
+					// For each poll option
+
+					// we can't just use as_u64() because "id": String("...") and serde would parse it as None
+					let id = option["id"].as_str()?.parse::<u64>().ok()?;
+					let text = option["text"].as_str()?.to_owned();
+					let vote_count = option["vote_count"].as_u64();
+
+					// Construct PollOption items
+					Some(Self { id, text, vote_count })
+				})
+				.collect::<Vec<Self>>(),
+		)
+	}
 }
 
 // Post flags with nsfw and stickied
@@ -204,10 +261,17 @@ impl GalleryMedia {
 				// For each image in gallery
 				let media_id = item["media_id"].as_str().unwrap_or_default();
 				let image = &metadata[media_id]["s"];
+				let image_type = &metadata[media_id]["m"];
+
+				let url = if image_type == "image/gif" {
+					image["gif"].as_str().unwrap_or_default()
+				} else {
+					image["u"].as_str().unwrap_or_default()
+				};
 
 				// Construct gallery items
 				Self {
-					url: format_url(image["u"].as_str().unwrap_or_default()),
+					url: format_url(url),
 					width: image["x"].as_i64().unwrap_or_default(),
 					height: image["y"].as_i64().unwrap_or_default(),
 					caption: item["caption"].as_str().unwrap_or_default().to_string(),
@@ -226,6 +290,7 @@ pub struct Post {
 	pub body: String,
 	pub author: Author,
 	pub permalink: String,
+	pub poll: Option<Poll>,
 	pub score: (String, String),
 	pub upvote_ratio: i64,
 	pub post_type: String,
@@ -335,6 +400,7 @@ impl Post {
 					stickied: data["stickied"].as_bool().unwrap_or_default() || data["pinned"].as_bool().unwrap_or_default(),
 				},
 				permalink: val(post, "permalink"),
+				poll: Poll::parse(&data["poll_data"]),
 				rel_time,
 				created,
 				num_duplicates: post["data"]["num_duplicates"].as_u64().unwrap_or(0),
@@ -370,6 +436,7 @@ pub struct Comment {
 	pub awards: Awards,
 	pub collapsed: bool,
 	pub is_filtered: bool,
+	pub more_count: i64,
 	pub prefs: Preferences,
 }
 
@@ -506,6 +573,7 @@ pub struct Preferences {
 	pub use_hls: String,
 	pub autoplay_videos: String,
 	pub fixed_navbar: String,
+	pub disable_visit_reddit_confirmation: String,
 	pub comment_sort: String,
 	pub post_sort: String,
 	pub subscriptions: Vec<String>,
@@ -530,21 +598,22 @@ impl Preferences {
 		}
 		Self {
 			available_themes: themes,
-			theme: setting(&req, "theme"),
-			front_page: setting(&req, "front_page"),
-			layout: setting(&req, "layout"),
-			wide: setting(&req, "wide"),
-			show_nsfw: setting(&req, "show_nsfw"),
-			blur_nsfw: setting(&req, "blur_nsfw"),
-			use_hls: setting(&req, "use_hls"),
-			hide_hls_notification: setting(&req, "hide_hls_notification"),
-			autoplay_videos: setting(&req, "autoplay_videos"),
-			fixed_navbar: setting_or_default(&req, "fixed_navbar", "on".to_string()),
-			comment_sort: setting(&req, "comment_sort"),
-			post_sort: setting(&req, "post_sort"),
-			subscriptions: setting(&req, "subscriptions").split('+').map(String::from).filter(|s| !s.is_empty()).collect(),
-			filters: setting(&req, "filters").split('+').map(String::from).filter(|s| !s.is_empty()).collect(),
-			hide_awards: setting(&req, "hide_awards"),
+			theme: setting(req, "theme"),
+			front_page: setting(req, "front_page"),
+			layout: setting(req, "layout"),
+			wide: setting(req, "wide"),
+			show_nsfw: setting(req, "show_nsfw"),
+			blur_nsfw: setting(req, "blur_nsfw"),
+			use_hls: setting(req, "use_hls"),
+			hide_hls_notification: setting(req, "hide_hls_notification"),
+			autoplay_videos: setting(req, "autoplay_videos"),
+      fixed_navbar: setting_or_default(&req, "fixed_navbar", "on".to_string()),
+			disable_visit_reddit_confirmation: setting(req, "disable_visit_reddit_confirmation"),
+			comment_sort: setting(req, "comment_sort"),
+			post_sort: setting(req, "post_sort"),
+			subscriptions: setting(req, "subscriptions").split('+').map(String::from).filter(|s| !s.is_empty()).collect(),
+			filters: setting(req, "filters").split('+').map(String::from).filter(|s| !s.is_empty()).collect(),
+			hide_awards: setting(req, "hide_awards"),
 		}
 	}
 }
@@ -592,9 +661,12 @@ pub async fn parse_post(post: &serde_json::Value) -> Post {
 
 	let permalink = val(post, "permalink");
 
+	let poll = Poll::parse(&post["data"]["poll_data"]);
+
 	let body = if val(post, "removed_by_category") == "moderator" {
 		format!(
-			"<div class=\"md\"><p>[removed] — <a href=\"https://www.unddit.com{}\">view removed post</a></p></div>",
+			"<div class=\"md\"><p>[removed] — <a href=\"https://{}{}\">view removed post</a></p></div>",
+			get_setting("LIBREDDIT_PUSHSHIFT_FRONTEND").unwrap_or(String::from(crate::config::DEFAULT_PUSHSHIFT_FRONTEND)),
 			permalink
 		)
 	} else {
@@ -622,6 +694,7 @@ pub async fn parse_post(post: &serde_json::Value) -> Post {
 			distinguished: val(post, "distinguished"),
 		},
 		permalink,
+		poll,
 		score: format_num(score),
 		upvote_ratio: ratio as i64,
 		post_type,
@@ -719,6 +792,21 @@ pub async fn catch_random(sub: &str, additional: &str) -> Result<Response<Body>,
 	}
 }
 
+static REGEX_URL_WWW: Lazy<Regex> = Lazy::new(|| Regex::new(r"https://www\.reddit\.com/(.*)").unwrap());
+static REGEX_URL_OLD: Lazy<Regex> = Lazy::new(|| Regex::new(r"https://old\.reddit\.com/(.*)").unwrap());
+static REGEX_URL_NP: Lazy<Regex> = Lazy::new(|| Regex::new(r"https://np\.reddit\.com/(.*)").unwrap());
+static REGEX_URL_PLAIN: Lazy<Regex> = Lazy::new(|| Regex::new(r"https://reddit\.com/(.*)").unwrap());
+static REGEX_URL_VIDEOS: Lazy<Regex> = Lazy::new(|| Regex::new(r"https://v\.redd\.it/(.*)/DASH_([0-9]{2,4}(\.mp4|$|\?source=fallback))").unwrap());
+static REGEX_URL_VIDEOS_HLS: Lazy<Regex> = Lazy::new(|| Regex::new(r"https://v\.redd\.it/(.+)/(HLSPlaylist\.m3u8.*)$").unwrap());
+static REGEX_URL_IMAGES: Lazy<Regex> = Lazy::new(|| Regex::new(r"https://i\.redd\.it/(.*)").unwrap());
+static REGEX_URL_THUMBS_A: Lazy<Regex> = Lazy::new(|| Regex::new(r"https://a\.thumbs\.redditmedia\.com/(.*)").unwrap());
+static REGEX_URL_THUMBS_B: Lazy<Regex> = Lazy::new(|| Regex::new(r"https://b\.thumbs\.redditmedia\.com/(.*)").unwrap());
+static REGEX_URL_EMOJI: Lazy<Regex> = Lazy::new(|| Regex::new(r"https://emoji\.redditmedia\.com/(.*)/(.*)").unwrap());
+static REGEX_URL_PREVIEW: Lazy<Regex> = Lazy::new(|| Regex::new(r"https://preview\.redd\.it/(.*)").unwrap());
+static REGEX_URL_EXTERNAL_PREVIEW: Lazy<Regex> = Lazy::new(|| Regex::new(r"https://external\-preview\.redd\.it/(.*)").unwrap());
+static REGEX_URL_STYLES: Lazy<Regex> = Lazy::new(|| Regex::new(r"https://styles\.redditmedia\.com/(.*)").unwrap());
+static REGEX_URL_STATIC_MEDIA: Lazy<Regex> = Lazy::new(|| Regex::new(r"https://www\.redditstatic\.com/(.*)").unwrap());
+
 // Direct urls to proxy if proxy is enabled
 pub fn format_url(url: &str) -> String {
 	if url.is_empty() || url == "self" || url == "default" || url == "nsfw" || url == "spoiler" {
@@ -727,13 +815,11 @@ pub fn format_url(url: &str) -> String {
 		Url::parse(url).map_or(url.to_string(), |parsed| {
 			let domain = parsed.domain().unwrap_or_default();
 
-			let capture = |regex: &str, format: &str, segments: i16| {
-				Regex::new(regex).map_or(String::new(), |re| {
-					re.captures(url).map_or(String::new(), |caps| match segments {
-						1 => [format, &caps[1]].join(""),
-						2 => [format, &caps[1], "/", &caps[2]].join(""),
-						_ => String::new(),
-					})
+			let capture = |regex: &Regex, format: &str, segments: i16| {
+				regex.captures(url).map_or(String::new(), |caps| match segments {
+					1 => [format, &caps[1]].join(""),
+					2 => [format, &caps[1], "/", &caps[2]].join(""),
+					_ => String::new(),
 				})
 			};
 
@@ -759,44 +845,46 @@ pub fn format_url(url: &str) -> String {
 			}
 
 			match domain {
-				"www.reddit.com" => capture(r"https://www\.reddit\.com/(.*)", "/", 1),
-				"old.reddit.com" => capture(r"https://old\.reddit\.com/(.*)", "/", 1),
-				"np.reddit.com" => capture(r"https://np\.reddit\.com/(.*)", "/", 1),
-				"reddit.com" => capture(r"https://reddit\.com/(.*)", "/", 1),
-				"v.redd.it" => chain!(
-					capture(r"https://v\.redd\.it/(.*)/DASH_([0-9]{2,4}(\.mp4|$|\?source=fallback))", "/vid/", 2),
-					capture(r"https://v\.redd\.it/(.+)/(HLSPlaylist\.m3u8.*)$", "/hls/", 2)
-				),
-				"i.redd.it" => capture(r"https://i\.redd\.it/(.*)", "/img/", 1),
-				"a.thumbs.redditmedia.com" => capture(r"https://a\.thumbs\.redditmedia\.com/(.*)", "/thumb/a/", 1),
-				"b.thumbs.redditmedia.com" => capture(r"https://b\.thumbs\.redditmedia\.com/(.*)", "/thumb/b/", 1),
-				"emoji.redditmedia.com" => capture(r"https://emoji\.redditmedia\.com/(.*)/(.*)", "/emoji/", 2),
-				"preview.redd.it" => capture(r"https://preview\.redd\.it/(.*)", "/preview/pre/", 1),
-				"external-preview.redd.it" => capture(r"https://external\-preview\.redd\.it/(.*)", "/preview/external-pre/", 1),
-				"styles.redditmedia.com" => capture(r"https://styles\.redditmedia\.com/(.*)", "/style/", 1),
-				"www.redditstatic.com" => capture(r"https://www\.redditstatic\.com/(.*)", "/static/", 1),
+				"www.reddit.com" => capture(&REGEX_URL_WWW, "/", 1),
+				"old.reddit.com" => capture(&REGEX_URL_OLD, "/", 1),
+				"np.reddit.com" => capture(&REGEX_URL_NP, "/", 1),
+				"reddit.com" => capture(&REGEX_URL_PLAIN, "/", 1),
+				"v.redd.it" => chain!(capture(&REGEX_URL_VIDEOS, "/vid/", 2), capture(&REGEX_URL_VIDEOS_HLS, "/hls/", 2)),
+				"i.redd.it" => capture(&REGEX_URL_IMAGES, "/img/", 1),
+				"a.thumbs.redditmedia.com" => capture(&REGEX_URL_THUMBS_A, "/thumb/a/", 1),
+				"b.thumbs.redditmedia.com" => capture(&REGEX_URL_THUMBS_B, "/thumb/b/", 1),
+				"emoji.redditmedia.com" => capture(&REGEX_URL_EMOJI, "/emoji/", 2),
+				"preview.redd.it" => capture(&REGEX_URL_PREVIEW, "/preview/pre/", 1),
+				"external-preview.redd.it" => capture(&REGEX_URL_EXTERNAL_PREVIEW, "/preview/external-pre/", 1),
+				"styles.redditmedia.com" => capture(&REGEX_URL_STYLES, "/style/", 1),
+				"www.redditstatic.com" => capture(&REGEX_URL_STATIC_MEDIA, "/static/", 1),
 				_ => url.to_string(),
 			}
 		})
 	}
 }
 
+static REDDIT_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r#"href="(https|http|)://(www\.|old\.|np\.|amp\.|)(reddit\.com|redd\.it)/"#).unwrap());
+static REDDIT_PREVIEW_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r"https://external-preview\.redd\.it(.*)[^?]").unwrap());
+
 // Rewrite Reddit links to Libreddit in body of text
 pub fn rewrite_urls(input_text: &str) -> String {
-	let text1 = Regex::new(r#"href="(https|http|)://(www\.|old\.|np\.|amp\.|)(reddit\.com|redd\.it)/"#)
-		.map_or(String::new(), |re| re.replace_all(input_text, r#"href="/"#).to_string())
-		// Remove (html-encoded) "\" from URLs.
-		.replace("%5C", "")
-		.replace('\\', "");
+	let text1 =
+		// Rewrite Reddit links to Libreddit
+		REDDIT_REGEX.replace_all(input_text, r#"href="/"#)
+			.to_string()
+			// Remove (html-encoded) "\" from URLs.
+			.replace("%5C", "")
+			.replace('\\', "");
 
 	// Rewrite external media previews to Libreddit
-	Regex::new(r"https://external-preview\.redd\.it(.*)[^?]").map_or(String::new(), |re| {
-		if re.is_match(&text1) {
-			re.replace_all(&text1, format_url(re.find(&text1).map(|x| x.as_str()).unwrap_or_default())).to_string()
-		} else {
-			text1
-		}
-	})
+	if REDDIT_PREVIEW_REGEX.is_match(&text1) {
+		REDDIT_PREVIEW_REGEX
+			.replace_all(&text1, format_url(REDDIT_PREVIEW_REGEX.find(&text1).map(|x| x.as_str()).unwrap_or_default()))
+			.to_string()
+	} else {
+		text1
+	}
 }
 
 // Format vote count to a string that will be displayed.
@@ -817,19 +905,30 @@ pub fn format_num(num: i64) -> (String, String) {
 // Parse a relative and absolute time from a UNIX timestamp
 pub fn time(created: f64) -> (String, String) {
 	let time = OffsetDateTime::from_unix_timestamp(created.round() as i64).unwrap_or(OffsetDateTime::UNIX_EPOCH);
-	let time_delta = OffsetDateTime::now_utc() - time;
+	let now = OffsetDateTime::now_utc();
+	let min = time.min(now);
+	let max = time.max(now);
+	let time_delta = max - min;
 
 	// If the time difference is more than a month, show full date
-	let rel_time = if time_delta > Duration::days(30) {
+	let mut rel_time = if time_delta > Duration::days(30) {
 		time.format(format_description!("[month repr:short] [day] '[year repr:last_two]")).unwrap_or_default()
 	// Otherwise, show relative date/time
 	} else if time_delta.whole_days() > 0 {
-		format!("{}d ago", time_delta.whole_days())
+		format!("{}d", time_delta.whole_days())
 	} else if time_delta.whole_hours() > 0 {
-		format!("{}h ago", time_delta.whole_hours())
+		format!("{}h", time_delta.whole_hours())
 	} else {
-		format!("{}m ago", time_delta.whole_minutes())
+		format!("{}m", time_delta.whole_minutes())
 	};
+
+	if time_delta <= Duration::days(30) {
+		if now < time {
+			rel_time += " left";
+		} else {
+			rel_time += " ago";
+		}
+	}
 
 	(
 		rel_time,
@@ -895,11 +994,21 @@ pub fn sfw_only() -> bool {
 	}
 }
 
+// Determines if a request shoud redirect to a nsfw landing gate.
+pub fn should_be_nsfw_gated(req: &Request<Body>, req_url: &str) -> bool {
+	let sfw_instance = sfw_only();
+	let gate_nsfw = (setting(req, "show_nsfw") != "on") || sfw_instance;
+
+	// Nsfw landing gate should not be bypassed on a sfw only instance,
+	let bypass_gate = !sfw_instance && req_url.contains("&bypass_nsfw_landing");
+
+	gate_nsfw && !bypass_gate
+}
+
 /// Renders the landing page for NSFW content when the user has not enabled
 /// "show NSFW posts" in settings.
-pub async fn nsfw_landing(req: Request<Body>) -> Result<Response<Body>, String> {
+pub async fn nsfw_landing(req: Request<Body>, req_url: String) -> Result<Response<Body>, String> {
 	let res_type: ResourceType;
-	let url = req.uri().to_string();
 
 	// Determine from the request URL if the resource is a subreddit, a user
 	// page, or a post.
@@ -918,7 +1027,7 @@ pub async fn nsfw_landing(req: Request<Body>) -> Result<Response<Body>, String> 
 		res,
 		res_type,
 		prefs: Preferences::new(&req),
-		url,
+		url: req_url,
 	}
 	.render()
 	.unwrap_or_default();

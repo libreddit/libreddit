@@ -4,6 +4,30 @@
 :root {
 	--nsfw: #ff5c5d;
 	--admin: #ea0027;
+
+	/* Reddit redirect warning constants */
+	--popup-red: #ea0027;
+	--popup-black: #111;
+	--popup-text: #fff;
+	--popup-background-1: #0f0f0f;
+	--popup-background-2: #220f0f;
+	--popup-reddit-url: var(--popup-red);
+
+	--popup-background: repeating-linear-gradient(
+		-45deg,
+		var(--popup-background-1),
+		var(--popup-background-1) 50px,
+		var(--popup-background-2) 50px,
+		var(--popup-background-2) 100px
+	);
+
+	--popup-toreddit-background: var(--popup-black);
+	--popup-toreddit-text: var(--popup-red);
+	--popup-goback-background: var(--popup-red);
+	--popup-goback-text: #222;
+	--popup-border: 1px solid var(--popup-red);
+
+	--footer-height: 30px;
 }
 
 @font-face {
@@ -26,6 +50,7 @@
 	--highlighted: #333;
 	--visited: #aaa;
 	--shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+	--popup: #b80a27;
 
 	/* Hint color theme to browser for scrollbar */
 	color-scheme: dark;
@@ -79,6 +104,9 @@ body {
 
 body.fixed_navbar {
 	padding-top: 60px;
+	padding-bottom: var(--footer-height);
+	min-height: calc(100vh - 60px);
+	position: relative;
 }
 
 nav {
@@ -126,12 +154,6 @@ nav #links svg {
 	display: none;
 }
 
-nav #version {
-	opacity: 50%;
-	vertical-align: -2px;
-	margin-right: 10px;
-}
-
 nav #libreddit {
 	vertical-align: -2px;
 }
@@ -141,8 +163,107 @@ nav #libreddit {
 	margin-left: 10px;
 }
 
-#reddit_link {
+.popup {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	overflow: clip;
+	opacity: 0;
+	position: fixed;
+	width: 100vw;
+	height: 100vh;
+	bottom: 0;
+	right: 0;
+	visibility: hidden;
+	transition: all 0.1s ease-in-out;
+	z-index: 2;
+}
+
+/* fallback for firefox esr */
+.popup {
+	background-color: #000000fd;
+}
+
+/* all other browsers */
+@supports ((-webkit-backdrop-filter: none) or (backdrop-filter: none)) {
+	.popup {
+		-webkit-backdrop-filter: blur(.25rem) brightness(15%);
+		backdrop-filter: blur(.25rem) brightness(15%);
+	}
+}
+
+.popup-inner {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	text-align: center;
+	max-width: 600px;
+	max-height: 500px;
+	width: fit-content;
+	height: fit-content;
+	padding: 1rem;
+	background: var(--popup-background);
+	border: var(--popup-border);
+	border-radius: 5px;
+	transition: all 0.1s ease-in-out;
+}
+
+.popup-inner svg {
+	display: unset !important;
+	width: 35%;
+	stroke: none;
+	margin: 1rem;
+}
+
+.popup-inner h1 {
+	color: var(--popup-text);
+	margin: 1.5rem 1.5rem 1rem;
+}
+
+.popup-inner p {
+	color: var(--popup-text);
+}
+
+.popup-inner a {
+	border-radius: 5px;
+	padding: 2%;
+	width: 80%;
+	margin: 0.5rem;
+	cursor: pointer;
+	transition: all 0.1s ease-in-out;
+}
+
+#goback {
+	background: var(--popup-goback-background);
+	color: var(--popup-goback-text);
+}
+
+#goback:not(.selected):hover {
 	opacity: 0.8;
+}
+
+#toreddit {
+	background: var(--popup-toreddit-background);
+	color: var(--popup-toreddit-text);
+	border: 1px solid var(--popup-red);
+}
+
+#toreddit:not(.selected):hover {
+	background: var(--popup-toreddit-text);
+	color: var(--popup-toreddit-background);
+}
+
+.popup:target {
+	visibility: visible;
+	opacity: 1;
+}
+
+#reddit_url {
+	width: 80%;
+	color: var(--popup-reddit-url);
+	font-weight: 600;
+	line-break: anywhere;
+	margin-top: 1rem;
 }
 
 #code {
@@ -155,6 +276,7 @@ main {
 	max-width: 1000px;
 	padding: 10px 20px;
 	margin: 0 auto;
+	padding-bottom: 4em;
 }
 
 .wide main {
@@ -177,16 +299,24 @@ main {
 body > footer {
 	display: flex;
 	justify-content: center;
-	margin: 20px;
+	align-items: center;
+	width: 100%;
+	background: var(--post);
+	position: absolute;
+	bottom: 0;
 }
 
-body > footer > div#sfw-only {
-	color: var(--green);
-	border: 1px solid var(--green);
-	padding: 5px;
+.footer-button {
+	align-items: center;
+	border-radius: .25rem;
 	box-sizing: border-box;
-	border-radius: 5px;
+	color: var(--text);
+	cursor: pointer;
+	display: inline-flex;
+	padding-left: 1em;
+	opacity: 0.8;
 }
+
 /* / Body footer. */
 
 /* Footer in content block. */
@@ -206,6 +336,7 @@ button {
 	background: none;
 	border: none;
 	font-weight: bold;
+	cursor: pointer;
 }
 
 hr {
@@ -256,13 +387,17 @@ aside {
 	border-radius: 5px;
 	overflow: hidden;
 }
+#subreddit, #sidebar { min-width: 350px; }
 
 #user *, #subreddit * { text-align: center; }
 
 #user, #sub_meta, #sidebar_contents { padding: 20px; }
 
 #sidebar, #sidebar_contents { margin-top: 10px; }
-#sidebar_label { padding: 10px; }
+#sidebar_label, #subreddit_label {
+	padding: 10px;
+	text-align: left;
+}
 
 #user_icon, #sub_icon {
 	width: 100px;
@@ -274,7 +409,6 @@ aside {
 }
 
 #user_title, #sub_title {
-	margin: 0 20px;
 	font-size: 20px;
 	font-weight: bold;
 }
@@ -418,6 +552,7 @@ select, #search, #sort_options, #listing_options, #inside, #searchbox > *, #sort
 select {
 	background: var(--outside);
 	transition: 0.2s background;
+	cursor: pointer;
 }
 
 select, #search {
@@ -428,6 +563,10 @@ select, #search {
 	-webkit-appearance: none;
 	-moz-appearance: none;
 	border-radius: 5px 0px 0px 5px;
+}
+
+.commentQuery {
+    background: var(--post);
 }
 
 #searchbox {
@@ -507,14 +646,19 @@ button.submit:hover > svg { stroke: var(--accent); }
 	background: transparent;
 }
 
+#commentQueryForms { 
+  display: flex; 
+  justify-content: space-between;
+}
+
+#allCommentsLink {
+  color: var(--green);
+}
+
 #sort, #search_sort {
 	display: flex;
 	align-items: center;
 	margin-bottom: 20px;
-}
-
-#listing_options {
-	overflow-x: auto;
 }
 
 #sort_options, #listing_options, main > * > footer > a {
@@ -523,7 +667,7 @@ button.submit:hover > svg { stroke: var(--accent); }
 	box-shadow: var(--shadow);
 	background: var(--outside);
 	display: flex;
-	overflow: hidden;
+	overflow-y: hidden;
 }
 
 #sort_options > a, #listing_options > a, main > * > footer > a {
@@ -634,6 +778,7 @@ a.search_subreddit:hover {
 			"post_score post_title  post_thumbnail" 1fr
 			"post_score post_media  post_thumbnail" auto
 			"post_score post_body   post_thumbnail" auto
+			"post_score post_poll   post_thumbnail" auto
 			"post_score post_notification post_thumbnail" auto
 			"post_score post_footer post_thumbnail" auto
 			/ minmax(40px, auto) minmax(0, 1fr) fit-content(min(20%, 152px));
@@ -832,6 +977,44 @@ a.search_subreddit:hover {
 	grid-area: post_body;
 	width: calc(100% - 30px);
 	overflow-wrap: anywhere;
+}
+
+.post_poll {
+	grid-area: post_poll;
+	padding: 5px 15px 5px 12px;
+}
+
+.poll_option {
+	position: relative;
+	margin-right: 15px;
+	margin-top: 14px;
+	z-index: 0;
+	display: flex;
+	align-items: center;
+}
+
+.poll_chart {
+	padding: 14px 0;
+	background-color: var(--accent);
+	opacity: 0.2;
+	border-radius: 5px;
+	z-index: -1;
+	position: absolute;
+}
+
+.poll_option span {
+	margin-left: 8px;
+	color: var(--text);
+}
+
+.poll_option span:nth-of-type(1) {
+	min-width: 10%;
+	font-weight: bold;
+}
+
+.most_voted {
+	opacity: 0.45;
+	width: 100%;
 }
 
 /* Used only for text post preview */
@@ -1245,6 +1428,10 @@ input[type="submit"] {
 	width: 250px;
 	background: var(--highlighted) !important;
 }
+/* Info page */
+.unset {
+	color: lightslategrey;
+}
 
 /* Markdown */
 
@@ -1387,6 +1574,9 @@ td, th {
 
 @media screen and (max-width: 800px) {
 	body.fixed_navbar { padding-top: 120px }
+	body {
+		padding-bottom: var(--footer-height);
+	}
 
 	main {
 		flex-direction: column-reverse;
@@ -1425,17 +1615,21 @@ td, th {
 	#user, #sidebar { margin: 20px 0;	}
 	#logo, #links { margin-bottom: 5px; }
 	#searchbox { width: calc(100vw - 35px); }
+
 }
 
 @media screen and (max-width: 480px) {
 	body.fixed_navbar { padding-top: 100px; }
-	#version { display: none; }
+	body {
+		padding-bottom: var(--footer-height);
+	}
 
 	.post {
 		grid-template: 	"post_header post_header post_thumbnail" auto
 				"post_title  post_title  post_thumbnail" 1fr
 				"post_media  post_media  post_thumbnail" auto
 				"post_body   post_body   post_thumbnail" auto
+				"post_poll   post_poll   post_thumbnail" auto
 				"post_notification post_notification post_thumbnail" auto
 				"post_score  post_footer post_thumbnail" auto
 				/ auto 1fr fit-content(min(20%, 152px));
@@ -1444,6 +1638,10 @@ td, th {
 	.post_score {
 		margin: 5px 0px 20px 15px;
 		padding: 0;
+	}
+
+	.post_poll {
+		padding: 5px 15px 10px 12px;
 	}
 	
 	.compact .post_score { padding: 0; }
@@ -1488,4 +1686,17 @@ td, th {
 	#post_links > li.desktop_item { display: none }
 	#post_links > li.mobile_item { display: auto }
 	.post_footer > p > span#upvoted { display: none }
+
+	.popup {
+		width: auto;
+	}
+
+	.popup-inner {
+		max-width: 80%;
+	}
+
+    #commentQueryForms { 
+      display: initial;
+      justify-content: initial;
+    }
 }

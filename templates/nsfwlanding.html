@@ -19,10 +19,12 @@
         {% if crate::utils::sfw_only() %}
         This instance of Libreddit is SFW-only.</p>
         {% else %}
-        Enable "Show NSFW posts" in <a href="/settings">settings</a> to view this {% if res_type == crate::utils::ResourceType::Subreddit %}subreddit{% else if res_type == crate::utils::ResourceType::User %}user's posts or comments{% else if res_type == crate::utils::ResourceType::Post %}post{% endif %}.
+        Enable "Show NSFW posts" in <a href="/settings">settings</a> to view this {% if res_type == crate::utils::ResourceType::Subreddit %}subreddit{% else if res_type == crate::utils::ResourceType::User %}user's posts or comments{% else if res_type == crate::utils::ResourceType::Post %}post{% endif %}. <br>
+        {% if res_type == crate::utils::ResourceType::Post %} You can also temporarily bypass this gate and view the post by clicking on this <a href="{{url}}&bypass_nsfw_landing">link</a>.{% endif %}
         {% endif %}
     </p>
 </div>
 {% endblock %}
 {% block footer %}
 {% endblock %}
+

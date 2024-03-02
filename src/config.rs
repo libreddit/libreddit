@@ -1,4 +1,5 @@
 use once_cell::sync::Lazy;
+use serde::{Deserialize, Serialize};
 use std::{env::var, fs::read_to_string};
 
 // Waiting for https://github.com/rust-lang/rust/issues/74465 to land, so we
@@ -6,44 +7,69 @@ use std::{env::var, fs::read_to_string};
 //
 // This is the local static that is initialized at runtime (technically at
 // first request) and contains the instance settings.
-static CONFIG: Lazy<Config> = Lazy::new(Config::load);
+pub(crate) static CONFIG: Lazy<Config> = Lazy::new(Config::load);
+
+// This serves as the frontend for the Pushshift API - on removed comments, this URL will
+// be the base of a link, to display removed content (on another site).
+pub(crate) const DEFAULT_PUSHSHIFT_FRONTEND: &str = "www.unddit.com";
 
 /// Stores the configuration parsed from the environment variables and the
 /// config file. `Config::Default()` contains None for each setting.
-#[derive(Default, serde::Deserialize)]
+/// When adding more config settings, add it to `Config::load`,
+/// `get_setting_from_config`, both below, as well as
+/// instance_info::InstanceInfo.to_string(), README.md and app.json.
+#[derive(Default, Serialize, Deserialize, Clone, Debug)]
 pub struct Config {
 	#[serde(rename = "LIBREDDIT_SFW_ONLY")]
-	sfw_only: Option<String>,
+	pub(crate) sfw_only: Option<String>,
 
 	#[serde(rename = "LIBREDDIT_DEFAULT_THEME")]
-	default_theme: Option<String>,
+	pub(crate) default_theme: Option<String>,
 
 	#[serde(rename = "LIBREDDIT_DEFAULT_FRONT_PAGE")]
-	default_front_page: Option<String>,
+	pub(crate) default_front_page: Option<String>,
 
 	#[serde(rename = "LIBREDDIT_DEFAULT_LAYOUT")]
-	default_layout: Option<String>,
+	pub(crate) default_layout: Option<String>,
 
 	#[serde(rename = "LIBREDDIT_DEFAULT_WIDE")]
-	default_wide: Option<String>,
+	pub(crate) default_wide: Option<String>,
 
 	#[serde(rename = "LIBREDDIT_DEFAULT_COMMENT_SORT")]
-	default_comment_sort: Option<String>,
+	pub(crate) default_comment_sort: Option<String>,
 
 	#[serde(rename = "LIBREDDIT_DEFAULT_POST_SORT")]
-	default_post_sort: Option<String>,
+	pub(crate) default_post_sort: Option<String>,
 
 	#[serde(rename = "LIBREDDIT_DEFAULT_SHOW_NSFW")]
-	default_show_nsfw: Option<String>,
+	pub(crate) default_show_nsfw: Option<String>,
 
 	#[serde(rename = "LIBREDDIT_DEFAULT_BLUR_NSFW")]
-	default_blur_nsfw: Option<String>,
+	pub(crate) default_blur_nsfw: Option<String>,
 
 	#[serde(rename = "LIBREDDIT_DEFAULT_USE_HLS")]
-	default_use_hls: Option<String>,
+	pub(crate) default_use_hls: Option<String>,
 
 	#[serde(rename = "LIBREDDIT_DEFAULT_HIDE_HLS_NOTIFICATION")]
-	default_hide_hls_notification: Option<String>,
+	pub(crate) default_hide_hls_notification: Option<String>,
+
+	#[serde(rename = "LIBREDDIT_DEFAULT_HIDE_AWARDS")]
+	pub(crate) default_hide_awards: Option<String>,
+
+	#[serde(rename = "LIBREDDIT_DEFAULT_SUBSCRIPTIONS")]
+	pub(crate) default_subscriptions: Option<String>,
+
+	#[serde(rename = "LIBREDDIT_DEFAULT_DISABLE_VISIT_REDDIT_CONFIRMATION")]
+	pub(crate) default_disable_visit_reddit_confirmation: Option<String>,
+
+	#[serde(rename = "LIBREDDIT_BANNER")]
+	pub(crate) banner: Option<String>,
+
+	#[serde(rename = "LIBREDDIT_ROBOTS_DISABLE_INDEXING")]
+	pub(crate) robots_disable_indexing: Option<String>,
+
+	#[serde(rename = "LIBREDDIT_PUSHSHIFT_FRONTEND")]
+	pub(crate) pushshift: Option<String>,
 }
 
 impl Config {
@@ -58,6 +84,7 @@ impl Config {
 		// environment variables with "LIBREDDIT", then check the config, then if
 		// both are `None`, return a `None` via the `map_or_else` function
 		let parse = |key: &str| -> Option<String> { var(key).ok().map_or_else(|| get_setting_from_config(key, &config), Some) };
+
 		Self {
 			sfw_only: parse("LIBREDDIT_SFW_ONLY"),
 			default_theme: parse("LIBREDDIT_DEFAULT_THEME"),
@@ -70,6 +97,12 @@ impl Config {
 			default_blur_nsfw: parse("LIBREDDIT_DEFAULT_BLUR_NSFW"),
 			default_use_hls: parse("LIBREDDIT_DEFAULT_USE_HLS"),
 			default_hide_hls_notification: parse("LIBREDDIT_DEFAULT_HIDE_HLS"),
+			default_hide_awards: parse("LIBREDDIT_DEFAULT_HIDE_AWARDS"),
+			default_subscriptions: parse("LIBREDDIT_DEFAULT_SUBSCRIPTIONS"),
+			default_disable_visit_reddit_confirmation: parse("LIBREDDIT_DEFAULT_DISABLE_VISIT_REDDIT_CONFIRMATION"),
+			banner: parse("LIBREDDIT_BANNER"),
+			robots_disable_indexing: parse("LIBREDDIT_ROBOTS_DISABLE_INDEXING"),
+			pushshift: parse("LIBREDDIT_PUSHSHIFT_FRONTEND"),
 		}
 	}
 }
@@ -87,6 +120,12 @@ fn get_setting_from_config(name: &str, config: &Config) -> Option<String> {
 		"LIBREDDIT_DEFAULT_USE_HLS" => config.default_use_hls.clone(),
 		"LIBREDDIT_DEFAULT_HIDE_HLS_NOTIFICATION" => config.default_hide_hls_notification.clone(),
 		"LIBREDDIT_DEFAULT_WIDE" => config.default_wide.clone(),
+		"LIBREDDIT_DEFAULT_HIDE_AWARDS" => config.default_hide_awards.clone(),
+		"LIBREDDIT_DEFAULT_SUBSCRIPTIONS" => config.default_subscriptions.clone(),
+		"LIBREDDIT_DEFAULT_DISABLE_VISIT_REDDIT_CONFIRMATION" => config.default_disable_visit_reddit_confirmation.clone(),
+		"LIBREDDIT_BANNER" => config.banner.clone(),
+		"LIBREDDIT_ROBOTS_DISABLE_INDEXING" => config.robots_disable_indexing.clone(),
+		"LIBREDDIT_PUSHSHIFT_FRONTEND" => config.pushshift.clone(),
 		_ => None,
 	}
 }
@@ -98,6 +137,13 @@ pub(crate) fn get_setting(name: &str) -> Option<String> {
 
 #[cfg(test)]
 use {sealed_test::prelude::*, std::fs::write};
+
+#[test]
+fn test_deserialize() {
+	// Must handle empty input
+	let result = toml::from_str::<Config>("");
+	assert!(result.is_ok(), "Error: {}", result.unwrap_err());
+}
 
 #[test]
 #[sealed_test(env = [("LIBREDDIT_SFW_ONLY", "on")])]
@@ -127,4 +173,9 @@ fn test_alt_env_config_precedence() {
 	let config_to_write = r#"LIBREDDIT_DEFAULT_COMMENT_SORT = "best""#;
 	write("libreddit.toml", config_to_write).unwrap();
 	assert_eq!(get_setting("LIBREDDIT_DEFAULT_COMMENT_SORT"), Some("top".into()))
+}
+#[test]
+#[sealed_test(env = [("LIBREDDIT_DEFAULT_SUBSCRIPTIONS", "news+bestof")])]
+fn test_default_subscriptions() {
+	assert_eq!(get_setting("LIBREDDIT_DEFAULT_SUBSCRIPTIONS"), Some("news+bestof".into()));
 }
