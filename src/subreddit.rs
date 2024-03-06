@@ -212,19 +212,23 @@ pub async fn subscriptions_filters(req: Request<Body>) -> Result<Response<Body>,
 	let mut filters = preferences.filters;
 
 	// Retrieve list of posts for these subreddits to extract display names
-	let posts = json(format!("/r/{}/hot.json?raw_json=1", sub), true).await?;
-	let display_lookup: Vec<(String, &str)> = posts["data"]["children"]
-		.as_array()
-		.map(|list| {
-			list
-				.iter()
-				.map(|post| {
-					let display_name = post["data"]["subreddit"].as_str().unwrap_or_default();
-					(display_name.to_lowercase(), display_name)
-				})
-				.collect::<Vec<_>>()
-		})
-		.unwrap_or_default();
+
+	let posts = json(format!("/r/{}/hot.json?raw_json=1", sub), true).await;
+	let display_lookup: Vec<(String, &str)> = match &posts {
+		Ok(posts) => posts["data"]["children"]
+			.as_array()
+			.map(|list| {
+				list
+					.iter()
+					.map(|post| {
+						let display_name = post["data"]["subreddit"].as_str().unwrap_or_default();
+						(display_name.to_lowercase(), display_name)
+					})
+					.collect::<Vec<_>>()
+			})
+			.unwrap_or_default(),
+		Err(_) => vec![],
+	};
 
 	// Find each subreddit name (separated by '+') in sub parameter
 	for part in sub.split('+').filter(|x| x != &"") {
@@ -238,8 +242,12 @@ pub async fn subscriptions_filters(req: Request<Body>) -> Result<Response<Body>,
 		} else {
 			// This subreddit display name isn't known, retrieve it
 			let path: String = format!("/r/{}/about.json?raw_json=1", part);
-			display = json(path, true).await?;
-			display["data"]["display_name"].as_str().ok_or_else(|| "Failed to query subreddit name".to_string())?
+			display = json(path, true).await;
+			match &display {
+				Ok(display) => display["data"]["display_name"].as_str(),
+				Err(_) => None,
+			}
+			.unwrap_or(part)
 		};
 
 		// Modify sub list based on action
