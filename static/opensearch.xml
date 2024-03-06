@@ -1,0 +1,11 @@
+<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/"
+                       xmlns:moz="http://www.mozilla.org/2006/browser/search/">
+  <ShortName>Search Libreddit</ShortName>
+  <Description>Search for whatever you want on Libreddit, awesome Reddit frontend</Description>
+  <InputEncoding>UTF-8</InputEncoding>
+  <Image width="32" height="32" type="image/x-icon">/favicon.ico</Image>
+  <Url type="text/html" template="/search">
+    <Param name="q" value="{searchTerms}"/>
+  </Url>
+  <moz:SearchForm>/search</moz:SearchForm>
+</OpenSearchDescription>
