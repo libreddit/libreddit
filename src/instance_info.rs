@@ -1,3 +1,5 @@
+use std::sync::atomic::{AtomicU32, Ordering::SeqCst};
+
 use crate::{
 	config::{Config, CONFIG},
 	server::RequestExt,
@@ -88,6 +90,8 @@ pub(crate) struct InstanceInfo {
 	deploy_date: String,
 	compile_mode: String,
 	deploy_unix_ts: i64,
+	pub(crate) reddit_requests: AtomicU32,
+	pub(crate) total_requests: AtomicU32,
 	config: Config,
 }
 
@@ -103,6 +107,8 @@ impl InstanceInfo {
 			compile_mode: "Release".into(),
 			deploy_unix_ts: OffsetDateTime::now_local().unwrap_or_else(|_| OffsetDateTime::now_utc()).unix_timestamp(),
 			config: CONFIG.clone(),
+			reddit_requests: AtomicU32::new(0),
+			total_requests: AtomicU32::new(0),
 		}
 	}
 	fn to_table(&self) -> String {
@@ -122,6 +128,9 @@ impl InstanceInfo {
 				["Deploy timestamp", &self.deploy_unix_ts.to_string()],
 				["Compile mode", &self.compile_mode],
 				["SFW only", &convert(&self.config.sfw_only)],
+				["Disable stats collection", &convert(&self.config.disable_stats_collection)],
+				["Reddit request count", &self.reddit_requests.load(SeqCst).to_string()],
+				["Total request count", &self.total_requests.load(SeqCst).to_string()],
 				["Pushshift frontend", &convert(&self.config.pushshift)],
 				//TODO: fallback to crate::config::DEFAULT_PUSHSHIFT_FRONTEND
 			])
@@ -157,6 +166,9 @@ impl InstanceInfo {
                 Deploy timestamp: {}\n
                 Compile mode: {}\n
 				SFW only: {:?}\n
+				Disable stats collection: {:?}\n
+				Reddit request count: {}\n
+				Total request count: {}\n
 				Pushshift frontend: {:?}\n
                 Config:\n
                     Banner: {:?}\n
@@ -178,6 +190,9 @@ impl InstanceInfo {
 					self.deploy_unix_ts,
 					self.compile_mode,
 					self.config.sfw_only,
+					self.config.disable_stats_collection,
+					self.reddit_requests.load(SeqCst),
+					self.total_requests.load(SeqCst),
 					self.config.pushshift,
 					self.config.banner,
 					self.config.default_hide_awards,
