@@ -572,6 +572,7 @@ pub struct Preferences {
 	pub hide_hls_notification: String,
 	pub use_hls: String,
 	pub autoplay_videos: String,
+	pub fixed_navbar: String,
 	pub disable_visit_reddit_confirmation: String,
 	pub comment_sort: String,
 	pub post_sort: String,
@@ -606,6 +607,7 @@ impl Preferences {
 			use_hls: setting(req, "use_hls"),
 			hide_hls_notification: setting(req, "hide_hls_notification"),
 			autoplay_videos: setting(req, "autoplay_videos"),
+      fixed_navbar: setting_or_default(&req, "fixed_navbar", "on".to_string()),
 			disable_visit_reddit_confirmation: setting(req, "disable_visit_reddit_confirmation"),
 			comment_sort: setting(req, "comment_sort"),
 			post_sort: setting(req, "post_sort"),
@@ -765,6 +767,16 @@ pub fn setting(req: &Request<Body>, name: &str) -> String {
 		})
 		.value()
 		.to_string()
+}
+
+// Retrieve the value of a setting by name or the default value
+pub fn setting_or_default(req: &Request<Body>, name: &str, default: String) -> String {
+	let value = setting(req, name);
+	if !value.is_empty() {
+		value
+	} else {
+		default
+	}
 }
 
 // Detect and redirect in the event of a random subreddit
