@@ -20,10 +20,11 @@ use std::{
 	result::Result,
 	str::{from_utf8, Split},
 	string::ToString,
+	sync::atomic::Ordering::SeqCst,
 };
 use time::Duration;
 
-use crate::dbg_msg;
+use crate::{config, dbg_msg, instance_info::INSTANCE_INFO};
 
 type BoxResponse = Pin<Box<dyn Future<Output = Result<Response<Body>, String>> + Send>>;
 
@@ -234,6 +235,11 @@ impl Server {
 					match router.recognize(&format!("/{}{}", req.method().as_str(), path)) {
 						// If a route was configured for this path
 						Ok(found) => {
+							if config::get_setting("LIBREDDIT_DISABLE_STATS_COLLECTION").is_none() {
+								// Add to total_requests count
+								INSTANCE_INFO.total_requests.fetch_add(1, SeqCst);
+							}
+
 							let mut parammed = req;
 							parammed.set_params(found.params().clone());
 
