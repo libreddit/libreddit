@@ -286,6 +286,14 @@ guarantee nginx waits for this service to start. Edit
 Before=nginx.service
 ```
 
+## launchd
+
+If you are on macOS, you can use the launchd service available in `contrib/libreddit.plist`.
+
+Install it with `cp contrib/libreddit.plist ~/Library/LaunchAgents/`.
+
+Load and start it with `launchctl load ~/Library/LaunchAgents/libreddit.plist`.
+
 ## Building
 
 ```
