@@ -2,7 +2,7 @@
 
 > An alternative private front-end to Reddit
 
-# ➡️ Discontinued. Use [Redlib](https://github.com/redlib-org/redlib) instead.
+# ➡️ Rebranded to [Redlib](https://github.com/redlib-org/redlib), where Reddit API workarounds were implemented and development is ongoing.
 
 ## As of July 12th, 2023, Libreddit is currently not operational as Reddit's API changes, that were designed to kill third-party apps and content scrapers who don't pay [large fees](https://www.theverge.com/2023/5/31/23743993/reddit-apollo-client-api-cost), went into effect. [Read the full announcement here.](https://github.com/libreddit/libreddit/issues/840)
 
